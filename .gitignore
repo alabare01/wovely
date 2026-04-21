@@ -22,6 +22,9 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# One-off local scripts (welcome emails, migrations, etc.) — never commit
+/scripts/
+
 # Claude Code — user-local state stays out, project-scoped commands ship with the repo
 .claude/*
 !.claude/commands/
