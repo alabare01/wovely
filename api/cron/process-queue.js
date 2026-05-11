@@ -21,6 +21,17 @@ import { runVisionExtraction } from '../extract-pattern-vision.js';
 export const config = { maxDuration: 300 };
 
 const POSTHOG_HOST = 'https://us.i.posthog.com';
+// A job fails permanently once retry_count reaches this value (so the original
+// attempt + one retry, then status='failed'). Shared by the in-loop catch
+// block and the stuck-in-processing sweep.
+const MAX_RETRY_COUNT = 2;
+// Per-extraction wall-clock ceiling. 60s under Vercel's 300s function cap so
+// the worker has time to write status='failed' cleanly before the runtime
+// kills the function.
+const EXTRACTION_TIMEOUT_MS = 240_000;
+// Stuck-in-processing sweep: rows whose updated_at hasn't moved in this
+// window are treated as orphans (crash / function timeout).
+const STUCK_PROCESSING_WINDOW_MS = 5 * 60 * 1000;
 
 function captureServerEvent({ posthogKey, distinctId, event, properties }) {
   if (!posthogKey || !distinctId) return;
@@ -98,6 +109,45 @@ export default async function handler(req, res) {
     'Content-Type': 'application/json',
   };
 
+  // ── Sweep: rescue rows stuck in 'processing' past the orphan window. ─────
+  // Common causes: function killed by Vercel maxDuration, unhandled crash
+  // between claim and write-back. We bump retry_count; if the bump would
+  // exceed MAX_RETRY_COUNT we mark the row failed rather than looping forever.
+  const stuckCutoff = new Date(Date.now() - STUCK_PROCESSING_WINDOW_MS).toISOString();
+  const stuckListRes = await fetch(
+    `${supabaseUrl}/rest/v1/import_jobs?status=eq.processing&updated_at=lt.${encodeURIComponent(stuckCutoff)}&select=id,retry_count,user_id,file_type`,
+    { headers: supaHeaders }
+  );
+  if (stuckListRes.ok) {
+    const stuck = await stuckListRes.json();
+    if (Array.isArray(stuck) && stuck.length > 0) {
+      let sweptReset = 0;
+      let sweptFailed = 0;
+      for (const row of stuck) {
+        const newRetry = (row.retry_count || 0) + 1;
+        const willFail = newRetry >= MAX_RETRY_COUNT;
+        const body = willFail
+          ? { status: 'failed', retry_count: newRetry, error_message: 'Stuck in processing; max retries exceeded' }
+          : { status: 'pending', retry_count: newRetry };
+        await fetch(`${supabaseUrl}/rest/v1/import_jobs?id=eq.${row.id}`, {
+          method: 'PATCH',
+          headers: { ...supaHeaders, 'Prefer': 'return=minimal' },
+          body: JSON.stringify(body),
+        });
+        if (willFail) sweptFailed++;
+        else sweptReset++;
+      }
+      console.log(`[sweep] rescued ${stuck.length} orphaned processing jobs (reset=${sweptReset}, failed=${sweptFailed})`);
+      logToVercelLogs({
+        supabaseUrl, serviceKey, level: 'warn',
+        message: `[sweep] rescued ${stuck.length} orphaned processing jobs (reset=${sweptReset}, failed=${sweptFailed})`,
+        status_code: 200,
+      });
+    }
+  } else {
+    console.error('[sweep] stuck-list query failed:', stuckListRes.status);
+  }
+
   // Fetch pending rows (oldest first)
   const listRes = await fetch(
     `${supabaseUrl}/rest/v1/import_jobs?status=eq.pending&order=created_at.asc&limit=10&select=*`,
@@ -155,12 +205,26 @@ export default async function handler(req, res) {
       properties: { job_id: claimedJob.id, file_type: claimedJob.file_type, retry_count: claimedJob.retry_count },
     });
 
-    // Run extraction
+    // Run extraction, bounded by EXTRACTION_TIMEOUT_MS. The AbortController
+    // gives a hard wall-clock ceiling so the worker can write status='failed'
+    // cleanly before Vercel's 300s function-kill orphans the row. The
+    // underlying extraction modules do not currently consume `signal`, so the
+    // timeout fires via Promise.race; the in-flight extraction is abandoned
+    // but the function exits on its own when the runtime tears down.
     let result;
+    const extractController = new AbortController();
+    let extractTimer;
+    const timeoutPromise = new Promise((_, reject) => {
+      extractTimer = setTimeout(() => {
+        extractController.abort();
+        reject(new Error(`Extraction timed out after ${Math.floor(EXTRACTION_TIMEOUT_MS / 1000)}s`));
+      }, EXTRACTION_TIMEOUT_MS);
+    });
     try {
+      let extractionPromise;
       if (claimedJob.file_type === 'pdf') {
         if (!claimedJob.raw_text) throw new Error('pdf job missing raw_text');
-        result = await runPdfExtraction({
+        extractionPromise = runPdfExtraction({
           pdfText: claimedJob.raw_text,
           pageCount: null,
           geminiKey,
@@ -168,7 +232,7 @@ export default async function handler(req, res) {
         });
       } else if (claimedJob.file_type === 'image') {
         const dataUri = await fetchImageAsDataUri(claimedJob.file_url);
-        result = await runVisionExtraction({
+        extractionPromise = runVisionExtraction({
           images: [dataUri],
           fileName: claimedJob.file_url.split('/').pop() || 'image',
           geminiKey,
@@ -177,10 +241,11 @@ export default async function handler(req, res) {
       } else {
         throw new Error(`Unknown file_type: ${claimedJob.file_type}`);
       }
+      result = await Promise.race([extractionPromise, timeoutPromise]);
     } catch (extractErr) {
       console.error(`[process-queue] Extraction failed for ${claimedJob.id}: ${extractErr.message}`);
       const newRetryCount = (claimedJob.retry_count || 0) + 1;
-      const willFail = newRetryCount >= 2;
+      const willFail = newRetryCount >= MAX_RETRY_COUNT;
       const updateBody = willFail
         ? { status: 'failed', retry_count: newRetryCount, error_message: extractErr.message.substring(0, 500) }
         : { status: 'pending', retry_count: newRetryCount };
@@ -215,6 +280,8 @@ export default async function handler(req, res) {
       if (willFail) summary.failed++;
       else summary.retried++;
       continue;
+    } finally {
+      clearTimeout(extractTimer);
     }
 
     // Success — mark completed

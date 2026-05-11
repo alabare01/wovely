@@ -78,20 +78,31 @@ export default async function handler(req, res) {
   const jobId = job?.id;
   if (!jobId) return res.status(500).json({ error: "Insert succeeded but no id returned" });
 
-  // Fire-and-forget kick to the worker. keepalive:true lets the request outlive
-  // this function so we can return job_id to the client immediately. We always
-  // attempt the kick when VERCEL_URL is available; if CRON_SECRET is empty here
-  // it will also be empty on the worker side, where the auth check is skipped.
+  // Best-effort awaited kick — AbortController gives a hard 800ms ceiling so a
+  // slow worker can't block the POST response. The worker returns ~immediately
+  // once it has claimed (or determined idle), so the typical kick resolves in
+  // well under that. Failures (timeout, network, non-200) are swallowed: the
+  // cron (post-merge to main) and the next POST will retry the trigger. The
+  // kick is best-effort, not authoritative.
   const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null;
   if (baseUrl) {
+    const kickT0 = Date.now();
+    const kickController = new AbortController();
+    const kickTimer = setTimeout(() => kickController.abort(), 800);
     try {
       const kickHeaders = cronSecret ? { 'Authorization': `Bearer ${cronSecret}` } : {};
-      fetch(`${baseUrl}/api/cron/process-queue`, {
+      const kickRes = await fetch(`${baseUrl}/api/cron/process-queue`, {
         method: 'POST',
         headers: kickHeaders,
-        keepalive: true,
-      }).catch(() => {});
-    } catch {}
+        signal: kickController.signal,
+      });
+      console.log(`[keepalive] kicked worker in ${Date.now() - kickT0}ms (status=${kickRes.status})`);
+    } catch (kickErr) {
+      const reason = kickErr?.name === 'AbortError' ? 'timeout at 800ms' : (kickErr?.message || 'unknown');
+      console.log(`[keepalive] kick failed: ${reason}`);
+    } finally {
+      clearTimeout(kickTimer);
+    }
   }
 
   // Inline log
