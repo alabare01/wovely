@@ -47,7 +47,7 @@ export default async function handler(req, res) {
   const userId = decodeJwtSub(userToken);
   if (!userId) return res.status(401).json({ error: "Invalid token" });
 
-  const { file_url, file_type, raw_text } = req.body || {};
+  const { file_url, file_type, raw_text, cover_image_url } = req.body || {};
   if (!file_url || !file_type) return res.status(400).json({ error: "file_url and file_type required" });
   if (file_type !== 'pdf' && file_type !== 'image') return res.status(400).json({ error: "file_type must be 'pdf' or 'image'" });
   if (file_type === 'pdf' && !raw_text) return res.status(400).json({ error: "raw_text required for pdf jobs" });
@@ -66,6 +66,7 @@ export default async function handler(req, res) {
       file_type,
       file_url,
       raw_text: file_type === 'pdf' ? raw_text : null,
+      cover_image_url: cover_image_url || null,
     }),
   });
   if (!insertRes.ok) {

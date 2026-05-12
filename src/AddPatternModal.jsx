@@ -950,7 +950,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onMinimize,onExtracti
                 const jobRes = await fetch('/api/import-job', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userToken}` },
-                  body: JSON.stringify({ file_url: uploaded.url, file_type: 'pdf', raw_text: pdfText }),
+                  body: JSON.stringify({ file_url: uploaded.url, file_type: 'pdf', raw_text: pdfText, cover_image_url: coverCloudinaryUrl || null }),
                 });
                 if (jobRes.ok) {
                   const { job_id } = await jobRes.json();
@@ -1342,10 +1342,13 @@ const BrowserImport = ({onSave,Btn,Photo}) => {
   );
 };
 
-const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,initialMethod,initialUrl,initialExtracted,minimized,onMinimize,onExpand}) => {
+const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,initialMethod,initialUrl,initialExtracted,initialCoverUrl,minimized,onMinimize,onExpand}) => {
   // initialExtracted (from ImportPill queue completion) is wrapped into pdfHandoff
-  // so PDFUploadForm lands directly on its review stage.
-  const initialHandoff = initialExtracted ? { extracted: initialExtracted, pdfText: "", fileInfo: null, coverUrl: null } : null;
+  // so PDFUploadForm lands directly on its review stage. initialCoverUrl is the
+  // Cloudinary URL the client rendered & uploaded during the original upload
+  // step, threaded back through import_jobs.cover_image_url so the cover
+  // survives the modal-close → queue → pill → re-open round trip.
+  const initialHandoff = initialExtracted ? { extracted: initialExtracted, pdfText: "", fileInfo: null, coverUrl: initialCoverUrl || null } : null;
   const [method,setMethod]=useState(initialExtracted?"pdf":(initialMethod||null)),[closing,setClosing]=useState(false);
   const [pdfHandoff,setPdfHandoff]=useState(initialHandoff);
   const extractingRef=useRef(false);

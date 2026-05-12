@@ -158,7 +158,7 @@ export default function ImportPill({ onTapReview, onTapTryAgain }) {
   const handleTap = () => {
     if (!job) return;
     if (job.status === "completed") {
-      onTapReview?.({ jobId: job.id, fileType: job.file_type, extractedData: job.extracted_data });
+      onTapReview?.({ jobId: job.id, fileType: job.file_type, extractedData: job.extracted_data, coverImageUrl: job.cover_image_url || null });
       dismiss();
       return;
     }
