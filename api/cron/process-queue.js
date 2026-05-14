@@ -158,8 +158,10 @@ export default async function handler(req, res) {
       for (const row of stuck) {
         const newRetry = (row.retry_count || 0) + 1;
         const willFail = newRetry >= MAX_RETRY_COUNT;
+        // current_phase intentionally not set in either branch — preserve the
+        // last phase the row was in so the UI / debugging can see where it died.
         const body = willFail
-          ? { status: 'failed', retry_count: newRetry, error_message: 'Stuck in processing; max retries exceeded' }
+          ? { status: 'failed', retry_count: newRetry, error_message: 'Max retry count exceeded' }
           : { status: 'pending', retry_count: newRetry };
         await fetch(`${supabaseUrl}/rest/v1/import_jobs?id=eq.${row.id}`, {
           method: 'PATCH',
@@ -180,9 +182,12 @@ export default async function handler(req, res) {
     console.error('[sweep] stuck-list query failed:', stuckListRes.status);
   }
 
-  // Fetch pending rows (oldest first)
+  // Fetch pending rows (oldest first). The retry_count filter is a defensive
+  // belt — the sweep + in-loop catch already mark exhausted rows as 'failed',
+  // but if a row ever lands in 'pending' with retry_count >= MAX_RETRY_COUNT
+  // (older bug, manual UPDATE, race), this prevents it from being re-picked.
   const listRes = await fetch(
-    `${supabaseUrl}/rest/v1/import_jobs?status=eq.pending&order=created_at.asc&limit=10&select=*`,
+    `${supabaseUrl}/rest/v1/import_jobs?status=eq.pending&retry_count=lt.${MAX_RETRY_COUNT}&order=created_at.asc&limit=10&select=*`,
     { headers: supaHeaders }
   );
   if (!listRes.ok) {
