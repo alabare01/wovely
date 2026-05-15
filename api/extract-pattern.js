@@ -162,6 +162,23 @@ Extract the COMPLETE abbreviations map from any table, legend, glossary, or defi
 • If the pattern defines no abbreviations, use standard crochet abbreviations found in the instructions: sc, dc, hdc, tr, sl st, ch, inc, dec, mr, fo, blo, flo, yo, pm, sm, sc2tog
 • This map is your reference for all subsequent extraction — use it to interpret shorthand in round/row instructions
 
+═══ STEP 2.5 — MATERIALS, YARN, HOOK ═══
+Materials/yarn/hook may appear under headings like "Materials", "Supplies", "You will need", "Tools", "What you need", or as inline prose without any heading at all. Scan the entire document — not only sections labeled "Materials". If no explicit Materials section exists, extract from the gauge section or pattern body.
+
+YARN WEIGHT — set yarn_weight as the closest canonical name. Match by named keyword first, then infer from meterage:
+• Lace / Cobweb (≥600 m per 100g)
+• Fingering / Sock / 4-ply (~350–500 m per 100g)
+• Sport (~280–350 m per 100g)
+• DK / Light Worsted (~200–280 m per 100g)
+• Worsted / Aran / Medium (~140–200 m per 100g)
+• Bulky / Chunky (~80–140 m per 100g)
+• Super Bulky (<80 m per 100g)
+If the pattern gives meterage like "160 m / 50 g" or "270 m / 100 g", normalize to per-100g (160 m/50g = 320 m/100g → Sport; 270 m/100g → DK) and pick the closest canonical name. If yarn is named by brand+line (e.g. "Yarn Art Jeans", "Alize Baby Cotton") without an explicit weight word, use the meterage. Multiple yarns of different weights → list the primary first ("Sport/DK").
+
+HOOK SIZE — any "<number> mm" (e.g. "2.25 mm", "5.0 mm") or "US <letter>" (B/1 through S/19) anywhere in the document, including inline prose like "2.25 mm crochet hook" or "I used a 5 mm hook". If multiple sizes are listed (one per yarn weight or technique), include them all in hook_size, primary first.
+
+MATERIALS list — extract every distinct yarn, hook, notion, and assembly tool found anywhere, even when listed as run-on prose instead of bullets. Each item gets {name, amount, notes}. Yarn entries should preserve brand+line in name and colorways/quantities in amount or notes. Include notions: stitch markers, scissors, tapestry/yarn needle, stuffing, fishing line, glue gun, safety eyes, etc.
+
 ═══ STEP 3 — ROUND/ROW EXTRACTION ═══
 Extract every round or row as its own entry. Apply these rules strictly:
 
@@ -340,6 +357,14 @@ Rules:
 - For components like "FLIPPER (MAKE 2)", set make_count: 2
 - Extract title, designer, materials, hook size, yarn weight, abbreviations from this section if present
 - If a component starts in this chunk but appears incomplete, extract what is here — subsequent chunks will continue it
+
+Materials/yarn/hook may appear under headings like "Materials", "Supplies", "You will need", "Tools", or as inline prose with NO heading at all. Scan the whole chunk, not only sections labeled "Materials". If no explicit section exists, infer from gauge or pattern body.
+
+yarn_weight: closest canonical name — Lace, Fingering/Sock, Sport, DK, Worsted/Aran, Bulky, Super Bulky. If pattern gives meterage like "160 m / 50 g" or "270 m / 100 g", normalize to per-100g (160/50g = 320 m/100g → Sport; 270 m/100g → DK) and pick the closest. If yarn is named only by brand+line (e.g. "Yarn Art Jeans", "Alize Baby Cotton"), use the meterage. Multiple weights → primary first ("Sport/DK").
+
+hook_size: any "<number> mm" (e.g. "2.25 mm", "5.0 mm") or "US <letter>" (B/1 through S/19) anywhere in the chunk, even inline like "2.25 mm crochet hook". Multiple sizes → list all, primary first.
+
+materials[]: every distinct yarn (preserve brand+line in name, colorways/quantities in amount or notes), hook, and notion (stitch markers, scissors, tapestry needle, stuffing, fishing line, glue gun, safety eyes, etc.) — even when listed as run-on prose instead of bullets.
 
 PATTERN SECTION:
 ${chunkText}`
