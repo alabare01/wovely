@@ -9,6 +9,13 @@ import { useImportJobPolling } from "./hooks/useImportJobPolling.js";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 
+// Strip authoring-tool file extensions left on extracted titles (e.g. ".cdr"
+// from CorelDraw exports). Mirrors sanitizeTitle in api/extract-pattern.js;
+// duplicated here so the client bundle doesn't pull from api/.
+const sanitizeTitle = (raw) => typeof raw === 'string'
+  ? raw.replace(/\.(cdr|pdf|docx|doc|ai|psd|jpg|jpeg|png)$/i, '').trim()
+  : raw;
+
 // ─── CATEGORY IMAGES (for cover picker in PDF review) ─────────────────────
 const CAT_IMG = {
   "Amigurumi":"https://res.cloudinary.com/dmaupzhcx/image/upload/v1774405272/duiwkpuwzctq42zjox9x.png",
@@ -907,7 +914,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onMinimize,onExtracti
       if(intv3Ref.current){clearInterval(intv3Ref.current);intv3Ref.current=null;}
       const result=polling.extractedData||{};
       setExtracted(result);
-      setEditTitle(result.title||"");setEditDesigner(result.designer||"");
+      setEditTitle(sanitizeTitle(result.title)||"");setEditDesigner(result.designer||"");
       setEditHook(result.hook_size||"");setEditWeight(result.yarn_weight||"");
       if(polling.coverImageUrl) setCoverUrl(polling.coverImageUrl);
       // Server-side BevCheck result (S66). When validation_report has an
@@ -1161,7 +1168,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onMinimize,onExtracti
       clearInterval(intv2);clearInterval(intv3);setProgress(66);
       setStage("building");setStageText("Building your workspace...");
       await new Promise(r=>setTimeout(r,600));setProgress(100);
-      setExtracted(result);setEditTitle(result.title||"");setEditDesigner(result.designer||"");setEditHook(result.hook_size||"");setEditWeight(result.yarn_weight||"");
+      setExtracted(result);setEditTitle(sanitizeTitle(result.title)||"");setEditDesigner(result.designer||"");setEditHook(result.hook_size||"");setEditWeight(result.yarn_weight||"");
       // Import failsafe: lightweight validation flags
       const allRows=(result.components||[]).flatMap(c=>(c.rows||[]));
       const flags=[];

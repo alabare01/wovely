@@ -172,6 +172,11 @@ const estYards = p => {
   return (p.materials||[]).reduce((s,m) => {
     if (m.yardage > 0) return s + m.yardage;
     const t = ((m.name||"")+" "+(m.amount||"")).toLowerCase();
+    // Direct yardage on the material — e.g. "13 yds", "120 yards". Checked
+    // before ball/skein so a "13 yds" amount isn't missed for materials whose
+    // name happens to contain "ball" or "skein".
+    const yd = t.match(/(\d+)\s*(yds?|yards?)\b/);
+    if (yd) return s + parseInt(yd[1]);
     const b = t.match(/(\d+)\s*ball/); const sk = t.match(/(\d+)\s*skein/);
     if (b) return s + parseInt(b[1])*200; if (sk) return s + parseInt(sk[1])*200;
     return s;
@@ -192,7 +197,10 @@ const Stars = ({val=0,onChange,ro}) => (
 const Photo = ({src,alt,style:sx}) => {
   const [err,setErr]=useState(false);
   if(err) return <div style={{...sx,background:"linear-gradient(145deg,#C4855A,#6B3A22)",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:32,opacity:.4}}>🧶</span></div>;
-  return <img src={src} alt={alt} onError={()=>setErr(true)} style={{...sx,objectFit:"cover",display:"block"}}/>;
+  // Default objectFit/display BEFORE the spread so callers can override them.
+  // (Pre-S67.5 these were after the spread and silently won — library cards
+  // with portrait covers couldn't ask for objectFit:"contain".)
+  return <img src={src} alt={alt} onError={()=>setErr(true)} style={{objectFit:"cover",display:"block",...sx}}/>;
 };
 
 // ─── CATEGORY FALLBACK IMAGES (Imagen 4.0 generated) ──────────────────────

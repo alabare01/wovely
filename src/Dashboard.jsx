@@ -83,7 +83,7 @@ const PatternCard = ({p,onClick,onPark,onUnpark,onDelete,onCoverChange,onRename,
       </div>}
       <div style={{position:"relative",height:200,overflow:"hidden",borderRadius:`${GLASS.radius}px ${GLASS.radius}px 0 0`,background:"linear-gradient(135deg, #EDE4F7 0%, #F5F0FA 100%)"}}>
         {hasImage
-          ? <Photo src={cardPhoto} alt={p.title} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top",display:"block"}}/>
+          ? <Photo src={cardPhoto} alt={p.title} style={{width:"100%",height:"100%",objectFit:"contain",objectPosition:"center",display:"block"}}/>
           : <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
               <span style={{fontFamily:PF,fontSize:36,color:ACCENT,opacity:0.5}}>{(p.title||"?")[0]}</span>
             </div>

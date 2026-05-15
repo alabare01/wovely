@@ -413,6 +413,18 @@ ${chunkText}`;
 // Pure(ish) function called by both the HTTP handler below and the queue worker.
 // Throws on hard failure. Caller decides how to log/persist.
 
+// Strip authoring-tool file extensions (.cdr, .pdf, .docx, etc.) that some
+// PDF authoring tools leave on the metadata title field (notably CorelDraw).
+// Case-insensitive. Returns the trimmed cleaned title. Exported so the modal
+// save paths can apply the same scrub at review time without re-importing the
+// regex.
+export function sanitizeTitle(raw) {
+  if (typeof raw !== 'string') return raw;
+  return raw
+    .replace(/\.(cdr|pdf|docx|doc|ai|psd|jpg|jpeg|png)$/i, '')
+    .trim();
+}
+
 // Applies the client-supplied PDF metadata title as a fallback when the
 // model returned an empty/null title. Common cause: long PDFs where the
 // title page is image-only and the chunked merger never sees a textual
@@ -423,7 +435,7 @@ function applyPdfMetadataTitleFallback(data, pdfMetadataTitle, baseMethod) {
   const needsFallback = isEmptyish(currentTitle) && !isEmptyish(pdfMetadataTitle);
   if (!needsFallback) return { data, extractionMethod: baseMethod };
   return {
-    data: { ...data, title: pdfMetadataTitle.trim() },
+    data: { ...data, title: sanitizeTitle(pdfMetadataTitle) },
     extractionMethod: `${baseMethod}_with_pdf_meta_title`,
   };
 }

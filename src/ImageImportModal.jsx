@@ -12,6 +12,12 @@ import { useImportJobPolling } from "./hooks/useImportJobPolling.js";
 const MAX_DIM = 1200;
 const JPEG_QUALITY = 0.75;
 
+// Strip authoring-tool file extensions left on extracted titles (e.g. ".cdr"
+// from CorelDraw exports). Mirrors sanitizeTitle in api/extract-pattern.js.
+const sanitizeTitle = (raw) => typeof raw === 'string'
+  ? raw.replace(/\.(cdr|pdf|docx|doc|ai|psd|jpg|jpeg|png)$/i, '').trim()
+  : raw;
+
 const compressImage = (file) => new Promise((resolve, reject) => {
   const url = URL.createObjectURL(file);
   const img = new Image();
@@ -119,7 +125,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, m
   useEffect(() => {
     if (initialExtracted) {
       setExtracted(initialExtracted);
-      setEditTitle(initialExtracted.title || "");
+      setEditTitle(sanitizeTitle(initialExtracted.title) || "");
       setEditDesigner(initialExtracted.designer || "");
       setEditHook(initialExtracted.hook_size || "");
       setEditWeight(initialExtracted.yarn_weight || "");
@@ -143,7 +149,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, m
       if (msgIntervalRef.current) { clearInterval(msgIntervalRef.current); msgIntervalRef.current = null; }
       const result = polling.extractedData || {};
       setExtracted(result);
-      setEditTitle(result.title || "");
+      setEditTitle(sanitizeTitle(result.title) || "");
       setEditDesigner(result.designer || "");
       setEditHook(result.hook_size || "");
       setEditWeight(result.yarn_weight || "");

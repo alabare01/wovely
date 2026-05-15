@@ -5,15 +5,17 @@
 //   variant="compact"  — summary gauge for crowded modals. Matches pre-S54
 //                        geometry exactly; only the arc palette is new.
 // Needle angle math is app-driven in both variants:
-//   HIGH score = LEFT, LOW score = RIGHT.
+//   HIGH score = RIGHT (PASS), LOW score = LEFT (ISSUES). Flipped from the
+//   original orientation in S67 — user mental model is "needle pegs right
+//   when you crushed it."
 
 const ADVISORY_IDS = new Set(["translation", "structure"]);
 
 // --- Legacy exports (kept for callsite compatibility) ---
 
-// Pre-calculated needle endpoints from pivot (100,100), length 58px
-// pass: 218° → (54, 64)   warning: 270° → (100, 42)   issues: 322° → (146, 64)
-export const NEEDLE_END = { pass: "54 64", warning: "100 42", issues: "146 64" };
+// Pre-calculated needle endpoints from pivot (100,100), length 58px.
+// After the S67 flip: pass: 322° → (146, 64)   warning: 270° → (100, 42)   issues: 218° → (54, 64)
+export const NEEDLE_END = { pass: "146 64", warning: "100 42", issues: "54 64" };
 
 /**
  * Derive a state string from any BevCheck result shape.
@@ -51,12 +53,12 @@ const LAVENDER = "#9B7EC8";
 const scoreToState = (s) => (s >= 80 ? "pass" : s >= 60 ? "warning" : "issues");
 const STATE_LABEL = { pass: "Looks Good", warning: "Heads Up", issues: "Issues Found" };
 
-// App semantics: HIGH score = LEFT (pass), LOW score = RIGHT (issues).
-// 100% → 180° (leftmost), 0% → 360° (rightmost), 68% → 237.6° (upper-left of top).
-const scoreToAngle = (s) => 360 - Math.max(0, Math.min(100, s)) * 1.8;
+// App semantics: HIGH score = RIGHT (pass), LOW score = LEFT (issues).
+// 0% → 180° (leftmost), 100% → 360° (rightmost), 68% → 302.4° (upper-right of top).
+const scoreToAngle = (s) => 180 + Math.max(0, Math.min(100, s)) * 1.8;
 
 // Discrete legacy-state angles (match existing three zones)
-const LEGACY_ANGLE = { pass: 218, warning: 270, issues: 322 };
+const LEGACY_ANGLE = { pass: 322, warning: 270, issues: 218 };
 
 /**
  * BevGauge
@@ -103,9 +105,9 @@ const CompactGauge = ({ state, label, angleDeg }) => {
       <svg viewBox="0 0 200 110" style={{ width: "100%", maxWidth: 280, display: "block", margin: "0 auto" }}>
         <defs>
           <linearGradient id="bevCompactGrad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor={ZONE.pass} />
+            <stop offset="0%" stopColor={ZONE.issues} />
             <stop offset="50%" stopColor={ZONE.warning} />
-            <stop offset="100%" stopColor={ZONE.issues} />
+            <stop offset="100%" stopColor={ZONE.pass} />
           </linearGradient>
           <clipPath id="bevCompactClip"><circle cx="100" cy="78" r="18" /></clipPath>
         </defs>
@@ -124,10 +126,10 @@ const CompactGauge = ({ state, label, angleDeg }) => {
         {/* Pivot dot */}
         <circle cx="100" cy="100" r="6" fill={LAVENDER} />
       </svg>
-      {/* Zone labels row */}
+      {/* Zone labels row — ISSUES on left, PASS on right (S67 flip) */}
       <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 280, margin: "4px auto 0" }}>
-        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: state === "pass" ? 700 : 600, color: LAVENDER, opacity: state === "pass" ? 1 : 0.5 }}>PASS</span>
         <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: state === "issues" ? 700 : 600, color: LAVENDER, opacity: state === "issues" ? 1 : 0.5 }}>ISSUES</span>
+        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: state === "pass" ? 700 : 600, color: LAVENDER, opacity: state === "pass" ? 1 : 0.5 }}>PASS</span>
       </div>
       {/* State label — navy for all states (rose #CEA0A4 fails AA at 18px on #F8F6FF; revisit later) */}
       <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: NAVY, marginTop: 4 }}>{label}</div>
@@ -228,9 +230,9 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
       >
         <defs>
           <linearGradient id="bevGSem" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor={ZONE.pass} />
+            <stop offset="0%" stopColor={ZONE.issues} />
             <stop offset="50%" stopColor={ZONE.warning} />
-            <stop offset="100%" stopColor={ZONE.issues} />
+            <stop offset="100%" stopColor={ZONE.pass} />
           </linearGradient>
           <radialGradient id="bevGSpec" cx="151.8" cy="58.65" r="42" gradientUnits="userSpaceOnUse">
             <stop offset="0%" stopColor="rgba(255,255,255,0.95)" />
@@ -321,14 +323,14 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
           </g>
         </g>
 
-        {/* Zone labels — navy text with colored dots */}
+        {/* Zone labels — navy text with colored dots. ISSUES left, PASS right (S67 flip) */}
         <g fontFamily="Inter,sans-serif" fontSize="11" fontWeight="700" letterSpacing="0.14em" fill={NAVY}>
-          <circle cx="26" cy="180" r="4" fill={ZONE.pass} />
-          <text x="54" y="184" textAnchor="middle">PASS</text>
+          <circle cx="26" cy="180" r="4" fill={ZONE.issues} />
+          <text x="54" y="184" textAnchor="middle">ISSUES</text>
           <circle cx="240" cy="6" r="4" fill={ZONE.warning} />
           <text x="240" y="20" textAnchor="middle">HEADS UP</text>
-          <circle cx="454" cy="180" r="4" fill={ZONE.issues} />
-          <text x="426" y="184" textAnchor="middle">ISSUES</text>
+          <circle cx="454" cy="180" r="4" fill={ZONE.pass} />
+          <text x="426" y="184" textAnchor="middle">PASS</text>
         </g>
 
         {/* Endpoint labels */}
