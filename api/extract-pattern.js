@@ -434,6 +434,379 @@ ${chunkText}`;
   }
 }
 
+// ─── Smart chunked extraction (S2 — replaces the dumb char-based chunker) ───
+// For patterns 15KB–150KB the model first plans the document into components,
+// then we extract setup + each component separately. Each AI call stays well
+// under its own 90s timeout and the merged result matches the single-shot
+// output shape exactly — downstream (BevCheck, UI, save) sees no difference.
+
+const TIER_SMALL_THRESHOLD = 15000;
+const TIER_OVERSIZED_THRESHOLD = 150000;
+const PER_CALL_TIMEOUT_MS = 90000;
+
+const planningPrompt = `You are analyzing a crochet pattern document. Identify the distinct construction sections so a downstream extractor can process them separately.
+
+A "component" is a body part or shaped piece the user crochets separately — Body, Head, Tentacle, Wing, Border, Assembly, etc. CRITICAL: "Tentacle (make 8)" counts as ONE component repeated eight times — DO NOT list it eight times. Include the multiplier in the component name when present (e.g. "Tentacle (x8)", "Leg (x2)").
+
+The "shared_context_end_marker" marks the boundary where the setup section (materials, abbreviations, gauge, designer notes) ends and the first construction component begins.
+
+Markers (start_marker, end_marker, shared_context_end_marker) must be LITERAL substrings copied verbatim from the document — about 30 characters each, enough to be unique. If a marker isn't actually present in the text, the downstream slice will fail.
+
+Return ONLY valid JSON, no markdown, no backticks, no commentary:
+{
+  "pattern_name": "string",
+  "component_count": number,
+  "components": [
+    {
+      "name": "string",
+      "start_marker": "string",
+      "end_marker": "string",
+      "estimated_rows": number
+    }
+  ],
+  "shared_context_end_marker": "string"
+}
+
+If the document has no construction components (rare — pure setup pages, error documents), return component_count: 0 and components: [].
+
+DOCUMENT:
+`;
+
+// Locate a model-returned marker in the source text. Try exact match first,
+// then a whitespace-normalized match. Returns the offset or -1.
+function findMarker(text, marker) {
+  if (!marker || typeof marker !== 'string') return -1;
+  const direct = text.indexOf(marker);
+  if (direct >= 0) return direct;
+  // Whitespace tolerance: collapse runs in both haystack and needle, match
+  // positions back into the original. Common when the model preserves spacing
+  // it saw rendered but the raw text has different line breaks.
+  const norm = (s) => s.replace(/\s+/g, ' ').trim();
+  const haystackNorm = norm(text);
+  const needleNorm = norm(marker);
+  if (!needleNorm) return -1;
+  const normIdx = haystackNorm.indexOf(needleNorm);
+  if (normIdx < 0) return -1;
+  // Walk the original to find the same position (accounting for collapsed ws).
+  // Cheap approximation: scan original, advance a parallel normalized-position
+  // counter, and return the original offset where normalized counter == normIdx.
+  let np = 0;
+  let lastWasSpace = false;
+  for (let i = 0; i < text.length; i++) {
+    if (np === normIdx) return i;
+    const c = text[i];
+    if (/\s/.test(c)) {
+      if (!lastWasSpace) { np++; lastWasSpace = true; }
+    } else {
+      np++; lastWasSpace = false;
+    }
+  }
+  return -1;
+}
+
+// Strip JSON fences + thought blocks from a model response and parse.
+function parseModelJson(text) {
+  const cleaned = text.replace(/^[\s\S]*?```(?:json|JSON)?\s*\n?/i, '').replace(/\n?\s*```[\s\S]*$/, '').trim();
+  const candidate = cleaned.startsWith('{') || cleaned.startsWith('[')
+    ? cleaned
+    : text.replace(/```json/gi, '').replace(/```/g, '').trim();
+  const jsonStart = candidate.indexOf('{');
+  const jsonEnd = candidate.lastIndexOf('}');
+  const slice = jsonStart >= 0 && jsonEnd > jsonStart ? candidate.slice(jsonStart, jsonEnd + 1) : candidate;
+  return JSON.parse(slice);
+}
+
+async function callClaudeCompact({ prompt, anthropicKey, maxTokens, timeoutMs = PER_CALL_TIMEOUT_MS, label }) {
+  if (!anthropicKey) throw new Error('Anthropic API key not configured');
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': anthropicKey, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: maxTokens,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+      signal: controller.signal,
+    });
+    if (!r.ok) {
+      const body = await r.text();
+      throw new Error(`Claude ${label} ${r.status}: ${body.substring(0, 200)}`);
+    }
+    const data = await r.json();
+    const text = data.content?.[0]?.text || '';
+    if (!text) throw new Error(`Claude ${label} empty response, stop_reason=${data.stop_reason}`);
+    return parseModelJson(text);
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error(`Claude ${label} timeout after ${Math.floor(timeoutMs / 1000)}s`);
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function callGeminiCompact({ prompt, geminiKey, maxTokens, timeoutMs = PER_CALL_TIMEOUT_MS, label }) {
+  if (!geminiKey) throw new Error('Gemini API key not configured');
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${geminiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: maxTokens, thinkingConfig: { thinkingBudget: 0 } },
+        }),
+        signal: controller.signal,
+      }
+    );
+    if (!r.ok) {
+      const body = await r.text();
+      throw new Error(`Gemini ${label} ${r.status}: ${body.substring(0, 200)}`);
+    }
+    const data = await r.json();
+    const parts = (data.candidates?.[0]?.content?.parts || []).filter(p => !p.thought);
+    const text = parts[0]?.text || data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!text) {
+      const fr = data.candidates?.[0]?.finishReason || 'unknown';
+      throw new Error(`Gemini ${label} empty response, finishReason=${fr}`);
+    }
+    return parseModelJson(text);
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error(`Gemini ${label} timeout after ${Math.floor(timeoutMs / 1000)}s`);
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// Try Claude first, fall back to Gemini. Both return parsed JSON.
+async function callPrimaryWithFallback({ prompt, maxTokens, geminiKey, anthropicKey, label, timeoutMs }) {
+  try {
+    return await callClaudeCompact({ prompt, anthropicKey, maxTokens, timeoutMs, label });
+  } catch (e) {
+    console.warn(`[smart-chunk] Claude ${label} failed (${e.message}); falling back to Gemini`);
+    return await callGeminiCompact({ prompt, geminiKey, maxTokens, timeoutMs, label });
+  }
+}
+
+const sharedContextPrompt = (text) => `You are a crochet pattern extraction specialist. Below is the setup/preamble portion of a pattern document — materials, abbreviations, gauge, designer notes — BEFORE any construction instructions. Extract metadata only. Do NOT invent rows or components; the construction sections are processed separately.
+
+Return ONLY valid JSON, no markdown, no backticks. Shape (use empty string/array/null when the field is absent):
+{"title":"string","designer":"string","source_url":null,"finished_size":"string","difficulty":"Beginner or Intermediate or Advanced","yarn_weight":"string","hook_size":"string","gauge":"string or null","materials":[{"name":"string","amount":"string","notes":"string"}],"abbreviations":[{"abbr":"string","meaning":"string"}],"abbreviations_map":{},"suggested_resources":[{"label":"string","url":"string"}],"pattern_notes":"string","image_description":"string"}
+
+Materials/yarn/hook may appear under headings like "Materials", "Supplies", "You will need", "Tools", or as inline prose. Scan the whole section. yarn_weight: closest canonical name — Lace, Fingering/Sock, Sport, DK, Worsted/Aran, Bulky, Super Bulky. Infer from meterage (160 m/50g = 320 m/100g → Sport; 270 m/100g → DK) if not stated. hook_size: any "<n> mm" or "US <letter>" anywhere, inline included. abbreviations_map: flat key→value object (e.g. {"sc":"single crochet","mr":"magic ring"}).
+
+SETUP SECTION:
+${text}`;
+
+const componentPrompt = ({ componentName, sharedAbbreviations, sharedAbbreviationsMap, patternName, text }) => `You are a crochet pattern extraction specialist. Below is the section for ONE component of a larger pattern. Extract just this component's rows/rounds. Metadata (title, materials, yarn, hook) is already captured separately — don't repeat it.
+
+Pattern name: ${patternName || 'unknown'}
+This component: ${componentName}
+Known abbreviations: ${JSON.stringify(sharedAbbreviationsMap || {})}
+
+Return ONLY valid JSON, no markdown, no backticks:
+{"name":"${componentName}","make_count":1,"independent":false,"rows":[{"id":"rnd-1","label":"RND 1","text":"full instruction text","stitch_count":null,"note":null,"action_item":false,"repeat_brackets":[{"sequence":"string","count":2}]}]}
+
+Rules:
+- Extract EVERY round/row visible as its own entry — never skip or collapse ranges.
+- Use RND for rounds worked in the round, ROW for flat rows.
+- Expand ranges like "RND 10-23" into individual entries RND 10, RND 11... each with the same instruction.
+- Keep bracket notation exactly as written: (sc, inc) x 6.
+- repeat_brackets: extract any (sequence) x N / [sequence] x N / *sequence* repeat N times patterns into the array.
+- If the component name includes a multiplier like "Tentacle (x8)" or "Leg (make 2)", set make_count to that number.
+- independent: true only if the pattern explicitly says this component is worked separately.
+- If this is an assembly/finishing section, set every row's action_item: true.
+- Notes/tips that accompany a row → attach as the row's note field, NOT a separate row.
+
+COMPONENT SECTION:
+${text}`;
+
+async function planComponents({ pdfText, geminiKey, anthropicKey }) {
+  // Planning sees the whole document at once. Big input, tiny output — under
+  // 1500 tokens covers a ~20-component pattern comfortably.
+  const prompt = planningPrompt + pdfText;
+  return callPrimaryWithFallback({ prompt, maxTokens: 1500, geminiKey, anthropicKey, label: 'planning' });
+}
+
+async function extractSharedContextSection({ sectionText, geminiKey, anthropicKey }) {
+  return callPrimaryWithFallback({
+    prompt: sharedContextPrompt(sectionText),
+    maxTokens: 4000,
+    geminiKey,
+    anthropicKey,
+    label: 'shared-context',
+  });
+}
+
+async function extractComponentSection({ componentName, sectionText, sharedContext, patternName, geminiKey, anthropicKey }) {
+  return callPrimaryWithFallback({
+    prompt: componentPrompt({
+      componentName,
+      sharedAbbreviations: sharedContext?.abbreviations || [],
+      sharedAbbreviationsMap: sharedContext?.abbreviations_map || {},
+      patternName,
+      text: sectionText,
+    }),
+    maxTokens: 16000,
+    geminiKey,
+    anthropicKey,
+    label: `component[${componentName}]`,
+  });
+}
+
+// Slice text from start_marker to end_marker. Falls back to a heuristic split
+// when a marker can't be located so we never lose a whole component to a bad
+// model marker. Returns { text, source } where source is 'markers' | 'fallback'.
+function sliceByMarkers(text, startMarker, endMarker, hintStart, hintEnd) {
+  const startIdx = findMarker(text, startMarker);
+  if (startIdx < 0) {
+    if (hintStart != null) {
+      const safeEnd = hintEnd != null && hintEnd > hintStart ? hintEnd : text.length;
+      return { text: text.slice(hintStart, safeEnd), source: 'fallback' };
+    }
+    return null;
+  }
+  let endIdx = findMarker(text.slice(startIdx + startMarker.length), endMarker);
+  if (endIdx < 0) {
+    const safeEnd = hintEnd != null && hintEnd > startIdx ? hintEnd : text.length;
+    return { text: text.slice(startIdx, safeEnd), source: 'fallback' };
+  }
+  endIdx = startIdx + startMarker.length + endIdx + endMarker.length;
+  return { text: text.slice(startIdx, endIdx), source: 'markers' };
+}
+
+// Compose the final extracted_data from the shared metadata + per-component
+// results. Output shape matches the single-shot fullPrompt schema exactly so
+// downstream (BevCheck, modal review, save) treats the chunked result as a
+// drop-in replacement.
+function assembleChunkedResult({ shared, componentResults, planning }) {
+  const totalRows = (componentResults || []).reduce((sum, c) => sum + (c?.rows?.length || 0), 0);
+  const confidence = totalRows >= 10 ? 'high' : totalRows >= 3 ? 'medium' : 'low';
+  return {
+    title: shared?.title || planning?.pattern_name || '',
+    designer: shared?.designer || '',
+    source_url: shared?.source_url || null,
+    finished_size: shared?.finished_size || '',
+    difficulty: shared?.difficulty || '',
+    yarn_weight: shared?.yarn_weight || '',
+    hook_size: shared?.hook_size || '',
+    gauge: shared?.gauge || null,
+    confidence,
+    materials: Array.isArray(shared?.materials) ? shared.materials : [],
+    abbreviations: Array.isArray(shared?.abbreviations) ? shared.abbreviations : [],
+    abbreviations_map: shared?.abbreviations_map || {},
+    suggested_resources: Array.isArray(shared?.suggested_resources) ? shared.suggested_resources : [],
+    pattern_notes: shared?.pattern_notes || '',
+    components: (componentResults || []).filter(Boolean).map(c => ({
+      name: c.name || 'Component',
+      make_count: typeof c.make_count === 'number' ? c.make_count : 1,
+      independent: !!c.independent,
+      rows: Array.isArray(c.rows) ? c.rows : [],
+    })),
+    assembly_notes: shared?.assembly_notes || '',
+    image_description: shared?.image_description || '',
+  };
+}
+
+// Detect "Tentacle (x8)" / "Tentacle (make 8)" → set make_count: 8 + strip
+// the suffix from the name. Idempotent if the model already set make_count.
+function normalizeComponentName(comp) {
+  if (!comp || typeof comp.name !== 'string') return comp;
+  const m = comp.name.match(/\s*\(\s*(?:x|make\s+)(\d+)\s*\)\s*$/i);
+  if (!m) return comp;
+  const n = parseInt(m[1], 10);
+  if (Number.isFinite(n) && n > 0) {
+    comp.name = comp.name.replace(m[0], '').trim();
+    if (!comp.make_count || comp.make_count === 1) comp.make_count = n;
+  }
+  return comp;
+}
+
+async function runSmartChunkedExtraction({ pdfText, geminiKey, anthropicKey, pdfMetadataTitle, t0, onPathChange, onPlanned }) {
+  // ── Phase 1: planning ──
+  await onPathChange?.('chunked_planning');
+  const phasePlanStart = Date.now();
+  const planning = await planComponents({ pdfText, geminiKey, anthropicKey });
+  console.log(`[smart-chunk] phase=planning components=${planning?.component_count || 0} (${Date.now() - phasePlanStart}ms)`);
+  await onPlanned?.(planning?.component_count || 0);
+
+  // Edge case: planner found nothing. Treat as Tier 1 single-shot (the document
+  // was probably mostly setup with no construction components).
+  if (!planning || !Array.isArray(planning.components) || planning.components.length === 0) {
+    console.warn('[smart-chunk] planner returned 0 components — falling through to single-shot');
+    await onPathChange?.('single_shot');
+    const data = await callGeminiExtract({ prompt: fullPrompt, pdfText, geminiKey, maxTokens: 65536 });
+    const finalized = applyPdfMetadataTitleFallback(data, pdfMetadataTitle, 'pdf-text');
+    return { data: finalized.data, extractionMethod: finalized.extractionMethod, providerUsed: 'gemini', durationMs: Date.now() - t0 };
+  }
+
+  // ── Phase 2: shared context (setup + materials + abbreviations) ──
+  await onPathChange?.('chunked_extracting');
+  const sharedEndIdx = findMarker(pdfText, planning.shared_context_end_marker);
+  // If the marker isn't in the text, assume shared context = up to the first
+  // component's start marker. If THAT fails too, take the first 25% of the
+  // doc (heuristic minimum — every pattern has SOME preamble).
+  let sharedEnd;
+  if (sharedEndIdx >= 0) {
+    sharedEnd = sharedEndIdx + (planning.shared_context_end_marker?.length || 0);
+  } else {
+    const firstCompStart = planning.components[0]?.start_marker ? findMarker(pdfText, planning.components[0].start_marker) : -1;
+    sharedEnd = firstCompStart >= 0 ? firstCompStart : Math.floor(pdfText.length * 0.25);
+  }
+  const sharedSlice = pdfText.slice(0, sharedEnd);
+  const phaseSharedStart = Date.now();
+  const shared = await extractSharedContextSection({ sectionText: sharedSlice, geminiKey, anthropicKey });
+  console.log(`[smart-chunk] phase=shared sliceLen=${sharedSlice.length} (${Date.now() - phaseSharedStart}ms)`);
+
+  // ── Phase 3: per-component extraction, sequential, 1 retry per chunk ──
+  const componentResults = [];
+  for (let i = 0; i < planning.components.length; i++) {
+    const comp = planning.components[i];
+    const phaseCompStart = Date.now();
+    const slice = sliceByMarkers(pdfText, comp.start_marker, comp.end_marker);
+    if (!slice || !slice.text || slice.text.length < 20) {
+      console.warn(`[smart-chunk] component[${i + 1}/${planning.components.length}] '${comp.name}' marker miss — skipping`);
+      continue;
+    }
+    let attempt = 0;
+    let extracted = null;
+    let lastErr = null;
+    while (attempt < 2 && !extracted) {
+      attempt++;
+      try {
+        extracted = await extractComponentSection({
+          componentName: comp.name,
+          sectionText: slice.text,
+          sharedContext: shared,
+          patternName: planning.pattern_name,
+          geminiKey,
+          anthropicKey,
+        });
+      } catch (err) {
+        lastErr = err;
+        console.warn(`[smart-chunk] component[${i + 1}] '${comp.name}' attempt ${attempt} failed: ${err.message}`);
+      }
+    }
+    if (!extracted) {
+      throw new Error(`Smart chunked extraction failed at component '${comp.name}' (attempts=${attempt}): ${lastErr?.message || 'unknown'}`);
+    }
+    componentResults.push(normalizeComponentName(extracted));
+    console.log(`[smart-chunk] phase=component[${i + 1}/${planning.components.length}] '${comp.name}' sliceLen=${slice.text.length} source=${slice.source} (${Date.now() - phaseCompStart}ms)`);
+  }
+
+  // ── Phase 4: merge (pure JS) ──
+  await onPathChange?.('chunked_merging');
+  const merged = assembleChunkedResult({ shared, componentResults, planning });
+  const finalized = applyPdfMetadataTitleFallback(merged, pdfMetadataTitle, 'pdf-text-chunked');
+  return { data: finalized.data, extractionMethod: finalized.extractionMethod, providerUsed: 'claude', durationMs: Date.now() - t0 };
+}
+
 // ─── EXPORTED: runPdfExtraction ──────────────────────────────────────────────
 // Pure(ish) function called by both the HTTP handler below and the queue worker.
 // Throws on hard failure. Caller decides how to log/persist.
@@ -465,19 +838,20 @@ function applyPdfMetadataTitleFallback(data, pdfMetadataTitle, baseMethod) {
   };
 }
 
-export async function runPdfExtraction({ pdfText, pageCount, geminiKey, anthropicKey, pdfMetadataTitle }) {
+export async function runPdfExtraction({ pdfText, pageCount, geminiKey, anthropicKey, pdfMetadataTitle, onPathChange, onPlanned }) {
   if (!pdfText) throw new Error("pdfText is required");
   if (!geminiKey) throw new Error("Gemini API key not configured");
 
   const t0 = Date.now();
-  const CHUNK_THRESHOLD = 14000;
-  const chunks = splitIntoChunks(pdfText, CHUNK_THRESHOLD, 500);
-  const isChunked = chunks.length > 1;
+  const textLen = pdfText.length;
+  const isOversized = textLen > TIER_OVERSIZED_THRESHOLD;
+  const useChunked = textLen >= TIER_SMALL_THRESHOLD;
 
-  console.log(`[runPdfExtraction] textLen=${pdfText.length} chunks=${chunks.length} chunked=${isChunked} pageCount=${pageCount || 'unknown'}`);
+  console.log(`[runPdfExtraction] textLen=${textLen} tier=${isOversized ? 'oversized' : useChunked ? 'smart-chunked' : 'single-shot'} pageCount=${pageCount || 'unknown'}`);
 
-  // SHORT PATTERNS: Gemini → Claude cascade
-  if (!isChunked) {
+  // TIER 1: SHORT PATTERNS (<15KB) — Gemini → Claude cascade, unchanged.
+  if (!useChunked) {
+    await onPathChange?.('single_shot');
     const preferredProvider = await getPreferredProvider(geminiKey);
     console.log("[runPdfExtraction] Router selected:", preferredProvider);
 
@@ -503,39 +877,24 @@ export async function runPdfExtraction({ pdfText, pageCount, geminiKey, anthropi
     }
   }
 
-  // LONG PATTERNS: chunked Claude
-  console.log(`[runPdfExtraction] CHUNKED MODE: ${chunks.length} chunks`);
-  const chunkResults = [];
-  let chunksFailed = 0;
-  for (let i = 0; i < chunks.length; i++) {
-    const elapsed = Date.now() - t0;
-    if (elapsed > 250000) {
-      console.warn(`[runPdfExtraction] Time budget nearly exhausted at chunk ${i + 1}/${chunks.length} (${elapsed}ms) — stopping early`);
-      break;
-    }
-    try {
-      const result = await callClaudeChunkExtract({
-        chunkText: chunks[i], chunkIndex: i, totalChunks: chunks.length, isFirstChunk: i === 0, anthropicKey
-      });
-      chunkResults.push(result);
-    } catch (chunkErr) {
-      console.error(`[runPdfExtraction] Chunk ${i + 1} failed: ${chunkErr.message}`);
-      chunksFailed++;
-    }
+  // TIER 2/3: SMART CHUNKED EXTRACTION
+  // - Planning pass discovers components
+  // - Shared context extracts setup/metadata once
+  // - Each component slice extracts independently (1 retry per slice)
+  // - Pure-JS merge builds the standard extracted_data shape
+  // Tier 3 (>150KB) just logs a warning and runs the same path — the outer
+  // 300s budget either catches the result or the worker marks the job failed.
+  if (isOversized) {
+    console.warn(`[runPdfExtraction] OVERSIZED (${textLen} chars > ${TIER_OVERSIZED_THRESHOLD}) — attempting smart chunked anyway`);
   }
-  if (chunkResults.length === 0) {
-    throw new Error(`PDF extraction failed: all ${chunks.length} chunks failed`);
+  try {
+    return await runSmartChunkedExtraction({ pdfText, geminiKey, anthropicKey, pdfMetadataTitle, t0, onPathChange, onPlanned });
+  } catch (chunkErr) {
+    if (isOversized) {
+      throw new Error(`This pattern is unusually large. Bev needs a moment — try again or contact support. (chunked: ${chunkErr.message})`);
+    }
+    throw chunkErr;
   }
-  const merged = mergeChunkResults(chunkResults);
-  const finalized = applyPdfMetadataTitleFallback(merged, pdfMetadataTitle, 'pdf-text');
-  return {
-    data: finalized.data,
-    extractionMethod: finalized.extractionMethod,
-    providerUsed: 'claude',
-    durationMs: Date.now() - t0,
-    chunksTotal: chunks.length,
-    chunksFailed,
-  };
 }
 
 // ─── HTTP handler (existing surface; thin wrapper around runPdfExtraction + bevcheck) ───

@@ -104,10 +104,11 @@ const POSTHOG_HOST = 'https://us.i.posthog.com';
 // attempt + one retry, then status='failed'). Shared by the in-loop catch
 // block and the stuck-in-processing sweep.
 const MAX_RETRY_COUNT = 2;
-// Per-extraction wall-clock ceiling. 60s under Vercel's 300s function cap so
-// the worker has time to write status='failed' cleanly before the runtime
-// kills the function.
-const EXTRACTION_TIMEOUT_MS = 240_000;
+// Per-extraction wall-clock ceiling. Aligned with Vercel's 300s function
+// cap (process-queue maxDuration: 300 in vercel.json). Smart chunked
+// extraction needs the full budget for 5–10-component patterns; each
+// inner AI call still has its own 90s timeout in extract-pattern.js.
+const EXTRACTION_TIMEOUT_MS = 300_000;
 // Stuck-in-processing sweep: rows whose updated_at hasn't moved in this
 // window are treated as orphans (crash / function timeout).
 const STUCK_PROCESSING_WINDOW_MS = 5 * 60 * 1000;
@@ -311,12 +312,16 @@ export default async function handler(req, res) {
       }
     };
 
-    // Analyze (Stage 1 of v1.5 — measurement only). Run cheap regex passes
-    // over raw_text before we touch Gemini, persist the complexity_score
-    // jsonb so we can find the single-shot cliff empirically. Image jobs
-    // have no raw_text pre-extraction — they get a zeroed shape so the
-    // analyzed_at marker is still present. Path is always 'single_shot' at
-    // this stage; Stage 2 introduces 'chunked' once the cliff is mapped.
+    // Analyze (Stage 1 of v1.5 — measurement). Run cheap regex passes over
+    // raw_text before we touch Gemini, persist the complexity_score jsonb so
+    // we can find the single-shot cliff empirically. Image jobs have no
+    // raw_text pre-extraction — they get a zeroed shape so the analyzed_at
+    // marker is still present.
+    //
+    // path_taken is NOT set here anymore. Stage 2 (smart chunking) lets
+    // runPdfExtraction announce the actual path via onPathChange: one of
+    // 'single_shot' | 'chunked_planning' | 'chunked_extracting' |
+    // 'chunked_merging'. The callback below PATCHes it as the worker moves.
     const analyzeMeta = claimedJob.file_type === 'pdf'
       ? { title: claimedJob.pdf_metadata_title || null }
       : {};
@@ -331,7 +336,6 @@ export default async function handler(req, res) {
           current_phase: PHASE_READING,
           phase_timestamps: phaseStamps,
           complexity_score: complexity,
-          path_taken: 'single_shot',
         }),
       });
     } catch (e) {
@@ -339,6 +343,39 @@ export default async function handler(req, res) {
       // because we couldn't write the analyzer output.
       console.warn(`[process-queue] analyze write failed for ${claimedJob.id}: ${e.message}`);
     }
+
+    // Phase-aware path_taken updater used by runPdfExtraction.
+    // Best-effort PATCH — a network blip here doesn't fail the import.
+    const updatePathTaken = async (label) => {
+      try {
+        await fetch(`${supabaseUrl}/rest/v1/import_jobs?id=eq.${claimedJob.id}`, {
+          method: 'PATCH',
+          headers: { ...supaHeaders, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ path_taken: label }),
+        });
+        console.log(`[process-queue] job=${claimedJob.id} path_taken=${label}`);
+      } catch (e) {
+        console.warn(`[process-queue] path_taken update (${label}) failed: ${e.message}`);
+      }
+    };
+
+    // Record the planner's discovered component count into complexity_score
+    // so we can study fan-out vs success rates. Merges into the existing
+    // jsonb instead of clobbering — components were not part of the
+    // measurement output, just regex-derived analytics fields.
+    const recordPlannedComponents = async (n) => {
+      const next = { ...complexity, planned_component_count: n };
+      try {
+        await fetch(`${supabaseUrl}/rest/v1/import_jobs?id=eq.${claimedJob.id}`, {
+          method: 'PATCH',
+          headers: { ...supaHeaders, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ complexity_score: next }),
+        });
+        console.log(`[process-queue] job=${claimedJob.id} planned_component_count=${n}`);
+      } catch (e) {
+        console.warn(`[process-queue] planned_component_count update failed: ${e.message}`);
+      }
+    };
 
     captureServerEvent({
       posthogKey,
@@ -380,6 +417,8 @@ export default async function handler(req, res) {
           geminiKey,
           anthropicKey,
           pdfMetadataTitle: claimedJob.pdf_metadata_title || null,
+          onPathChange: updatePathTaken,
+          onPlanned: recordPlannedComponents,
         });
       } else if (claimedJob.file_type === 'image') {
         const dataUri = await fetchImageAsDataUri(claimedJob.file_url);
