@@ -357,7 +357,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             ))}
           </div>
         </div>
-        <div style={{padding:`4px 20px ${isAnonymous?140:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
+        <div style={{padding:`4px 20px ${isAnonymous?220:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
         {tab==="materials"&&(<>
           {(editing?draft.materials:p.materials).map((m,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${T.border}`}}>
@@ -414,68 +414,70 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
       </div>
       {/* Floating source pill now rendered inside RowManager */}
       {isAnonymous && (
-        // Always-visible signup nudge on the pattern detail view. Renders
-        // on all tabs (Materials / Instructions / Notes) so guests can
-        // convert without scrolling to find the inline CTA. The card style
-        // matches the standard Wovely glass treatment but with a stronger
-        // alpha so legibility holds over varied content underneath.
+        // Always-visible conversion surface for guests. Renders on every
+        // tab (Materials / Instructions / Notes) so the CTA is on screen
+        // without scrolling. Mirrors the inline glass card so the styling
+        // language stays consistent — same heading, body copy, primary
+        // button, and "Already have an account?" link.
         <div style={{
           position:"fixed",
           left:0,
           right:0,
           bottom:0,
-          zIndex:45,
-          background:"rgba(255,255,255,0.92)",
+          zIndex:100,
+          background:"rgba(255,255,255,0.95)",
           backdropFilter:"blur(16px)",
           WebkitBackdropFilter:"blur(16px)",
           borderTop:"1px solid rgba(255,255,255,0.45)",
-          boxShadow:"0 -4px 24px rgba(45,58,124,0.08)",
-          padding: isDesktop ? "12px 24px" : "12px 16px",
+          boxShadow:"0 -4px 24px rgba(45,58,124,0.12)",
+          padding: isDesktop ? "20px 24px" : "16px 16px",
           fontFamily:"Inter,sans-serif",
+          textAlign:"center",
         }}>
-          {isDesktop ? (
-            <div style={{maxWidth:760,margin:"0 auto",display:"flex",alignItems:"center",gap:16}}>
-              <div style={{flex:1,fontSize:14,color:"#2D2D4E",lineHeight:1.4}}>
-                You're seeing a preview. Create a free account for the full pattern.
-              </div>
-              <button
-                onClick={()=>onSignUp&&onSignUp()}
-                style={{
-                  background:"#9B7EC8",
-                  color:"#fff",
-                  border:"none",
-                  borderRadius:9999,
-                  padding:"10px 22px",
-                  fontSize:14,
-                  fontWeight:600,
-                  cursor:"pointer",
-                  boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
-                  whiteSpace:"nowrap",
-                }}
-              >Create Free Account</button>
+          <div style={{maxWidth:600,margin:"0 auto"}}>
+            <div style={{
+              fontFamily:"'Playfair Display', Georgia, serif",
+              fontSize: isDesktop ? 20 : 16,
+              fontWeight:700,
+              color:"#2D3A7C",
+              lineHeight:1.25,
+              marginBottom:6,
+            }}>
+              You're just getting started
             </div>
-          ) : (
-            <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"stretch"}}>
-              <div style={{fontSize:13,color:"#2D2D4E",lineHeight:1.4,textAlign:"center"}}>
-                You're seeing a preview. Create a free account for the full pattern.
-              </div>
-              <button
-                onClick={()=>onSignUp&&onSignUp()}
-                style={{
-                  width:"100%",
-                  background:"#9B7EC8",
-                  color:"#fff",
-                  border:"none",
-                  borderRadius:12,
-                  padding:"12px 16px",
-                  fontSize:14,
-                  fontWeight:600,
-                  cursor:"pointer",
-                  boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
-                }}
-              >Create Free Account</button>
+            <div style={{
+              fontSize: isDesktop ? 14 : 13,
+              color:"#6B6B8A",
+              lineHeight:1.55,
+              marginBottom:14,
+            }}>
+              Create a free account to see the full pattern, save your progress, and let Bev help you craft with confidence.
             </div>
-          )}
+            <button
+              onClick={()=>onSignUp&&onSignUp()}
+              style={{
+                background:"#9B7EC8",
+                color:"#fff",
+                border:"none",
+                borderRadius:12,
+                padding: isDesktop ? "12px 28px" : "12px 16px",
+                fontSize:14,
+                fontWeight:600,
+                cursor:"pointer",
+                boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
+                width: isDesktop ? "auto" : "100%",
+                minWidth: isDesktop ? 220 : undefined,
+                marginBottom:10,
+              }}
+            >Create Free Account</button>
+            <div style={{fontSize:13,color:"#6B6B8A"}}>
+              Already have an account?{" "}
+              <span
+                onClick={()=>onSignUp&&onSignUp()}
+                style={{color:"#9B7EC8",cursor:"pointer",fontWeight:600}}
+              >Sign in</span>
+            </div>
+          </div>
         </div>
       )}
     </div>
