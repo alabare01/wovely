@@ -95,6 +95,11 @@ const patternIdFromPath = (pathname) => {
   return m ? decodeURIComponent(m[2]) : null;
 };
 
+// sessionStorage key for the tier picked from TieredUpgradeModal before
+// signup. Survives remounts (OAuth round-trip, page reload during the
+// auth flow) so the post-signup auto-checkout finds the right tier.
+const PENDING_UPGRADE_KEY = "wovely_pending_upgrade_tier";
+
 // PHOTOS, PILL imported from ./constants.js
 
 // Supabase auth imported from ./supabase.js
@@ -485,7 +490,7 @@ export const UPGRADE_TIER_DEFS = [
   },
 ];
 
-const TieredUpgradeModal = ({ onClose, currentTier, reason }) => {
+const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false, onSignupRequired }) => {
   const { isDesktop } = useBreakpoint();
   const [checkingOut, setCheckingOut] = useState(null); // tier key in flight
   const safeTier = normalizeTier(currentTier);
@@ -495,7 +500,14 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason }) => {
   const recommendedKey = safeTier === TIER_FREE ? TIER_PRO : safeTier === TIER_PRO ? TIER_CRAFT : null;
 
   const handleCheckout = async (tierKey) => {
-    posthog.capture("upgrade_clicked", { tier: tierKey, reason: reason || 'general' });
+    posthog.capture("upgrade_clicked", { tier: tierKey, reason: reason || 'general', anonymous: isAnonymous });
+    // Anonymous users can't have a Stripe subscription — there's no email
+    // on file. Hand control back to App.jsx so it can open the signup
+    // flow with the picked tier stashed; checkout fires after conversion.
+    if (isAnonymous) {
+      if (onSignupRequired) onSignupRequired(tierKey);
+      return;
+    }
     setCheckingOut(tierKey);
     try {
       const user = supabaseAuth.getUser();
@@ -516,10 +528,17 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason }) => {
     }
   };
 
-  const reasonHeader = reason === 'paywall' ? "Your pattern box is full" : "Pick the plan that fits your craft";
-  const reasonSub = reason === 'paywall'
-    ? `You've used all ${TIER_CONFIG.free.patternCap} free patterns. Pick a plan to keep adding.`
-    : "Compare plans and choose what works for you.";
+  // Headline copy varies by who's looking. Guests see a signup-first frame
+  // ("Pick a plan to start"); paywalled Free users see the cap-hit frame;
+  // everyone else sees the generic compare-plans frame.
+  const reasonHeader = isAnonymous
+    ? "Pick a plan to get started"
+    : reason === 'paywall' ? "Your pattern box is full" : "Pick the plan that fits your craft";
+  const reasonSub = isAnonymous
+    ? "Create your free account, then subscribe to the plan you pick. Free is always available too."
+    : reason === 'paywall'
+      ? `You've used all ${TIER_CONFIG.free.patternCap} free patterns. Pick a plan to keep adding.`
+      : "Compare plans and choose what works for you.";
 
   return (
     <div style={{position:"fixed",inset:0,zIndex:600,display:"flex",alignItems:isDesktop?"center":"flex-end",justifyContent:"center"}} onClick={onClose}>
@@ -599,9 +618,28 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason }) => {
                   {isCurrent ? (
                     <div style={{width:"100%",textAlign:"center",fontSize:12,color:T.ink3,padding:"11px 16px",border:`1px solid ${T.border}`,borderRadius:99,fontWeight:600}}>You're on this plan</div>
                   ) : def.key === TIER_FREE ? (
-                    // Free is never an upgrade target from a paid tier in
-                    // this modal — manage-subscription handles downgrades.
-                    <div style={{width:"100%",textAlign:"center",fontSize:12,color:T.ink3,padding:"11px 16px",border:`1px dashed ${T.border}`,borderRadius:99}}>Always available</div>
+                    // For anonymous users, Free is the create-account-no-charge
+                    // path — render an actual button so the conversion intent
+                    // is one click. For signed-in Free/paid users it's not an
+                    // upgrade target, so the dashed label stays.
+                    isAnonymous ? (
+                      <button
+                        onClick={() => onSignupRequired && onSignupRequired(null)}
+                        style={{
+                          width:"100%",
+                          background:"transparent",
+                          color:T.terra,
+                          border:`1.5px solid ${T.terra}`,
+                          borderRadius:99,
+                          padding:"12px 16px",
+                          fontSize:14,
+                          fontWeight:600,
+                          cursor:"pointer",
+                        }}
+                      >Create Free Account</button>
+                    ) : (
+                      <div style={{width:"100%",textAlign:"center",fontSize:12,color:T.ink3,padding:"11px 16px",border:`1px dashed ${T.border}`,borderRadius:99}}>Always available</div>
+                    )
                   ) : (
                     <button
                       onClick={() => handleCheckout(def.key)}
@@ -619,7 +657,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason }) => {
                         boxShadow: isRecommended ? "0 4px 16px rgba(155,126,200,.3)" : "none",
                         opacity: isCheckingOut ? 0.7 : 1,
                       }}
-                    >{isCheckingOut ? "Opening checkout..." : `Upgrade to ${def.name}`}</button>
+                    >{isCheckingOut ? "Opening checkout..." : isAnonymous ? `Create account & get ${def.name}` : `Upgrade to ${def.name}`}</button>
                   )}
                 </div>
               </div>
@@ -644,8 +682,14 @@ const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,o
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Pro feature");
   const ITEMS=[{key:"collection",label:"My Wovely",sub:starterC+" starter"+(starterC!==1?"s":"")+" · "+addedC+" added",icon:"🧶"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated",icon:"🛒"}];
   const planLabel = isPro ? "My plan" : "See plans";
-  const planSub = isAnonymous ? "Sign up to compare plans" : (isPro ? `You're on ${tierLabel(tier)}` : "Compare Free, Pro, Craft");
-  const handlePlansClick = () => { if (isAnonymous) { onOpenAuthWall(); return; } onUpgrade(); };
+  // Anonymous users get the same subtitle as Free — the modal explains the
+  // signup-before-Stripe step itself. Mismatched copy ("Sign up to compare
+  // plans") was killing the click intent before the modal could open.
+  const planSub = isPro ? `You're on ${tierLabel(tier)}` : "Compare Free, Pro, Craft";
+  // Always open the upgrade modal. The modal is the single source of truth
+  // for plan comparison; the AuthWall used to be wedged in front of it for
+  // guests, which hid the comparison before they ever saw it.
+  const handlePlansClick = () => { onUpgrade(); };
   return (
     <div style={{width:260,background:"#9B7EC8",height:"100vh",position:"sticky",top:0,display:"flex",flexDirection:"column",flexShrink:0}}>
       <div onClick={()=>onNavigate("collection")} style={{display:"flex",flexDirection:"column",alignItems:"center",padding:"24px 16px 20px",gap:8,cursor:"pointer",transition:"opacity .15s"}} onMouseEnter={e=>e.currentTarget.style.opacity=".85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
@@ -686,9 +730,10 @@ const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,o
         );})()}
       </div>
       <div style={{padding:"0 16px 24px"}}>
-        {isPro?<div onClick={onUpgrade} style={{background:"rgba(255,255,255,.15)",borderRadius:12,padding:"12px 14px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}><span style={{fontSize:16}}>✨</span><div style={{flex:1}}><div style={{fontSize:12,fontWeight:700,color:"#fff"}}>Wovely {tierLabel(tier)}</div><div style={{fontSize:11,color:"rgba(255,255,255,.7)"}}>{tier==='craft'?"Every feature active":"Tap to manage or upgrade"}</div></div></div>
-        :<div style={{background:"rgba(255,255,255,.15)",borderRadius:12,padding:"14px"}}><div style={{fontSize:12,fontWeight:700,color:"#fff",marginBottom:3}}>✨ Upgrade your plan</div><div style={{fontSize:11,color:"rgba(255,255,255,.75)",lineHeight:1.5,marginBottom:10}}>{isAnonymous?"Sign up free to save patterns. Pick a paid plan anytime.":"Unlimited patterns, big-pattern imports, BevCheck quality scoring."}</div>{isAnonymous?<div onClick={onOpenAuthWall} style={{background:"rgba(255,255,255,.2)",borderRadius:9999,padding:"8px",textAlign:"center",fontSize:12,fontWeight:700,color:"#fff",cursor:"pointer"}}>Get started free</div>:<div onClick={onUpgrade} style={{background:"rgba(255,255,255,.2)",borderRadius:9999,padding:"8px",textAlign:"center",fontSize:12,fontWeight:700,color:"#fff",cursor:"pointer"}}>See plans</div>}</div>}
-        {isAnonymous?<button onClick={onOpenAuthWall} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:9999,padding:"8px",fontSize:12,color:"#fff",cursor:"pointer",marginTop:10,fontWeight:500}}>Sign in / Create account</button>:(onSignOut&&<button onClick={onSignOut} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:9999,padding:"8px",fontSize:12,color:"#fff",cursor:"pointer",marginTop:10,fontWeight:500}}>Sign out</button>)}
+        {/* The bottom upgrade/manage card was removed — "See plans" in the
+            nav list above is now the single entry point to the upgrade
+            modal for every user state. */}
+        {isAnonymous?<button onClick={onOpenAuthWall} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:9999,padding:"8px",fontSize:12,color:"#fff",cursor:"pointer",fontWeight:500}}>Sign in / Create account</button>:(onSignOut&&<button onClick={onSignOut} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:9999,padding:"8px",fontSize:12,color:"#fff",cursor:"pointer",fontWeight:500}}>Sign out</button>)}
         <div style={{textAlign:"center",marginTop:12,fontSize:11}}>
           <span onClick={()=>onNavigate("privacy")} style={{color:"rgba(255,255,255,.5)",cursor:"pointer"}}>Privacy</span>
           <span style={{margin:"0 6px",color:"rgba(255,255,255,.3)"}}>|</span>
@@ -708,8 +753,11 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Pro feature");
   const ITEMS=[{key:"collection",label:"My Wovely",sub:count+" patterns",icon:"🧶"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs",icon:"🛒"}];
   const planLabel = isPro ? "My plan" : "See plans";
-  const planSub = isAnonymous ? "Sign up to compare plans" : (isPro ? `You're on ${tierLabel(tier)}` : "Compare Free, Pro, Craft");
-  const handlePlansClick = () => { if (isAnonymous) { onOpenAuthWall?.(); dismiss(); return; } onUpgrade(); dismiss(); };
+  // Same rationale as SidebarNav: the modal is the single source of truth
+  // for plan comparison, including for anonymous users. The modal itself
+  // gates the Stripe step on signup.
+  const planSub = isPro ? `You're on ${tierLabel(tier)}` : "Compare Free, Pro, Craft";
+  const handlePlansClick = () => { onUpgrade(); dismiss(); };
   return (
     <div style={{position:"fixed",inset:0,zIndex:100}}>
       <div className={closing?"dim-out":"dim-in"} onClick={dismiss} style={{position:"absolute",inset:0,background:"rgba(28,23,20,.52)",backdropFilter:"blur(3px)"}}/>
@@ -1760,6 +1808,13 @@ export default function Wovely() {
   const [pendingImportUrl,setPendingImportUrl]=useState(null);
   // Handoff from ImportPill (queue completed) → review modal. { fileType, extractedData } or null.
   const [pendingExtractedHandoff,setPendingExtractedHandoff]=useState(null);
+  // Tier the user picked from the upgrade modal while still anonymous.
+  // Stashed so that after they convert through the AuthWall, we can auto-fire
+  // Stripe checkout for the tier they picked — no second click needed.
+  // null when the picked tier was Free (signup-only, no Stripe step).
+  // Mirrored to sessionStorage (PENDING_UPGRADE_KEY) so OAuth or any
+  // full-page redirect path that remounts the React tree doesn't lose it.
+  const [pendingUpgradeTier,setPendingUpgradeTier]=useState(null);
   // Anonymous mode: set when user clicks "Try it free" on landing. Persists in sessionStorage so
   // refresh/nav within the tab keeps them in the app shell instead of bouncing to the landing.
   const [anonymousMode,setAnonymousMode]=useState(()=>{try{return sessionStorage.getItem("wovely_anonymous_mode")==="1";}catch{return false;}});
@@ -1809,6 +1864,72 @@ export default function Wovely() {
     cb();
   };
 
+  // Fire Stripe checkout for the given tier. Optional `passedUser` short
+  // circuits the session read — important for the post-conversion path
+  // where supabaseAuth.getUser() can briefly lag the rotated JWT during
+  // the anonymous-to-real flip. Trusting the user object returned by
+  // waitForSession() in the AuthWallModal avoids that race entirely.
+  // Navigates the page on success, returns false on failure so the
+  // caller can decide how to recover.
+  const fireUpgradeCheckout = async (tierKey, passedUser) => {
+    try {
+      let email, userId;
+      if (passedUser?.email) {
+        email = passedUser.email;
+        userId = passedUser.id;
+      } else {
+        const u = supabaseAuth.getUser();
+        const s = getSession();
+        if (!u || !s) {
+          console.warn("[Wovely] fireUpgradeCheckout: no user/session, bailing");
+          return false;
+        }
+        email = u.email;
+        userId = (()=>{try{const p=JSON.parse(atob(s.access_token.split(".")[1]));return p.sub;}catch{return null;}})() || u.id;
+      }
+      console.log("[Wovely] fireUpgradeCheckout:", { tierKey, hasPassedUser: !!passedUser, email, userId });
+      const res = await fetch("/api/stripe-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, email, tier: tierKey }),
+      });
+      const data = await res.json();
+      if (!res.ok) { console.error("[Wovely] Checkout error:", data?.error || data); return false; }
+      window.location.href = data.url;
+      return true;
+    } catch (err) {
+      console.error("[Wovely] Checkout exception:", err);
+      return false;
+    }
+  };
+
+  // Called by TieredUpgradeModal when an anonymous user picks any plan
+  // (paid or free). Closes the modal, stashes the picked tier, and opens
+  // the AuthWall in convert mode with copy that matches the intent.
+  // Passing null means the user picked Free — signup only, no Stripe.
+  const handleUpgradeSignupRequired = (tierKey) => {
+    setShowPaywall(false);
+    setShowProModal(false);
+    setPendingUpgradeTier(tierKey || null);
+    // Mirror to sessionStorage so the tier survives any remount path —
+    // most importantly OAuth, which round-trips through the provider and
+    // returns to a fresh app instance with no React state to read from.
+    try {
+      if (tierKey) sessionStorage.setItem(PENDING_UPGRADE_KEY, tierKey);
+      else sessionStorage.removeItem(PENDING_UPGRADE_KEY);
+    } catch {}
+    setAuthWallContext({
+      title: tierKey ? `Create your account to subscribe` : "Create your free account",
+      subtitle: tierKey
+        ? `One step to get Wovely ${tierKey === TIER_PRO ? 'Pro' : 'Craft'}. Your guest pattern carries over.`
+        : "Your guest pattern carries over to your new account.",
+      intent: tierKey ? `upgrade_signup_${tierKey}` : "upgrade_signup_free",
+      requiresPro: false,
+      onSuccess: () => {},
+    });
+    setAuthWallOpen(true);
+  };
+
   // Shared handler for AuthWallModal success. Flips auth state, clears anon mode, identifies the
   // user in PostHog, prefetches tier so Pro/Craft-gated resumes don't flash, THEN invokes the
   // context's onSuccess (which runs the gate's setTimeout → proceedCallback). Must be async so the
@@ -1842,12 +1963,60 @@ export default function Wovely() {
       } catch (e) { console.warn("[Wovely] AuthWall profile prefetch failed:", e.message); }
     }
     if (authWallContext?.onSuccess) authWallContext.onSuccess(user);
+    // Post-conversion auto-checkout: if the user picked a paid tier from
+    // the upgrade modal before signing up, send them straight to Stripe
+    // without making them re-open the modal and re-pick. Picked Free is
+    // a no-op — they wanted the free account and now they have one.
+    // Read from sessionStorage first so we don't lose the picked tier
+    // across an OAuth round-trip or other remount; fall back to state.
+    let tierKey = null;
+    try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
+    if (!tierKey) tierKey = pendingUpgradeTier;
+    if (tierKey) {
+      // Clear both stores immediately so a failed Stripe call doesn't
+      // produce a redirect loop on the next mount.
+      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+      setPendingUpgradeTier(null);
+      // 500ms gives the rotated JWT + profile fetch enough headroom to
+      // settle in localStorage. Pass `user` directly so the checkout
+      // call doesn't depend on the session read — robust to any
+      // remaining lag in the anonymous-to-real conversion flip.
+      setTimeout(() => { fireUpgradeCheckout(tierKey, user); }, 500);
+    }
   };
 
   // Initialize client-side error reporting once on mount
   useEffect(() => {
     initErrorReporter();
   }, []);
+
+  // Post-signup auto-checkout, redirect-safe variant. Catches the cases
+  // where the React tree remounts between picking the tier and finishing
+  // the auth flow — OAuth round-trip, full page reload, email confirm
+  // link, etc. handleAuthWallSuccess covers the in-app signup path
+  // already; sessionStorage removeItem is the lock so both paths can
+  // race safely (first reader wins). Skips when the user is anonymous
+  // or already paid (no Stripe call needed in either state).
+  useEffect(() => {
+    if (!authChecked || !authed || isAnonymous) return;
+    if (isPaidTier(tier)) {
+      // User already has a paid plan — drop any stale pending tier on
+      // the floor rather than redirecting them to Stripe for a second
+      // subscription.
+      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+      return;
+    }
+    let tierKey = null;
+    try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
+    if (!tierKey) return;
+    try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+    setPendingUpgradeTier(null);
+    // Same 100ms settle delay as the AuthWall path for JWT + profile
+    // localStorage writes. Stripe checkout failure is logged but not
+    // retried; the user can re-open "See plans" and pick again.
+    setTimeout(() => { fireUpgradeCheckout(tierKey); }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authChecked, authed, isAnonymous, tier]);
 
   // Route-change dismissal (S1.5.3). When the user navigates while an import
   // modal is mounted, close it. If a polling job is still in flight, the
@@ -1963,7 +2132,7 @@ export default function Wovely() {
     }
   },[]);
 
-  const handleSignOut = async () => { posthog.reset(); await supabaseAuth.signOut(); setAuthed(false); setTier(TIER_FREE); setUserPatterns([]); clearCachedTier(); setIsAnonymous(false); clearCachedIsAnonymous(); try { sessionStorage.removeItem("wovely_redirect_intent"); sessionStorage.removeItem("wovely_anonymous_mode"); } catch {} setAnonymousMode(false); document.cookie="wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; navigate("/"); };
+  const handleSignOut = async () => { posthog.reset(); await supabaseAuth.signOut(); setAuthed(false); setTier(TIER_FREE); setUserPatterns([]); clearCachedTier(); setIsAnonymous(false); clearCachedIsAnonymous(); setPendingUpgradeTier(null); try { sessionStorage.removeItem("wovely_redirect_intent"); sessionStorage.removeItem("wovely_anonymous_mode"); sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {} setAnonymousMode(false); document.cookie="wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; navigate("/"); };
 
   // Navigation helper — translates view keys to URL paths
   const navigateToView = useCallback((v, patternId) => {
@@ -2433,11 +2602,11 @@ export default function Wovely() {
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:"transparent",fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
-      {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>setShowPaywall(false)}/>}
-      {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>setShowProModal(false)}/>}
+      {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>setShowPaywall(false)} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired}/>}
+      {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>setShowProModal(false)} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired}/>}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null}/>}
       {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
       {addMenuOpen&&menuAnchor&&<><div onClick={()=>{setAddMenuOpen(false);setMenuAnchor(null);}} style={{position:"fixed",inset:0,zIndex:49}}/><div style={{position:"fixed",top:menuAnchor.top,left:menuAnchor.left,zIndex:50,background:"#fff",border:`1px solid ${T.border}`,borderRadius:14,boxShadow:"0 8px 32px rgba(45,45,78,.12)",minWidth:220,padding:"6px 0",fontFamily:"Inter,sans-serif"}}>{[{icon:"📄",label:"Add PDF",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openImageImport();}},{icon:"🔗",label:"Paste a URL",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("url");}},{icon:"🌐",label:"Explore free patterns",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 16px",cursor:"pointer",fontSize:13,fontWeight:500,color:T.ink,transition:"background .12s"}} onMouseEnter={e=>e.currentTarget.style.background=T.linen} onMouseLeave={e=>e.currentTarget.style.background="transparent"}><span style={{fontSize:16,width:22,textAlign:"center"}}>{item.icon}</span>{item.label}</div>))}</div></>}
@@ -2447,7 +2616,7 @@ export default function Wovely() {
       {coverPickerTarget&&<CoverImagePicker pattern={coverPickerTarget} onConfirm={handleCoverConfirm} onClose={()=>setCoverPickerTarget(null)} pdfThumbUrl={pdfThumbUrl} CAT_IMG={CAT_IMG} ALL_CAT_ENTRIES={ALL_CAT_ENTRIES}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?"Welcome to Wovely Pro!":"No worries — you can upgrade anytime"}</div>}
-      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e?.currentTarget?.getBoundingClientRect();if(r)setMenuAnchor({top:r.bottom+8,left:r.left});setAddMenuOpen(true);}} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})} userPatterns={userPatterns} allPatterns={allPatterns}/>
+      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e?.currentTarget?.getBoundingClientRect();if(r)setMenuAnchor({top:r.bottom+8,left:r.left});setAddMenuOpen(true);}} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})} userPatterns={userPatterns} allPatterns={allPatterns}/>
       <div style={{flex:1,minWidth:0,overflowY:"auto",display:"flex",flexDirection:"column",background:"transparent"}}>
         <WelcomeBanner visible={showWelcomeBanner}/>
         <div style={{background:"#FFFFFF",borderBottom:"1px solid #EDE4F7",padding:"0 32px",height:64,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0}}>
@@ -2480,14 +2649,14 @@ export default function Wovely() {
     <div style={{fontFamily:T.sans,background:"transparent",minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?"Welcome to Wovely Pro!":"No worries — you can upgrade anytime"}</div>}
-      <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})}/>
-      {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>setShowPaywall(false)}/>}
-      {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>setShowProModal(false)}/>}
+      <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})}/>
+      {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>setShowPaywall(false)} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired}/>}
+      {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>setShowProModal(false)} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired}/>}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null}/>}
       {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
       {createdPattern&&<PatternCreatedOverlay pattern={createdPattern} onStartBuilding={()=>{const p=createdPattern;setCreatedPattern(null);startAndOpenPattern(p);}} onGoToHive={()=>{setCreatedPattern(null);navigateToView("collection");}}/>}
