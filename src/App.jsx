@@ -1864,24 +1864,37 @@ export default function Wovely() {
     cb();
   };
 
-  // Fire Stripe checkout for the given tier using the current session.
-  // Extracted from TieredUpgradeModal so callers outside the modal — most
-  // importantly the post-conversion auto-checkout path — can share the
-  // same code path. Navigates the page on success, returns false on
-  // failure so the caller can decide how to recover.
-  const fireUpgradeCheckout = async (tierKey) => {
+  // Fire Stripe checkout for the given tier. Optional `passedUser` short
+  // circuits the session read — important for the post-conversion path
+  // where supabaseAuth.getUser() can briefly lag the rotated JWT during
+  // the anonymous-to-real flip. Trusting the user object returned by
+  // waitForSession() in the AuthWallModal avoids that race entirely.
+  // Navigates the page on success, returns false on failure so the
+  // caller can decide how to recover.
+  const fireUpgradeCheckout = async (tierKey, passedUser) => {
     try {
-      const u = supabaseAuth.getUser();
-      const s = getSession();
-      if (!u || !s) return false;
-      const uid = (()=>{try{const p=JSON.parse(atob(s.access_token.split(".")[1]));return p.sub;}catch{return null;}})();
+      let email, userId;
+      if (passedUser?.email) {
+        email = passedUser.email;
+        userId = passedUser.id;
+      } else {
+        const u = supabaseAuth.getUser();
+        const s = getSession();
+        if (!u || !s) {
+          console.warn("[Wovely] fireUpgradeCheckout: no user/session, bailing");
+          return false;
+        }
+        email = u.email;
+        userId = (()=>{try{const p=JSON.parse(atob(s.access_token.split(".")[1]));return p.sub;}catch{return null;}})() || u.id;
+      }
+      console.log("[Wovely] fireUpgradeCheckout:", { tierKey, hasPassedUser: !!passedUser, email, userId });
       const res = await fetch("/api/stripe-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: uid || u.id, email: u.email, tier: tierKey }),
+        body: JSON.stringify({ userId, email, tier: tierKey }),
       });
       const data = await res.json();
-      if (!res.ok) { console.error("[Wovely] Checkout error:", data?.error); return false; }
+      if (!res.ok) { console.error("[Wovely] Checkout error:", data?.error || data); return false; }
       window.location.href = data.url;
       return true;
     } catch (err) {
@@ -1964,9 +1977,11 @@ export default function Wovely() {
       // produce a redirect loop on the next mount.
       try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
       setPendingUpgradeTier(null);
-      // Tiny delay so the freshly-rotated JWT + profile fetch above are
-      // settled in localStorage when stripe-checkout reads them.
-      setTimeout(() => { fireUpgradeCheckout(tierKey); }, 100);
+      // 500ms gives the rotated JWT + profile fetch enough headroom to
+      // settle in localStorage. Pass `user` directly so the checkout
+      // call doesn't depend on the session read — robust to any
+      // remaining lag in the anonymous-to-real conversion flip.
+      setTimeout(() => { fireUpgradeCheckout(tierKey, user); }, 500);
     }
   };
 
@@ -1999,7 +2014,7 @@ export default function Wovely() {
     // Same 100ms settle delay as the AuthWall path for JWT + profile
     // localStorage writes. Stripe checkout failure is logged but not
     // retried; the user can re-open "See plans" and pick again.
-    setTimeout(() => { fireUpgradeCheckout(tierKey); }, 100);
+    setTimeout(() => { fireUpgradeCheckout(tierKey); }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authChecked, authed, isAnonymous, tier]);
 
