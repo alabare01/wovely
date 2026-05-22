@@ -357,7 +357,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             ))}
           </div>
         </div>
-        <div style={{padding:"4px 20px 36px",maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
+        <div style={{padding:`4px 20px ${isAnonymous?140:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
         {tab==="materials"&&(<>
           {(editing?draft.materials:p.materials).map((m,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${T.border}`}}>
@@ -413,6 +413,71 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
         </div>
       </div>
       {/* Floating source pill now rendered inside RowManager */}
+      {isAnonymous && (
+        // Always-visible signup nudge on the pattern detail view. Renders
+        // on all tabs (Materials / Instructions / Notes) so guests can
+        // convert without scrolling to find the inline CTA. The card style
+        // matches the standard Wovely glass treatment but with a stronger
+        // alpha so legibility holds over varied content underneath.
+        <div style={{
+          position:"fixed",
+          left:0,
+          right:0,
+          bottom:0,
+          zIndex:45,
+          background:"rgba(255,255,255,0.92)",
+          backdropFilter:"blur(16px)",
+          WebkitBackdropFilter:"blur(16px)",
+          borderTop:"1px solid rgba(255,255,255,0.45)",
+          boxShadow:"0 -4px 24px rgba(45,58,124,0.08)",
+          padding: isDesktop ? "12px 24px" : "12px 16px",
+          fontFamily:"Inter,sans-serif",
+        }}>
+          {isDesktop ? (
+            <div style={{maxWidth:760,margin:"0 auto",display:"flex",alignItems:"center",gap:16}}>
+              <div style={{flex:1,fontSize:14,color:"#2D2D4E",lineHeight:1.4}}>
+                You're seeing a preview. Create a free account for the full pattern.
+              </div>
+              <button
+                onClick={()=>onSignUp&&onSignUp()}
+                style={{
+                  background:"#9B7EC8",
+                  color:"#fff",
+                  border:"none",
+                  borderRadius:9999,
+                  padding:"10px 22px",
+                  fontSize:14,
+                  fontWeight:600,
+                  cursor:"pointer",
+                  boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
+                  whiteSpace:"nowrap",
+                }}
+              >Create Free Account</button>
+            </div>
+          ) : (
+            <div style={{display:"flex",flexDirection:"column",gap:8,alignItems:"stretch"}}>
+              <div style={{fontSize:13,color:"#2D2D4E",lineHeight:1.4,textAlign:"center"}}>
+                You're seeing a preview. Create a free account for the full pattern.
+              </div>
+              <button
+                onClick={()=>onSignUp&&onSignUp()}
+                style={{
+                  width:"100%",
+                  background:"#9B7EC8",
+                  color:"#fff",
+                  border:"none",
+                  borderRadius:12,
+                  padding:"12px 16px",
+                  fontSize:14,
+                  fontWeight:600,
+                  cursor:"pointer",
+                  boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
+                }}
+              >Create Free Account</button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
