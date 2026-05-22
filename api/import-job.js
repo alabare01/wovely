@@ -47,6 +47,41 @@ export default async function handler(req, res) {
   const userId = decodeJwtSub(userToken);
   if (!userId) return res.status(401).json({ error: "Invalid token" });
 
+  // Decode is_anonymous from the JWT directly — anonymous users (guests)
+  // are capped at one import_job total. Reading the claim avoids an extra
+  // auth.users round-trip; the JWT is signed by Supabase so we trust it.
+  let isAnonymous = false;
+  try {
+    const [, payload] = userToken.split('.');
+    if (payload) {
+      const json = Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+      isAnonymous = JSON.parse(json).is_anonymous === true;
+    }
+  } catch {}
+
+  if (isAnonymous && serviceKey && supabaseUrl) {
+    try {
+      // Count this user's existing import_jobs. Anything > 0 means they've
+      // already used their guest import — block here so the friendly modal
+      // message surfaces instead of the worker silently doing the work and
+      // the client hitting tier paywall on save.
+      const countRes = await fetch(`${supabaseUrl}/rest/v1/import_jobs?user_id=eq.${userId}&select=id`, {
+        headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}`, 'Prefer': 'count=exact' },
+      });
+      if (countRes.ok) {
+        const existing = await countRes.json();
+        if (Array.isArray(existing) && existing.length >= 1) {
+          return res.status(402).json({
+            error: 'guest_import_cap_reached',
+            message: "Create a free account to keep importing. Your guest pattern stays attached.",
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('[import-job] guest cap check failed, letting through:', e.message);
+    }
+  }
+
   const { file_url, file_type, raw_text, cover_image_url, pdf_metadata_title } = req.body || {};
   if (!file_url || !file_type) return res.status(400).json({ error: "file_url and file_type required" });
   if (file_type !== 'pdf' && file_type !== 'image') return res.status(400).json({ error: "file_type must be 'pdf' or 'image'" });
@@ -58,8 +93,18 @@ export default async function handler(req, res) {
   // creation entirely so the worker never sees the job — failing here
   // with a typed code is way better UX than letting the queue time out.
   // Threshold matches TIER_SMALL_THRESHOLD in api/extract-pattern.js.
+  // Anonymous users hit the same gate as Free tier — big patterns are
+  // a paid feature regardless of guest status.
   const CHUNKED_IMPORT_THRESHOLD = 15000;
-  if (file_type === 'pdf' && raw_text && raw_text.length >= CHUNKED_IMPORT_THRESHOLD && serviceKey && supabaseUrl) {
+  if (file_type === 'pdf' && raw_text && raw_text.length >= CHUNKED_IMPORT_THRESHOLD && (isAnonymous || (serviceKey && supabaseUrl))) {
+    if (isAnonymous) {
+      return res.status(402).json({
+        error: 'chunked_import_requires_paid_tier',
+        message: "This pattern is a big one. Create a free account first, then upgrade to Pro for full support.",
+        required_tier: 'pro',
+        text_length: raw_text.length,
+      });
+    }
     try {
       const tierRes = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${userId}&select=tier,is_pro`, {
         headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` },

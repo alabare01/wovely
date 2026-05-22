@@ -31,6 +31,7 @@ const AuthWallModal = ({
   title = "Create a free account",
   subtitle = "Takes 10 seconds. No credit card.",
   intent,
+  isAnonymous = false,
 }) => {
   const [mode, setMode] = useState("signup");
   const [email, setEmail] = useState("");
@@ -57,13 +58,18 @@ const AuthWallModal = ({
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { data, error: err } = await supabaseAuth.signUp(email.trim(), pass);
+        // Anonymous → real account conversion preserves the UUID and all
+        // attached patterns/import_jobs. Falls back to a fresh signUp if
+        // the conversion call fails (e.g. JWT expired mid-flight).
+        const { data, error: err } = isAnonymous
+          ? await supabaseAuth.convertAnonymousToUser(email.trim(), pass)
+          : await supabaseAuth.signUp(email.trim(), pass);
         if (err) { setError(err.msg || err.error_description || err.message || "Sign-up failed."); setLoading(false); return; }
         const user = await waitForSession();
         if (!user) { setError("Signup succeeded but session setup failed. Please sign in manually."); setLoading(false); return; }
         setError(null);
         try {
-          posthog.capture("user_signed_up", { intent: intent || "unknown", source: "auth_wall_modal" });
+          posthog.capture("user_signed_up", { intent: intent || "unknown", source: "auth_wall_modal", converted_from_anon: isAnonymous });
           posthog.capture("signed_up_from_wall", { intent: intent || "unknown" });
         } catch {}
         if (onSuccess) await onSuccess(user);
@@ -150,6 +156,20 @@ const AuthWallModal = ({
           {mode === "signup" ? subtitle : "Sign in to continue."}
         </div>
 
+        {isAnonymous && mode === "signin" && (
+          <div style={{
+            background: "#FFF4D6",
+            border: "1px solid #E8C77A",
+            borderRadius: 10,
+            padding: "10px 12px",
+            marginBottom: 12,
+            fontSize: 12,
+            color: "#6B5400",
+            lineHeight: 1.5,
+          }}>
+            Signing in to an existing account discards your guest pattern. Pick "Create account" to keep it.
+          </div>
+        )}
         <div onKeyDown={onKey} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <input
             value={email}

@@ -17,7 +17,15 @@ export const FEATURE_GATES = {
   bevsRead:          [TIER_CRAFT], // future — not exposed in UI yet
 };
 
-export const canAccess = (feature, tier) => {
+// Anonymous (guest) users are below Free — they cannot use any gated
+// feature, AND they get a stricter pattern cap (handled outside this map
+// via ANON_PATTERN_CAP). Every gate call site that has the anonymous flag
+// available should short-circuit on it before consulting the tier map.
+export const ANON_PATTERN_CAP = 1;
+export const ANON_PREVIEW_FRACTION = 0.25;
+
+export const canAccess = (feature, tier, isAnonymous = false) => {
+  if (isAnonymous) return false;
   const allowed = FEATURE_GATES[feature];
   // Unknown features default open — better than silently locking a typo.
   return allowed ? allowed.includes(tier) : true;
@@ -32,7 +40,7 @@ export const requiredTier = (feature) => {
 
 // Convenience helpers for the gates that get checked most often. Kept as
 // thin wrappers so call sites read naturally at the point of use.
-export const canAccessCollections = (tier) => canAccess('collections', tier);
-export const canAccessBevCheck = (tier) => canAccess('bevCheck', tier);
-export const canAccessChunkedImport = (tier) => canAccess('chunkedImport', tier);
-export const canAccessUnlimitedPatterns = (tier) => canAccess('unlimitedPatterns', tier);
+export const canAccessCollections = (tier, isAnonymous=false) => canAccess('collections', tier, isAnonymous);
+export const canAccessBevCheck = (tier, isAnonymous=false) => canAccess('bevCheck', tier, isAnonymous);
+export const canAccessChunkedImport = (tier, isAnonymous=false) => canAccess('chunkedImport', tier, isAnonymous);
+export const canAccessUnlimitedPatterns = (tier, isAnonymous=false) => canAccess('unlimitedPatterns', tier, isAnonymous);
