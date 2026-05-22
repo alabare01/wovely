@@ -1,10 +1,16 @@
 // api/stripe-webhook.js
-// Handles Stripe webhook events for Wovely Pro subscriptions
+// Handles Stripe webhook events for Wovely subscriptions (Pro + Craft).
 // Requires Vercel env vars:
-//   STRIPE_SECRET_KEY — from Stripe dashboard
-//   STRIPE_WEBHOOK_SECRET — from Stripe webhook endpoint config
-//   SUPABASE_SERVICE_ROLE_KEY — from Supabase dashboard > Settings > API (bypasses RLS)
-//   VITE_SUPABASE_URL — Supabase project URL
+//   STRIPE_SECRET_KEY      — from Stripe dashboard
+//   STRIPE_WEBHOOK_SECRET  — from Stripe webhook endpoint config
+//   STRIPE_PRO_PRICE_ID    — recurring price for $4.99 Pro tier
+//   STRIPE_CRAFT_PRICE_ID  — recurring price for $8.99 Craft tier
+//   SUPABASE_SERVICE_ROLE_KEY — bypasses RLS so we can write tier on any row
+//   VITE_SUPABASE_URL      — Supabase project URL
+//
+// Source of truth on the row is user_profiles.tier ('free' | 'pro' | 'craft').
+// is_pro is kept synced (true for pro and craft) as a legacy mirror until
+// every client has rolled to the tier-aware read path.
 
 export const config = { api: { bodyParser: false } };
 
@@ -17,6 +23,19 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+const PRO_PRICE_ID = process.env.STRIPE_PRO_PRICE_ID;
+const CRAFT_PRICE_ID = process.env.STRIPE_CRAFT_PRICE_ID;
+
+// Map a Stripe price_id back to a Wovely tier string. Falls back to 'pro'
+// when nothing matches — better to give a paying user a paid tier than
+// to leave them on free while we figure out the env var mismatch.
+function tierFromPriceId(priceId, fallbackMeta) {
+  if (priceId && CRAFT_PRICE_ID && priceId === CRAFT_PRICE_ID) return 'craft';
+  if (priceId && PRO_PRICE_ID && priceId === PRO_PRICE_ID) return 'pro';
+  if (fallbackMeta === 'craft' || fallbackMeta === 'pro') return fallbackMeta;
+  return 'pro';
+}
+
 function getRawBody(req) {
   return new Promise((resolve, reject) => {
     let data = '';
@@ -24,6 +43,29 @@ function getRawBody(req) {
     req.on('end', () => resolve(data));
     req.on('error', reject);
   });
+}
+
+async function setTierForUser(userId, tier, extra = {}) {
+  const isPro = tier === 'pro' || tier === 'craft';
+  const { error } = await supabase
+    .from('user_profiles')
+    .update({ tier, is_pro: isPro, ...extra })
+    .eq('id', userId);
+  if (error) console.error('[stripe-webhook] tier update failed:', error.message);
+  return !error;
+}
+
+async function setTierBySubscription(subscriptionId, tier) {
+  const isPro = tier === 'pro' || tier === 'craft';
+  const update = { tier, is_pro: isPro };
+  // 'free' = cancelled subscription, so clear the subscription id too.
+  if (tier === 'free') update.stripe_subscription_id = null;
+  const { error } = await supabase
+    .from('user_profiles')
+    .update(update)
+    .eq('stripe_subscription_id', subscriptionId);
+  if (error) console.error('[stripe-webhook] tier-by-subscription update failed:', error.message);
+  return !error;
 }
 
 export default async function handler(req, res) {
@@ -46,40 +88,53 @@ export default async function handler(req, res) {
 
   console.log('[stripe-webhook] Event:', event.type);
 
+  // 1. New subscription — set tier from the purchased price.
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    const userId = session.metadata.userId;
+    const userId = session.metadata?.userId;
     const customerId = session.customer;
     const subscriptionId = session.subscription;
-
-    const { error } = await supabase
-      .from('user_profiles')
-      .update({
-        is_pro: true,
+    // The session's line_items isn't expanded by default; fetch the
+    // subscription to get the price id we need to derive the tier from.
+    let purchasedTier = session.metadata?.tier || 'pro';
+    if (subscriptionId) {
+      try {
+        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        const priceId = sub.items?.data?.[0]?.price?.id;
+        purchasedTier = tierFromPriceId(priceId, session.metadata?.tier);
+      } catch (e) {
+        console.warn('[stripe-webhook] subscription retrieve failed, using metadata tier:', e.message);
+      }
+    }
+    if (userId) {
+      await setTierForUser(userId, purchasedTier, {
         stripe_customer_id: customerId,
-        stripe_subscription_id: subscriptionId
-      })
-      .eq('id', userId);
-
-    if (error) {
-      console.error('[stripe-webhook] Supabase update error:', error.message);
+        stripe_subscription_id: subscriptionId,
+      });
+      console.log(`[stripe-webhook] tier=${purchasedTier} activated for user:`, userId);
     } else {
-      console.log('[stripe-webhook] Pro activated for user:', userId);
+      console.warn('[stripe-webhook] checkout.session.completed missing metadata.userId');
     }
   }
 
+  // 2. Plan change (Pro ↔ Craft) — update tier from the new price.
+  if (event.type === 'customer.subscription.updated') {
+    const subscription = event.data.object;
+    const priceId = subscription.items?.data?.[0]?.price?.id;
+    // Only relevant when the subscription is still active. cancel_at_period_end
+    // doesn't change tier; the actual deletion event will.
+    if (subscription.status === 'active' || subscription.status === 'trialing') {
+      const newTier = tierFromPriceId(priceId, null);
+      await setTierBySubscription(subscription.id, newTier);
+      console.log(`[stripe-webhook] subscription ${subscription.id} updated → tier=${newTier}`);
+    }
+  }
+
+  // 3. Cancellation — back to free.
   if (event.type === 'customer.subscription.deleted') {
     const subscription = event.data.object;
-    const { error } = await supabase
-      .from('user_profiles')
-      .update({ is_pro: false, stripe_subscription_id: null })
-      .eq('stripe_subscription_id', subscription.id);
-
-    if (error) {
-      console.error('[stripe-webhook] Cancel error:', error.message);
-    } else {
-      console.log('[stripe-webhook] Pro cancelled for subscription:', subscription.id);
-    }
+    await setTierBySubscription(subscription.id, 'free');
+    console.log('[stripe-webhook] tier=free (cancelled) for subscription:', subscription.id);
   }
 
   if (_url && _key) {
@@ -91,4 +146,3 @@ export default async function handler(req, res) {
   }
   res.json({ received: true });
 }
-

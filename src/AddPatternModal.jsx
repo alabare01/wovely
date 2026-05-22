@@ -1083,8 +1083,16 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
                 clearInterval(intv2);intv2Ref.current=null;
                 onExtractionEnd?.();
                 setStage('error');
-                setErrorType('extraction_failed');
-                setErrorMsg(errBody.error || 'We couldn’t start your import. Try again.');
+                // 402 from the chunked-import tier gate gets its own
+                // errorType so the error stage renders the upgrade nudge
+                // instead of the generic "stumped" retry copy.
+                if (jobRes.status === 402 && errBody.error === 'chunked_import_requires_paid_tier') {
+                  setErrorType('tier_gated_chunked');
+                  setErrorMsg(errBody.message || 'This pattern is a big one. Pro members get full support for complex patterns.');
+                } else {
+                  setErrorType('extraction_failed');
+                  setErrorMsg(errBody.error || 'We couldn’t start your import. Try again.');
+                }
                 return;
               } catch (queueErr) {
                 console.error('[Wovely] Queue POST exception:', queueErr.message);
@@ -1265,6 +1273,26 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
   }
   if(stage==="error") {
     const isHiccup=errorType==="server_hiccup";
+    const isTierGated=errorType==="tier_gated_chunked";
+    if(isTierGated) {
+      // Free user hit the chunked-import gate. Friendly headline +
+      // upgrade CTA, no retry button (retry would just fail again).
+      return (
+        <div style={{padding:"24px 0 12px"}}>
+          <div style={{fontSize:36,textAlign:"center",marginBottom:12}}>🧶</div>
+          <div style={{fontFamily:T.serif,fontSize:17,color:T.ink,textAlign:"center",marginBottom:6}}>This pattern is a big one</div>
+          <div style={{fontSize:13,color:T.ink2,textAlign:"center",lineHeight:1.7,marginBottom:20,padding:"0 8px"}}>
+            {errorMsg||"Pro members get full support for complex patterns. Bev handles everything from setup to finishing."}
+          </div>
+          {onUpgrade && (
+            <div style={{marginBottom:8}}>
+              <Btn onClick={onUpgrade}>See plans</Btn>
+            </div>
+          )}
+          <div style={{textAlign:"center",fontSize:11,color:T.ink3,opacity:0.7,marginTop:4}}>Or try a shorter pattern.</div>
+        </div>
+      );
+    }
     return (
       <div style={{padding:"24px 0"}}>
         <div style={{fontSize:36,textAlign:"center",marginBottom:12}}>🧶</div>
