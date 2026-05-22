@@ -99,6 +99,8 @@ const RowManager = ({
   setMilestone,
   Bar,
   onViewSource,
+  isAnonymous = false,
+  onSignUp,
 }) => {
   const [noteEdit,setNoteEdit]=useState(null);
   const [expandedSections,setExpandedSections]=useState({});
@@ -242,18 +244,25 @@ const RowManager = ({
           const defaultOpen=sec.rows.some(r=>!r.done)||!sec.header;
           const open=expandedSections[secKey]!==undefined?expandedSections[secKey]:defaultOpen;
           const toggleSec=()=>setExpandedSections(prev=>({...prev,[secKey]:!open}));
+          // Guest preview: show only the first 25% of rows in each section.
+          // Per-section truncation gives a tease of every component instead
+          // of cutting off the first component partway through and leaving
+          // later components invisible.
+          const previewLimit = isAnonymous ? Math.max(1, Math.ceil(sec.rows.length * 0.25)) : sec.rows.length;
+          const visibleRows = sec.rows.slice(0, previewLimit);
+          const hiddenRowCount = sec.rows.length - visibleRows.length;
           return (<div key={secKey} style={{marginBottom:8}}>
             {sec.header&&<button onClick={toggleSec} style={{width:"100%",background:secComplete?T.sageLt:T.linen,border:`1px solid ${secComplete?"rgba(92,122,94,.3)":T.border}`,borderRadius:open?"10px 10px 0 0":10,padding:"12px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,textAlign:"left"}}>
               <span style={{fontSize:12,color:T.ink3}}>{open?"▼":"▶"}</span>
               <div style={{flex:1}}>
                 <div style={{fontSize:13,fontWeight:700,color:secComplete?T.sage:T.terra}}>{sec.header.text.replace(/──/g,"").trim()}{secComplete?" ✓":""}</div>
-                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{secDone} of {secTotal} complete</div>
+                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{isAnonymous?`Showing ${visibleRows.length} of ${sec.rows.length} rows`:`${secDone} of ${secTotal} complete`}</div>
               </div>
               {sec.header.makeCount>1&&<div style={{background:T.gold,color:"#fff",borderRadius:99,padding:"2px 8px",fontSize:10,fontWeight:700}}>×{sec.header.makeCount}</div>}
               <div style={{width:60}}><Bar val={secTotal?secDone/secTotal*100:0} color={secComplete?T.sage:T.terra} h={3}/></div>
             </button>}
-            {(open||!sec.header)&&<div style={{border:sec.header?`1px solid ${T.border}`:"none",borderTop:"none",borderRadius:sec.header?"0 0 10px 10px":0,overflow:"hidden"}}>
-              {sec.rows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;return(
+            {(open||!sec.header)&&<div style={{border:sec.header?`1px solid ${T.border}`:"none",borderTop:"none",borderRadius:sec.header?"0 0 10px 10px":0,overflow:"hidden",position:"relative"}}>
+              {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;return(
         <div key={r.id} id={`row-${i + 1}`} data-row={i + 1} style={{borderBottom:`1px solid ${T.border}`,background:flagStatus==="fail"?"rgba(192,84,74,0.08)":flagStatus==="warning"?"rgba(201,168,76,0.08)":r.isAction&&!rowLocked?"rgba(184,144,44,.06)":"transparent",borderLeft:flagStatus==="fail"?"3px solid #C0544A":flagStatus==="warning"?"3px solid #C9A84C":"none"}}>
           <div onClick={()=>{if(!rowLocked)toggle(r.id);}} style={{display:"flex",gap:13,alignItems:"flex-start",cursor:rowLocked?"default":"pointer",background:isCurrent&&!rowLocked?"rgba(155,126,200,.04)":"transparent",padding:"14px 8px",margin:"0 -8px",opacity:rowLocked?.45:1,transition:"opacity .15s"}}>
             <div style={{width:26,height:26,borderRadius:7,flexShrink:0,marginTop:1,background:r.done?T.terra:rowLocked?"#E8E4DF":T.surface,border:"1.5px solid "+(r.done?T.terra:isCurrent&&!rowLocked?T.terra:rowLocked?"#D5D0CA":T.border),display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",boxShadow:r.done?"0 2px 8px rgba(155,126,200,.3)":isCurrent&&!rowLocked?"0 0 0 3px rgba(155,126,200,.15)":"none"}}>
@@ -283,14 +292,92 @@ const RowManager = ({
           {noteEdit===r.id&&!rowLocked&&<div style={{padding:"0 8px 12px 47px",display:"flex",alignItems:"center",gap:8}}><input value={r.note} onChange={e=>updateNote(r.id,e.target.value)} placeholder="Add a note for this row…" style={{flex:1,padding:"9px 12px",background:T.linen,border:`1.5px solid ${T.terra}`,borderRadius:9,fontSize:13,color:T.ink,outline:"none"}}/>{noteSaved&&<span style={{fontSize:11,color:T.sage,fontWeight:600,flexShrink:0}}>Note saved</span>}</div>}
         </div>
       );})}
+              {isAnonymous && hiddenRowCount > 0 && (
+                <div style={{padding:"12px 14px 4px",fontSize:12,color:T.ink3,textAlign:"center",fontStyle:"italic"}}>
+                  {hiddenRowCount} more {hiddenRowCount===1?"row":"rows"} after the preview
+                </div>
+              )}
             </div>}
           </div>);
         });
       })()}
-      <div style={{display:"flex",gap:8,marginTop:16}}>
-        <input value={newRow} onChange={e=>setNewRow(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addRow()} placeholder="Add a row or step…" style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:11,padding:"10px 14px",fontSize:13,color:T.ink,background:T.linen,outline:"none"}} onFocus={e=>e.target.style.borderColor=T.terra} onBlur={e=>e.target.style.borderColor=T.border}/>
-        <button onClick={addRow} style={{background:T.terra,color:"#fff",border:"none",borderRadius:11,padding:"10px 18px",fontSize:22,cursor:"pointer",lineHeight:1,boxShadow:"0 4px 12px rgba(155,126,200,.35)"}}>+</button>
-      </div>
+      {isAnonymous ? (
+        // Guest preview wall — fade overlay above a glass CTA card. Renders
+        // after the truncated rows so the page reads "first taste, then a
+        // gentle nudge to convert". onSignUp opens the AuthWallModal in
+        // convert-anonymous-to-real mode so the same UUID + pattern carries
+        // forward without a reimport.
+        <div style={{position:"relative",marginTop:8}}>
+          <div style={{
+            position:"absolute",
+            top:-80,
+            left:0,
+            right:0,
+            height:80,
+            background:"linear-gradient(to bottom, rgba(248,246,255,0) 0%, rgba(248,246,255,1) 100%)",
+            pointerEvents:"none",
+          }}/>
+          <div style={{
+            background:"rgba(255,255,255,0.82)",
+            backdropFilter:"blur(16px)",
+            WebkitBackdropFilter:"blur(16px)",
+            border:"1px solid rgba(255,255,255,0.45)",
+            borderRadius:16,
+            boxShadow:"0 4px 24px rgba(45,58,124,0.08)",
+            padding:"28px 24px",
+            textAlign:"center",
+          }}>
+            <div style={{
+              fontFamily:"'Playfair Display', Georgia, serif",
+              fontSize:22,
+              fontWeight:700,
+              color:"#2D3A7C",
+              lineHeight:1.25,
+              marginBottom:8,
+            }}>
+              You're just getting started
+            </div>
+            <div style={{
+              fontFamily:"Inter,sans-serif",
+              fontSize:14,
+              color:"#6B6B8A",
+              lineHeight:1.6,
+              marginBottom:20,
+              maxWidth:360,
+              margin:"0 auto 20px",
+            }}>
+              Create a free account to see the full pattern, save your progress, and let Bev help you craft with confidence.
+            </div>
+            <button
+              onClick={()=>onSignUp&&onSignUp()}
+              style={{
+                background:"#9B7EC8",
+                color:"#fff",
+                border:"none",
+                borderRadius:12,
+                padding:"13px 28px",
+                fontSize:14,
+                fontWeight:600,
+                cursor:"pointer",
+                boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
+                marginBottom:12,
+              }}
+            >Create Free Account</button>
+            <div style={{fontSize:12.5,color:"#6B6B8A"}}>
+              Already have an account?{" "}
+              <span
+                onClick={()=>onSignUp&&onSignUp()}
+                style={{color:"#9B7EC8",cursor:"pointer",fontWeight:600}}
+              >Sign in</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div style={{display:"flex",gap:8,marginTop:16}}>
+          <input value={newRow} onChange={e=>setNewRow(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addRow()} placeholder="Add a row or step…" style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:11,padding:"10px 14px",fontSize:13,color:T.ink,background:T.linen,outline:"none"}} onFocus={e=>e.target.style.borderColor=T.terra} onBlur={e=>e.target.style.borderColor=T.border}/>
+          <button onClick={addRow} style={{background:T.terra,color:"#fff",border:"none",borderRadius:11,padding:"10px 18px",fontSize:22,cursor:"pointer",lineHeight:1,boxShadow:"0 4px 12px rgba(155,126,200,.35)"}}>+</button>
+        </div>
+      )}
       {/* Floating source pattern pill */}
       {p.source_file_url&&onViewSource&&<button onClick={onViewSource} style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:200,background:T.terra,color:"#fff",border:"none",borderRadius:999,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.4)",whiteSpace:"nowrap"}}>📄 View Source Pattern →</button>}
     </>

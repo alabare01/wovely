@@ -3,7 +3,7 @@ import { initErrorReporter, setErrorReporterUser } from './utils/errorReporter.j
 import { useNavigate, useLocation, useParams, Routes, Route, Navigate } from "react-router-dom";
 import posthog from "posthog-js";
 import { T, useBreakpoint, Field } from "./theme.jsx";
-import { SUPABASE_URL, SUPABASE_ANON_KEY, APP_ORIGIN, saveSession, getSession, supabaseAuth } from "./supabase.js";
+import { SUPABASE_URL, SUPABASE_ANON_KEY, APP_ORIGIN, saveSession, getSession, supabaseAuth, isAnonymousSession } from "./supabase.js";
 import { PHOTOS, PILL, APP_VERSION } from "./constants.js";
 import Calculators from "./Calculators.jsx";
 import StitchCheck from "./StitchCheck.jsx";
@@ -27,8 +27,9 @@ import {
   TIER_FREE, TIER_PRO, TIER_CRAFT,
   isPaidTier, isCraftTier, tierLabel, normalizeTier,
   tierFromLegacyIsPro, readCachedTier, writeCachedTier, clearCachedTier,
+  readCachedIsAnonymous, writeCachedIsAnonymous, clearCachedIsAnonymous,
 } from "./utils/tierUtils.js";
-import { canAccess, requiredTier } from "./utils/featureGates.js";
+import { canAccess, requiredTier, ANON_PATTERN_CAP } from "./utils/featureGates.js";
 
 if (typeof document !== "undefined" && !document.getElementById("sb-font")) {
   const l = document.createElement("link");
@@ -1721,6 +1722,13 @@ export default function Wovely() {
   // (true for pro+craft). Initial state reads the cached tier (falls back
   // to legacy yh_is_pro flag for sessions that pre-date migration 008).
   const [authed,setAuthed]=useState(_hasLocalSession);
+  // Anonymous (guest) state: true when the active session's JWT has
+  // is_anonymous: true. Initialized from the cached flag + JWT so the
+  // first paint reflects guest UI without waiting for validate(). Real
+  // sign-up via convertAnonymousToUser flips this back to false and
+  // clears the cache.
+  const [isAnonymous,setIsAnonymousState]=useState(()=>_hasLocalSession ? (isAnonymousSession() || readCachedIsAnonymous()) : false);
+  const setIsAnonymous=(v)=>{setIsAnonymousState(!!v);writeCachedIsAnonymous(!!v);};
   const [tier,setTierState]=useState(()=>_hasLocalSession?readCachedTier():TIER_FREE);
   const isPro=isPaidTier(tier);
   const setTier=(t)=>{const n=normalizeTier(t);setTierState(n);writeCachedTier(n);};
@@ -1810,6 +1818,10 @@ export default function Wovely() {
     document.cookie = "wovely_authed=1;path=/;max-age=31536000";
     try { sessionStorage.removeItem("wovely_anonymous_mode"); } catch {}
     setAnonymousMode(false);
+    // After a conversion (PUT /auth/v1/user + refresh), the new JWT no
+    // longer carries is_anonymous. Re-read it so the wall on the pattern
+    // detail page drops immediately without a reload.
+    setIsAnonymous(isAnonymousSession());
     if (user) posthog.identify(user.id, { email: user.email });
     setErrorReporterUser(user?.id || null);
     // Prefetch tier so paid-tier resumes see the right value (new users default to free, which is
@@ -1906,6 +1918,10 @@ export default function Wovely() {
           const restoredUser=supabaseAuth.getUser();
           if(restoredUser) posthog.identify(restoredUser.id,{email:restoredUser.email});
           setErrorReporterUser(restoredUser?.id || null);
+          // Refresh isAnonymous from the freshly-rotated JWT — covers the
+          // page-reload case where a guest comes back to a still-anonymous
+          // session and we need the guest UI before render.
+          setIsAnonymous(isAnonymousSession());
           setAuthed(true);document.cookie="wovely_authed=1;path=/;max-age=31536000";
         } else {
           clearAuth();
@@ -1947,7 +1963,7 @@ export default function Wovely() {
     }
   },[]);
 
-  const handleSignOut = async () => { posthog.reset(); await supabaseAuth.signOut(); setAuthed(false); setTier(TIER_FREE); setUserPatterns([]); clearCachedTier(); try { sessionStorage.removeItem("wovely_redirect_intent"); sessionStorage.removeItem("wovely_anonymous_mode"); } catch {} setAnonymousMode(false); document.cookie="wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; navigate("/"); };
+  const handleSignOut = async () => { posthog.reset(); await supabaseAuth.signOut(); setAuthed(false); setTier(TIER_FREE); setUserPatterns([]); clearCachedTier(); setIsAnonymous(false); clearCachedIsAnonymous(); try { sessionStorage.removeItem("wovely_redirect_intent"); sessionStorage.removeItem("wovely_anonymous_mode"); } catch {} setAnonymousMode(false); document.cookie="wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; navigate("/"); };
 
   // Navigation helper — translates view keys to URL paths
   const navigateToView = useCallback((v, patternId) => {
@@ -2271,23 +2287,67 @@ export default function Wovely() {
       }catch(e){console.error("[Wovely] Pattern save error:",e);}
     }
   };
+  // Guest import gate. Different from gateAction: unauthed users go through
+  // silent anonymous sign-in instead of the AuthWall, then proceed to the
+  // file picker. Already-anonymous users with their 1 free import used are
+  // routed to the AuthWall with copy that nudges them to convert rather than
+  // pushed to the paid-tier paywall. Free/Pro/Craft users keep the existing
+  // behavior (cap → tier paywall, else proceed).
+  const gateImport = async (intent, proceedCallback) => {
+    const cb = typeof proceedCallback === "function" ? proceedCallback : () => {};
+    if (!authed) {
+      try { posthog.capture("guest_import_started", { intent }); } catch {}
+      const { error } = await supabaseAuth.signInAnonymously();
+      if (error) {
+        // Anon sign-in failed (most likely Allow anonymous sign-ins is OFF
+        // in Supabase). Fall back to the AuthWall so the user can still
+        // sign up the regular way.
+        console.warn("[Wovely] Anonymous sign-in failed, falling back to AuthWall:", error?.message || error);
+        gateAction(
+          { intent: intent || "import_pattern", title: "Create a free account to save patterns", subtitle: "Your imports and progress stay with you across devices." },
+          () => { if(tierGate.atCap){setShowPaywall(true);return;} cb(); }
+        );
+        return;
+      }
+      // Anon sign-in succeeded — flip the session flags before opening
+      // the modal so the import API call carries the new Bearer token.
+      setAuthed(true);
+      document.cookie = "wovely_authed=1;path=/;max-age=31536000";
+      setIsAnonymous(true);
+      try { sessionStorage.removeItem("wovely_anonymous_mode"); } catch {}
+      setAnonymousMode(false);
+      const u = supabaseAuth.getUser();
+      if (u) posthog.identify(u.id, { email: u.email || "guest" });
+      cb();
+      return;
+    }
+    if (isAnonymous && userPatterns.length >= ANON_PATTERN_CAP) {
+      // Guest already used their 1 import. Show the AuthWall with copy
+      // that emphasizes "create an account to keep importing", not a
+      // paid-tier upsell.
+      try { posthog.capture("guest_cap_hit", { intent }); } catch {}
+      setAuthWallContext({
+        title: "Create a free account to save up to 5 patterns",
+        subtitle: "Your guest pattern stays attached to your new account.",
+        intent: intent || "guest_cap",
+        requiresPro: false,
+        onSuccess: () => { setTimeout(() => cb(), 300); },
+      });
+      setAuthWallOpen(true);
+      return;
+    }
+    if (tierGate.atCap) { setShowPaywall(true); return; }
+    cb();
+  };
+
   const openAddModal=(method)=>{
-    gateAction(
-      { intent: "import_pattern", title: "Create a free account to save patterns", subtitle: "Your imports and progress stay with you across devices." },
-      () => { if(tierGate.atCap){setShowPaywall(true);return;} setPendingImportUrl(null); setPendingMethod(method||null); setAddOpen(true); }
-    );
+    gateImport("import_pattern", () => { setPendingImportUrl(null); setPendingMethod(method||null); setAddOpen(true); });
   };
   const handleImportUrl=(u)=>{
-    gateAction(
-      { intent: "import_pattern_url", title: "Create a free account to save patterns", subtitle: "Your imports and progress stay with you across devices." },
-      () => { if(tierGate.atCap){setShowPaywall(true);return;} setPendingImportUrl(u); setPendingMethod("url"); setAddOpen(true); }
-    );
+    gateImport("import_pattern_url", () => { setPendingImportUrl(u); setPendingMethod("url"); setAddOpen(true); });
   };
   const openImageImport=()=>{
-    gateAction(
-      { intent: "import_pattern_image", title: "Create a free account to save patterns", subtitle: "Your imports and progress stay with you across devices." },
-      () => { if(tierGate.atCap){setShowPaywall(true);return;} setImageImportOpen(true); }
-    );
+    gateImport("import_pattern_image", () => { setImageImportOpen(true); });
   };
   // ImportPill callbacks. Completed: open the review modal with extracted data.
   // Failed: open a fresh import modal (no auto-requeue per spec).
@@ -2373,7 +2433,7 @@ export default function Wovely() {
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:"transparent",fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>setShowPaywall(false)}/>}
@@ -2387,7 +2447,7 @@ export default function Wovely() {
       {coverPickerTarget&&<CoverImagePicker pattern={coverPickerTarget} onConfirm={handleCoverConfirm} onClose={()=>setCoverPickerTarget(null)} pdfThumbUrl={pdfThumbUrl} CAT_IMG={CAT_IMG} ALL_CAT_ENTRIES={ALL_CAT_ENTRIES}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?"Welcome to Wovely Pro!":"No worries — you can upgrade anytime"}</div>}
-      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed} onAddPattern={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e?.currentTarget?.getBoundingClientRect();if(r)setMenuAnchor({top:r.bottom+8,left:r.left});setAddMenuOpen(true);}} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})} userPatterns={userPatterns} allPatterns={allPatterns}/>
+      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e?.currentTarget?.getBoundingClientRect();if(r)setMenuAnchor({top:r.bottom+8,left:r.left});setAddMenuOpen(true);}} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})} userPatterns={userPatterns} allPatterns={allPatterns}/>
       <div style={{flex:1,minWidth:0,overflowY:"auto",display:"flex",flexDirection:"column",background:"transparent"}}>
         <WelcomeBanner visible={showWelcomeBanner}/>
         <div style={{background:"#FFFFFF",borderBottom:"1px solid #EDE4F7",padding:"0 32px",height:64,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0}}>
@@ -2401,7 +2461,7 @@ export default function Wovely() {
         <div style={{flex:1,padding:"0 32px",minHeight:"100vh"}}>
           {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
           {view==="wip"&&<div style={{padding:"24px 0 80px"}}><button onClick={()=>navigateToView("collection")} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Back</button>{inProgress.length===0?<div style={{textAlign:"center",padding:"80px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:20,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
-          {view==="detail"&&selected&&<div style={{margin:"0 -40px"}}><Detail p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow}/></div>}
+          {view==="detail"&&selected&&<div style={{margin:"0 -40px"}}><Detail p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}}/></div>}
           {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
           {view==="stash"&&<div style={{paddingTop:24}}><YarnStash gateAction={gateAction}/></div>}
           {view==="calculator"&&<div style={{paddingTop:24}}><Calculators/></div>}
@@ -2420,12 +2480,12 @@ export default function Wovely() {
     <div style={{fontFamily:T.sans,background:"transparent",minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?"Welcome to Wovely Pro!":"No worries — you can upgrade anytime"}</div>}
-      <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})}/>
+      <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})}/>
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>setShowPaywall(false)}/>}
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>setShowProModal(false)}/>}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null}/>}
@@ -2446,7 +2506,7 @@ export default function Wovely() {
       <div style={{flex:1,overflowY:"auto",paddingBottom:100,minHeight:"100vh"}}>
         {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
         {view==="wip"&&<div style={{padding:"16px 18px 80px"}}>{inProgress.length===0?<div style={{textAlign:"center",padding:"60px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
-        {view==="detail"&&selected&&<Detail p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow}/>}
+        {view==="detail"&&selected&&<Detail p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}}/>}
         {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
         {view==="stash"&&<div style={{paddingTop:18}}><YarnStash gateAction={gateAction}/></div>}
         {view==="calculator"&&<div style={{paddingTop:18}}><Calculators/></div>}

@@ -8,6 +8,13 @@ export const TIER_CRAFT = 'craft';
 
 const VALID_TIERS = new Set([TIER_FREE, TIER_PRO, TIER_CRAFT]);
 
+// Anonymous (guest) users live BELOW the Free tier. Their DB profile row is
+// still tier='free' so the rest of the stack keeps working, but the UI applies
+// stricter caps (1 pattern, 25% preview). Anonymous status comes from the JWT
+// `is_anonymous` claim, not from the tier column — keep the two concepts
+// distinct.
+export const isAnonymousTier = (isAnonymous) => isAnonymous === true;
+
 export const normalizeTier = (t) => (VALID_TIERS.has(t) ? t : TIER_FREE);
 
 // True for any paying tier. Replaces the old is_pro boolean wherever the
@@ -58,4 +65,22 @@ export const clearCachedTier = () => {
     localStorage.removeItem('yh_tier');
     localStorage.removeItem('yh_is_pro');
   } catch {}
+};
+
+// Anonymous flag cache — mirrors the JWT is_anonymous claim so the next page
+// load doesn't flash "free user UI" before the JWT is decoded.
+export const readCachedIsAnonymous = () => {
+  try { return localStorage.getItem('yh_is_anonymous') === 'true'; }
+  catch { return false; }
+};
+
+export const writeCachedIsAnonymous = (isAnon) => {
+  try {
+    if (isAnon) localStorage.setItem('yh_is_anonymous', 'true');
+    else localStorage.removeItem('yh_is_anonymous');
+  } catch {}
+};
+
+export const clearCachedIsAnonymous = () => {
+  try { localStorage.removeItem('yh_is_anonymous'); } catch {}
 };

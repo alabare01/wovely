@@ -268,7 +268,7 @@ const ShareCardModal = ({pattern,onClose,pct,Btn}) => {
   );
 };
 
-const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Photo,Stars,WireframeViewer,Btn,scrollToRow:initialScrollToRow}) => {
+const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Photo,Stars,WireframeViewer,Btn,scrollToRow:initialScrollToRow,isAnonymous=false,onSignUp}) => {
   const VALID_TABS=["materials","rows","notes"];
   // Auto-hide header on scroll down, show on scroll up (with iOS momentum debounce)
   const scrollRef=useRef(null);
@@ -382,7 +382,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             <button onClick={()=>setShowScale(true)} style={{marginTop:12,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:10,padding:"10px",fontSize:13,fontWeight:600,cursor:"pointer"}}>⚖️ Scale pattern to different size →</button>
           </div>
         </>)}
-        {tab==="rows"&&<RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource}/>}
+        {tab==="rows"&&<RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>}
         {/* Source file direct link */}
         {tab==="materials"&&(
           <div style={{marginTop:16,borderTop:`1px solid ${T.border}`,paddingTop:14}}>
