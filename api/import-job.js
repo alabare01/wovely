@@ -52,6 +52,38 @@ export default async function handler(req, res) {
   if (file_type !== 'pdf' && file_type !== 'image') return res.status(400).json({ error: "file_type must be 'pdf' or 'image'" });
   if (file_type === 'pdf' && !raw_text) return res.status(400).json({ error: "raw_text required for pdf jobs" });
 
+  // Chunked-import gate (free tier). PDFs over the smart-chunking
+  // threshold (15KB raw_text) take the planning → per-component path
+  // in extract-pattern.js, which is a paid-tier feature. Block the row
+  // creation entirely so the worker never sees the job — failing here
+  // with a typed code is way better UX than letting the queue time out.
+  // Threshold matches TIER_SMALL_THRESHOLD in api/extract-pattern.js.
+  const CHUNKED_IMPORT_THRESHOLD = 15000;
+  if (file_type === 'pdf' && raw_text && raw_text.length >= CHUNKED_IMPORT_THRESHOLD && serviceKey && supabaseUrl) {
+    try {
+      const tierRes = await fetch(`${supabaseUrl}/rest/v1/user_profiles?id=eq.${userId}&select=tier,is_pro`, {
+        headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}` },
+      });
+      if (tierRes.ok) {
+        const rows = await tierRes.json();
+        const row = Array.isArray(rows) ? rows[0] : null;
+        const tier = row?.tier || (row?.is_pro ? 'craft' : 'free');
+        if (tier === 'free') {
+          return res.status(402).json({
+            error: 'chunked_import_requires_paid_tier',
+            message: "This pattern is a big one. Pro members get full support for complex patterns.",
+            required_tier: 'pro',
+            text_length: raw_text.length,
+          });
+        }
+      }
+    } catch (e) {
+      // Tier lookup failure shouldn't block legitimate paying users. Log
+      // and continue — the worker will still process the job.
+      console.warn('[import-job] tier lookup failed, letting job through:', e.message);
+    }
+  }
+
   // Insert row via user's own access token — RLS enforces user_id = auth.uid()
   const insertRes = await fetch(`${supabaseUrl}/rest/v1/import_jobs`, {
     method: 'POST',

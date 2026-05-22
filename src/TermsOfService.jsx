@@ -30,7 +30,7 @@ export default function TermsOfService() {
       <p style={S.p}>We accept payment via Stripe. You agree to provide current, complete, and accurate purchase and account information. We reserve the right to refuse any order.</p>
 
       <div style={S.h2}>Subscriptions</div>
-      <p style={S.p}>Wovely Pro is available at $8.99 per month, billed monthly. Your subscription will automatically renew unless you cancel before the end of the current billing period. You may cancel your subscription at any time through your account settings or by contacting us. Cancellation takes effect at the end of the current paid period. No refunds are provided for partial billing periods.</p>
+      <p style={S.p}>Wovely is offered in three tiers: Free, Pro ($4.99 per month), and Craft ($8.99 per month). Paid subscriptions are billed monthly and automatically renew unless you cancel before the end of the current billing period. You may cancel your subscription at any time through your account settings or by contacting us. Cancellation takes effect at the end of the current paid period. No refunds are provided for partial billing periods.</p>
 
       <div style={S.h2}>Prohibited Activities</div>
       <p style={S.p}>You may not: (1) systematically retrieve data to create a collection or database; (2) trick, defraud, or mislead us or other users; (3) circumvent security features; (4) harass, abuse, or harm another person; (5) misuse our support services; (6) use the Services in violation of applicable law; (7) upload or transmit viruses or malicious code; (8) engage in automated use of the system; (9) attempt to impersonate another user; (10) sell or transfer your profile; or (11) use the Services for any revenue-generating endeavor not authorized by us.</p>
