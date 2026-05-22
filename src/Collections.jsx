@@ -298,7 +298,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
                   </div>
                   <div style={{ fontSize: 12, color: T.ink3 }}>
                     {isMkal
-                      ? `${patterns.length} of ${Math.max(patterns.length, 6)} clues`
+                      ? `${patterns.length} ${patterns.length === 1 ? "clue" : "clues"}`
                       : `${patterns.length} ${patterns.length === 1 ? "pattern" : "patterns"}`}
                   </div>
                 </div>
@@ -492,7 +492,6 @@ const PatternTile = ({ p, onOpen, onRemove }) => {
 // import session — they can add patterns one at a time from inside the
 // detail view instead.
 export const NewCollectionModal = ({ onClose, onCreated }) => {
-  const { isDesktop } = useBreakpoint();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState("mkal");
@@ -512,9 +511,12 @@ export const NewCollectionModal = ({ onClose, onCreated }) => {
     onCreated?.(data);
   };
 
+  // Centered overlay on every viewport (matches AuthWallModal style),
+  // capped at 480px wide with breathing room around the edges. Earlier
+  // iteration was a bottom sheet on mobile which read as full-screen.
   return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 600, display: "flex", alignItems: isDesktop ? "center" : "flex-end", justifyContent: "center", padding: isDesktop ? 24 : 0, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)" }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: T.surface, borderRadius: isDesktop ? 18 : "20px 20px 0 0", padding: 24, width: "100%", maxWidth: 440, boxShadow: "0 20px 60px rgba(28,23,20,0.35)", fontFamily: T.sans }}>
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: "100%", maxWidth: 480, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(28,23,20,0.28)", fontFamily: T.sans, boxSizing: "border-box" }}>
         <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 6 }}>New collection</div>
         <div style={{ fontSize: 13, color: T.ink2, marginBottom: 18, lineHeight: 1.5 }}>Name it, pick a type, then add patterns from the collection page.</div>
         <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Lemon Drop MKAL 2026" style={{ width: "100%", padding: "11px 14px", border: `1.5px solid ${T.border}`, borderRadius: 10, fontSize: 14, color: T.ink, background: T.linen, outline: "none", marginBottom: 10 }} onFocus={e => e.target.style.borderColor = T.terra} onBlur={e => e.target.style.borderColor = T.border} />

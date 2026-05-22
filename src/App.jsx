@@ -2472,8 +2472,16 @@ export default function Wovely() {
     const localId=p.id||"local_"+Date.now();
     const localPattern={...p,id:localId,title:dedupTitle};
     setUserPatterns(prev=>[localPattern,...prev]);
-    // "Review Issue →" flow: skip overlay, go directly to detail with scrollToRow
-    if(p._reviewRowNumber!==undefined){
+    // Collection import: skip the PatternCreatedOverlay entirely and
+    // navigate back to the collection detail view after the Supabase
+    // save + linkage completes (handled below). This is the MKAL
+    // workflow — the user is adding clues sequentially, they want to
+    // see the growing collection, not the standalone pattern view.
+    const isCollectionImport = !!collectionContext?.id;
+    if (isCollectionImport) {
+      setAddOpen(false);
+    } else if(p._reviewRowNumber!==undefined){
+      // "Review Issue →" flow: skip overlay, go directly to detail with scrollToRow
       setPendingScrollToRow(p._reviewRowNumber);
       setAddOpen(false);
       setTimeout(()=>{startAndOpenPattern(localPattern);},100);
@@ -2503,11 +2511,18 @@ export default function Wovely() {
             // its pattern list on remount so the new entry shows up
             // without any explicit refresh wiring here.
             if (collectionContext?.id) {
+              const ctxCollection = collectionContext;
               try {
-                const { data: existing } = await listPatternsInCollection(collectionContext.id);
+                const { data: existing } = await listPatternsInCollection(ctxCollection.id);
                 const nextOrder = (existing?.length || 0) + 1;
-                await linkPatternToCollection(rows[0].id, collectionContext.id, nextOrder);
+                await linkPatternToCollection(rows[0].id, ctxCollection.id, nextOrder);
               } catch (e) { console.warn("[Wovely] Collection linkage failed:", e.message); }
+              // Navigate back to the collection detail view. Clear
+              // context AFTER navigating so the overlay's onClose
+              // doesn't accidentally race with this redirect.
+              setCollectionContext(null);
+              setSelectedCollection(ctxCollection);
+              navigate("/collections/" + ctxCollection.id);
             }
           }
         }else{const errText=await res.text();console.error("[Wovely] Pattern save failed:",res.status,errText);}
