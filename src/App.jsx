@@ -635,13 +635,16 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason }) => {
 };
 
 
-const SidebarNav = ({view,onNavigate,count,isPro,isAnonymous,onAddPattern,onSignOut,onUpgrade,onOpenAuthWall,userPatterns=[],allPatterns=[]}) => {
+const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,onSignOut,onUpgrade,onOpenAuthWall,userPatterns=[],allPatterns=[]}) => {
   const starterC=DEFAULT_STARTERS.length;const addedC=userPatterns.filter(p=>!p.isStarter&&p.status!=="deleted"&&p.status!=="parked").length;
   const wipCount=allPatterns.filter(p=>!p.isStarter&&(p.status==="in_progress"||p.started)).filter(p=>pct(p)<100).length;
   // For anonymous users, surface Pro items without the padlock/"Pro feature" visual — the gate fires
   // on click. Showing the lock pre-gate suggests "sign up and you still can't have this" which kills conversion.
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Pro feature");
   const ITEMS=[{key:"collection",label:"My Wovely",sub:starterC+" starter"+(starterC!==1?"s":"")+" · "+addedC+" added",icon:"🧶"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated",icon:"🛒"}];
+  const planLabel = isPro ? "My plan" : "See plans";
+  const planSub = isAnonymous ? "Sign up to compare plans" : (isPro ? `You're on ${tierLabel(tier)}` : "Compare Free, Pro, Craft");
+  const handlePlansClick = () => { if (isAnonymous) { onOpenAuthWall(); return; } onUpgrade(); };
   return (
     <div style={{width:260,background:"#9B7EC8",height:"100vh",position:"sticky",top:0,display:"flex",flexDirection:"column",flexShrink:0}}>
       <div onClick={()=>onNavigate("collection")} style={{display:"flex",flexDirection:"column",alignItems:"center",padding:"24px 16px 20px",gap:8,cursor:"pointer",transition:"opacity .15s"}} onMouseEnter={e=>e.currentTarget.style.opacity=".85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
@@ -662,6 +665,17 @@ const SidebarNav = ({view,onNavigate,count,isPro,isAnonymous,onAddPattern,onSign
         );})}
       </div>
       <div style={{padding:"0 0 8px"}}>
+        {/* Plans — always-visible entry to TieredUpgradeModal. Free + anonymous
+            see "See plans" with the sparkle; paid users see "My plan" with
+            their tier. Click opens the modal directly (it's not a route). */}
+        <div className="nav-item" onClick={handlePlansClick} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 20px",cursor:"pointer",transition:"background .12s"}}>
+          <span style={{fontSize:18,width:24,textAlign:"center"}}>✨</span>
+          <div style={{flex:1}}>
+            <div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{planLabel}</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>{planSub}</div>
+          </div>
+          {!isPro&&!isAnonymous&&<span style={{background:"rgba(255,255,255,0.22)",color:"#fff",fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:99}}>New</span>}
+        </div>
         {(()=>{const active=view==="profile";return(
           <div className="nav-item" onClick={()=>onNavigate("profile")} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 20px",background:active?"rgba(255,255,255,0.25)":"transparent",cursor:"pointer",transition:"background .12s"}}>
             <span style={{fontSize:18,width:24,textAlign:"center"}}>👤</span>
@@ -671,8 +685,8 @@ const SidebarNav = ({view,onNavigate,count,isPro,isAnonymous,onAddPattern,onSign
         );})()}
       </div>
       <div style={{padding:"0 16px 24px"}}>
-        {isPro?<div style={{background:"rgba(255,255,255,.15)",borderRadius:12,padding:"12px 14px",display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:16}}>✨</span><div><div style={{fontSize:12,fontWeight:700,color:"#fff"}}>Wovely Pro</div><div style={{fontSize:11,color:"rgba(255,255,255,.7)"}}>All features active</div></div></div>
-        :<div style={{background:"rgba(255,255,255,.15)",borderRadius:12,padding:"14px"}}><div style={{fontSize:12,fontWeight:700,color:"#fff",marginBottom:3}}>✨ Upgrade to Pro</div><div style={{fontSize:11,color:"rgba(255,255,255,.75)",lineHeight:1.5,marginBottom:10}}>{isAnonymous?"Sign up free to save patterns. Upgrade to Pro later for unlimited everything.":"Unlimited patterns, all imports, Snap & Stitch, cloud sync."}</div>{isAnonymous?<div onClick={onOpenAuthWall} style={{background:"rgba(255,255,255,.2)",borderRadius:9999,padding:"8px",textAlign:"center",fontSize:12,fontWeight:700,color:"#fff",cursor:"pointer"}}>Get started free</div>:<div onClick={onUpgrade} style={{background:"rgba(255,255,255,.2)",borderRadius:9999,padding:"8px",textAlign:"center",fontSize:12,fontWeight:700,color:"#fff",cursor:"pointer"}}>$8.99/mo</div>}</div>}
+        {isPro?<div onClick={onUpgrade} style={{background:"rgba(255,255,255,.15)",borderRadius:12,padding:"12px 14px",display:"flex",alignItems:"center",gap:10,cursor:"pointer"}}><span style={{fontSize:16}}>✨</span><div style={{flex:1}}><div style={{fontSize:12,fontWeight:700,color:"#fff"}}>Wovely {tierLabel(tier)}</div><div style={{fontSize:11,color:"rgba(255,255,255,.7)"}}>{tier==='craft'?"Every feature active":"Tap to manage or upgrade"}</div></div></div>
+        :<div style={{background:"rgba(255,255,255,.15)",borderRadius:12,padding:"14px"}}><div style={{fontSize:12,fontWeight:700,color:"#fff",marginBottom:3}}>✨ Upgrade your plan</div><div style={{fontSize:11,color:"rgba(255,255,255,.75)",lineHeight:1.5,marginBottom:10}}>{isAnonymous?"Sign up free to save patterns. Pick a paid plan anytime.":"Unlimited patterns, big-pattern imports, BevCheck quality scoring."}</div>{isAnonymous?<div onClick={onOpenAuthWall} style={{background:"rgba(255,255,255,.2)",borderRadius:9999,padding:"8px",textAlign:"center",fontSize:12,fontWeight:700,color:"#fff",cursor:"pointer"}}>Get started free</div>:<div onClick={onUpgrade} style={{background:"rgba(255,255,255,.2)",borderRadius:9999,padding:"8px",textAlign:"center",fontSize:12,fontWeight:700,color:"#fff",cursor:"pointer"}}>See plans</div>}</div>}
         {isAnonymous?<button onClick={onOpenAuthWall} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:9999,padding:"8px",fontSize:12,color:"#fff",cursor:"pointer",marginTop:10,fontWeight:500}}>Sign in / Create account</button>:(onSignOut&&<button onClick={onSignOut} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:9999,padding:"8px",fontSize:12,color:"#fff",cursor:"pointer",marginTop:10,fontWeight:500}}>Sign out</button>)}
         <div style={{textAlign:"center",marginTop:12,fontSize:11}}>
           <span onClick={()=>onNavigate("privacy")} style={{color:"rgba(255,255,255,.5)",cursor:"pointer"}}>Privacy</span>
@@ -684,7 +698,7 @@ const SidebarNav = ({view,onNavigate,count,isPro,isAnonymous,onAddPattern,onSign
   );
 };
 
-const NavPanel = ({open,onClose,view,onNavigate,count,isPro,isAnonymous,onSignOut,onUpgrade,onOpenAuthWall}) => {
+const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onSignOut,onUpgrade,onOpenAuthWall}) => {
   const [closing,setClosing]=useState(false);
   const dismiss=()=>{setClosing(true);setTimeout(()=>{setClosing(false);onClose();},220);};
   const go=v=>{onNavigate(v);dismiss();};
@@ -692,6 +706,9 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,isAnonymous,onSignOu
   // See SidebarNav for rationale: hide pre-gate padlocks from anonymous users to not kill conversion motivation.
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Pro feature");
   const ITEMS=[{key:"collection",label:"My Wovely",sub:count+" patterns",icon:"🧶"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs",icon:"🛒"}];
+  const planLabel = isPro ? "My plan" : "See plans";
+  const planSub = isAnonymous ? "Sign up to compare plans" : (isPro ? `You're on ${tierLabel(tier)}` : "Compare Free, Pro, Craft");
+  const handlePlansClick = () => { if (isAnonymous) { onOpenAuthWall?.(); dismiss(); return; } onUpgrade(); dismiss(); };
   return (
     <div style={{position:"fixed",inset:0,zIndex:100}}>
       <div className={closing?"dim-out":"dim-in"} onClick={dismiss} style={{position:"absolute",inset:0,background:"rgba(28,23,20,.52)",backdropFilter:"blur(3px)"}}/>
@@ -712,12 +729,21 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,isAnonymous,onSignOu
           );})}
           {/* Divider */}
           <div style={{height:1,background:"rgba(255,255,255,0.15)",margin:"8px 16px"}} />
+          {/* Plans — always-visible entry to TieredUpgradeModal */}
+          <div className="nav-item" onClick={handlePlansClick} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 20px",cursor:"pointer",transition:"background .12s"}}>
+            <span style={{fontSize:20,width:26,textAlign:"center"}}>✨</span>
+            <div style={{flex:1}}>
+              <div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{planLabel}</div>
+              <div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>{planSub}</div>
+            </div>
+            {!isPro&&!isAnonymous&&<span style={{background:"rgba(255,255,255,0.22)",color:"#fff",fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:99}}>New</span>}
+          </div>
           {/* Profile & Settings — inline nav row */}
           {(()=>{const active=view==="profile";return(
             <div className="nav-item" onClick={()=>go("profile")} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 20px",background:active?"rgba(255,255,255,0.25)":"transparent",cursor:"pointer",transition:"background .12s"}}>
               <span style={{fontSize:20,width:26,textAlign:"center"}}>👤</span>
               <div style={{flex:1}}>
-                <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>Profile & Settings</div>{isPro&&<span style={{background:"rgba(155,126,200,0.6)",color:"#fff",fontSize:10,fontWeight:700,padding:"1px 6px",borderRadius:4}}>PRO</span>}</div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>Profile & Settings</div>{isPro&&<span style={{background:"rgba(155,126,200,0.6)",color:"#fff",fontSize:10,fontWeight:700,padding:"1px 6px",borderRadius:4}}>{tierLabel(tier).toUpperCase()}</span>}</div>
                 {isAnonymous&&<div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>Sign in to save</div>}
               </div>
               {active&&<div style={{width:6,height:6,borderRadius:99,background:"#fff"}}/>}
@@ -913,6 +939,22 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
       }
 
       {DIVIDER}
+
+      {/* Plan & Billing — clean list-style row that always opens the
+          TieredUpgradeModal. The big gradient card above is the marquee
+          surface for free users; this row is the discoverable settings
+          path for everyone (especially paid users who'd otherwise see
+          no obvious "manage plan" entry). */}
+      <div style={SECTION}>
+        <div style={SECTION_TITLE}>Plan &amp; Billing</div>
+        <div onClick={onOpenProModal} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"4px 0"}}>
+          <div>
+            <div style={{fontSize:14,color:T.ink}}>{isPro ? `Wovely ${tierLabel(tier)}` : 'Free plan'}</div>
+            <div style={{...SC_LABEL,marginTop:4}}>{isPro ? 'Tap to manage or compare plans' : 'See what Pro and Craft include'}</div>
+          </div>
+          <div style={{fontSize:13,fontWeight:600,color:T.terra,whiteSpace:"nowrap"}}>{isPro ? 'Manage plan ›' : 'See plans ›'}</div>
+        </div>
+      </div>
 
       <div style={SECTION}>
         <div style={SECTION_TITLE}>Preferences</div>
@@ -2345,7 +2387,7 @@ export default function Wovely() {
       {coverPickerTarget&&<CoverImagePicker pattern={coverPickerTarget} onConfirm={handleCoverConfirm} onClose={()=>setCoverPickerTarget(null)} pdfThumbUrl={pdfThumbUrl} CAT_IMG={CAT_IMG} ALL_CAT_ENTRIES={ALL_CAT_ENTRIES}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?"Welcome to Wovely Pro!":"No worries — you can upgrade anytime"}</div>}
-      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} isAnonymous={!authed} onAddPattern={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e?.currentTarget?.getBoundingClientRect();if(r)setMenuAnchor({top:r.bottom+8,left:r.left});setAddMenuOpen(true);}} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})} userPatterns={userPatterns} allPatterns={allPatterns}/>
+      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed} onAddPattern={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e?.currentTarget?.getBoundingClientRect();if(r)setMenuAnchor({top:r.bottom+8,left:r.left});setAddMenuOpen(true);}} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})} userPatterns={userPatterns} allPatterns={allPatterns}/>
       <div style={{flex:1,minWidth:0,overflowY:"auto",display:"flex",flexDirection:"column",background:"transparent"}}>
         <WelcomeBanner visible={showWelcomeBanner}/>
         <div style={{background:"#FFFFFF",borderBottom:"1px solid #EDE4F7",padding:"0 32px",height:64,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0}}>
@@ -2383,7 +2425,7 @@ export default function Wovely() {
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?"Welcome to Wovely Pro!":"No worries — you can upgrade anytime"}</div>}
-      <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} isAnonymous={!authed} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})}/>
+      <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed} onSignOut={handleSignOut} onUpgrade={()=>openProGate("locked_nav")} onOpenAuthWall={()=>gateAction({ intent: "nav_sign_in", title: "Create a free account", subtitle: "Takes 10 seconds. No credit card." }, ()=>{})}/>
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>setShowPaywall(false)}/>}
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>setShowProModal(false)}/>}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null}/>}
