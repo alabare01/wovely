@@ -95,6 +95,11 @@ const patternIdFromPath = (pathname) => {
   return m ? decodeURIComponent(m[2]) : null;
 };
 
+// sessionStorage key for the tier picked from TieredUpgradeModal before
+// signup. Survives remounts (OAuth round-trip, page reload during the
+// auth flow) so the post-signup auto-checkout finds the right tier.
+const PENDING_UPGRADE_KEY = "wovely_pending_upgrade_tier";
+
 // PHOTOS, PILL imported from ./constants.js
 
 // Supabase auth imported from ./supabase.js
@@ -1807,6 +1812,8 @@ export default function Wovely() {
   // Stashed so that after they convert through the AuthWall, we can auto-fire
   // Stripe checkout for the tier they picked — no second click needed.
   // null when the picked tier was Free (signup-only, no Stripe step).
+  // Mirrored to sessionStorage (PENDING_UPGRADE_KEY) so OAuth or any
+  // full-page redirect path that remounts the React tree doesn't lose it.
   const [pendingUpgradeTier,setPendingUpgradeTier]=useState(null);
   // Anonymous mode: set when user clicks "Try it free" on landing. Persists in sessionStorage so
   // refresh/nav within the tab keeps them in the app shell instead of bouncing to the landing.
@@ -1891,6 +1898,13 @@ export default function Wovely() {
     setShowPaywall(false);
     setShowProModal(false);
     setPendingUpgradeTier(tierKey || null);
+    // Mirror to sessionStorage so the tier survives any remount path —
+    // most importantly OAuth, which round-trips through the provider and
+    // returns to a fresh app instance with no React state to read from.
+    try {
+      if (tierKey) sessionStorage.setItem(PENDING_UPGRADE_KEY, tierKey);
+      else sessionStorage.removeItem(PENDING_UPGRADE_KEY);
+    } catch {}
     setAuthWallContext({
       title: tierKey ? `Create your account to subscribe` : "Create your free account",
       subtitle: tierKey
@@ -1940,8 +1954,15 @@ export default function Wovely() {
     // the upgrade modal before signing up, send them straight to Stripe
     // without making them re-open the modal and re-pick. Picked Free is
     // a no-op — they wanted the free account and now they have one.
-    if (pendingUpgradeTier) {
-      const tierKey = pendingUpgradeTier;
+    // Read from sessionStorage first so we don't lose the picked tier
+    // across an OAuth round-trip or other remount; fall back to state.
+    let tierKey = null;
+    try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
+    if (!tierKey) tierKey = pendingUpgradeTier;
+    if (tierKey) {
+      // Clear both stores immediately so a failed Stripe call doesn't
+      // produce a redirect loop on the next mount.
+      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
       setPendingUpgradeTier(null);
       // Tiny delay so the freshly-rotated JWT + profile fetch above are
       // settled in localStorage when stripe-checkout reads them.
@@ -1953,6 +1974,34 @@ export default function Wovely() {
   useEffect(() => {
     initErrorReporter();
   }, []);
+
+  // Post-signup auto-checkout, redirect-safe variant. Catches the cases
+  // where the React tree remounts between picking the tier and finishing
+  // the auth flow — OAuth round-trip, full page reload, email confirm
+  // link, etc. handleAuthWallSuccess covers the in-app signup path
+  // already; sessionStorage removeItem is the lock so both paths can
+  // race safely (first reader wins). Skips when the user is anonymous
+  // or already paid (no Stripe call needed in either state).
+  useEffect(() => {
+    if (!authChecked || !authed || isAnonymous) return;
+    if (isPaidTier(tier)) {
+      // User already has a paid plan — drop any stale pending tier on
+      // the floor rather than redirecting them to Stripe for a second
+      // subscription.
+      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+      return;
+    }
+    let tierKey = null;
+    try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
+    if (!tierKey) return;
+    try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+    setPendingUpgradeTier(null);
+    // Same 100ms settle delay as the AuthWall path for JWT + profile
+    // localStorage writes. Stripe checkout failure is logged but not
+    // retried; the user can re-open "See plans" and pick again.
+    setTimeout(() => { fireUpgradeCheckout(tierKey); }, 100);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authChecked, authed, isAnonymous, tier]);
 
   // Route-change dismissal (S1.5.3). When the user navigates while an import
   // modal is mounted, close it. If a polling job is still in flight, the
@@ -2068,7 +2117,7 @@ export default function Wovely() {
     }
   },[]);
 
-  const handleSignOut = async () => { posthog.reset(); await supabaseAuth.signOut(); setAuthed(false); setTier(TIER_FREE); setUserPatterns([]); clearCachedTier(); setIsAnonymous(false); clearCachedIsAnonymous(); try { sessionStorage.removeItem("wovely_redirect_intent"); sessionStorage.removeItem("wovely_anonymous_mode"); } catch {} setAnonymousMode(false); document.cookie="wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; navigate("/"); };
+  const handleSignOut = async () => { posthog.reset(); await supabaseAuth.signOut(); setAuthed(false); setTier(TIER_FREE); setUserPatterns([]); clearCachedTier(); setIsAnonymous(false); clearCachedIsAnonymous(); setPendingUpgradeTier(null); try { sessionStorage.removeItem("wovely_redirect_intent"); sessionStorage.removeItem("wovely_anonymous_mode"); sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {} setAnonymousMode(false); document.cookie="wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; navigate("/"); };
 
   // Navigation helper — translates view keys to URL paths
   const navigateToView = useCallback((v, patternId) => {
@@ -2538,7 +2587,7 @@ export default function Wovely() {
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:"transparent",fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>setShowPaywall(false)} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired}/>}
@@ -2585,7 +2634,7 @@ export default function Wovely() {
     <div style={{fontFamily:T.sans,background:"transparent",minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
