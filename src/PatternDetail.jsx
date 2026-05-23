@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { T, useBreakpoint, Field } from "./theme.jsx";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseAuth, getSession } from "./supabase.js";
 import { PILL } from "./constants.js";
 import PatternHeader from "./PatternHeader.jsx";
 import RowManager, { ensureRepeatBrackets } from "./RowManager.jsx";
 import { uploadPatternFile } from "./AddPatternModal.jsx";
+import { listPatternsInCollection } from "./utils/collections.js";
 
 const YarnSummaryCard = ({label, myKey, myVal, fallback, onSave}) => {
   const display = myVal || fallback;
@@ -270,6 +272,67 @@ const ShareCardModal = ({pattern,onClose,pct,Btn}) => {
 
 const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Photo,Stars,WireframeViewer,Btn,scrollToRow:initialScrollToRow,isAnonymous=false,onSignUp}) => {
   const VALID_TABS=["materials","rows","notes"];
+  const navigate = useNavigate();
+  // Collection context — only populated when this pattern belongs to a
+  // collection (is_collection_part + collection_id set). The fetch lives
+  // here rather than in App.jsx so PatternDetail is self-contained for the
+  // breadcrumb + clue-to-clue navigation it owns.
+  const [collectionMeta, setCollectionMeta] = useState(null); // { id, name, siblings: [...] }
+  useEffect(() => {
+    if (!p.collection_id || !p.is_collection_part) { setCollectionMeta(null); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const s = getSession();
+        if (!s?.access_token) return;
+        // Two parallel reads — the collection row for the name + the
+        // sibling pattern list for the prev/next nav. Both are tiny.
+        const [colRes, sibRes] = await Promise.all([
+          fetch(`${SUPABASE_URL}/rest/v1/collections?id=eq.${p.collection_id}&select=id,name,collection_type`, {
+            headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${s.access_token}` },
+          }),
+          listPatternsInCollection(p.collection_id),
+        ]);
+        if (cancelled) return;
+        const colRows = colRes.ok ? await colRes.json() : [];
+        const siblings = (sibRes?.data || []).filter(x => x.is_collection_part);
+        if (colRows[0]) {
+          setCollectionMeta({
+            id: colRows[0].id,
+            name: colRows[0].name || "Collection",
+            type: colRows[0].collection_type || "general",
+            siblings,
+          });
+        }
+      } catch (e) { console.warn("[Wovely] Collection context fetch failed:", e?.message); }
+    })();
+    return () => { cancelled = true; };
+  }, [p.collection_id, p.is_collection_part, p.id, p._supabaseId]);
+
+  // Resolve where this pattern sits within the collection. siblings are
+  // already ordered by collection_order asc by the data layer.
+  const currentPid = p._supabaseId || p.id;
+  const siblings = collectionMeta?.siblings || [];
+  const sibIndex = siblings.findIndex(s => String(s.id) === String(currentPid));
+  const prevSibling = sibIndex > 0 ? siblings[sibIndex - 1] : null;
+  const nextSibling = sibIndex >= 0 && sibIndex < siblings.length - 1 ? siblings[sibIndex + 1] : null;
+  const isMkalCollection = collectionMeta?.type === "mkal";
+
+  const collectionBack = collectionMeta
+    ? () => navigate("/collections/" + collectionMeta.id)
+    : null;
+  const handleBack = collectionBack || onBack;
+
+  const goToSibling = (sib) => {
+    if (!sib) return;
+    const sid = sib._supabaseId || sib.id;
+    navigate("/pattern/" + encodeURIComponent(sid));
+  };
+  // No next clue imported yet — drop the user on the collection detail
+  // view, which shows the "Import next clue" placeholder slot.
+  const goToNextSlot = () => {
+    if (collectionMeta?.id) navigate("/collections/" + collectionMeta.id);
+  };
   // Auto-hide header on scroll down, show on scroll up (with iOS momentum debounce)
   const scrollRef=useRef(null);
   const lastScrollY=useRef(0);
@@ -350,7 +413,57 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
       )}
       <div ref={scrollRef} style={{flex:1,WebkitOverflowScrolling:"touch"}}>
         <div style={{position:"sticky",top:0,zIndex:10,transform:headerHidden?"translateY(-100%)":"translateY(0)",transition:"transform 220ms ease"}}>
-          <PatternHeader p={p} rows={rows} done={done} editing={editing} draft={draft} setDraft={setDraft} milestone={milestone} setMilestone={setMilestone} onBack={onBack} onShare={()=>setShowShare(true)} onScale={()=>setShowScale(true)} onEdit={()=>editing?save():setEditing(true)} onSave={save} detailPhoto={detailPhoto} Bar={Bar} Photo={Photo} WireframeViewer={WireframeViewer} onViewSource={handleViewSource}/>
+          <PatternHeader p={p} rows={rows} done={done} editing={editing} draft={draft} setDraft={setDraft} milestone={milestone} setMilestone={setMilestone} onBack={handleBack} backLabel={collectionMeta?.name} onShare={()=>setShowShare(true)} onScale={()=>setShowScale(true)} onEdit={()=>editing?save():setEditing(true)} onSave={save} detailPhoto={detailPhoto} Bar={Bar} Photo={Photo} WireframeViewer={WireframeViewer} onViewSource={handleViewSource}/>
+          {collectionMeta && isMkalCollection && sibIndex >= 0 && (
+            // Clue-to-clue navigation. Only shown for MKAL collections —
+            // general collections are unordered so prev/next doesn't apply.
+            // "Next" jumps to the next imported clue if there is one; if
+            // not, it lands on the collection detail page where the user
+            // can import the next slot. Same component handles both.
+            <div style={{
+              background: T.surface, borderBottom: `1px solid ${T.border}`,
+              padding: "8px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+              fontFamily: T.sans,
+            }}>
+              <button
+                onClick={() => goToSibling(prevSibling)}
+                disabled={!prevSibling}
+                style={{
+                  background: "none", border: "none", padding: "4px 6px",
+                  color: prevSibling ? T.terra : T.ink3,
+                  cursor: prevSibling ? "pointer" : "default",
+                  opacity: prevSibling ? 1 : 0.4,
+                  fontSize: 12, fontWeight: 600, fontFamily: T.sans,
+                  display: "flex", alignItems: "center", gap: 4, minWidth: 0, overflow: "hidden",
+                }}
+                aria-label="Previous clue"
+              >
+                <span style={{ flexShrink: 0 }}>←</span>
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {prevSibling ? `Clue ${sibIndex}` : ""}
+                </span>
+              </button>
+              <div style={{ fontSize: 12, fontWeight: 700, color: T.ink, fontFamily: T.serif, flexShrink: 0 }}>
+                Clue {sibIndex + 1} of {siblings.length}
+              </div>
+              <button
+                onClick={() => nextSibling ? goToSibling(nextSibling) : goToNextSlot()}
+                style={{
+                  background: "none", border: "none", padding: "4px 6px",
+                  color: T.terra,
+                  cursor: "pointer",
+                  fontSize: 12, fontWeight: 600, fontFamily: T.sans,
+                  display: "flex", alignItems: "center", gap: 4, minWidth: 0, overflow: "hidden", justifyContent: "flex-end",
+                }}
+                aria-label={nextSibling ? "Next clue" : "Import next clue"}
+              >
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {nextSibling ? `Clue ${sibIndex + 2}` : `Import Clue ${sibIndex + 2}`}
+                </span>
+                <span style={{ flexShrink: 0 }}>→</span>
+              </button>
+            </div>
+          )}
           <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
             {[["materials","Materials"],["rows","Instructions/Rows"],["notes","My Notes"]].map(([key,label])=>(
               <button key={key} onClick={()=>{setTab(key);localStorage.setItem("yh_last_tab",key);}} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>

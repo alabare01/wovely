@@ -21,6 +21,7 @@ const PatternHeader = ({
   milestone,
   setMilestone,
   onBack,
+  backLabel,
   onShare,
   onScale,
   onEdit,
@@ -31,6 +32,10 @@ const PatternHeader = ({
   WireframeViewer,
   onViewSource,
 }) => {
+  // Back-button label. When the pattern belongs to a collection, the parent
+  // supplies "← <Collection Name>" so the breadcrumb hint is visible without
+  // a separate breadcrumb row. Falls back to plain "← Back".
+  const backText = backLabel ? `← ${backLabel}` : "← Back";
   const{isDesktop}=useBreakpoint();
 
   return (
@@ -49,7 +54,7 @@ const PatternHeader = ({
         <div style={{flexShrink:0,background:"#2D2D4E",marginTop:milestone?56:0,transition:"margin .3s"}}>
           {/* top bar */}
           <div style={{position:"relative",zIndex:2,padding:"12px 18px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <button onClick={onBack} style={{background:"rgba(255,255,255,.12)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.15)",borderRadius:10,padding:"7px 16px",color:"#fff",cursor:"pointer",fontSize:13,fontWeight:500}}>← Back</button>
+            <button onClick={onBack} style={{background:"rgba(255,255,255,.12)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.15)",borderRadius:10,padding:"7px 16px",color:"#fff",cursor:"pointer",fontSize:13,fontWeight:500}}>{backText}</button>
             <div style={{display:"flex",gap:8}}>
               {p.source_file_url&&onViewSource&&<button onClick={onViewSource} style={{background:"rgba(255,255,255,.1)",border:"1px solid rgba(255,255,255,.15)",borderRadius:10,padding:"7px 14px",color:"#fff",cursor:"pointer",fontSize:12,fontWeight:600}}>📄 Source</button>}
               <button onClick={onShare} style={{background:"rgba(255,255,255,.1)",border:"1px solid rgba(255,255,255,.15)",borderRadius:10,padding:"7px 14px",color:"#fff",cursor:"pointer",fontSize:12,fontWeight:600}}>📤 Share</button>
@@ -100,7 +105,7 @@ const PatternHeader = ({
           {detailPhoto&&<img src={detailPhoto} alt={p.title} style={{position:"absolute",left:"50%",transform:"translateX(-50%)",height:"100%",width:"auto",objectFit:"contain",zIndex:1}}/>}
           <div style={{position:"absolute",inset:0,background:"linear-gradient(to top,rgba(20,14,10,.88) 0%,rgba(20,14,10,.2) 50%,rgba(20,14,10,.05) 100%)",zIndex:2}}/>
           <div style={{position:"absolute",top:0,left:0,right:0,padding:"14px 18px",display:"flex",justifyContent:"space-between",zIndex:3}}>
-            <button onClick={onBack} style={{background:"rgba(15,10,8,.45)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.15)",borderRadius:10,padding:"7px 16px",color:"#fff",cursor:"pointer",fontSize:13,fontWeight:500}}>← Back</button>
+            <button onClick={onBack} style={{background:"rgba(15,10,8,.45)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.15)",borderRadius:10,padding:"7px 16px",color:"#fff",cursor:"pointer",fontSize:13,fontWeight:500}}>{backText}</button>
             <div style={{display:"flex",gap:8}}>
               {p.source_file_url&&onViewSource&&<button onClick={onViewSource} style={{background:"rgba(15,10,8,.45)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.15)",borderRadius:10,padding:"7px 14px",color:"#fff",cursor:"pointer",fontSize:12,fontWeight:600}}>📄 Source</button>}
               <button onClick={onShare} style={{background:"rgba(15,10,8,.45)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.15)",borderRadius:10,padding:"7px 14px",color:"#fff",cursor:"pointer",fontSize:12,fontWeight:600}}>📤 Share</button>

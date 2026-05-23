@@ -210,7 +210,7 @@ const CollectionCard = ({ c, onOpen }) => {
 
 // ─── Detail view ─────────────────────────────────────────────────────────
 
-export const CollectionDetailView = ({ collection: initial, onBack, onOpenPattern, onAddPattern, onCollectionChanged, onCollectionDeleted }) => {
+export const CollectionDetailView = ({ collection: initial, onBack, onOpenPattern, onAddPattern, onImportClue, onCollectionChanged, onCollectionDeleted }) => {
   const { isDesktop } = useBreakpoint();
   const [collection, setCollection] = useState(initial);
   const [patterns, setPatterns] = useState([]);
@@ -285,7 +285,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
 
   return (
     <div style={PAGE}>
-      <button onClick={onBack} style={{ background: "none", border: "none", color: T.terra, cursor: "pointer", fontSize: 13, fontWeight: 600, padding: 0, marginBottom: 18, display: "flex", alignItems: "center", gap: 6 }}>← All collections</button>
+      <button onClick={onBack} style={{ background: "none", border: "none", color: T.terra, cursor: "pointer", fontSize: 13, fontWeight: 600, padding: 0, marginBottom: 18, display: "flex", alignItems: "center", gap: 6 }}>← My Wovely</button>
 
       <div style={{ ...GLASS, padding: 22, marginBottom: 16 }}>
         {!editingHeader ? (
@@ -402,6 +402,14 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
               onRemove={() => handleRemove(p.id)}
             />
           ))}
+          {/* Greyed-out next-clue placeholder. Single slot — we don't
+              persist a total clue count for the MKAL today, so we only
+              expose the one immediately-next position. Tapping it
+              triggers the import flow with the target order pre-set. */}
+          <UnimportedClueSlot
+            clueNumber={patterns.length + 1}
+            onImport={() => (onImportClue ? onImportClue(collection, patterns.length + 1) : onAddPattern?.(collection))}
+          />
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "1fr 1fr 1fr" : "1fr 1fr", gap: 12, marginBottom: 16 }}>
@@ -432,6 +440,44 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
     </div>
   );
 };
+
+// Placeholder slot for the next un-imported clue in an MKAL collection.
+// Visually a dashed greyed-out card so the user reads it as "empty slot",
+// not as a duplicate of imported rows. Includes Bev so the empty state
+// stays on-brand instead of feeling like an error state.
+const UnimportedClueSlot = ({ clueNumber, onImport }) => (
+  <div
+    onClick={onImport}
+    role="button"
+    tabIndex={0}
+    onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onImport?.(); } }}
+    style={{
+      background: "rgba(253,251,255,0.7)",
+      backdropFilter: "blur(12px)",
+      WebkitBackdropFilter: "blur(12px)",
+      border: "2px dashed #D4C5ED",
+      borderRadius: 16,
+      padding: 14,
+      display: "flex",
+      alignItems: "center",
+      gap: 14,
+      cursor: "pointer",
+      transition: "border-color .15s, background .15s",
+    }}
+    onMouseEnter={e => { e.currentTarget.style.borderColor = T.terra; e.currentTarget.style.background = "rgba(243,239,248,0.85)"; }}
+    onMouseLeave={e => { e.currentTarget.style.borderColor = "#D4C5ED"; e.currentTarget.style.background = "rgba(253,251,255,0.7)"; }}
+  >
+    <div style={{ width: 56, height: 56, borderRadius: 10, background: "linear-gradient(135deg,#EDE4F7,#F5F0FA)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      <img src="/bev_neutral.png" alt="" style={{ width: 48, height: 48, objectFit: "contain", opacity: 0.85 }} />
+    </div>
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ fontSize: 10, color: T.terra, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 2 }}>Clue {clueNumber}</div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: T.ink2, lineHeight: 1.25, marginBottom: 2 }}>Not yet imported</div>
+      <div style={{ fontSize: 12, color: T.ink3 }}>Tap to import Clue {clueNumber}</div>
+    </div>
+    <div style={{ fontSize: 18, color: T.terra, fontWeight: 600, flexShrink: 0, paddingRight: 6 }}>+</div>
+  </div>
+);
 
 // Pattern row used by MKAL detail (ordered, with up/down).
 const PatternRow = ({ p, idx, total, onOpen, onMoveUp, onMoveDown, onRemove }) => {

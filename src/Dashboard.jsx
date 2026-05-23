@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { T, useBreakpoint } from "./theme.jsx";
 import { PILL } from "./constants.js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, getSession, supabaseAuth } from "./supabase.js";
+import { listCollections, listPatternsInCollection } from "./utils/collections.js";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 const hoursSince = (dateStr) => {
@@ -464,11 +465,167 @@ const BragShelf = ({ patterns, pct, isMobile }) => {
   );
 };
 
+// ─── COLLECTIONS SECTION ────────────────────────────────────────────────────
+// Lock icon (SVG, lavender — emoji is reserved for Bev surfaces only)
+const LockIcon = ({size=18,color=ACCENT}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+
+const pctCheckable = (rows) => {
+  const c = (rows||[]).filter(r => !r.isHeader && !r.isNoteOnly);
+  if (!c.length) return 0;
+  return Math.round(c.filter(r => r.done).length / c.length * 100);
+};
+
+// One collection card on the My Wovely surface. Loads its own pattern
+// list to compute the clue count + aggregate progress — matches the
+// existing CollectionCard pattern in Collections.jsx so the two stay
+// visually and behaviorally aligned.
+const CollectionTile = ({c, onOpen, isMobile}) => {
+  const [patterns, setPatterns] = useState([]);
+  useEffect(() => {
+    let cancelled = false;
+    listPatternsInCollection(c.id).then(({data}) => { if(!cancelled) setPatterns(data || []); });
+    return () => { cancelled = true; };
+  }, [c.id]);
+  const cover = c.cover_image_url || patterns.find(p => p.cover_image_url)?.cover_image_url || null;
+  const isMkal = c.collection_type === "mkal";
+  const count = patterns.length;
+  const countLabel = isMkal
+    ? `${count} ${count === 1 ? "clue" : "clues"}`
+    : `${count} ${count === 1 ? "pattern" : "patterns"}`;
+  return (
+    <div onClick={onOpen} style={{
+      background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
+      borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
+      overflow: "hidden", cursor: "pointer",
+      transition: "transform 0.15s ease, box-shadow 0.15s ease",
+    }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(155,126,200,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
+      <div style={{height: 140, position: "relative", overflow: "hidden", borderRadius: `${GLASS.radius}px ${GLASS.radius}px 0 0`, background: "linear-gradient(135deg,#EDE4F7 0%,#F5F0FA 100%)"}}>
+        {cover
+          ? <img src={cover} alt={c.name} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+          : <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{opacity:0.45}}>
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+            </div>
+        }
+        <div style={{position:"absolute",top:10,left:10,background:"rgba(155,126,200,0.92)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:600,padding:"3px 10px",borderRadius:20,letterSpacing:"0.06em",textTransform:"uppercase"}}>
+          {isMkal ? "MKAL" : "General"}
+        </div>
+      </div>
+      <div style={{padding:"14px 16px 16px"}}>
+        <div style={{fontFamily:PF,fontSize:14,fontWeight:700,color:NAVY,lineHeight:1.3,marginBottom:6,overflow:"hidden",textOverflow:"ellipsis",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{c.name}</div>
+        <div style={{fontFamily:INTER,fontSize:11,color:MUTED}}>{countLabel}</div>
+      </div>
+    </div>
+  );
+};
+
+const CollectionsSection = ({tier, isAnonymous, onOpenCollection, onCreateCollection, onOpenUpgrade, isMobile}) => {
+  // Anonymous users don't see Collections at all — they can't be Craft tier
+  // and the marketing surface for them is the Plans modal in the nav.
+  if (isAnonymous) return null;
+  const isCraft = tier?.isCraft;
+  const [collections, setCollections] = useState([]);
+  const [loading, setLoading] = useState(isCraft);
+  useEffect(() => {
+    if (!isCraft) return;
+    let cancelled = false;
+    listCollections().then(({data}) => {
+      if (cancelled) return;
+      setCollections(data || []);
+      setLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [isCraft]);
+
+  const header = (
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+      <span style={{fontFamily:PF,fontSize:20,fontWeight:600,color:NAVY}}>Collections</span>
+      {!isCraft && <LockIcon size={16} color={ACCENT} />}
+      <InfoTooltip text={isCraft ? "Group related patterns — MKALs, designer bundles, or pattern sets — into a single shared progress view." : "Craft members organize MKALs and bundled patterns here. Tap to see what's inside."} />
+    </div>
+  );
+
+  // Free / Pro: glass teaser card. Soft, inviting, premium preview — not a
+  // wall. Same glass treatment as the rest of My Wovely so it reads as a
+  // section of the same page, not an ad.
+  if (!isCraft) {
+    return (
+      <div style={{gridColumn:"1 / -1", marginTop: 32}}>
+        {header}
+        <div onClick={onOpenUpgrade} style={{
+          background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
+          borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
+          padding: isMobile ? 20 : "28px 32px", cursor: "pointer",
+          display: "flex", alignItems: "center", gap: isMobile ? 16 : 24,
+          transition: "transform 0.15s ease, box-shadow 0.15s ease",
+        }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(155,126,200,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
+          <div style={{width: isMobile?52:64, height: isMobile?52:64, borderRadius:"50%", background:"linear-gradient(135deg, rgba(155,126,200,0.18), rgba(155,126,200,0.08))", display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <LockIcon size={isMobile?24:28} color={ACCENT} />
+          </div>
+          <div style={{flex:1, minWidth:0}}>
+            <div style={{fontFamily:PF,fontSize:isMobile?17:19,fontWeight:600,color:NAVY,marginBottom:4}}>Collections</div>
+            <div style={{fontFamily:INTER,fontSize:isMobile?13:14,color:MUTED,lineHeight:1.5,marginBottom:isMobile?12:14}}>Organize your MKALs, group project patterns, and track multi-part makes.</div>
+            <button onClick={(e)=>{e.stopPropagation();onOpenUpgrade();}} style={{
+              background: ACCENT, color: "#fff", border: "none", borderRadius: 14,
+              padding: isMobile ? "10px 20px" : "11px 24px", fontSize: 13, fontWeight: 600,
+              cursor: "pointer", fontFamily: INTER,
+              boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
+            }}>See plans</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Craft: render the user's collections. Empty state has its own
+  // glass card with a primary CTA so it doesn't feel like dead space.
+  return (
+    <div style={{gridColumn:"1 / -1", marginTop: 32}}>
+      {header}
+      {loading ? (
+        <div style={{textAlign:"center", padding:"40px 0"}}>
+          <div className="spinner" style={{width:24,height:24,border:`3px solid ${T.border}`,borderTopColor:ACCENT,borderRadius:"50%",margin:"0 auto"}}/>
+        </div>
+      ) : collections.length === 0 ? (
+        <div style={{
+          background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
+          borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
+          padding: "32px 24px", textAlign: "center",
+        }}>
+          <div style={{fontFamily:PF,fontSize:18,fontWeight:600,color:NAVY,marginBottom:6}}>Start your first collection</div>
+          <div style={{fontFamily:INTER,fontSize:13,color:MUTED,lineHeight:1.55,marginBottom:18,maxWidth:420,margin:"0 auto 18px"}}>Perfect for MKALs, designer bundles, and matching sets. Bev keeps the materials and progress in one place.</div>
+          <button onClick={onCreateCollection} style={{
+            background: ACCENT, color: "#fff", border: "none", borderRadius: 14,
+            padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+            fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
+          }}>Create a Collection</button>
+        </div>
+      ) : (
+        <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(3,1fr)",gap:isMobile?14:20}}>
+          {collections.map(c => (
+            <CollectionTile key={c.id} c={c} onOpen={() => onOpenCollection?.(c)} isMobile={isMobile} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // ─── MAIN COLLECTION VIEW ───────────────────────────────────────────────────
-const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearch,openDetail,onAddPattern,isPro,tier,setView,onPark,onUnpark,onDelete,onCoverChange,onRename,pct,catFallbackPhoto,Photo,Bar,Stars,CATS,TIER_CONFIG}) => {
+const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearch,openDetail,onAddPattern,isPro,tier,setView,isAnonymous,onOpenCollection,onCreateCollection,onOpenUpgrade,onPark,onUnpark,onDelete,onCoverChange,onRename,pct,catFallbackPhoto,Photo,Bar,Stars,CATS,TIER_CONFIG}) => {
   const{isDesktop,isMobile}=useBreakpoint();
   const allPatterns = [...userPatterns,...starterPatterns];
-  const visible=allPatterns.filter(p=>p.status!=="deleted");
+  // Patterns that belong to a collection (clue-of-MKAL etc.) are surfaced
+  // through their collection card, not as standalone library cards. This
+  // matches the spec: (collection_id IS NULL OR is_collection_part IS NOT true).
+  const visible=allPatterns.filter(p=>p.status!=="deleted" && !(p.collection_id && p.is_collection_part === true));
   const starterPats=visible.filter(p=>p.isStarter);
   const addedPats=visible.filter(p=>!p.isStarter);
   const filteredAll=[...addedPats,...starterPats].filter(p=>(cat==="All"||p.cat===cat)&&(!search||p.title.toLowerCase().includes(search.toLowerCase())));
@@ -521,7 +678,7 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
                 {filteredAll.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.04} onClick={()=>openDetail(p)} onPark={onPark} onUnpark={onUnpark} onDelete={onDelete} onCoverChange={onCoverChange} onRename={onRename} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}
                 {!isPro&&cat==="All"&&!search&&Array.from({length:emptySlots}).map((_,i)=><EmptySlotCard key={"slot_"+i} slotIndex={i} onClick={onAddPattern}/>)}
               </div>
-            ):(
+            ) : (
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
                 {filteredAll.length===0&&<div style={{textAlign:"center",padding:"40px 20px",color:MUTED,fontSize:13}}>No patterns yet. Add your first!</div>}
                 {filteredAll.map((p,i)=>(
@@ -536,6 +693,15 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
               </div>
             )}
           </div>
+
+          <CollectionsSection
+            tier={tier}
+            isAnonymous={isAnonymous}
+            onOpenCollection={onOpenCollection}
+            onCreateCollection={onCreateCollection}
+            onOpenUpgrade={onOpenUpgrade}
+            isMobile={isMobile}
+          />
         </div>
       </div>
     </div>

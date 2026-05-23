@@ -14,7 +14,7 @@ import PatternHeader from "./PatternHeader.jsx";
 import RowManager, { ensureRepeatBrackets } from "./RowManager.jsx";
 import AddPatternModal, { uploadPatternFile, buildRowsFromComponents } from "./AddPatternModal.jsx";
 import CollectionView, { PatternCard } from "./Dashboard.jsx";
-import { CollectionsListView, CollectionDetailView, NewCollectionModal } from "./Collections.jsx";
+import { CollectionDetailView, NewCollectionModal } from "./Collections.jsx";
 import { linkPatternToCollection, listPatternsInCollection } from "./utils/collections.js";
 import Detail, { CoverImagePicker, DeleteConfirmModal, ReadyToBuildPrompt, PatternCreatedOverlay } from "./PatternDetail.jsx";
 import ImageImportModal from "./ImageImportModal.jsx";
@@ -85,12 +85,18 @@ if (typeof document !== "undefined" && !document.getElementById("sb-font")) {
 })();
 
 // ─── ROUTE ↔ VIEW MAPPING ───────────────────────────────────────────────────
-const VIEW_TO_PATH = {collection:"/",detail:"/",wip:"/builds",browse:"/browse",stash:"/stash",calculator:"/tools","stitch-check":"/stitch-check",shopping:"/shopping",profile:"/profile",collections:"/collections"};
-const PATH_TO_VIEW = {"/":"collection","/hive":"collection","/builds":"wip","/browse":"browse","/stash":"stash","/tools":"calculator","/stitch-check":"stitch-check","/shopping":"shopping","/profile":"profile","/hive-vision":"hive-vision","/privacy":"privacy","/terms":"terms","/collections":"collections"};
+// Collections is no longer a standalone destination. The list lives inside
+// My Wovely (Dashboard) and the only Collections-specific route is the
+// deep-link detail at /collections/:id. /collections falls back to / so
+// older bookmarks land on My Wovely instead of a dead route.
+const VIEW_TO_PATH = {collection:"/",detail:"/",wip:"/builds",browse:"/browse",stash:"/stash",calculator:"/tools","stitch-check":"/stitch-check",shopping:"/shopping",profile:"/profile"};
+const PATH_TO_VIEW = {"/":"collection","/hive":"collection","/builds":"wip","/browse":"browse","/stash":"stash","/tools":"calculator","/stitch-check":"stitch-check","/shopping":"shopping","/profile":"profile","/hive-vision":"hive-vision","/privacy":"privacy","/terms":"terms"};
 const viewFromPath = (pathname) => {
   if(pathname.startsWith("/pattern/")) return "detail";
   if(pathname.startsWith("/hive/")) return "detail";
   if(pathname.startsWith("/collections/")) return "collection-detail";
+  // /collections (bare) routes back to My Wovely — Collections lives inside it now.
+  if(pathname === "/collections") return "collection";
   return PATH_TO_VIEW[pathname] || "collection";
 };
 const patternIdFromPath = (pathname) => {
@@ -687,10 +693,10 @@ const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,o
   // For anonymous users, surface Pro items without the padlock/"Pro feature" visual — the gate fires
   // on click. Showing the lock pre-gate suggests "sign up and you still can't have this" which kills conversion.
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Pro feature");
-  // Collections is Craft-only. Anonymous users don't see it at all (the
-  // marketing surface is the Plans modal). Free/Pro users see it with a
-  // lock so they can tap through and discover what's behind the tier.
-  const ITEMS=[{key:"collection",label:"My Wovely",sub:starterC+" starter"+(starterC!==1?"s":"")+" · "+addedC+" added",icon:"🧶"},...(isAnonymous?[]:[{key:"collections",label:"Collections",sub:tier===TIER_CRAFT?"MKALs and pattern sets":"Craft feature",icon:"📚",craftOnly:true}]),{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated",icon:"🛒"}];
+  // Collections is no longer a sibling destination — it lives inside My Wovely
+  // as a section below the pattern grid. The tier gating and lock teaser are
+  // handled there. Plans modal remains the marketing surface for guests.
+  const ITEMS=[{key:"collection",label:"My Wovely",sub:starterC+" starter"+(starterC!==1?"s":"")+" · "+addedC+" added",icon:"🧶"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated",icon:"🛒"}];
   const planLabel = isPro ? "My plan" : "See plans";
   // Anonymous users get the same subtitle as Free — the modal explains the
   // signup-before-Stripe step itself. Mismatched copy ("Sign up to compare
@@ -761,7 +767,7 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
   if(!open) return null;
   // See SidebarNav for rationale: hide pre-gate padlocks from anonymous users to not kill conversion motivation.
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Pro feature");
-  const ITEMS=[{key:"collection",label:"My Wovely",sub:count+" patterns",icon:"🧶"},...(isAnonymous?[]:[{key:"collections",label:"Collections",sub:tier===TIER_CRAFT?"MKALs and pattern sets":"Craft feature",icon:"📚",craftOnly:true}]),{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs",icon:"🛒"}];
+  const ITEMS=[{key:"collection",label:"My Wovely",sub:count+" patterns",icon:"🧶"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs",icon:"🛒"}];
   const planLabel = isPro ? "My plan" : "See plans";
   // Same rationale as SidebarNav: the modal is the single source of truth
   // for plan comparison, including for anonymous users. The modal itself
@@ -2192,6 +2198,7 @@ export default function Wovely() {
               status:r.status||"active",isStarter:!!r.is_starter,is_ai_generated:!!r.is_ai_generated,difficulty:r.difficulty||"",tags:r.tags||[],started:r.status==="in_progress",
               source_file_url:r.source_file_url||"",source_file_name:r.source_file_name||"",source_file_type:r.source_file_type||"",
               my_hook_size:r.my_hook_size||null,my_yarn_weight:r.my_yarn_weight||null,my_yardage:r.my_yardage||null,my_skeins:r.my_skeins||null,
+              collection_id:r.collection_id||null,is_collection_part:!!r.is_collection_part,collection_order:r.collection_order||0,
             }));
             // Backfill known patterns missing cover images
             const MARINA_COVER="https://res.cloudinary.com/dmaupzhcx/image/upload/v1774406086/l0rdxjgszsdkctqrnyeh.png";
@@ -2249,8 +2256,9 @@ export default function Wovely() {
   // Deep-link resolution for /collections/:id. If the URL points to a
   // specific collection but selectedCollection is null (page reload,
   // shared URL, back/forward nav), fetch the row so the detail view
-  // can render. Falls through to the list view if the fetch returns
-  // no row (deleted or not owned).
+  // can render. Falls through to My Wovely if the fetch returns no row
+  // (deleted or not owned) — there's no standalone collections list
+  // anymore.
   useEffect(() => {
     if (view !== "collection-detail") return;
     const cid = collectionIdFromPath(location.pathname);
@@ -2264,11 +2272,11 @@ export default function Wovely() {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/collections?id=eq.${cid}&select=*`, {
           headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${s.access_token}` },
         });
-        if (!res.ok) { navigate("/collections", { replace: true }); return; }
+        if (!res.ok) { navigate("/", { replace: true }); return; }
         const rows = await res.json();
         if (rows[0]) setSelectedCollection(rows[0]);
-        else navigate("/collections", { replace: true });
-      } catch { navigate("/collections", { replace: true }); }
+        else navigate("/", { replace: true });
+      } catch { navigate("/", { replace: true }); }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, location.pathname, authed, selectedCollection?.id]);
@@ -2395,6 +2403,8 @@ export default function Wovely() {
     }
   }
   // Unknown routes redirect to /
+  // /collections (bare) is kept in knownPaths so old bookmarks don't 404 —
+  // viewFromPath maps it to "collection" so the user lands on My Wovely.
   const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/hive-vision","/master-doc","/privacy","/terms","/collections"];
   if(!knownPaths.some(p=>location.pathname===p||location.pathname.startsWith("/pattern/")||location.pathname.startsWith("/hive/")||location.pathname.startsWith("/collections/"))) return <Navigate to="/" replace/>;
   const detailOnSave=u=>{
@@ -2506,23 +2516,36 @@ export default function Wovely() {
             setUserPatterns(prev=>prev.map(pat=>pat.id===localId?{...pat,id:rows[0].id,_supabaseId:rows[0].id}:pat));
             setCreatedPattern(prev=>prev&&prev.id===localId?{...prev,id:rows[0].id,_supabaseId:rows[0].id}:prev);
             // Collection linkage — when the import was launched from a
-            // collection detail view, append this pattern at the next
-            // available collection_order. The detail view re-fetches
-            // its pattern list on remount so the new entry shows up
-            // without any explicit refresh wiring here.
+            // collection detail view (or a greyed clue slot), persist
+            // collection_id / collection_order so the new pattern shows
+            // up inside the collection on the next fetch. Explicit
+            // _targetOrder wins (greyed slot picked a specific clue
+            // number); else we append at the end of the current list.
             if (collectionContext?.id) {
               const ctxCollection = collectionContext;
+              let assignedOrder = ctxCollection._targetOrder;
               try {
-                const { data: existing } = await listPatternsInCollection(ctxCollection.id);
-                const nextOrder = (existing?.length || 0) + 1;
-                await linkPatternToCollection(rows[0].id, ctxCollection.id, nextOrder);
+                if (!assignedOrder) {
+                  const { data: existing } = await listPatternsInCollection(ctxCollection.id);
+                  assignedOrder = (existing?.length || 0) + 1;
+                }
+                await linkPatternToCollection(rows[0].id, ctxCollection.id, assignedOrder);
               } catch (e) { console.warn("[Wovely] Collection linkage failed:", e.message); }
-              // Navigate back to the collection detail view. Clear
-              // context AFTER navigating so the overlay's onClose
-              // doesn't accidentally race with this redirect.
+              // Reflect the collection link locally so the pattern detail
+              // breadcrumb + clue nav render correctly on first navigation
+              // — the next fetch will overwrite this with the canonical row.
+              setUserPatterns(prev => prev.map(pat => pat.id === rows[0].id
+                ? { ...pat, collection_id: ctxCollection.id, is_collection_part: true, collection_order: assignedOrder }
+                : pat));
               setCollectionContext(null);
               setSelectedCollection(ctxCollection);
-              navigate("/collections/" + ctxCollection.id);
+              // After a collection import, drop the user on the pattern
+              // detail with collection context — back arrow points to
+              // the collection, clue nav becomes visible. Matches the
+              // "navigate to pattern detail WITH collection context" spec.
+              const linkedPattern = { ...localPattern, id: rows[0].id, _supabaseId: rows[0].id, collection_id: ctxCollection.id, is_collection_part: true, collection_order: assignedOrder };
+              setSelected(linkedPattern);
+              navigate("/pattern/" + encodeURIComponent(rows[0].id));
             }
           }
         }else{const errText=await res.text();console.error("[Wovely] Pattern save failed:",res.status,errText);}
@@ -2701,7 +2724,7 @@ export default function Wovely() {
           </div>
         </div>
         <div style={{flex:1,padding:"0 32px",minHeight:"100vh"}}>
-          {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
+          {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>setNewCollectionOpen(true)} onOpenUpgrade={()=>setShowProModal(true)} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
           {view==="wip"&&<div style={{padding:"24px 0 80px"}}><button onClick={()=>navigateToView("collection")} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Back</button>{inProgress.length===0?<div style={{textAlign:"center",padding:"80px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:20,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
           {view==="detail"&&selected&&<div style={{margin:"0 -40px"}}><Detail p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}}/></div>}
           {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
@@ -2710,8 +2733,7 @@ export default function Wovely() {
           {view==="stitch-check"&&<div style={{paddingTop:24}}><StitchCheck gateAction={gateAction}/></div>}
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
           {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
-          {view==="collections"&&<CollectionsListView key={collectionsRefreshNonce} tier={tier} onOpenDetail={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onStartCreate={()=>setNewCollectionOpen(true)} onOpenUpgrade={()=>setShowProModal(true)}/>}
-          {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/collections");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={()=>{setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/collections");}}/>}
+          {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={()=>{setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="privacy"&&<PrivacyPolicy/>}
           {view==="terms"&&<TermsOfService/>}
           {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:24}}><StitchResultPage/></div>}
@@ -2749,7 +2771,7 @@ export default function Wovely() {
       </div>
       {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Inter,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);setNewCollectionOpen(true);}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}
       <div style={{flex:1,overflowY:"auto",paddingBottom:100,minHeight:"100vh"}}>
-        {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
+        {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>setNewCollectionOpen(true)} onOpenUpgrade={()=>setShowProModal(true)} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
         {view==="wip"&&<div style={{padding:"16px 18px 80px"}}>{inProgress.length===0?<div style={{textAlign:"center",padding:"60px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
         {view==="detail"&&selected&&<Detail p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}}/>}
         {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
@@ -2758,8 +2780,7 @@ export default function Wovely() {
         {view==="stitch-check"&&<div style={{paddingTop:18}}><StitchCheck gateAction={gateAction}/></div>}
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
         {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
-        {view==="collections"&&<CollectionsListView key={collectionsRefreshNonce} tier={tier} onOpenDetail={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onStartCreate={()=>setNewCollectionOpen(true)} onOpenUpgrade={()=>setShowProModal(true)}/>}
-        {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/collections");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={()=>{setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/collections");}}/>}
+        {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={()=>{setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
         {view==="privacy"&&<PrivacyPolicy/>}
         {view==="terms"&&<TermsOfService/>}
         {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:18}}><StitchResultPage/></div>}
