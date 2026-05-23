@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { T, useBreakpoint } from "./theme.jsx";
 import { PILL } from "./constants.js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, getSession, supabaseAuth } from "./supabase.js";
-import { listCollections, listPatternsInCollection } from "./utils/collections.js";
+import { listCollections, deleteCollection, partLabelFor, partLabelPlural } from "./utils/collections.js";
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 const hoursSince = (dateStr) => {
@@ -285,9 +285,17 @@ const BevCorner = ({ patterns, isMobile, isPro }) => {
 };
 
 // ─── ON THE HOOK ────────────────────────────────────────────────────────────
-const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto, Photo, isMobile }) => {
+const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto, Photo, isMobile, collections = [], partsByCollection }) => {
   const navigate = useNavigate();
   const sectionLabel = <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}><span style={{ fontFamily: PF, fontSize: 20, fontWeight: 600, color: NAVY }}>On the Hook</span><InfoTooltip text="Your most recently touched pattern — pick up right where you left off." /></div>;
+  // If the hero is a collection part, the card surfaces the collection
+  // identity (name + part label + position) instead of just the standalone
+  // pattern title. The collection itself is found via the in-memory map
+  // CollectionView already builds — no extra fetch.
+  const heroForLookup = inProgress[0];
+  const heroCollection = (heroForLookup?.is_collection_part && heroForLookup?.collection_id)
+    ? (collections || []).find(c => c.id === heroForLookup.collection_id) || null
+    : null;
 
   if (inProgress.length === 0) {
     return (
@@ -348,7 +356,32 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(20,14,10,0.88) 0%, rgba(20,14,10,0.2) 50%, rgba(20,14,10,0.05) 100%)", zIndex: 2 }} />
         </div>
         <div style={{ padding: isMobile ? 16 : "20px 22px 22px", boxSizing: "border-box", width: "100%" }}>
-          <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 600, color: NAVY, marginBottom: 6 }}>{hero.title}</div>
+          {heroCollection ? (() => {
+            // Hero is a collection part — lead with the collection name and
+            // surface the part position. The standalone pattern title moves
+            // to a tertiary line so the user still sees what they're on.
+            const partLabel = partLabelFor(heroCollection);
+            const allParts = (partsByCollection && partsByCollection.get(heroCollection.id)) || [];
+            const sortedParts = [...allParts].sort((a, b) => (a.collection_order || 0) - (b.collection_order || 0));
+            const heroIdx = sortedParts.findIndex(p => p.id === hero.id || p._supabaseId === hero.id);
+            const heroPos = heroIdx >= 0 ? heroIdx + 1 : (hero.collection_order || 1);
+            const knownTotal = (typeof heroCollection.expected_part_count === "number" && heroCollection.expected_part_count > sortedParts.length)
+              ? heroCollection.expected_part_count
+              : sortedParts.length;
+            return (
+              <>
+                <div style={{ fontFamily: INTER, fontSize: 10, fontWeight: 600, color: ACCENT, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>
+                  {heroCollection.collection_type === "mkal" ? "MKAL" : "Collection"}
+                </div>
+                <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 600, color: NAVY, marginBottom: 2 }}>{heroCollection.name}</div>
+                <div style={{ fontFamily: INTER, fontSize: 13, color: T.ink2, marginBottom: 6 }}>
+                  {partLabel} {heroPos}{knownTotal > 1 ? ` of ${knownTotal}` : ""} · {hero.title}
+                </div>
+              </>
+            );
+          })() : (
+            <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 600, color: NAVY, marginBottom: 6 }}>{hero.title}</div>
+          )}
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: totalRows > 0 ? 12 : 0 }}>
             {hero.difficulty && <span style={{ fontFamily: INTER, fontSize: 10, background: PILL_BG, color: ACCENT, borderRadius: 20, padding: "3px 10px" }}>{hero.difficulty}</span>}
             <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED }}>{timeAgo(hero.updated_at)}</span>
@@ -465,14 +498,10 @@ const BragShelf = ({ patterns, pct, isMobile }) => {
   );
 };
 
-// ─── COLLECTIONS SECTION ────────────────────────────────────────────────────
-// Lock icon (SVG, lavender — emoji is reserved for Bev surfaces only)
-const LockIcon = ({size=18,color=ACCENT}) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}>
-    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-  </svg>
-);
+// ─── COLLECTIONS — INLINE LIBRARY CARDS ─────────────────────────────────────
+// Collections now sit in the same library grid as pattern cards, not in a
+// separate section. The visual differentiation is a thin lavender top
+// accent + the type pill — same outer shape so they grid cleanly.
 
 const pctCheckable = (rows) => {
   const c = (rows||[]).filter(r => !r.isHeader && !r.isNoteOnly);
@@ -480,10 +509,122 @@ const pctCheckable = (rows) => {
   return Math.round(c.filter(r => r.done).length / c.length * 100);
 };
 
-// One collection card on the My Wovely surface. Loads its own pattern
-// list to compute the clue count + aggregate progress — matches the
-// existing CollectionCard pattern in Collections.jsx so the two stay
-// visually and behaviorally aligned.
+// Aggregate progress across a set of collection-part patterns. Mirrors
+// utils/collections.js aggregatePct but kept inline so Dashboard doesn't
+// need a round trip through that helper just for the card grid.
+const aggregatePctFromParts = (parts) => {
+  let done = 0, total = 0;
+  for (const p of (parts || [])) {
+    const checkable = (p.rows || []).filter(r => !r.isHeader && !r.isNoteOnly);
+    total += checkable.length;
+    done += checkable.filter(r => r.done).length;
+  }
+  return total > 0 ? Math.round((done / total) * 100) : 0;
+};
+
+// Collection card rendered inline with PatternCards in the library grid.
+// Visually peer to PatternCard — same outer dimensions / glass treatment —
+// with a lavender top accent + type pill so it reads as a different kind
+// of thing without breaking the grid rhythm.
+const CollectionLibraryCard = ({c, parts, onOpen, onDelete, delay=0}) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const partLabel = partLabelFor(c);
+  const partLabelP = partLabelPlural(c);
+  const isMkal = c.collection_type === "mkal";
+  const importedCount = parts.length;
+  const knownTotal = (typeof c.expected_part_count === "number" && c.expected_part_count > importedCount) ? c.expected_part_count : null;
+  const countText = knownTotal ? `${importedCount} of ${knownTotal} ${partLabelP}` : `${importedCount} ${importedCount === 1 ? partLabel : partLabelP}`;
+  const progress = aggregatePctFromParts(parts);
+  const cover = c.cover_image_url || parts.find(p => p.cover_image_url)?.cover_image_url || parts.find(p => p.photo && p.photo !== "PILL")?.photo || null;
+  return (
+    <div className="card fu" onClick={onOpen} style={{
+      background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
+      borderRadius: GLASS.radius, overflow: "hidden",
+      border: GLASS.border, cursor: "pointer", animationDelay: delay + "s",
+      position: "relative", boxShadow: GLASS.shadow,
+      transition: "transform 0.15s ease, box-shadow 0.15s ease",
+    }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(155,126,200,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
+      {/* Lavender top accent — the visual cue that this is a collection,
+          not a single pattern. Subtle enough to not disrupt the grid. */}
+      <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:`linear-gradient(90deg, ${ACCENT}, #B9A3DC, ${ACCENT})`,zIndex:5}}/>
+      {/* Three-dot menu — matches the pattern card menu pattern. Edit
+          opens the detail (where the existing Edit button lives); Delete
+          opens the confirm flow at the parent. */}
+      <div style={{position:"absolute",top:8,right:8,zIndex:6}}>
+        <button onClick={e=>{e.stopPropagation();setMenuOpen(!menuOpen);}} style={{background:"rgba(0,0,0,.45)",backdropFilter:"blur(4px)",border:"none",borderRadius:99,width:28,height:28,cursor:"pointer",color:"#fff",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>⋮</button>
+        {menuOpen && (
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",right:0,top:32,background:"rgba(255,255,255,0.95)",backdropFilter:"blur(12px)",border:GLASS.border,borderRadius:10,boxShadow:GLASS.shadow,zIndex:10,minWidth:160,overflow:"hidden"}}>
+            <div onClick={()=>{setMenuOpen(false);onOpen();}} style={{padding:"10px 14px",fontSize:13,color:INK,cursor:"pointer",borderBottom:"1px solid #EDE4F7"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Edit collection</div>
+            <div onClick={()=>{setMenuOpen(false);onDelete&&onDelete(c);}} style={{padding:"10px 14px",fontSize:13,color:"#C0544A",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Delete collection</div>
+          </div>
+        )}
+      </div>
+      <div style={{position:"relative",height:200,overflow:"hidden",borderRadius:`${GLASS.radius}px ${GLASS.radius}px 0 0`,background:"linear-gradient(135deg, #EDE4F7 0%, #F5F0FA 100%)"}}>
+        {cover
+          ? <img src={cover} alt={c.name} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+          : <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{opacity:0.45}}>
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+              </svg>
+            </div>
+        }
+        <div style={{position:"absolute",top:10,left:10,background:isMkal?ACCENT:"rgba(45,58,124,0.85)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:600,padding:"3px 10px",borderRadius:20,letterSpacing:"0.06em",textTransform:"uppercase"}}>
+          {isMkal ? "MKAL" : "General"}
+        </div>
+        {progress === 100 ? (
+          <div style={{position:"absolute",top:10,right:46,background:T.sage,color:"#fff",fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:99,letterSpacing:".07em"}}>DONE</div>
+        ) : progress > 0 ? (
+          <>
+            <div style={{position:"absolute",top:10,right:46,background:"rgba(28,23,20,.65)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:600,padding:"3px 8px",borderRadius:99}}>{progress}%</div>
+            <div style={{position:"absolute",bottom:0,left:0,right:0,height:3,background:"rgba(255,255,255,.2)"}}>
+              <div style={{width:`${progress}%`,height:"100%",background:"rgba(255,255,255,.85)",transition:"width .3s"}}/>
+            </div>
+          </>
+        ) : null}
+      </div>
+      <div style={{padding:"14px 16px 16px"}}>
+        <div style={{fontFamily:INTER,fontSize:10,fontWeight:600,color:ACCENT,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>Collection</div>
+        <div style={{fontFamily:PF,fontSize:14,fontWeight:700,color:NAVY,lineHeight:1.3,margin:"0 0 6px",overflow:"hidden",textOverflow:"ellipsis",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical"}}>{c.name}</div>
+        <div style={{fontFamily:INTER,fontSize:11,color:MUTED}}>{countText}</div>
+      </div>
+    </div>
+  );
+};
+
+// Subtle "Start a Collection" prompt that sits in the library area when
+// a Craft user has no collections yet. Hidden once they create one.
+const StartCollectionPrompt = ({onStartCollection, isMobile}) => (
+  <div onClick={onStartCollection} style={{
+    background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
+    border: `1px dashed #D4C5ED`, borderRadius: GLASS.radius, boxShadow: GLASS.shadow,
+    padding: isMobile ? 16 : "18px 22px", cursor: "pointer",
+    display: "flex", alignItems: "center", gap: isMobile ? 12 : 16,
+    transition: "border-color .15s, background .15s",
+    marginBottom: 12,
+  }} onMouseEnter={e=>{e.currentTarget.style.borderColor=ACCENT;e.currentTarget.style.background="rgba(243,239,248,0.9)";}} onMouseLeave={e=>{e.currentTarget.style.borderColor="#D4C5ED";e.currentTarget.style.background=GLASS.bg;}}>
+    <div style={{width:isMobile?44:52,height:isMobile?44:52,borderRadius:"50%",background:"linear-gradient(135deg, rgba(155,126,200,0.18), rgba(155,126,200,0.08))",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+      <svg width={isMobile?22:26} height={isMobile?22:26} viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      </svg>
+    </div>
+    <div style={{flex:1,minWidth:0}}>
+      <div style={{fontFamily:PF,fontSize:isMobile?15:17,fontWeight:600,color:NAVY,marginBottom:2}}>Start a Collection</div>
+      <div style={{fontFamily:INTER,fontSize:isMobile?12:13,color:MUTED,lineHeight:1.5}}>Perfect for MKALs, designer bundles, and matching sets. Bev keeps the materials and progress in one place.</div>
+    </div>
+    <button onClick={(e)=>{e.stopPropagation();onStartCollection&&onStartCollection();}} style={{
+      background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
+      padding: isMobile ? "8px 14px" : "9px 18px", fontSize: 13, fontWeight: 600,
+      cursor: "pointer", fontFamily: INTER, flexShrink: 0,
+      boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
+    }}>Start</button>
+  </div>
+);
+
+// Old separate CollectionTile retained for reference / inline detail
+// view. Library grid uses CollectionLibraryCard above; this one is no
+// longer rendered in the dashboard.
 const CollectionTile = ({c, onOpen, isMobile}) => {
   const [patterns, setPatterns] = useState([]);
   useEffect(() => {
@@ -619,17 +760,60 @@ const CollectionsSection = ({tier, isAnonymous, onOpenCollection, onCreateCollec
 };
 
 // ─── MAIN COLLECTION VIEW ───────────────────────────────────────────────────
-const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearch,openDetail,onAddPattern,isPro,tier,setView,isAnonymous,onOpenCollection,onCreateCollection,onOpenUpgrade,onPark,onUnpark,onDelete,onCoverChange,onRename,pct,catFallbackPhoto,Photo,Bar,Stars,CATS,TIER_CONFIG}) => {
+const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearch,openDetail,onAddPattern,isPro,tier,setView,isAnonymous,onOpenCollection,onCreateCollection,onStartCollectionImport,onOpenUpgrade,onPark,onUnpark,onDelete,onCoverChange,onRename,pct,catFallbackPhoto,Photo,Bar,Stars,CATS,TIER_CONFIG}) => {
   const{isDesktop,isMobile}=useBreakpoint();
   const allPatterns = [...userPatterns,...starterPatterns];
   // Patterns that belong to a collection (clue-of-MKAL etc.) are surfaced
   // through their collection card, not as standalone library cards. This
   // matches the spec: (collection_id IS NULL OR is_collection_part IS NOT true).
   const visible=allPatterns.filter(p=>p.status!=="deleted" && !(p.collection_id && p.is_collection_part === true));
+  // Collections list — only fetched for Craft tier users. Anonymous and
+  // Free/Pro users don't see collection cards in the library; for them
+  // the contextual upgrade prompt lives on the PatternDetail after a
+  // multi-part import (see App.jsx detail banner).
+  const isCraft = !!tier?.isCraft;
+  const [collections, setCollections] = useState([]);
+  const [collectionsLoaded, setCollectionsLoaded] = useState(false);
+  const [deleteTargetCollection, setDeleteTargetCollection] = useState(null);
+  useEffect(() => {
+    if (!isCraft) { setCollectionsLoaded(true); return; }
+    let cancelled = false;
+    listCollections().then(({data}) => {
+      if (cancelled) return;
+      setCollections(data || []);
+      setCollectionsLoaded(true);
+    });
+    return () => { cancelled = true; };
+  }, [isCraft]);
+  // Map collection_id → parts pulled from the user's loaded patterns. No
+  // extra fetch — collection parts are already in userPatterns; we just
+  // bucket them. Used for the inline collection cards' progress numbers.
+  const partsByCollection = (() => {
+    const map = new Map();
+    for (const p of allPatterns) {
+      if (p.status === "deleted") continue;
+      if (p.collection_id && p.is_collection_part === true) {
+        const arr = map.get(p.collection_id) || [];
+        arr.push(p);
+        map.set(p.collection_id, arr);
+      }
+    }
+    return map;
+  })();
+  const handleDeleteCollection = async (c) => {
+    const { error } = await deleteCollection(c.id);
+    if (error) { console.warn("[Wovely] deleteCollection failed:", error); return; }
+    setCollections(prev => prev.filter(x => x.id !== c.id));
+    setDeleteTargetCollection(null);
+  };
   const starterPats=visible.filter(p=>p.isStarter);
   const addedPats=visible.filter(p=>!p.isStarter);
   const filteredAll=[...addedPats,...starterPats].filter(p=>(cat==="All"||p.cat===cat)&&(!search||p.title.toLowerCase().includes(search.toLowerCase())));
-  const inProgress=visible.filter(p=>{const v=pct(p);return !p.isStarter&&p.status!=="parked"&&(p.status==="in_progress"||p.started||(v>0&&v<100))&&v<100;}).sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0));
+  // inProgress is computed from ALL active patterns (not just `visible`)
+  // so a collection clue the user is currently working on can still be
+  // the On the Hook hero — On the Hook surfaces collection context when
+  // the hero is a collection part.
+  const inProgress=allPatterns.filter(p=>p.status!=="deleted").filter(p=>{const v=pct(p);return !p.isStarter&&p.status!=="parked"&&(p.status==="in_progress"||p.started||(v>0&&v<100))&&v<100;}).sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0));
   const [viewMode,setViewMode]=useState("grid");
   const emptySlots=isPro?0:Math.max(0,TIER_CONFIG.free.patternCap-addedPats.length);
 
@@ -649,7 +833,7 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
 
           <BevCorner patterns={visible} isMobile={isMobile} isPro={isPro} />
 
-          <OnTheHook inProgress={inProgress} openDetail={openDetail} onAddPattern={onAddPattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} isMobile={isMobile} />
+          <OnTheHook inProgress={inProgress} openDetail={openDetail} onAddPattern={onAddPattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} isMobile={isMobile} collections={collections} partsByCollection={partsByCollection} />
 
           <BragShelf patterns={visible} pct={pct} isMobile={isMobile} />
 
@@ -673,12 +857,49 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
                 <button onClick={()=>setViewMode("list")} style={{background:viewMode==="list"?PILL_BG:"transparent",border:`1px solid ${viewMode==="list"?"#EDE4F7":"transparent"}`,borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:12,color:MUTED,lineHeight:1}}>☰</button>
               </div>
             </div>
-            {viewMode==="grid"?(
-              <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(3,1fr)",gap:isMobile?14:20}}>
-                {filteredAll.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.04} onClick={()=>openDetail(p)} onPark={onPark} onUnpark={onUnpark} onDelete={onDelete} onCoverChange={onCoverChange} onRename={onRename} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}
-                {!isPro&&cat==="All"&&!search&&Array.from({length:emptySlots}).map((_,i)=><EmptySlotCard key={"slot_"+i} slotIndex={i} onClick={onAddPattern}/>)}
-              </div>
-            ) : (
+            {/* Empty-state prompt for Craft users with no collections yet —
+                a single-line dashed banner above the grid, not a card,
+                so the visual rhythm of the grid isn't disrupted. */}
+            {isCraft && collectionsLoaded && collections.length === 0 && cat === "All" && !search && (
+              <StartCollectionPrompt onStartCollection={onStartCollectionImport} isMobile={isMobile} />
+            )}
+            {viewMode==="grid"?(() => {
+              // Build the library items list. Collection cards (Craft only)
+              // are intermixed with patterns and sorted by recency so the
+              // user's actively-worked items float up regardless of type.
+              // "Recency" for a collection = max updated_at of its parts,
+              // falling back to the collection row's own updated_at.
+              const patternItems = filteredAll.map(p => ({
+                kind: "pattern",
+                key: `p_${p.id}`,
+                ts: new Date(p.updated_at || p.created_at || 0).getTime(),
+                pattern: p,
+              }));
+              const collectionItems = isCraft
+                ? (collections || []).filter(c => cat === "All" && (!search || c.name.toLowerCase().includes(search.toLowerCase()))).map(c => {
+                    const parts = partsByCollection.get(c.id) || [];
+                    const latestPartTs = parts.reduce((m, p) => Math.max(m, new Date(p.updated_at || 0).getTime()), 0);
+                    const colTs = new Date(c.updated_at || c.created_at || 0).getTime();
+                    return {
+                      kind: "collection",
+                      key: `c_${c.id}`,
+                      ts: Math.max(latestPartTs, colTs),
+                      collection: c,
+                      parts,
+                    };
+                  })
+                : [];
+              const items = [...patternItems, ...collectionItems].sort((a, b) => b.ts - a.ts);
+              return (
+                <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(3,1fr)",gap:isMobile?14:20}}>
+                  {items.map((item, i) => item.kind === "collection"
+                    ? <CollectionLibraryCard key={item.key} c={item.collection} parts={item.parts} delay={i*.04} onOpen={() => onOpenCollection?.(item.collection)} onDelete={(c) => setDeleteTargetCollection(c)} />
+                    : <PatternCard key={item.key} p={item.pattern} delay={i*.04} onClick={()=>openDetail(item.pattern)} onPark={onPark} onUnpark={onUnpark} onDelete={onDelete} onCoverChange={onCoverChange} onRename={onRename} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>
+                  )}
+                  {!isPro&&cat==="All"&&!search&&Array.from({length:emptySlots}).map((_,i)=><EmptySlotCard key={"slot_"+i} slotIndex={i} onClick={onAddPattern}/>)}
+                </div>
+              );
+            })() : (
               <div style={{display:"flex",flexDirection:"column",gap:8}}>
                 {filteredAll.length===0&&<div style={{textAlign:"center",padding:"40px 20px",color:MUTED,fontSize:13}}>No patterns yet. Add your first!</div>}
                 {filteredAll.map((p,i)=>(
@@ -693,17 +914,22 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
               </div>
             )}
           </div>
-
-          <CollectionsSection
-            tier={tier}
-            isAnonymous={isAnonymous}
-            onOpenCollection={onOpenCollection}
-            onCreateCollection={onCreateCollection}
-            onOpenUpgrade={onOpenUpgrade}
-            isMobile={isMobile}
-          />
         </div>
       </div>
+      {deleteTargetCollection && (
+        // Library-grid delete confirmation. Glass card + #C0544A button —
+        // matches the style guide and the in-detail-view confirmation.
+        <div onClick={() => setDeleteTargetCollection(null)} style={{ position: "fixed", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", fontFamily: INTER }}>
+          <div onClick={e => e.stopPropagation()} className="fu" style={{ background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur, border: GLASS.border, borderRadius: GLASS.radius, boxShadow: "0 20px 60px rgba(45,58,124,0.28)", padding: 24, width: "100%", maxWidth: 380 }}>
+            <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 700, color: INK, marginBottom: 8 }}>Delete this collection?</div>
+            <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.55, marginBottom: 20 }}>Patterns will stay in your library. Only the collection grouping is removed.</div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button onClick={() => setDeleteTargetCollection(null)} style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "9px 18px", fontSize: 13, color: T.ink2, cursor: "pointer", fontWeight: 600 }}>Cancel</button>
+              <button onClick={() => handleDeleteCollection(deleteTargetCollection)} style={{ background: "#C0544A", color: "#fff", border: "none", borderRadius: 99, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Delete Collection</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

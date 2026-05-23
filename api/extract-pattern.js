@@ -210,9 +210,18 @@ After extraction, assess quality:
 • If all major sections were found and 10+ rounds extracted, set "confidence": "high"
 • Otherwise set "confidence": "medium"
 
+═══ STEP 5 — MULTI-PART DETECTION ═══
+Determine if this PDF is one part of a larger multi-part project (MKAL, MCAL, mystery knit/crochet along, sequential clues, parts, sections, chapters, or a book of multiple related patterns). If so, populate these fields. If this is a single standalone pattern, set them all to null.
+
+• collection_name: the overall project name (e.g. "Arcoiris 2026 Mystery Crochet Along"). Strip the part suffix from the title — "Lemon MKAL Clue 3" → collection_name "Lemon MKAL".
+• collection_type: "mkal" when parts are sequential/ordered (MKALs, MCALs, mystery alongs, clue 1/2/3 builds), "general" when patterns are independent companions (a book of doll outfits, a designer bundle).
+• part_label: what the pattern calls its sub-sections — "Clue", "Part", "Section", "Chapter", "Pattern", "Module", "Block". Return the SINGULAR form. Default "Part" if unclear.
+• expected_part_count: total number of parts mentioned in the PDF, or null if not stated.
+• current_part_number: which part number this specific PDF represents (1-based). Default 1 if multi-part but unstated.
+
 ═══ OUTPUT FORMAT ═══
 Return this exact JSON structure:
-{"title":"string","designer":"string","source_url":null,"finished_size":"string","difficulty":"Beginner or Intermediate or Advanced","yarn_weight":"string","hook_size":"string","gauge":"string or null","confidence":"low or medium or high","materials":[{"name":"string","amount":"string","notes":"string"}],"abbreviations":[{"abbr":"string","meaning":"string"}],"abbreviations_map":{"mr":"magic ring","sc":"single crochet"},"suggested_resources":[{"label":"string","url":"string"}],"pattern_notes":"string","components":[{"name":"string","make_count":1,"independent":false,"rows":[{"id":"rnd-1","label":"RND 1","text":"full instruction text with all references resolved","stitch_count":null,"note":null,"action_item":false,"repeat_brackets":[{"sequence":"string","count":2}]}]}],"assembly_notes":"string","image_description":"string"}
+{"title":"string","designer":"string","source_url":null,"finished_size":"string","difficulty":"Beginner or Intermediate or Advanced","yarn_weight":"string","hook_size":"string","gauge":"string or null","confidence":"low or medium or high","materials":[{"name":"string","amount":"string","notes":"string"}],"abbreviations":[{"abbr":"string","meaning":"string"}],"abbreviations_map":{"mr":"magic ring","sc":"single crochet"},"suggested_resources":[{"label":"string","url":"string"}],"pattern_notes":"string","components":[{"name":"string","make_count":1,"independent":false,"rows":[{"id":"rnd-1","label":"RND 1","text":"full instruction text with all references resolved","stitch_count":null,"note":null,"action_item":false,"repeat_brackets":[{"sequence":"string","count":2}]}]}],"assembly_notes":"string","image_description":"string","collection_name":"string or null","collection_type":"mkal or general or null","part_label":"string or null","expected_part_count":"number or null","current_part_number":"number or null"}
 
 COMPONENT RULES:
 • For components like 'FLIPPER (MAKE 2)', set make_count: 2. Default 1 if not specified.
@@ -452,6 +461,14 @@ The "shared_context_end_marker" marks the boundary where the setup section (mate
 
 Markers (start_marker, end_marker, shared_context_end_marker) must be LITERAL substrings copied verbatim from the document — about 30 characters each, enough to be unique. If a marker isn't actually present in the text, the downstream slice will fail.
 
+ADDITIONALLY — multi-part detection. Determine if this PDF is one part of a larger multi-part project (MKAL, MCAL, mystery knit/crochet along, sequential clues, parts, sections, chapters, or a book of multiple related patterns). If so, set the fields below. If this is a single standalone pattern, set them all to null.
+
+- collection_name: the overall project name (e.g. "Arcoiris 2026 Mystery Crochet Along"). Strip the part suffix from the title — "Lemon MKAL Clue 3" → collection_name "Lemon MKAL".
+- collection_type: "mkal" when parts are sequential/ordered (MKALs, MCALs, mystery alongs, clue 1/2/3 builds), "general" when patterns are independent companions (a book of doll outfits, a designer bundle).
+- part_label: what the pattern calls its sub-sections — "Clue", "Part", "Section", "Chapter", "Pattern", "Module", "Block". Return the SINGULAR form. Default "Part" if unclear.
+- expected_part_count: total number of parts mentioned in the PDF (e.g. "This is a 12-part mystery along"), or null if not stated in this PDF.
+- current_part_number: which part number this specific PDF represents (1-based). Default 1 if a multi-part project but the part number isn't explicit.
+
 Return ONLY valid JSON, no markdown, no backticks, no commentary:
 {
   "pattern_name": "string",
@@ -464,7 +481,12 @@ Return ONLY valid JSON, no markdown, no backticks, no commentary:
       "estimated_rows": number
     }
   ],
-  "shared_context_end_marker": "string"
+  "shared_context_end_marker": "string",
+  "collection_name": "string or null",
+  "collection_type": "mkal or general or null",
+  "part_label": "string or null",
+  "expected_part_count": "number or null",
+  "current_part_number": "number or null"
 }
 
 If the document has no construction components (rare — pure setup pages, error documents), return component_count: 0 and components: [].
@@ -711,6 +733,13 @@ function assembleChunkedResult({ shared, componentResults, planning }) {
     })),
     assembly_notes: shared?.assembly_notes || '',
     image_description: shared?.image_description || '',
+    // Multi-part detection — passed straight through from the planning
+    // pass. Null when the planner determined this is a standalone pattern.
+    collection_name: planning?.collection_name || null,
+    collection_type: planning?.collection_type || null,
+    part_label: planning?.part_label || null,
+    expected_part_count: typeof planning?.expected_part_count === 'number' ? planning.expected_part_count : null,
+    current_part_number: typeof planning?.current_part_number === 'number' ? planning.current_part_number : null,
   };
 }
 

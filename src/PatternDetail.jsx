@@ -6,7 +6,7 @@ import { PILL } from "./constants.js";
 import PatternHeader from "./PatternHeader.jsx";
 import RowManager, { ensureRepeatBrackets } from "./RowManager.jsx";
 import { uploadPatternFile } from "./AddPatternModal.jsx";
-import { listPatternsInCollection } from "./utils/collections.js";
+import { listPatternsInCollection, partLabelFor } from "./utils/collections.js";
 
 const YarnSummaryCard = ({label, myKey, myVal, fallback, onSave}) => {
   const display = myVal || fallback;
@@ -270,7 +270,7 @@ const ShareCardModal = ({pattern,onClose,pct,Btn}) => {
   );
 };
 
-const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Photo,Stars,WireframeViewer,Btn,scrollToRow:initialScrollToRow,isAnonymous=false,onSignUp}) => {
+const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Photo,Stars,WireframeViewer,Btn,scrollToRow:initialScrollToRow,isAnonymous=false,onSignUp,collectionUpgrade,onCollectionUpgrade,onCollectionUpgradeDismiss}) => {
   const VALID_TABS=["materials","rows","notes"];
   const navigate = useNavigate();
   // Collection context — only populated when this pattern belongs to a
@@ -285,10 +285,10 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
       try {
         const s = getSession();
         if (!s?.access_token) return;
-        // Two parallel reads — the collection row for the name + the
-        // sibling pattern list for the prev/next nav. Both are tiny.
+        // Two parallel reads — the collection row for the name/vernacular
+        // + the sibling pattern list for the prev/next nav. Both are tiny.
         const [colRes, sibRes] = await Promise.all([
-          fetch(`${SUPABASE_URL}/rest/v1/collections?id=eq.${p.collection_id}&select=id,name,collection_type`, {
+          fetch(`${SUPABASE_URL}/rest/v1/collections?id=eq.${p.collection_id}&select=id,name,collection_type,part_label,expected_part_count`, {
             headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${s.access_token}` },
           }),
           listPatternsInCollection(p.collection_id),
@@ -301,6 +301,8 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             id: colRows[0].id,
             name: colRows[0].name || "Collection",
             type: colRows[0].collection_type || "general",
+            partLabel: partLabelFor(colRows[0]),
+            expectedPartCount: typeof colRows[0].expected_part_count === "number" ? colRows[0].expected_part_count : null,
             siblings,
           });
         }
@@ -414,56 +416,62 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
       <div ref={scrollRef} style={{flex:1,WebkitOverflowScrolling:"touch"}}>
         <div style={{position:"sticky",top:0,zIndex:10,transform:headerHidden?"translateY(-100%)":"translateY(0)",transition:"transform 220ms ease"}}>
           <PatternHeader p={p} rows={rows} done={done} editing={editing} draft={draft} setDraft={setDraft} milestone={milestone} setMilestone={setMilestone} onBack={handleBack} backLabel={collectionMeta?.name} onShare={()=>setShowShare(true)} onScale={()=>setShowScale(true)} onEdit={()=>editing?save():setEditing(true)} onSave={save} detailPhoto={detailPhoto} Bar={Bar} Photo={Photo} WireframeViewer={WireframeViewer} onViewSource={handleViewSource}/>
-          {collectionMeta && isMkalCollection && sibIndex >= 0 && (
-            // Clue-to-clue navigation. Only shown for MKAL collections —
+          {collectionMeta && isMkalCollection && sibIndex >= 0 && (() => {
+            // Part-to-part navigation. Only shown for MKAL collections —
             // general collections are unordered so prev/next doesn't apply.
-            // "Next" jumps to the next imported clue if there is one; if
-            // not, it lands on the collection detail page where the user
-            // can import the next slot. Same component handles both.
-            <div style={{
-              background: T.surface, borderBottom: `1px solid ${T.border}`,
-              padding: "8px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
-              fontFamily: T.sans,
-            }}>
-              <button
-                onClick={() => goToSibling(prevSibling)}
-                disabled={!prevSibling}
-                style={{
-                  background: "none", border: "none", padding: "4px 6px",
-                  color: prevSibling ? T.terra : T.ink3,
-                  cursor: prevSibling ? "pointer" : "default",
-                  opacity: prevSibling ? 1 : 0.4,
-                  fontSize: 12, fontWeight: 600, fontFamily: T.sans,
-                  display: "flex", alignItems: "center", gap: 4, minWidth: 0, overflow: "hidden",
-                }}
-                aria-label="Previous clue"
-              >
-                <span style={{ flexShrink: 0 }}>←</span>
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {prevSibling ? `Clue ${sibIndex}` : ""}
-                </span>
-              </button>
-              <div style={{ fontSize: 12, fontWeight: 700, color: T.ink, fontFamily: T.serif, flexShrink: 0 }}>
-                Clue {sibIndex + 1} of {siblings.length}
+            // Uses the collection's part_label vernacular (Clue / Part /
+            // Chapter / etc) for all labels, and prefers expected_part_count
+            // when the planner gave us a total.
+            const label = collectionMeta.partLabel || "Part";
+            const total = collectionMeta.expectedPartCount && collectionMeta.expectedPartCount > siblings.length
+              ? collectionMeta.expectedPartCount
+              : siblings.length;
+            return (
+              <div style={{
+                background: T.surface, borderBottom: `1px solid ${T.border}`,
+                padding: "8px 14px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+                fontFamily: T.sans,
+              }}>
+                <button
+                  onClick={() => goToSibling(prevSibling)}
+                  disabled={!prevSibling}
+                  style={{
+                    background: "none", border: "none", padding: "4px 6px",
+                    color: prevSibling ? T.terra : T.ink3,
+                    cursor: prevSibling ? "pointer" : "default",
+                    opacity: prevSibling ? 1 : 0.4,
+                    fontSize: 12, fontWeight: 600, fontFamily: T.sans,
+                    display: "flex", alignItems: "center", gap: 4, minWidth: 0, overflow: "hidden",
+                  }}
+                  aria-label={`Previous ${label.toLowerCase()}`}
+                >
+                  <span style={{ flexShrink: 0 }}>←</span>
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {prevSibling ? `${label} ${sibIndex}` : ""}
+                  </span>
+                </button>
+                <div style={{ fontSize: 12, fontWeight: 700, color: T.ink, fontFamily: T.serif, flexShrink: 0 }}>
+                  {label} {sibIndex + 1} of {total}
+                </div>
+                <button
+                  onClick={() => nextSibling ? goToSibling(nextSibling) : goToNextSlot()}
+                  style={{
+                    background: "none", border: "none", padding: "4px 6px",
+                    color: T.terra,
+                    cursor: "pointer",
+                    fontSize: 12, fontWeight: 600, fontFamily: T.sans,
+                    display: "flex", alignItems: "center", gap: 4, minWidth: 0, overflow: "hidden", justifyContent: "flex-end",
+                  }}
+                  aria-label={nextSibling ? `Next ${label.toLowerCase()}` : `Import next ${label.toLowerCase()}`}
+                >
+                  <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {nextSibling ? `${label} ${sibIndex + 2}` : `Import ${label} ${sibIndex + 2}`}
+                  </span>
+                  <span style={{ flexShrink: 0 }}>→</span>
+                </button>
               </div>
-              <button
-                onClick={() => nextSibling ? goToSibling(nextSibling) : goToNextSlot()}
-                style={{
-                  background: "none", border: "none", padding: "4px 6px",
-                  color: T.terra,
-                  cursor: "pointer",
-                  fontSize: 12, fontWeight: 600, fontFamily: T.sans,
-                  display: "flex", alignItems: "center", gap: 4, minWidth: 0, overflow: "hidden", justifyContent: "flex-end",
-                }}
-                aria-label={nextSibling ? "Next clue" : "Import next clue"}
-              >
-                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {nextSibling ? `Clue ${sibIndex + 2}` : `Import Clue ${sibIndex + 2}`}
-                </span>
-                <span style={{ flexShrink: 0 }}>→</span>
-              </button>
-            </div>
-          )}
+            );
+          })()}
           <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
             {[["materials","Materials"],["rows","Instructions/Rows"],["notes","My Notes"]].map(([key,label])=>(
               <button key={key} onClick={()=>{setTab(key);localStorage.setItem("yh_last_tab",key);}} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>
@@ -471,6 +479,36 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
           </div>
         </div>
         <div style={{padding:`4px 20px ${isAnonymous?220:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
+        {collectionUpgrade && (
+          // Contextual upgrade banner for Free/Pro users whose just-imported
+          // pattern looks like part of a larger project. Inline + dismissible
+          // so it never blocks the row work. See-plans opens the standard
+          // TieredUpgradeModal at the parent.
+          <div style={{
+            margin: "12px 0 18px",
+            background: "rgba(155,126,200,0.10)",
+            border: "1px solid rgba(155,126,200,0.32)",
+            borderRadius: 14,
+            padding: "12px 14px",
+            display: "flex",
+            alignItems: "flex-start",
+            gap: 12,
+            fontFamily: T.sans,
+          }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontFamily: T.serif, fontSize: 14, fontWeight: 700, color: T.ink, marginBottom: 4, lineHeight: 1.3 }}>
+                Bev found {collectionUpgrade.expected_part_count ? `${collectionUpgrade.expected_part_count} ${(collectionUpgrade.part_label || "part").toLowerCase()}s` : `multiple ${(collectionUpgrade.part_label || "part").toLowerCase()}s`} in this pattern
+              </div>
+              <div style={{ fontSize: 12, color: T.ink2, lineHeight: 1.55 }}>
+                Upgrade to Craft to organize them as a collection — Bev keeps the materials and progress in one place.
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
+              <button onClick={onCollectionUpgrade} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "8px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>See plans</button>
+              <button onClick={onCollectionUpgradeDismiss} aria-label="Dismiss" style={{ background: "transparent", border: "none", color: T.ink3, cursor: "pointer", fontSize: 16, padding: "4px 6px", lineHeight: 1 }}>×</button>
+            </div>
+          </div>
+        )}
         {tab==="materials"&&(<>
           {(editing?draft.materials:p.materials).map((m,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${T.border}`}}>

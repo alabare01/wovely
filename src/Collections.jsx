@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { T, useBreakpoint } from "./theme.jsx";
 import UpgradeNudge from "./components/UpgradeNudge.jsx";
 import {
@@ -12,6 +13,8 @@ import {
   getMonthlyCollectionUsage,
   mergeMaterials,
   aggregatePct,
+  partLabelFor,
+  partLabelPlural,
 } from "./utils/collections.js";
 import { TIER_CRAFT } from "./utils/tierUtils.js";
 
@@ -212,6 +215,7 @@ const CollectionCard = ({ c, onOpen }) => {
 
 export const CollectionDetailView = ({ collection: initial, onBack, onOpenPattern, onAddPattern, onImportClue, onCollectionChanged, onCollectionDeleted }) => {
   const { isDesktop } = useBreakpoint();
+  const navigate = useNavigate();
   const [collection, setCollection] = useState(initial);
   const [patterns, setPatterns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -219,6 +223,13 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
   const [draft, setDraft] = useState({ name: initial.name, description: initial.description || "", collection_type: initial.collection_type || "general" });
   const [showMaterials, setShowMaterials] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  // Sibling collections — populated so the user can jump between
+  // collections without going back to My Wovely. Empty / single-item
+  // arrays hide the pill row; one fetch on mount is plenty.
+  const [allCollections, setAllCollections] = useState([]);
+  useEffect(() => {
+    listCollections().then(({ data }) => setAllCollections(data || []));
+  }, []);
 
   const refresh = async () => {
     const { data } = await listPatternsInCollection(collection.id);
@@ -231,6 +242,18 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
   const isMkal = collection.collection_type === "mkal";
   const progress = aggregatePct(patterns);
   const materials = useMemo(() => mergeMaterials(patterns), [patterns]);
+  const partLabel = partLabelFor(collection);
+  const partLabelLower = partLabel.toLowerCase();
+  // Total slots for display ("4 of 12 Clues"). Falls back to the imported
+  // count when expected_part_count was never set by the planner.
+  const totalParts = (typeof collection.expected_part_count === "number" && collection.expected_part_count > patterns.length)
+    ? collection.expected_part_count
+    : patterns.length;
+  const partsLabelPlural = partLabelPlural(collection);
+  // Banner image — first imported pattern's cover or the collection's own.
+  // Structured as a single image now, but the JSX layout below leaves
+  // room for a future carousel without restructuring.
+  const bannerImage = collection.cover_image_url || patterns.find(p => p.cover_image_url)?.cover_image_url || patterns.find(p => p.photo && p.photo !== "PILL")?.photo || null;
 
   const saveHeader = async () => {
     const patch = {
@@ -283,43 +306,89 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
     );
   }
 
+  // Count label, vernacular-aware. MKAL with a known total → "4 of 12 Clues".
+  // Otherwise just the imported count + plural label ("3 Parts").
+  const countText = isMkal && totalParts > patterns.length
+    ? `${patterns.length} of ${totalParts} ${partsLabelPlural}`
+    : `${patterns.length} ${patterns.length === 1 ? partLabel : partsLabelPlural}`;
+
   return (
     <div style={PAGE}>
-      <button onClick={onBack} style={{ background: "none", border: "none", color: T.terra, cursor: "pointer", fontSize: 13, fontWeight: 600, padding: 0, marginBottom: 18, display: "flex", alignItems: "center", gap: 6 }}>← My Wovely</button>
+      <button onClick={onBack} style={{ background: "none", border: "none", color: T.terra, cursor: "pointer", fontSize: 13, fontWeight: 600, padding: 0, marginBottom: 14, display: "flex", alignItems: "center", gap: 6 }}>← My Wovely</button>
 
-      <div style={{ ...GLASS, padding: 22, marginBottom: 16 }}>
-        {!editingHeader ? (
-          <div>
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                  <div style={{ background: isMkal ? T.terra : "rgba(45,58,124,0.85)", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
-                    {isMkal ? "MKAL" : "Collection"}
-                  </div>
-                  <div style={{ fontSize: 12, color: T.ink3 }}>
-                    {isMkal
-                      ? `${patterns.length} ${patterns.length === 1 ? "clue" : "clues"}`
-                      : `${patterns.length} ${patterns.length === 1 ? "pattern" : "patterns"}`}
-                  </div>
-                </div>
-                <div style={{ fontFamily: T.serif, fontSize: 26, fontWeight: 700, color: T.ink, lineHeight: 1.15, marginBottom: 6 }}>{collection.name}</div>
-                {collection.description && (
-                  <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.6, marginBottom: 8 }}>{collection.description}</div>
-                )}
-              </div>
+      {/* "Your Collections" sibling pill row. Hidden when there's only
+          one collection so the chrome stays out of the way. The current
+          collection is highlighted; tapping another navigates without a
+          full back-trip through My Wovely. */}
+      {allCollections.length > 1 && (
+        <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 14, WebkitOverflowScrolling: "touch", scrollbarWidth: "none" }}>
+          {allCollections.map(c => {
+            const active = c.id === collection.id;
+            return (
               <button
-                onClick={() => setEditingHeader(true)}
-                style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "6px 12px", fontSize: 12, color: T.ink2, cursor: "pointer", fontWeight: 600, flexShrink: 0 }}
-              >Edit</button>
+                key={c.id}
+                onClick={() => { if (!active) { setCollection(c); navigate(`/collections/${c.id}`); } }}
+                style={{
+                  background: active ? T.terra : "rgba(255,255,255,0.82)",
+                  color: active ? "#fff" : T.ink2,
+                  border: active ? "none" : `1px solid ${T.border}`,
+                  borderRadius: 99,
+                  padding: "6px 14px",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  cursor: active ? "default" : "pointer",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                  fontFamily: T.sans,
+                }}
+              >{c.name}</button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Collection header card with cover banner. The banner uses the
+          same blurred-backdrop + sharp-centered treatment as the pattern
+          detail hero so the visual language stays consistent. Structured
+          as a single image now; the markup below leaves room for a
+          carousel to drop in later. */}
+      <div style={{ ...GLASS, marginBottom: 16, overflow: "hidden" }}>
+        <div style={{ position: "relative", height: 200, background: bannerImage ? "transparent" : "linear-gradient(135deg, #EDE4F7 0%, #F5F0FA 100%)", overflow: "hidden" }}>
+          {bannerImage && (
+            <>
+              {/* Blurred backdrop fills the frame; sharp image sits centered on top. */}
+              <img src={bannerImage} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "blur(20px) saturate(1.2) brightness(0.7)", transform: "scale(1.1)", pointerEvents: "none" }} />
+              <img src={bannerImage} alt={collection.name} style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)", height: "100%", width: "auto", objectFit: "contain", zIndex: 1 }} />
+            </>
+          )}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(20,14,10,0.78) 0%, rgba(20,14,10,0.18) 55%, rgba(20,14,10,0.05) 100%)", zIndex: 2 }} />
+          <div style={{ position: "absolute", left: 20, right: 20, bottom: 16, zIndex: 3, display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <span style={{ background: isMkal ? T.terra : "rgba(45,58,124,0.85)", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                  {isMkal ? "MKAL" : "General"}
+                </span>
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.78)", fontFamily: T.sans }}>{countText}</span>
+              </div>
+              <div style={{ fontFamily: T.serif, fontSize: 24, fontWeight: 700, color: "#fff", lineHeight: 1.15, textShadow: "0 2px 8px rgba(0,0,0,0.35)" }}>{collection.name}</div>
+              {collection.description && (
+                <div style={{ fontSize: 12, color: "rgba(255,255,255,0.86)", lineHeight: 1.55, marginTop: 4 }}>{collection.description}</div>
+              )}
             </div>
-            <div style={{ marginTop: 14 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: T.ink3, marginBottom: 6 }}>
-                <span>Overall progress</span>
-                <span style={{ fontWeight: 700, color: progress === 100 ? T.sage : T.terra }}>{progress}%</span>
-              </div>
-              <div style={{ background: T.border, borderRadius: 99, height: 6, overflow: "hidden" }}>
-                <div style={{ width: `${progress}%`, height: 6, background: progress === 100 ? T.sage : T.terra, borderRadius: 99, transition: "width .3s ease" }} />
-              </div>
+            <button
+              onClick={() => setEditingHeader(true)}
+              style={{ background: "rgba(255,255,255,0.18)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff", borderRadius: 99, padding: "6px 14px", fontSize: 12, fontWeight: 600, cursor: "pointer", flexShrink: 0 }}
+            >Edit</button>
+          </div>
+        </div>
+        {!editingHeader ? (
+          <div style={{ padding: "16px 20px 18px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: T.ink3, marginBottom: 6 }}>
+              <span>Overall progress</span>
+              <span style={{ fontWeight: 700, color: progress === 100 ? T.sage : T.terra }}>{progress}%</span>
+            </div>
+            <div style={{ background: T.border, borderRadius: 99, height: 6, overflow: "hidden" }}>
+              <div style={{ width: `${progress}%`, height: 6, background: progress === 100 ? T.sage : T.terra, borderRadius: 99, transition: "width .3s ease" }} />
             </div>
           </div>
         ) : (
@@ -384,9 +453,9 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
 
       {patterns.length === 0 ? (
         <div style={{ ...GLASS, padding: "32px 24px", textAlign: "center", marginBottom: 16 }}>
-          <div style={{ fontFamily: T.serif, fontSize: 17, fontWeight: 700, color: T.ink, marginBottom: 8 }}>No patterns yet</div>
-          <div style={{ fontSize: 13, color: T.ink2, marginBottom: 16 }}>{isMkal ? "Import Clue 1 to get started." : "Add the first pattern to this collection."}</div>
-          <button onClick={() => onAddPattern?.(collection)} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)" }}>{isMkal ? "Import Clue 1" : "Add a Pattern"}</button>
+          <div style={{ fontFamily: T.serif, fontSize: 17, fontWeight: 700, color: T.ink, marginBottom: 8 }}>No {partsLabelPlural.toLowerCase()} yet</div>
+          <div style={{ fontSize: 13, color: T.ink2, marginBottom: 16 }}>{isMkal ? `Import ${partLabel} 1 to get started.` : "Add the first pattern to this collection."}</div>
+          <button onClick={() => onAddPattern?.(collection)} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)" }}>{isMkal ? `Import ${partLabel} 1` : "Add a Pattern"}</button>
         </div>
       ) : isMkal ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
@@ -396,20 +465,30 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
               p={p}
               idx={idx}
               total={patterns.length}
+              partLabel={partLabel}
               onOpen={() => onOpenPattern?.(p)}
               onMoveUp={() => move(idx, -1)}
               onMoveDown={() => move(idx, 1)}
               onRemove={() => handleRemove(p.id)}
             />
           ))}
-          {/* Greyed-out next-clue placeholder. Single slot — we don't
-              persist a total clue count for the MKAL today, so we only
-              expose the one immediately-next position. Tapping it
-              triggers the import flow with the target order pre-set. */}
-          <UnimportedClueSlot
-            clueNumber={patterns.length + 1}
-            onImport={() => (onImportClue ? onImportClue(collection, patterns.length + 1) : onAddPattern?.(collection))}
-          />
+          {/* Unimported placeholder slots. If the planner knew the total
+              (expected_part_count), render every remaining slot so the
+              user sees the shape of the whole MKAL up front. Otherwise
+              just show the one immediately-next position. */}
+          {(() => {
+            const knownTotal = collection.expected_part_count && collection.expected_part_count > patterns.length;
+            const slotsToShow = knownTotal ? (collection.expected_part_count - patterns.length) : 1;
+            const startNumber = patterns.length + 1;
+            return Array.from({ length: slotsToShow }).map((_, i) => (
+              <UnimportedClueSlot
+                key={`slot-${startNumber + i}`}
+                clueNumber={startNumber + i}
+                partLabel={partLabel}
+                onImport={() => (onImportClue ? onImportClue(collection, startNumber + i) : onAddPattern?.(collection))}
+              />
+            ));
+          })()}
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: isDesktop ? "1fr 1fr 1fr" : "1fr 1fr", gap: 12, marginBottom: 16 }}>
@@ -422,21 +501,27 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
       <button
         onClick={() => onAddPattern?.(collection)}
         style={{ width: "100%", background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "13px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)", marginBottom: 24 }}
-      >{isMkal ? "Import Next Clue" : "Add a Pattern"}</button>
+      >{isMkal ? `Import Next ${partLabel}` : "Add a Pattern"}</button>
 
       <div style={{ textAlign: "center", paddingTop: 8 }}>
-        {!confirmDelete ? (
-          <button onClick={() => setConfirmDelete(true)} style={{ background: "none", border: "none", color: T.ink3, fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Delete this collection</button>
-        ) : (
-          <div style={{ ...GLASS, padding: 16 }}>
-            <div style={{ fontSize: 13, color: T.ink2, marginBottom: 12, lineHeight: 1.5 }}>Patterns will stay in your library. Only the collection grouping is removed.</div>
-            <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-              <button onClick={() => setConfirmDelete(false)} style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "8px 16px", fontSize: 12, color: T.ink2, cursor: "pointer", fontWeight: 600 }}>Cancel</button>
-              <button onClick={handleDelete} style={{ background: "#C0544A", color: "#fff", border: "none", borderRadius: 99, padding: "8px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>Delete Collection</button>
+        <button onClick={() => setConfirmDelete(true)} style={{ background: "none", border: "none", color: T.ink3, fontSize: 12, cursor: "pointer", textDecoration: "underline" }}>Delete this collection</button>
+      </div>
+
+      {confirmDelete && (
+        // Glass-card delete modal. Standard style guide colors throughout;
+        // the only red surface is the Delete button itself (#C0544A — the
+        // existing Danger color, no new salmons or terracottas).
+        <div onClick={() => setConfirmDelete(false)} style={{ position: "fixed", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", fontFamily: T.sans }}>
+          <div onClick={e => e.stopPropagation()} className="fu" style={{ ...GLASS, padding: 24, width: "100%", maxWidth: 380, boxShadow: "0 20px 60px rgba(45,58,124,0.28)" }}>
+            <div style={{ fontFamily: T.serif, fontSize: 18, fontWeight: 700, color: T.ink, marginBottom: 8 }}>Delete this collection?</div>
+            <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.55, marginBottom: 20 }}>Patterns will stay in your library. Only the collection grouping is removed.</div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button onClick={() => setConfirmDelete(false)} style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "9px 18px", fontSize: 13, color: T.ink2, cursor: "pointer", fontWeight: 600 }}>Cancel</button>
+              <button onClick={handleDelete} style={{ background: "#C0544A", color: "#fff", border: "none", borderRadius: 99, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Delete Collection</button>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -445,7 +530,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
 // Visually a dashed greyed-out card so the user reads it as "empty slot",
 // not as a duplicate of imported rows. Includes Bev so the empty state
 // stays on-brand instead of feeling like an error state.
-const UnimportedClueSlot = ({ clueNumber, onImport }) => (
+const UnimportedClueSlot = ({ clueNumber, partLabel = "Clue", onImport }) => (
   <div
     onClick={onImport}
     role="button"
@@ -471,16 +556,17 @@ const UnimportedClueSlot = ({ clueNumber, onImport }) => (
       <img src="/bev_neutral.png" alt="" style={{ width: 48, height: 48, objectFit: "contain", opacity: 0.85 }} />
     </div>
     <div style={{ flex: 1, minWidth: 0 }}>
-      <div style={{ fontSize: 10, color: T.terra, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 2 }}>Clue {clueNumber}</div>
+      <div style={{ fontSize: 10, color: T.terra, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 2 }}>{partLabel} {clueNumber}</div>
       <div style={{ fontSize: 14, fontWeight: 600, color: T.ink2, lineHeight: 1.25, marginBottom: 2 }}>Not yet imported</div>
-      <div style={{ fontSize: 12, color: T.ink3 }}>Tap to import Clue {clueNumber}</div>
+      <div style={{ fontSize: 12, color: T.ink3 }}>Tap to import {partLabel} {clueNumber}</div>
     </div>
     <div style={{ fontSize: 18, color: T.terra, fontWeight: 600, flexShrink: 0, paddingRight: 6 }}>+</div>
   </div>
 );
 
-// Pattern row used by MKAL detail (ordered, with up/down).
-const PatternRow = ({ p, idx, total, onOpen, onMoveUp, onMoveDown, onRemove }) => {
+// Pattern row used by MKAL detail (ordered, with up/down). partLabel is
+// the collection-specific vernacular ("Clue", "Part", "Section"…).
+const PatternRow = ({ p, idx, total, partLabel = "Clue", onOpen, onMoveUp, onMoveDown, onRemove }) => {
   const prog = pctOf(p.rows);
   const cover = p.cover_image_url || p.photo;
   return (
@@ -489,7 +575,7 @@ const PatternRow = ({ p, idx, total, onOpen, onMoveUp, onMoveDown, onRemove }) =
         {cover ? <img src={cover} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, opacity: 0.4 }}>🧶</div>}
       </div>
       <div onClick={onOpen} style={{ flex: 1, minWidth: 0, cursor: "pointer" }}>
-        <div style={{ fontSize: 10, color: T.terra, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 2 }}>Clue {idx + 1}</div>
+        <div style={{ fontSize: 10, color: T.terra, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 2 }}>{partLabel} {idx + 1}</div>
         <div style={{ fontSize: 14, fontWeight: 600, color: T.ink, lineHeight: 1.25, marginBottom: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title || "Untitled"}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ flex: 1, background: T.border, borderRadius: 99, height: 3, overflow: "hidden" }}>

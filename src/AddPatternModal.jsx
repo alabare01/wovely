@@ -1216,7 +1216,19 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
     const rows=buildRowsFromComponents(extracted.components);
     const mats=(extracted.materials||[]).map((m,i)=>({id:i+1,name:m.name||"",amount:m.amount||"",yardage:0,notes:m.notes||""}));
     const finalCover=coverUrl||fileInfo?.coverUrl||null;
-    onSave({id:Date.now(),title:editTitle||"Imported Pattern",source:editDesigner||"PDF Import",cat:"Uncategorized",hook:editHook||"",weight:editWeight||"",notes:"",pattern_notes:extracted.pattern_notes||"",yardage:0,rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},materials:mats,rows,photo:finalCover||PILL[Math.floor(Math.random()*PILL.length)],cover_image_url:finalCover,source_file_url:fileInfo?.url||"",source_url:extracted?.source_url||fileInfo?.url||"",source_file_name:fileInfo?.name||"",source_file_type:fileInfo?.type||"",extracted_by_ai:true,components:extracted.components||[],assembly_notes:extracted.assembly_notes||"",difficulty:extracted.difficulty||"",abbreviations_map:extracted.abbreviations_map||{},suggested_resources:extracted.suggested_resources||[],validation_flags:validationFlags.length>0?validationFlags:null,validation_report:isPro&&validationReport?validationReport:null});
+    onSave({id:Date.now(),title:editTitle||"Imported Pattern",source:editDesigner||"PDF Import",cat:"Uncategorized",hook:editHook||"",weight:editWeight||"",notes:"",pattern_notes:extracted.pattern_notes||"",yardage:0,rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},materials:mats,rows,photo:finalCover||PILL[Math.floor(Math.random()*PILL.length)],cover_image_url:finalCover,source_file_url:fileInfo?.url||"",source_url:extracted?.source_url||fileInfo?.url||"",source_file_name:fileInfo?.name||"",source_file_type:fileInfo?.type||"",extracted_by_ai:true,components:extracted.components||[],assembly_notes:extracted.assembly_notes||"",difficulty:extracted.difficulty||"",abbreviations_map:extracted.abbreviations_map||{},suggested_resources:extracted.suggested_resources||[],validation_flags:validationFlags.length>0?validationFlags:null,validation_report:isPro&&validationReport?validationReport:null,
+      // Multi-part detection fields from the planning pass — passed
+      // through to App.jsx so handleAddPattern can branch on them
+      // (auto-create a collection, show the "want to collect this?"
+      // prompt, or surface the contextual upgrade banner).
+      _multiPart: (extracted.collection_name || extracted.collection_type) ? {
+        collection_name: extracted.collection_name || null,
+        collection_type: extracted.collection_type || null,
+        part_label: extracted.part_label || null,
+        expected_part_count: typeof extracted.expected_part_count === "number" ? extracted.expected_part_count : null,
+        current_part_number: typeof extracted.current_part_number === "number" ? extracted.current_part_number : null,
+      } : null,
+    });
   };
   const handleFallbackSave=()=>{onSave({id:Date.now(),title:extracted?.title||"Imported Pattern",source:"PDF Import",cat:"Uncategorized",hook:"",weight:"",notes:"",yardage:0,rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},materials:[],rows:[],photo:fileInfo?.coverUrl||PILL[Math.floor(Math.random()*PILL.length)],cover_image_url:fileInfo?.coverUrl||null,source_file_url:fileInfo?.url||"",source_file_name:fileInfo?.name||"",source_file_type:fileInfo?.type||""});};
   const handleRetry=()=>{setStage("pick");setProgress(0);setErrorMsg("");setErrorType("");setComplexity(null);setComplexityStats(null);setAutoRetried(false);if(lastFileRef.current){const f=lastFileRef.current;setTimeout(()=>handleFile(f),100);}};

@@ -51,25 +51,41 @@ export const listPatternsInCollection = async (collectionId) => {
 
 // Create a new collection row. Returns the inserted record so the
 // caller can stash the id for subsequent pattern link-ups.
-export const createCollection = async ({ name, description, collection_type, cover_image_url }) => {
+export const createCollection = async ({ name, description, collection_type, cover_image_url, part_label, expected_part_count }) => {
   const user = supabaseAuth.getUser();
   if (!user) return { error: "Not authenticated" };
   try {
+    const body = {
+      user_id: user.id,
+      name: name || "Untitled Collection",
+      description: description || null,
+      collection_type: collection_type || "general",
+      cover_image_url: cover_image_url || null,
+    };
+    // Only send optional metadata when present — Supabase rejects unknown
+    // columns from older clients otherwise, and we want this helper to
+    // stay usable from the lightweight NewCollectionModal too.
+    if (part_label) body.part_label = part_label;
+    if (typeof expected_part_count === "number" && expected_part_count > 0) body.expected_part_count = expected_part_count;
     const res = await fetch(`${SUPABASE_URL}/rest/v1/collections`, {
       method: "POST",
       headers: { ...headers(), "Prefer": "return=representation" },
-      body: JSON.stringify({
-        user_id: user.id,
-        name: name || "Untitled Collection",
-        description: description || null,
-        collection_type: collection_type || "general",
-        cover_image_url: cover_image_url || null,
-      }),
+      body: JSON.stringify(body),
     });
     if (!res.ok) return { error: await res.text() };
     const rows = await res.json();
     return { data: Array.isArray(rows) ? rows[0] : rows };
   } catch (e) { return { error: e.message }; }
+};
+
+// Pull the part label from a collection row with a safe default. The
+// column was added in migration 010 — older rows pre-migration return
+// null, so default to "Part" so the UI never renders "undefined 1".
+export const partLabelFor = (collection) => (collection?.part_label || "Part");
+export const partLabelPlural = (collection) => {
+  const base = partLabelFor(collection);
+  // English plural rule covers Clue/Part/Section/Chapter/Module/Block.
+  return /s$/i.test(base) ? base : `${base}s`;
 };
 
 export const updateCollection = async (id, patch) => {
