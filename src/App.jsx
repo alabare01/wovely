@@ -2490,12 +2490,192 @@ export default function Wovely() {
       navigateToView("detail",p._supabaseId||p.id);
     }
   };
+  // Save the multi-component collection import path. Used when:
+  //   - the user came from "Start a Collection" OR an existing collection
+  //     surface (collectionContext.id set)
+  //   - AND the extraction produced more than one component
+  // Each component becomes its own pattern row, linked to a single
+  // collection. Shared metadata (materials, hook, source file, cover) is
+  // copied to every pattern; rows + title vary per component.
+  const runMultiComponentCollectionSave = async (p) => {
+    const user = supabaseAuth.getUser();
+    const session = getSession();
+    if (!user || !session) return false;
+
+    // 1) Resolve / create the target collection.
+    let targetCollection = collectionContext;
+    let baseOrder = 0;
+    if (startingCollection) {
+      const meta = p._multiPart || {};
+      const colPayload = {
+        name: meta.collection_name || p.title || "Untitled Collection",
+        description: null,
+        collection_type: meta.collection_type === "mkal" ? "mkal" : "general",
+        cover_image_url: p.cover_image_url || null,
+        part_label: meta.part_label || "Part",
+        expected_part_count: typeof meta.expected_part_count === "number" ? meta.expected_part_count : undefined,
+      };
+      const { data: newCol, error: colErr } = await createCollection(colPayload);
+      if (colErr || !newCol) { console.warn("[Wovely] Multi-part: collection create failed", colErr); return false; }
+      targetCollection = newCol;
+      baseOrder = 0;
+    } else if (collectionContext?.id) {
+      if (collectionContext._targetOrder) {
+        baseOrder = collectionContext._targetOrder - 1;
+      } else {
+        try {
+          const { data: existing } = await listPatternsInCollection(collectionContext.id);
+          baseOrder = existing?.length || 0;
+        } catch { baseOrder = 0; }
+      }
+    } else {
+      return false;
+    }
+
+    // 2) Loop and insert one pattern per component.
+    const components = Array.isArray(p.components) ? p.components : [];
+    const savedIds = [];
+    const partLabel = (p._multiPart?.part_label) || targetCollection.part_label || "Part";
+    for (let i = 0; i < components.length; i++) {
+      const comp = components[i];
+      const order = baseOrder + i + 1;
+      const compRows = buildRowsFromComponents([comp]);
+      const partTitle = (comp.name && comp.name.trim()) || `${partLabel} ${order}`;
+      const payload = {
+        user_id: user.id,
+        title: partTitle,
+        cat: p.cat || "",
+        source: p.source || "",
+        source_url: p.source_url || "",
+        notes: "",
+        pattern_notes: p.pattern_notes || null,
+        difficulty: p.difficulty || "",
+        yarn_weight: p.weight || "",
+        hook_size: p.hook || "",
+        gauge: p.gauge || {},
+        tags: p.tags || [],
+        is_ai_generated: !!p.is_ai_generated,
+        is_starter: false,
+        image_url: p.image_url || "",
+        photo: p.photo || "",
+        cover_image_url: p.cover_image_url || null,
+        row_count: compRows.length,
+        materials: p.materials || [],
+        rows: compRows,
+        rating: 0,
+        yardage: p.yardage || 0,
+        skeins: p.skeins || 0,
+        skein_yards: p.skeinYards || 200,
+        dimensions: p.dimensions || {},
+        weight: p.weight || "",
+        hook: p.hook || "",
+        source_file_url: p.source_file_url || null,
+        source_file_name: p.source_file_name || null,
+        source_file_type: p.source_file_type || null,
+        extracted_by_ai: !!p.extracted_by_ai,
+        components: [comp],
+        validation_flags: p.validation_flags || null,
+        validation_report: p.validation_report || null,
+        collection_id: targetCollection.id,
+        is_collection_part: true,
+        collection_order: order,
+      };
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/patterns`, {
+          method: "POST",
+          headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${session.access_token}`, "Content-Type": "application/json", "Prefer": "return=representation" },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) {
+          const rows = await res.json();
+          if (rows[0]?.id) {
+            savedIds.push(rows[0].id);
+            // Reflect locally — the pattern fetch on next mount will sync
+            // anything we missed (e.g., server defaults). skeinYards
+            // mirrors skein_yards back to the client field convention.
+            const localOne = {
+              id: rows[0].id,
+              _supabaseId: rows[0].id,
+              title: partTitle,
+              cat: payload.cat,
+              source: payload.source,
+              source_url: payload.source_url,
+              notes: payload.notes,
+              pattern_notes: payload.pattern_notes || "",
+              photo: payload.cover_image_url || payload.photo || payload.image_url || "",
+              cover_image_url: payload.cover_image_url,
+              hook: payload.hook,
+              weight: payload.weight,
+              yardage: payload.yardage,
+              materials: payload.materials,
+              rows: payload.rows.map(r => ({ ...r, done: !!r.done })),
+              rating: 0,
+              skeins: payload.skeins,
+              skeinYards: payload.skein_yards,
+              gauge: payload.gauge,
+              dimensions: payload.dimensions,
+              status: "active",
+              isStarter: false,
+              is_ai_generated: payload.is_ai_generated,
+              difficulty: payload.difficulty,
+              tags: payload.tags,
+              started: false,
+              source_file_url: payload.source_file_url || "",
+              source_file_name: payload.source_file_name || "",
+              source_file_type: payload.source_file_type || "",
+              my_hook_size: null, my_yarn_weight: null, my_yardage: null, my_skeins: null,
+              collection_id: targetCollection.id,
+              is_collection_part: true,
+              collection_order: order,
+            };
+            setUserPatterns(prev => [localOne, ...prev]);
+          }
+        } else {
+          console.warn("[Wovely] Multi-part insert failed", await res.text());
+        }
+      } catch (e) {
+        console.warn("[Wovely] Multi-part insert error", e?.message);
+      }
+    }
+
+    // 3) Refresh collection.pattern_count (best-effort).
+    try {
+      await fetch(`${SUPABASE_URL}/rest/v1/collections?id=eq.${targetCollection.id}`, {
+        method: "PATCH",
+        headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${session.access_token}`, "Content-Type": "application/json", "Prefer": "return=minimal" },
+        body: JSON.stringify({ pattern_count: baseOrder + savedIds.length, updated_at: new Date().toISOString() }),
+      });
+    } catch {}
+
+    // 4) Cleanup flow flags + navigate to the collection detail.
+    setStartingCollection(false);
+    setCollectionContext(null);
+    setAddOpen(false);
+    setActiveImportJob(null);
+    setSelectedCollection(targetCollection);
+    navigate("/collections/" + targetCollection.id);
+    return true;
+  };
+
   const handleAddPattern=async(p)=>{
     // Saving a pattern means we're done with the import_job that produced it —
     // clear sessionStorage so ImportPill doesn't re-render the same job after
     // the modal closes and walk the user through a duplicate import.
     setActiveImportJob(null);
     posthog.capture("pattern_uploaded",{file_type:p.source_file_type||"unknown"});
+
+    // Multi-component collection import → split. Each component becomes its
+    // own pattern row, linked to a single collection. Only kicks in when
+    // BOTH conditions hold: this is a collection-flavored import AND the
+    // extraction produced more than one component. Standalone imports and
+    // single-component collection imports keep the existing single-insert
+    // path below unchanged.
+    const isCollectionImportEarly = !!collectionContext?.id || !!startingCollection;
+    if (isCollectionImportEarly && Array.isArray(p.components) && p.components.length > 1) {
+      await runMultiComponentCollectionSave(p);
+      return;
+    }
+
     const user=supabaseAuth.getUser();
     const session=getSession();
     // Deduplicate title: if user already has a pattern with same title, append (2), (3), etc.
@@ -2700,6 +2880,22 @@ export default function Wovely() {
     setStartingCollection(true);
     gateImport("start_collection_import", () => { setPendingImportUrl(null); setPendingMethod("pdf"); setAddOpen(true); });
   };
+  // Shared local-state hook fired after a collection delete succeeds on the
+  // backend. The patterns_collection_id FK is set NULL by deleteCollection,
+  // but the user's loaded userPatterns array still holds stale references —
+  // those patterns would stay invisible (filtered out by the
+  // is_collection_part filter in the library grid) until a refetch.
+  // Mirroring the change locally lets them reappear in Your Library
+  // immediately as standalone patterns.
+  const releaseCollectionPatternsLocally = (collectionId) => {
+    if (!collectionId) return;
+    setUserPatterns(prev => prev.map(p => (p.collection_id === collectionId
+      ? { ...p, collection_id: null, is_collection_part: false, collection_order: 0 }
+      : p)));
+    if (selected && selected.collection_id === collectionId) {
+      setSelected(prev => prev ? { ...prev, collection_id: null, is_collection_part: false, collection_order: 0 } : prev);
+    }
+  };
   // CollectionSuggestionPrompt "Yes" — auto-create a new collection from
   // the detected metadata and re-link the just-saved pattern as the first
   // part, then jump to the collection detail. Mirrors the
@@ -2849,7 +3045,7 @@ export default function Wovely() {
           </div>
         </div>
         <div style={{flex:1,padding:"0 32px",minHeight:"100vh"}}>
-          {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>setNewCollectionOpen(true)} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
+          {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>setNewCollectionOpen(true)} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
           {view==="wip"&&<div style={{padding:"24px 0 80px"}}><button onClick={()=>navigateToView("collection")} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Back</button>{inProgress.length===0?<div style={{textAlign:"center",padding:"80px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:20,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
           {view==="detail"&&selected&&<div style={{margin:"0 -40px"}}><Detail p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>setShowProModal(true)} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/></div>}
           {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
@@ -2858,7 +3054,7 @@ export default function Wovely() {
           {view==="stitch-check"&&<div style={{paddingTop:24}}><StitchCheck gateAction={gateAction}/></div>}
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
           {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
-          {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={()=>{setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
+          {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="privacy"&&<PrivacyPolicy/>}
           {view==="terms"&&<TermsOfService/>}
           {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:24}}><StitchResultPage/></div>}
@@ -2897,7 +3093,7 @@ export default function Wovely() {
       </div>
       {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Inter,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);setNewCollectionOpen(true);}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}
       <div style={{flex:1,overflowY:"auto",paddingBottom:100,minHeight:"100vh"}}>
-        {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>setNewCollectionOpen(true)} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
+        {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>setNewCollectionOpen(true)} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
         {view==="wip"&&<div style={{padding:"16px 18px 80px"}}>{inProgress.length===0?<div style={{textAlign:"center",padding:"60px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
         {view==="detail"&&selected&&<Detail p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>setShowProModal(true)} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/>}
         {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
@@ -2906,7 +3102,7 @@ export default function Wovely() {
         {view==="stitch-check"&&<div style={{paddingTop:18}}><StitchCheck gateAction={gateAction}/></div>}
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
         {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
-        {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={()=>{setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
+        {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
         {view==="privacy"&&<PrivacyPolicy/>}
         {view==="terms"&&<TermsOfService/>}
         {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:18}}><StitchResultPage/></div>}

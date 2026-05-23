@@ -946,7 +946,7 @@ const CollectionsSection = ({tier, isAnonymous, onOpenCollection, onCreateCollec
 };
 
 // ─── MAIN COLLECTION VIEW ───────────────────────────────────────────────────
-const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearch,openDetail,onAddPattern,isPro,tier,setView,isAnonymous,onOpenCollection,onCreateCollection,onStartCollectionImport,onOpenUpgrade,onPark,onUnpark,onDelete,onCoverChange,onRename,pct,catFallbackPhoto,Photo,Bar,Stars,CATS,TIER_CONFIG}) => {
+const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearch,openDetail,onAddPattern,isPro,tier,setView,isAnonymous,onOpenCollection,onCreateCollection,onStartCollectionImport,onOpenUpgrade,onCollectionDeletedLocal,onPark,onUnpark,onDelete,onCoverChange,onRename,pct,catFallbackPhoto,Photo,Bar,Stars,CATS,TIER_CONFIG}) => {
   const{isDesktop,isMobile}=useBreakpoint();
   const allPatterns = [...userPatterns,...starterPatterns];
   // Patterns that belong to a collection (clue-of-MKAL etc.) are surfaced
@@ -991,6 +991,9 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
     if (error) { console.warn("[Wovely] deleteCollection failed:", error); return; }
     setCollections(prev => prev.filter(x => x.id !== c.id));
     setDeleteTargetCollection(null);
+    // Parent owns userPatterns — let it release the collection refs so the
+    // formerly-grouped patterns immediately reappear in Your Library.
+    onCollectionDeletedLocal?.(c.id);
   };
   const starterPats=visible.filter(p=>p.isStarter);
   const addedPats=visible.filter(p=>!p.isStarter);
