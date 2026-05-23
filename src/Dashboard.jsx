@@ -285,9 +285,19 @@ const BevCorner = ({ patterns, isMobile, isPro }) => {
 };
 
 // ─── ON THE HOOK ────────────────────────────────────────────────────────────
-const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto, Photo, isMobile, collections = [], partsByCollection }) => {
+// Exported so the parent can render the "On the Hook" section header above
+// the two-column grid (so both columns align at the card edge, not at the
+// header text).
+export const OnTheHookHeader = () => (
+  <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+    <span style={{ fontFamily: PF, fontSize: 20, fontWeight: 600, color: NAVY }}>On the Hook</span>
+    <InfoTooltip text="Your most recently touched pattern — pick up right where you left off." />
+  </div>
+);
+
+const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto, Photo, isMobile, collections = [], partsByCollection, hideHeader }) => {
   const navigate = useNavigate();
-  const sectionLabel = <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}><span style={{ fontFamily: PF, fontSize: 20, fontWeight: 600, color: NAVY }}>On the Hook</span><InfoTooltip text="Your most recently touched pattern — pick up right where you left off." /></div>;
+  const sectionLabel = hideHeader ? null : <OnTheHookHeader />;
   // If the hero is a collection part, the card surfaces the collection
   // identity (name + part label + position) instead of just the standalone
   // pattern title. The collection itself is found via the in-memory map
@@ -518,10 +528,26 @@ const CollectionPresenceRow = ({ c, parts, onOpen }) => {
   );
 };
 
-// Card A: Your Collections summary. Craft-only; renders for Craft users
-// regardless of how many collections they have (an empty state body
-// covers the zero case so the surface stays visible).
-const CollectionsSummaryCard = ({ collections = [], partsByCollection, onOpenCollection }) => {
+// Tiny 4-point sparkle SVG used as the Craft Services banner accent.
+// Stays subtle next to the wordmark so the banner reads as branding,
+// not as another active control.
+const SparkleIcon = ({ size = 12, color = "#fff" }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={color} style={{ flexShrink: 0, opacity: 0.95 }}>
+    <path d="M12 2 L13.5 9 L21 10.5 L13.5 12 L12 19 L10.5 12 L3 10.5 L10.5 9 Z" />
+  </svg>
+);
+
+// Single branded container that holds the Your Collections summary AND
+// the Start a Collection CTA. Locked variant for Free/Pro users keeps the
+// same structure so they can see exactly what Craft unlocks.
+const CraftServicesPanel = ({ tier, isAnonymous, collections = [], partsByCollection, onOpenCollection, onStartCollectionImport, onOpenUpgrade }) => {
+  if (isAnonymous) return null;
+  const isCraft = !!tier?.isCraft;
+  const locked = !isCraft;
+
+  // Section A — Your Collections. Same content for locked + unlocked
+  // (empty state for Free/Pro reads "No collections yet" which is fine —
+  // the locked overlay makes the gating intent obvious).
   const sorted = [...collections].sort((a, b) => {
     const aT = new Date(a.updated_at || a.created_at || 0).getTime();
     const bT = new Date(b.updated_at || b.created_at || 0).getTime();
@@ -533,12 +559,9 @@ const CollectionsSummaryCard = ({ collections = [], partsByCollection, onOpenCol
     const el = document.getElementById("your-library");
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-  return (
-    <div style={{
-      background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
-      borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
-      padding: 16, boxSizing: "border-box", width: "100%",
-    }}>
+
+  const sectionA = (
+    <div style={{ padding: 16 }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: collections.length === 0 ? 8 : 6 }}>
         <span style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY }}>Your Collections</span>
         {collections.length > 0 && <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED }}>{collections.length}</span>}
@@ -555,7 +578,7 @@ const CollectionsSummaryCard = ({ collections = [], partsByCollection, onOpenCol
                 key={c.id}
                 c={c}
                 parts={partsByCollection?.get?.(c.id) || []}
-                onOpen={() => onOpenCollection?.(c)}
+                onOpen={() => locked ? onOpenUpgrade?.() : onOpenCollection?.(c)}
               />
             ))}
           </div>
@@ -571,13 +594,7 @@ const CollectionsSummaryCard = ({ collections = [], partsByCollection, onOpenCol
       )}
     </div>
   );
-};
 
-// Card B: Start a Collection CTA. Craft → live button. Free/Pro → same
-// shape but greyed + lock icon + "See plans". Anonymous → not rendered
-// (handled in the parent CollectionsPresence wrapper).
-const StartCollectionCard = ({ isCraft, onStartCollectionImport, onOpenUpgrade }) => {
-  const locked = !isCraft;
   const stack = (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
       <path d="M12 2L2 7l10 5 10-5-10-5z"/>
@@ -585,64 +602,78 @@ const StartCollectionCard = ({ isCraft, onStartCollectionImport, onOpenUpgrade }
       <path d="M2 12l10 5 10-5"/>
     </svg>
   );
-  return (
-    <div style={{
-      position: "relative",
-      background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
-      borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
-      padding: 16, boxSizing: "border-box", width: "100%",
-    }}>
-      {/* Lock badge top-right when the feature is gated. The badge itself
-          stays full opacity so the lock is unmistakable; the body content
-          underneath fades to communicate "locked but not hidden". */}
-      {locked && (
-        <div style={{ position: "absolute", top: 12, right: 12, display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: "50%", background: "rgba(155,126,200,0.18)" }}>
-          <LockIconSVG size={14} color={ACCENT} />
-        </div>
-      )}
-      <div style={{ opacity: locked ? 0.55 : 1, pointerEvents: locked ? "none" : "auto" }}>
+
+  // Section B — Start a Collection CTA. flex:1 so it absorbs extra
+  // vertical space when the container is taller than its content
+  // (which is the common case once the grid stretches to match the
+  // left column). The button sits at the bottom of the section.
+  const sectionB = (
+    <div style={{ padding: 16, display: "flex", flexDirection: "column", justifyContent: "space-between", flex: 1, minHeight: 0 }}>
+      <div>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
           {stack}
           <span style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY }}>Start a Collection</span>
         </div>
-        <div style={{ fontFamily: INTER, fontSize: 13, color: MUTED, lineHeight: 1.5, marginBottom: 12 }}>
+        <div style={{ fontFamily: INTER, fontSize: 13, color: MUTED, lineHeight: 1.5, marginBottom: 14 }}>
           Import an MKAL, MCAL, or multi-part pattern.
         </div>
       </div>
-      {/* Button sits outside the dimmed container so locked variant stays
-          clickable on "See plans". */}
-      <button
-        onClick={locked ? onOpenUpgrade : onStartCollectionImport}
-        style={{
-          background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
-          padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer",
-          fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
-        }}
-      >{locked ? "See plans" : "Start a Collection"}</button>
+      <div>
+        <button
+          onClick={locked ? onOpenUpgrade : onStartCollectionImport}
+          style={{
+            background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
+            padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+            fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
+          }}
+        >{locked ? "See plans" : "Start a Collection"}</button>
+      </div>
     </div>
   );
-};
 
-const CollectionsPresence = ({ tier, isAnonymous, collections = [], partsByCollection, onOpenCollection, onStartCollectionImport, onOpenUpgrade }) => {
-  // Anonymous users don't see this column at all — the caller skips us.
-  if (isAnonymous) return null;
-  const isCraft = !!tier?.isCraft;
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12, alignSelf: "start" }}>
-      {/* Card A is Craft-only. Free/Pro users never had collections to
-          summarize; for them the right column is just Card B (locked). */}
-      {isCraft && (
-        <CollectionsSummaryCard
-          collections={collections}
-          partsByCollection={partsByCollection}
-          onOpenCollection={onOpenCollection}
-        />
-      )}
-      <StartCollectionCard
-        isCraft={isCraft}
-        onStartCollectionImport={onStartCollectionImport}
-        onOpenUpgrade={onOpenUpgrade}
-      />
+    <div style={{
+      // Single glass container — both sections live inside it.
+      background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
+      borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
+      overflow: "hidden",
+      display: "flex", flexDirection: "column",
+      width: "100%", height: "100%", boxSizing: "border-box",
+    }}>
+      {/* Craft Services banner — soft lavender gradient with white text
+          brands the entire right column. For Free/Pro it carries a lock
+          icon so the upgrade ask reads immediately. */}
+      <div style={{
+        flexShrink: 0,
+        background: "linear-gradient(135deg, #9B7EC8 0%, #7B5FB8 100%)",
+        color: "#fff",
+        padding: "10px 16px",
+        display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
+        opacity: locked ? 0.92 : 1,
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+          <SparkleIcon size={12} />
+          <span style={{ fontFamily: PF, fontSize: 14, fontWeight: 600, letterSpacing: "0.01em" }}>Craft Services</span>
+        </div>
+        {locked && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: "50%", background: "rgba(255,255,255,0.18)", flexShrink: 0 }} aria-label="Craft-only">
+            <LockIconSVG size={12} color="#fff" />
+          </div>
+        )}
+      </div>
+      {/* Body — fades for locked users so the gating reads, but stays
+          readable so they can see what Craft offers. Sections wrap in a
+          flex column with a divider between them; Section B's flex:1
+          pushes the button to the bottom of the container. */}
+      <div style={{
+        flex: 1, display: "flex", flexDirection: "column", minHeight: 0,
+        opacity: locked ? 0.55 : 1,
+        pointerEvents: locked ? "none" : "auto",
+      }}>
+        {sectionA}
+        <div style={{ borderTop: `1px solid ${T.border}` }} />
+        {sectionB}
+      </div>
     </div>
   );
 };
@@ -976,22 +1007,30 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
 
         <BevCorner patterns={visible} isMobile={isMobile} isPro={isPro} />
 
-        {/* Above-the-fold area. Desktop with collections surface = 3fr/2fr
-            two-column. Anonymous (or mobile) collapses to single column —
-            On the Hook takes full width and the Collections card stacks
-            below (or is hidden for anonymous). */}
+        {/* "On the Hook" section header sits above the grid so both
+            columns align at their card top edges, not at the header
+            text. The OnTheHook component renders without its own
+            header (hideHeader=true) to avoid duplication. */}
+        <OnTheHookHeader />
+
+        {/* Above-the-fold area. Desktop with Craft Services panel =
+            3fr/2fr two-column, align-items: stretch so the right column
+            matches the left column's height (OnTheHook card + stats row).
+            Anonymous (or mobile) collapses to single column — On the
+            Hook takes full width and Craft Services stacks below (or is
+            hidden entirely for anonymous). */}
         {(() => {
-          const showCollectionsCard = !isAnonymous;
-          const useTwoCol = !isMobile && showCollectionsCard;
+          const showCraftServices = !isAnonymous;
+          const useTwoCol = !isMobile && showCraftServices;
           const leftCol = (
-            <div style={{ minWidth: 0 }}>
-              <OnTheHook inProgress={inProgress} openDetail={openDetail} onAddPattern={onAddPattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} isMobile={isMobile} collections={collections} partsByCollection={partsByCollection} />
+            <div style={{ minWidth: 0, display: "flex", flexDirection: "column" }}>
+              <OnTheHook hideHeader inProgress={inProgress} openDetail={openDetail} onAddPattern={onAddPattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} isMobile={isMobile} collections={collections} partsByCollection={partsByCollection} />
               <BragShelf patterns={visible} pct={pct} isMobile={isMobile} />
             </div>
           );
-          const rightCol = showCollectionsCard ? (
-            <div style={{ minWidth: 0 }}>
-              <CollectionsPresence
+          const rightCol = showCraftServices ? (
+            <div style={{ minWidth: 0, display: "flex" }}>
+              <CraftServicesPanel
                 tier={tier}
                 isAnonymous={isAnonymous}
                 collections={collections}
@@ -999,13 +1038,12 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
                 onOpenCollection={onOpenCollection}
                 onStartCollectionImport={onStartCollectionImport}
                 onOpenUpgrade={onOpenUpgrade}
-                isMobile={isMobile}
               />
             </div>
           ) : null;
           if (useTwoCol) {
             return (
-              <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: 20, alignItems: "start", marginTop: 4 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: 20, alignItems: "stretch", marginTop: 4 }}>
                 {leftCol}
                 {rightCol}
               </div>
