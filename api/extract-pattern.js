@@ -210,14 +210,16 @@ After extraction, assess quality:
 • If all major sections were found and 10+ rounds extracted, set "confidence": "high"
 • Otherwise set "confidence": "medium"
 
-═══ STEP 5 — MULTI-PART DETECTION ═══
-Determine if this PDF is one part of a larger multi-part project (MKAL, MCAL, mystery knit/crochet along, sequential clues, parts, sections, chapters, or a book of multiple related patterns). If so, populate these fields. If this is a single standalone pattern, set them all to null.
+═══ STEP 5 — MULTI-PART DETECTION (orthogonal to component identification above) ═══
+This step is INDEPENDENT of component identification. Components from Step 3 must still be extracted in full — including every clue or part as its own component when this document contains multiple. This step only adds collection-level metadata about the broader project.
 
-• collection_name: the overall project name (e.g. "Arcoiris 2026 Mystery Crochet Along"). Strip the part suffix from the title — "Lemon MKAL Clue 3" → collection_name "Lemon MKAL".
-• collection_type: "mkal" when parts are sequential/ordered (MKALs, MCALs, mystery alongs, clue 1/2/3 builds), "general" when patterns are independent companions (a book of doll outfits, a designer bundle).
-• part_label: what the pattern calls its sub-sections — "Clue", "Part", "Section", "Chapter", "Pattern", "Module", "Block". Return the SINGULAR form. Default "Part" if unclear.
-• expected_part_count: total number of parts mentioned in the PDF, or null if not stated.
-• current_part_number: which part number this specific PDF represents (1-based). Default 1 if multi-part but unstated.
+Determine whether this document belongs to a larger multi-part project (MKAL, MCAL, mystery knit/crochet along, a series of sequential clues, or a book of related patterns).
+
+• collection_name: name of the overall project (e.g. "Arcoiris 2026 Mystery Crochet Along"). Strip any clue/part suffix from the title — "Lemon MKAL Clue 3" → collection_name "Lemon MKAL". Null if this is a single standalone pattern with no broader project.
+• collection_type: "mkal" when parts are sequential/ordered (MKALs, MCALs, mystery alongs, sequential clue/part builds), "general" when patterns are independent companions (a book of doll outfits, a designer bundle). Null if standalone.
+• part_label: what the project calls its sub-sections — "Clue", "Part", "Section", "Chapter", "Pattern", "Module", "Block". Return the SINGULAR form. Default "Part" if it's multi-part but the label is unclear. Null if standalone.
+• expected_part_count: total number of parts in the overall project if stated anywhere in the PDF. Null if not stated.
+• current_part_number: ONLY set when THIS PDF represents one specific part of a larger multi-PDF series (e.g. this file is Clue 3, and Clues 1, 2, 4–12 are separate PDFs). If this single PDF contains ALL the clues/parts of the project, set current_part_number to null. Null if standalone.
 
 ═══ OUTPUT FORMAT ═══
 Return this exact JSON structure:
@@ -226,6 +228,7 @@ Return this exact JSON structure:
 COMPONENT RULES:
 • For components like 'FLIPPER (MAKE 2)', set make_count: 2. Default 1 if not specified.
 • Set independent: true ONLY when the pattern explicitly says a component can be made separately — e.g. "make 2 separately", "work independently". Default false.
+• MULTI-CLUE / MULTI-PART PATTERNS: when a document contains multiple clues, parts, sections, or chapters as distinct construction sections (e.g. "Clue #1", "Clue #2", "Clue #3", "Clue #4"), EACH ONE IS ITS OWN COMPONENT — list every one of them. Never collapse multiple clues/parts into a single component. The Step 5 collection metadata is orthogonal to this and does not change component identification.
 • After all construction components, extract assembly/finishing as a final component named 'ASSEMBLY & FINISHING' with label: 'STEP' and action_item: true for all rows.
 
 PATTERN NOTES: Extract as a single string containing all special technique notes, tension guidance, construction tips, size variations, and open-ended repeat instructions.
@@ -455,19 +458,11 @@ const PER_CALL_TIMEOUT_MS = 90000;
 
 const planningPrompt = `You are analyzing a crochet pattern document. Identify the distinct construction sections so a downstream extractor can process them separately.
 
-A "component" is a body part or shaped piece the user crochets separately — Body, Head, Tentacle, Wing, Border, Assembly, etc. CRITICAL: "Tentacle (make 8)" counts as ONE component repeated eight times — DO NOT list it eight times. Include the multiplier in the component name when present (e.g. "Tentacle (x8)", "Leg (x2)").
+A "component" is a body part, shaped piece, OR pattern section the user crochets separately — Body, Head, Tentacle, Wing, Border, Assembly, etc. For MULTI-CLUE / MULTI-PART patterns where each clue or part is a distinct section IN THIS DOCUMENT, EACH CLUE OR PART IS ITS OWN COMPONENT — list every one of them (e.g. "Clue #1", "Clue #2", "Clue #3", "Clue #4" → four components, not one). Never collapse multiple clues or parts into a single component. CRITICAL: "Tentacle (make 8)" counts as ONE component repeated eight times — DO NOT list it eight times. Include the multiplier in the component name when present (e.g. "Tentacle (x8)", "Leg (x2)").
 
 The "shared_context_end_marker" marks the boundary where the setup section (materials, abbreviations, gauge, designer notes) ends and the first construction component begins.
 
 Markers (start_marker, end_marker, shared_context_end_marker) must be LITERAL substrings copied verbatim from the document — about 30 characters each, enough to be unique. If a marker isn't actually present in the text, the downstream slice will fail.
-
-ADDITIONALLY — multi-part detection. Determine if this PDF is one part of a larger multi-part project (MKAL, MCAL, mystery knit/crochet along, sequential clues, parts, sections, chapters, or a book of multiple related patterns). If so, set the fields below. If this is a single standalone pattern, set them all to null.
-
-- collection_name: the overall project name (e.g. "Arcoiris 2026 Mystery Crochet Along"). Strip the part suffix from the title — "Lemon MKAL Clue 3" → collection_name "Lemon MKAL".
-- collection_type: "mkal" when parts are sequential/ordered (MKALs, MCALs, mystery alongs, clue 1/2/3 builds), "general" when patterns are independent companions (a book of doll outfits, a designer bundle).
-- part_label: what the pattern calls its sub-sections — "Clue", "Part", "Section", "Chapter", "Pattern", "Module", "Block". Return the SINGULAR form. Default "Part" if unclear.
-- expected_part_count: total number of parts mentioned in the PDF (e.g. "This is a 12-part mystery along"), or null if not stated in this PDF.
-- current_part_number: which part number this specific PDF represents (1-based). Default 1 if a multi-part project but the part number isn't explicit.
 
 Return ONLY valid JSON, no markdown, no backticks, no commentary:
 {
@@ -490,6 +485,17 @@ Return ONLY valid JSON, no markdown, no backticks, no commentary:
 }
 
 If the document has no construction components (rare — pure setup pages, error documents), return component_count: 0 and components: [].
+
+═══ ADDITIONAL FIELDS — COLLECTION METADATA ═══
+This is a SEPARATE, ORTHOGONAL question from component identification above. Components MUST still be identified per the rules above regardless of what you answer here. Treat the two tasks independently.
+
+Determine whether this document belongs to a larger multi-part project (MKAL, MCAL, mystery knit/crochet along, a series of sequential clues, or a book of related patterns).
+
+- collection_name: name of the overall project (e.g. "Arcoiris 2026 Mystery Crochet Along"). Strip clue/part suffix from the title — "Lemon MKAL Clue 3" → collection_name "Lemon MKAL". Null if this is a single standalone pattern with no broader project.
+- collection_type: "mkal" if parts are sequential/ordered (MKALs, MCALs, mystery alongs, sequential clue/part builds), "general" if patterns are independent companions (a book of doll outfits, a designer bundle). Null if standalone.
+- part_label: what the project calls its sub-sections — "Clue", "Part", "Section", "Chapter", "Pattern", "Module", "Block". Return the SINGULAR form. Default "Part" if it's multi-part but the label is unclear. Null if standalone.
+- expected_part_count: total number of parts in the overall project if mentioned anywhere in the PDF (e.g. "This is a 12-part mystery along"). Null if not stated.
+- current_part_number: ONLY set when THIS PDF represents one specific part of a larger multi-PDF series (e.g. this file is Clue 3, and Clues 1, 2, 4–12 are separate PDFs). If this single PDF contains ALL the clues/parts of the project, set current_part_number to null. Null if standalone.
 
 DOCUMENT:
 `;

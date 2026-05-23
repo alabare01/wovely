@@ -642,18 +642,24 @@ const CraftServicesPanel = ({ tier, isAnonymous, collections = [], partsByCollec
     }}>
       {/* Craft Services banner — soft lavender gradient with white text
           brands the entire right column. For Free/Pro it carries a lock
-          icon so the upgrade ask reads immediately. */}
+          icon + an upsell-flavored tagline so the upgrade ask reads
+          immediately. */}
       <div style={{
         flexShrink: 0,
         background: "linear-gradient(135deg, #9B7EC8 0%, #7B5FB8 100%)",
         color: "#fff",
-        padding: "10px 16px",
+        padding: "10px 16px 12px",
         display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
         opacity: locked ? 0.92 : 1,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-          <SparkleIcon size={12} />
-          <span style={{ fontFamily: PF, fontSize: 14, fontWeight: 600, letterSpacing: "0.01em" }}>Craft Services</span>
+        <div style={{ display: "flex", flexDirection: "column", minWidth: 0, gap: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+            <SparkleIcon size={12} />
+            <span style={{ fontFamily: PF, fontSize: 14, fontWeight: 600, letterSpacing: "0.01em" }}>Craft Services</span>
+          </div>
+          <div style={{ fontFamily: INTER, fontSize: 11, color: "rgba(255,255,255,0.85)", lineHeight: 1.3 }}>
+            {locked ? "Unlock your full workspace" : "Your premium workspace"}
+          </div>
         </div>
         {locked && (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: "50%", background: "rgba(255,255,255,0.18)", flexShrink: 0 }} aria-label="Craft-only">
