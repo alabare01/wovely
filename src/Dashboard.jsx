@@ -341,8 +341,9 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
             For text-heavy PDFs this results in a poor hero image. Future improvement:
             scan PDF pages for the most image-rich page and use that as the cover instead
             of always page 1. See master doc: Bev's Read / Collections session. */}
-        {/* Hero image — blurred backdrop treatment (matches detail page PatternHeader) */}
-        <div style={{ height: isMobile ? 180 : 220, overflow: "hidden", borderRadius: `${GLASS.radius}px ${GLASS.radius}px 0 0`, position: "relative", background: ACCENT }}>
+        {/* Hero image — blurred backdrop treatment (matches detail page PatternHeader).
+            Heights tightened so On the Hook + Collections fit above the fold. */}
+        <div style={{ height: isMobile ? 140 : 160, overflow: "hidden", borderRadius: `${GLASS.radius}px ${GLASS.radius}px 0 0`, position: "relative", background: ACCENT }}>
           {/* Layer 1: blurred backdrop */}
           {heroHasImage && <img src={heroCardPhoto} alt="" style={{ position: "absolute", width: "100%", height: "100%", objectFit: "cover", filter: "blur(20px) saturate(1.2) brightness(0.6)", transform: "scale(1.1)", pointerEvents: "none" }} />}
           {/* Layer 2: sharp centered image */}
@@ -355,7 +356,7 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
           {/* Layer 3: dark gradient overlay */}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(20,14,10,0.88) 0%, rgba(20,14,10,0.2) 50%, rgba(20,14,10,0.05) 100%)", zIndex: 2 }} />
         </div>
-        <div style={{ padding: isMobile ? 16 : "20px 22px 22px", boxSizing: "border-box", width: "100%" }}>
+        <div style={{ padding: isMobile ? "12px 14px 14px" : "14px 18px 16px", boxSizing: "border-box", width: "100%" }}>
           {heroCollection ? (() => {
             // Hero is a collection part — lead with the collection name and
             // surface the part position. The standalone pattern title moves
@@ -391,57 +392,21 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
               <div style={{ height: 6, background: "#EDE4F7", borderRadius: 3, overflow: "hidden", margin: "0 0 6px" }}>
                 <div style={{ width: (doneRows / totalRows * 100) + "%", height: "100%", background: ACCENT, borderRadius: 3, transition: "width .3s" }} />
               </div>
-              <div style={{ fontFamily: INTER, fontSize: 11, color: MUTED, marginBottom: 18 }}>{doneRows} of {totalRows} rows</div>
+              <div style={{ fontFamily: INTER, fontSize: 11, color: MUTED, marginBottom: 12 }}>{doneRows} of {totalRows} rows</div>
             </>
           )}
           <button style={{
             display: "inline-flex", alignItems: "center", gap: 8, alignSelf: "flex-start",
-            width: "auto", background: ACCENT, color: "#fff", border: "none", borderRadius: 14,
-            padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer",
+            width: "auto", background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
+            padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer",
             fontFamily: INTER, letterSpacing: "0.01em",
             transition: "transform 0.15s ease, box-shadow 0.15s ease",
           }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 4px 16px rgba(155,126,200,0.35)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>Pick up where you left off →</button>
-
-          {/* Scroll row for remaining */}
-          {rest.length > 0 && (
-            <div style={{ marginTop: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}><span style={{ fontFamily: INTER, fontSize: 11, fontWeight: 600, color: "#9B87B8", letterSpacing: "0.1em", textTransform: "uppercase" }}>Also in progress</span><InfoTooltip text="Everything else you've started. Tap any to jump in." /></div>
-              <div style={{ display: "flex", gap: 10, overflowX: "auto", paddingBottom: 8, WebkitOverflowScrolling: "touch", scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                {rest.map(p => {
-                  const photo = p.cover_image_url || p.photo;
-                  const hasCover = !!(p.cover_image_url || p.photo);
-                  return (
-                    <div key={p.id} onClick={(e) => { e.stopPropagation(); openDetail(p); }} style={{
-                      flexShrink: 0, width: 130, borderRadius: 14,
-                      border: GLASS.border, overflow: "hidden",
-                      background: GLASS_LIGHT.bg, backdropFilter: GLASS_LIGHT.blur, WebkitBackdropFilter: GLASS_LIGHT.blur,
-                      cursor: "pointer",
-                    }}>
-                      <div style={{ height: 85, position: "relative", overflow: "hidden", background: hasCover ? undefined : "#1a1a2e" }}>
-                        {photo
-                          ? <img src={photo} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: hasCover ? "center" : "top center", display: "block", opacity: hasCover ? 1 : 0.85 }} />
-                          : <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg,#EDE4F7,#F5F0FA)", fontFamily: PF, fontSize: 24, color: ACCENT, opacity: 0.6 }}>{p.title?.charAt(0) || "?"}</div>
-                        }
-                        {!hasCover && photo && <>
-                          <div style={{ position: "absolute", top: 0, left: 0, width: "20%", height: "100%", background: "linear-gradient(to right, rgba(255,255,255,0.6) 0%, transparent 100%)", zIndex: 1 }} />
-                          <div style={{ position: "absolute", top: 0, right: 0, width: "20%", height: "100%", background: "linear-gradient(to left, rgba(255,255,255,0.6) 0%, transparent 100%)", zIndex: 1 }} />
-                        </>}
-                      </div>
-                      <p style={{ fontSize: 11, color: INK, padding: "8px 10px", margin: 0, lineHeight: 1.4, fontFamily: INTER, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" }}>{p.title}</p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+          {/* "Also in progress" scroller dropped from above-the-fold —
+              On the Hook stays compact here. Everything else in progress
+              still lives in the library grid below and at /builds. */}
         </div>
       </div>
-      {/* Contextual link to full On the Hook page */}
-      {inProgress.length > 0 && (
-        <div onClick={() => navigate("/builds")} style={{ marginTop: 10, display: "flex", alignItems: "center", justifyContent: "flex-end", cursor: "pointer" }}>
-          <span style={{ fontFamily: INTER, fontSize: 12, fontWeight: 500, color: ACCENT, letterSpacing: "0.01em" }}>Pick up where you left off →</span>
-        </div>
-      )}
     </div>
   );
 };
@@ -475,25 +440,175 @@ const BragShelf = ({ patterns, pct, isMobile }) => {
   ];
   const skeleton = <div style={{ width: 40, height: 24, background: "#EDE4F7", borderRadius: 6, margin: "0 auto" }} />;
 
+  // Always-horizontal compact stats row. Sits below On the Hook (left
+  // column on desktop, second item on mobile) — it shouldn't compete
+  // with Collections for above-fold real estate.
   return (
-    <div style={isMobile
-      ? { display: "flex", gap: 12, gridColumn: "1 / -1" }
-      : { display: "flex", flexDirection: "column", gap: 12, position: "sticky", top: 20 }
-    }>
-      <div style={{ display: "flex", alignItems: "center", marginBottom: 8, ...(isMobile ? { display: "none" } : {}) }}><span style={{ fontFamily: INTER, fontSize: 11, fontWeight: 600, color: "#9B87B8", letterSpacing: "0.1em", textTransform: "uppercase" }}>Your Wovely</span><InfoTooltip text="A snapshot of your crochet journey so far." alignRight /></div>
+    <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
       {stats.map(s => (
         <div key={s.label} style={{
-          flex: isMobile ? 1 : undefined,
+          flex: 1,
           background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
           borderRadius: GLASS.radius, boxShadow: GLASS.shadow, border: GLASS.border,
-          padding: isMobile ? 12 : 20, textAlign: "center",
+          padding: "10px 12px", textAlign: "center", minWidth: 0,
         }}>
-          <div style={{ fontFamily: PF, fontSize: isMobile ? 24 : 32, color: ACCENT, fontWeight: 600 }}>
+          <div style={{ fontFamily: PF, fontSize: 20, color: ACCENT, fontWeight: 600, lineHeight: 1.1 }}>
             {s.value === null ? skeleton : s.value}
           </div>
-          <div style={{ fontFamily: INTER, fontSize: 10, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 4 }}>{s.label}</div>
+          <div style={{ fontFamily: INTER, fontSize: 9, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.label}</div>
         </div>
       ))}
+    </div>
+  );
+};
+
+// ─── COLLECTIONS PRESENCE (above-the-fold right column) ────────────────────
+// Always-visible Collections surface that lives next to On the Hook so the
+// feature is discoverable without scrolling. Four variants, picked at
+// render time off `tier` + `isAnonymous`:
+//   • Craft + has collections → list up to 3 + "Start a new collection"
+//   • Craft + no collections   → Bev empty-state with "Start a Collection"
+//   • Free / Pro               → lock teaser → TieredUpgradeModal
+//   • Anonymous                → returns null; caller shouldn't render us
+
+const LockIconSVG = ({ size = 16, color = ACCENT }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
+);
+
+const CollectionPresenceRow = ({ c, parts, onOpen }) => {
+  const partLabel = partLabelFor(c);
+  const partLabelP = partLabelPlural(c);
+  const isMkal = c.collection_type === "mkal";
+  const importedCount = parts.length;
+  const knownTotal = (typeof c.expected_part_count === "number" && c.expected_part_count > importedCount) ? c.expected_part_count : null;
+  const countText = knownTotal ? `${importedCount} of ${knownTotal} ${partLabelP}` : `${importedCount} ${importedCount === 1 ? partLabel : partLabelP}`;
+  const progress = aggregatePctFromParts(parts);
+  const cover = c.cover_image_url || parts.find(p => p.cover_image_url)?.cover_image_url || parts.find(p => p.photo && p.photo !== "PILL")?.photo || null;
+  return (
+    <div onClick={onOpen} style={{
+      display: "flex", alignItems: "center", gap: 10,
+      padding: "8px 6px", cursor: "pointer", borderRadius: 10,
+      transition: "background .15s",
+    }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(155,126,200,0.08)"; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+      <div style={{ width: 40, height: 40, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #EDE4F7, #F5F0FA)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {cover
+          ? <img src={cover} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        }
+      </div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+          <span style={{ background: isMkal ? ACCENT : "rgba(45,58,124,0.85)", color: "#fff", fontSize: 8, fontWeight: 700, padding: "1px 6px", borderRadius: 99, letterSpacing: "0.06em", textTransform: "uppercase" }}>{isMkal ? "MKAL" : "General"}</span>
+          <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{countText}</span>
+        </div>
+        <div style={{ fontFamily: PF, fontSize: 13, fontWeight: 600, color: NAVY, lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</div>
+      </div>
+      <div style={{ fontFamily: INTER, fontSize: 11, fontWeight: 700, color: progress === 100 ? T.sage : ACCENT, flexShrink: 0, minWidth: 32, textAlign: "right" }}>
+        {progress}%
+      </div>
+    </div>
+  );
+};
+
+const CollectionsPresence = ({ tier, isAnonymous, collections = [], partsByCollection, onOpenCollection, onStartCollectionImport, onOpenUpgrade, isMobile }) => {
+  // Anonymous users don't see this card at all — the caller skips it.
+  if (isAnonymous) return null;
+
+  const isCraft = !!tier?.isCraft;
+
+  const cardWrap = {
+    background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
+    borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
+    padding: isMobile ? "16px 16px 14px" : "18px 18px 16px",
+    boxSizing: "border-box", width: "100%",
+  };
+
+  // Free/Pro: locked teaser → Plans modal.
+  if (!isCraft) {
+    return (
+      <div style={cardWrap}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <LockIconSVG size={16} color={ACCENT} />
+          <span style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY }}>Collections</span>
+        </div>
+        <div style={{ fontFamily: INTER, fontSize: 13, color: MUTED, lineHeight: 1.55, marginBottom: 14 }}>
+          Organize MKALs, track multi-part projects, and keep everything together.
+        </div>
+        <button onClick={onOpenUpgrade} style={{
+          background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
+          padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+          fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
+        }}>See plans</button>
+      </div>
+    );
+  }
+
+  // Craft + no collections: warm empty state with Bev.
+  if (collections.length === 0) {
+    return (
+      <div style={cardWrap}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+          <img src="/bev_neutral.png" alt="" style={{ width: 56, height: "auto", flexShrink: 0, filter: "drop-shadow(0 4px 12px rgba(155,126,200,0.35))" }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY, marginBottom: 6 }}>Start your first collection</div>
+            <div style={{ fontFamily: INTER, fontSize: 12, color: MUTED, lineHeight: 1.55, marginBottom: 12 }}>
+              Track your MKALs, organize multi-part projects, and keep your materials in one place.
+            </div>
+            <button onClick={onStartCollectionImport} style={{
+              background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
+              padding: "9px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer",
+              fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
+            }}>Start a Collection</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Craft + has collections: compact list of up to 3, sorted by recency.
+  const sorted = [...collections].sort((a, b) => {
+    const aT = new Date(a.updated_at || a.created_at || 0).getTime();
+    const bT = new Date(b.updated_at || b.created_at || 0).getTime();
+    return bT - aT;
+  });
+  const top = sorted.slice(0, 3);
+  const more = sorted.length - top.length;
+  const scrollToLibrary = () => {
+    const el = document.getElementById("your-library");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <div style={cardWrap}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+        <span style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY }}>Your Collections</span>
+        <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED }}>{collections.length}</span>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 6 }}>
+        {top.map(c => (
+          <CollectionPresenceRow
+            key={c.id}
+            c={c}
+            parts={partsByCollection?.get?.(c.id) || []}
+            onOpen={() => onOpenCollection?.(c)}
+          />
+        ))}
+      </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 8, paddingTop: 10, borderTop: `1px solid ${T.border}` }}>
+        <button onClick={onStartCollectionImport} style={{
+          background: "transparent", border: "none", padding: 0, cursor: "pointer",
+          fontFamily: INTER, fontSize: 12, fontWeight: 600, color: ACCENT,
+        }}>+ Start a new collection</button>
+        {more > 0 && (
+          <button onClick={scrollToLibrary} style={{
+            background: "transparent", border: "none", padding: 0, cursor: "pointer",
+            fontFamily: INTER, fontSize: 12, fontWeight: 600, color: MUTED,
+          }}>See all {collections.length} →</button>
+        )}
+      </div>
     </div>
   );
 };
@@ -820,25 +935,60 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
   return (
     <div style={{ minHeight: "100vh", background: "transparent" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: isMobile ? "16px 16px 160px" : "24px 32px 80px", boxSizing: "border-box", width: "100%" }}>
-        {/* Two-column grid on desktop, single column on mobile */}
-        <div style={isMobile ? { display: "flex", flexDirection: "column", gap: 16 } : {
-          display: "grid", gridTemplateColumns: "1fr 320px", gridTemplateRows: "auto auto 1fr", gap: 24,
-        }}>
-          {/* Time-of-day greeting */}
-          <div style={{ gridColumn: "1 / -1" }}>
-            <p style={{ fontFamily: PF, fontStyle: "italic", fontSize: 16, color: "#9B87B8", marginBottom: 20, marginTop: 4 }}>
-              Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}, here's your space.
-            </p>
-          </div>
+        {/* Greeting — full width on every layout. */}
+        <p style={{ fontFamily: PF, fontStyle: "italic", fontSize: 16, color: "#9B87B8", marginBottom: 20, marginTop: 4 }}>
+          Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}, here's your space.
+        </p>
 
-          <BevCorner patterns={visible} isMobile={isMobile} isPro={isPro} />
+        <BevCorner patterns={visible} isMobile={isMobile} isPro={isPro} />
 
-          <OnTheHook inProgress={inProgress} openDetail={openDetail} onAddPattern={onAddPattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} isMobile={isMobile} collections={collections} partsByCollection={partsByCollection} />
+        {/* Above-the-fold area. Desktop with collections surface = 3fr/2fr
+            two-column. Anonymous (or mobile) collapses to single column —
+            On the Hook takes full width and the Collections card stacks
+            below (or is hidden for anonymous). */}
+        {(() => {
+          const showCollectionsCard = !isAnonymous;
+          const useTwoCol = !isMobile && showCollectionsCard;
+          const leftCol = (
+            <div style={{ minWidth: 0 }}>
+              <OnTheHook inProgress={inProgress} openDetail={openDetail} onAddPattern={onAddPattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} isMobile={isMobile} collections={collections} partsByCollection={partsByCollection} />
+              <BragShelf patterns={visible} pct={pct} isMobile={isMobile} />
+            </div>
+          );
+          const rightCol = showCollectionsCard ? (
+            <div style={{ minWidth: 0 }}>
+              <CollectionsPresence
+                tier={tier}
+                isAnonymous={isAnonymous}
+                collections={collections}
+                partsByCollection={partsByCollection}
+                onOpenCollection={onOpenCollection}
+                onStartCollectionImport={onStartCollectionImport}
+                onOpenUpgrade={onOpenUpgrade}
+                isMobile={isMobile}
+              />
+            </div>
+          ) : null;
+          if (useTwoCol) {
+            return (
+              <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: 24, alignItems: "start", marginTop: 4 }}>
+                {leftCol}
+                {rightCol}
+              </div>
+            );
+          }
+          // Mobile or anonymous-desktop: stack. Anonymous gets no right col at all.
+          return (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 4 }}>
+              {leftCol}
+              {rightCol}
+            </div>
+          );
+        })()}
 
-          <BragShelf patterns={visible} pct={pct} isMobile={isMobile} />
-
+        <div>
           {/* Your Library — full width */}
-          <div style={{ gridColumn: "1 / -1", marginTop: 32 }}>
+          <div id="your-library" style={{ marginTop: 32 }}>
             <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}><span style={{ fontFamily: PF, fontSize: 20, fontWeight: 600, color: NAVY }}>Your Library</span><InfoTooltip text="Every pattern you've saved — search, filter, and dive in anytime." /></div>
             {/* Search bar — glass */}
             <div style={{ marginBottom: 12 }}>
@@ -857,12 +1007,9 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
                 <button onClick={()=>setViewMode("list")} style={{background:viewMode==="list"?PILL_BG:"transparent",border:`1px solid ${viewMode==="list"?"#EDE4F7":"transparent"}`,borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:12,color:MUTED,lineHeight:1}}>☰</button>
               </div>
             </div>
-            {/* Empty-state prompt for Craft users with no collections yet —
-                a single-line dashed banner above the grid, not a card,
-                so the visual rhythm of the grid isn't disrupted. */}
-            {isCraft && collectionsLoaded && collections.length === 0 && cat === "All" && !search && (
-              <StartCollectionPrompt onStartCollection={onStartCollectionImport} isMobile={isMobile} />
-            )}
+            {/* Empty-state prompt moved out of the library grid — it now
+                lives in the CollectionsPresence card above the fold so
+                a Craft user with no collections sees it on landing. */}
             {viewMode==="grid"?(() => {
               // Build the library items list. Collection cards (Craft only)
               // are intermixed with patterns and sorted by recency so the
