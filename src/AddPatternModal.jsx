@@ -1583,10 +1583,14 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
   // Single modal shape on each viewport. The medium "Expand" pill was removed
   // in S1.5.3 — the small ImportPill is now the only minimized surface, and
   // closing the modal mid-import hands off to it via the unmount cleanup.
-  const deskStyle = {position:"relative",background:T.surface,borderRadius:20,width:"100%",maxWidth:580,maxHeight:"85vh",display:"flex",flexDirection:"column",zIndex:1,boxShadow:"0 24px 64px rgba(28,23,20,.3)"};
+  // Modal container — capped at 520px so it doesn't sprawl on wide
+  // viewports. Padding lives on the header + content blocks (24px sides,
+  // 16px from top edge to the back link, 24px bottom on content) so the
+  // whole modal reads as 24px-inset content.
+  const deskStyle = {position:"relative",background:T.surface,borderRadius:16,width:"calc(100% - 48px)",maxWidth:520,maxHeight:"85vh",display:"flex",flexDirection:"column",zIndex:1,boxShadow:"0 24px 64px rgba(28,23,20,.3)"};
   const mobStyle = {position:"relative",background:T.surface,borderRadius:"24px 24px 0 0",width:"100%",maxHeight:"92vh",display:"flex",flexDirection:"column",zIndex:1};
   const containerStyle = isDesktop ? deskStyle : mobStyle;
-  const pad = isDesktop ? "0 28px 32px" : "0 22px 40px";
+  const pad = isDesktop ? "0 24px 24px" : "0 22px 40px";
   const wrapStyle = isDesktop
     ? {position:"fixed",inset:0,zIndex:400,display:"flex",alignItems:"center",justifyContent:"center"}
     : {position:"fixed",inset:0,zIndex:400,display:"flex",alignItems:"flex-end"};
@@ -1594,8 +1598,8 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
 
   // ── HEADER ──
   const deskHeader = (
-    <div style={{flexShrink:0,padding:"24px 28px 0"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+    <div style={{flexShrink:0,padding:"16px 24px 0"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
         {method?<button onClick={()=>{setPdfHandoff(null);setMethod(null);}} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:14,fontWeight:600,padding:0}}>← Back</button>:<div style={{fontFamily:T.serif,fontSize:22,color:T.ink}}>What are you adding to your Wovely?</div>}
       </div>
       {method&&<div style={{fontSize:12,color:T.ink3,marginBottom:14,fontWeight:500}}>{METHODS.find(m=>m.key===method)?.icon} {METHODS.find(m=>m.key===method)?.label}</div>}

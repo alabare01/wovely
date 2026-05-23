@@ -356,7 +356,7 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
           {/* Layer 3: dark gradient overlay */}
           <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(20,14,10,0.88) 0%, rgba(20,14,10,0.2) 50%, rgba(20,14,10,0.05) 100%)", zIndex: 2 }} />
         </div>
-        <div style={{ padding: isMobile ? "12px 14px 14px" : "14px 18px 16px", boxSizing: "border-box", width: "100%" }}>
+        <div style={{ padding: 16, boxSizing: "border-box", width: "100%" }}>
           {heroCollection ? (() => {
             // Hero is a collection part — lead with the collection name and
             // surface the part position. The standalone pattern title moves
@@ -371,19 +371,21 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
               : sortedParts.length;
             return (
               <>
-                <div style={{ fontFamily: INTER, fontSize: 10, fontWeight: 600, color: ACCENT, textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 4 }}>
-                  {heroCollection.collection_type === "mkal" ? "MKAL" : "Collection"}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                  <span style={{ background: heroCollection.collection_type === "mkal" ? ACCENT : "rgba(45,58,124,0.85)", color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 99, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                    {heroCollection.collection_type === "mkal" ? "MKAL" : "Collection"}
+                  </span>
+                  <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
+                    {heroCollection.name} · {partLabel} {heroPos}{knownTotal > 1 ? ` of ${knownTotal}` : ""}
+                  </span>
                 </div>
-                <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 600, color: NAVY, marginBottom: 2 }}>{heroCollection.name}</div>
-                <div style={{ fontFamily: INTER, fontSize: 13, color: T.ink2, marginBottom: 6 }}>
-                  {partLabel} {heroPos}{knownTotal > 1 ? ` of ${knownTotal}` : ""} · {hero.title}
-                </div>
+                <div style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hero.title}</div>
               </>
             );
           })() : (
-            <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 600, color: NAVY, marginBottom: 6 }}>{hero.title}</div>
+            <div style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{hero.title}</div>
           )}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: totalRows > 0 ? 12 : 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: totalRows > 0 ? 10 : 0 }}>
             {hero.difficulty && <span style={{ fontFamily: INTER, fontSize: 10, background: PILL_BG, color: ACCENT, borderRadius: 20, padding: "3px 10px" }}>{hero.difficulty}</span>}
             <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED }}>{timeAgo(hero.updated_at)}</span>
           </div>
@@ -392,13 +394,13 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
               <div style={{ height: 6, background: "#EDE4F7", borderRadius: 3, overflow: "hidden", margin: "0 0 6px" }}>
                 <div style={{ width: (doneRows / totalRows * 100) + "%", height: "100%", background: ACCENT, borderRadius: 3, transition: "width .3s" }} />
               </div>
-              <div style={{ fontFamily: INTER, fontSize: 11, color: MUTED, marginBottom: 12 }}>{doneRows} of {totalRows} rows</div>
+              <div style={{ fontFamily: INTER, fontSize: 12, color: MUTED, marginBottom: 12 }}>{doneRows} of {totalRows} rows</div>
             </>
           )}
           <button style={{
             display: "inline-flex", alignItems: "center", gap: 8, alignSelf: "flex-start",
             width: "auto", background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
-            padding: "10px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+            padding: "12px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer",
             fontFamily: INTER, letterSpacing: "0.01em",
             transition: "transform 0.15s ease, box-shadow 0.15s ease",
           }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 4px 16px rgba(155,126,200,0.35)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>Pick up where you left off →</button>
@@ -444,18 +446,19 @@ const BragShelf = ({ patterns, pct, isMobile }) => {
   // column on desktop, second item on mobile) — it shouldn't compete
   // with Collections for above-fold real estate.
   return (
-    <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+    <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
       {stats.map(s => (
         <div key={s.label} style={{
-          flex: 1,
+          flex: 1, minWidth: 0, minHeight: 56,
           background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
           borderRadius: GLASS.radius, boxShadow: GLASS.shadow, border: GLASS.border,
-          padding: "10px 12px", textAlign: "center", minWidth: 0,
+          padding: "10px 12px", textAlign: "center",
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 2,
         }}>
           <div style={{ fontFamily: PF, fontSize: 20, color: ACCENT, fontWeight: 600, lineHeight: 1.1 }}>
             {s.value === null ? skeleton : s.value}
           </div>
-          <div style={{ fontFamily: INTER, fontSize: 9, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", marginTop: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.label}</div>
+          <div style={{ fontFamily: INTER, fontSize: 9, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{s.label}</div>
         </div>
       ))}
     </div>
@@ -490,21 +493,23 @@ const CollectionPresenceRow = ({ c, parts, onOpen }) => {
   return (
     <div onClick={onOpen} style={{
       display: "flex", alignItems: "center", gap: 10,
-      padding: "8px 6px", cursor: "pointer", borderRadius: 10,
+      // 48px row height: 8px top/bottom padding + 32px content
+      padding: "8px", cursor: "pointer", borderRadius: 10,
+      minHeight: 48, boxSizing: "border-box",
       transition: "background .15s",
     }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(155,126,200,0.08)"; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-      <div style={{ width: 40, height: 40, borderRadius: 8, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #EDE4F7, #F5F0FA)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: 32, height: 32, borderRadius: 6, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #EDE4F7, #F5F0FA)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {cover
           ? <img src={cover} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-          : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         }
       </div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+        <div style={{ fontFamily: PF, fontSize: 13, fontWeight: 600, color: NAVY, lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 1 }}>
           <span style={{ background: isMkal ? ACCENT : "rgba(45,58,124,0.85)", color: "#fff", fontSize: 8, fontWeight: 700, padding: "1px 6px", borderRadius: 99, letterSpacing: "0.06em", textTransform: "uppercase" }}>{isMkal ? "MKAL" : "General"}</span>
           <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{countText}</span>
         </div>
-        <div style={{ fontFamily: PF, fontSize: 13, fontWeight: 600, color: NAVY, lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</div>
       </div>
       <div style={{ fontFamily: INTER, fontSize: 11, fontWeight: 700, color: progress === 100 ? T.sage : ACCENT, flexShrink: 0, minWidth: 32, textAlign: "right" }}>
         {progress}%
@@ -513,62 +518,10 @@ const CollectionPresenceRow = ({ c, parts, onOpen }) => {
   );
 };
 
-const CollectionsPresence = ({ tier, isAnonymous, collections = [], partsByCollection, onOpenCollection, onStartCollectionImport, onOpenUpgrade, isMobile }) => {
-  // Anonymous users don't see this card at all — the caller skips it.
-  if (isAnonymous) return null;
-
-  const isCraft = !!tier?.isCraft;
-
-  const cardWrap = {
-    background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
-    borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
-    padding: isMobile ? "16px 16px 14px" : "18px 18px 16px",
-    boxSizing: "border-box", width: "100%",
-  };
-
-  // Free/Pro: locked teaser → Plans modal.
-  if (!isCraft) {
-    return (
-      <div style={cardWrap}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-          <LockIconSVG size={16} color={ACCENT} />
-          <span style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY }}>Collections</span>
-        </div>
-        <div style={{ fontFamily: INTER, fontSize: 13, color: MUTED, lineHeight: 1.55, marginBottom: 14 }}>
-          Organize MKALs, track multi-part projects, and keep everything together.
-        </div>
-        <button onClick={onOpenUpgrade} style={{
-          background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
-          padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer",
-          fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
-        }}>See plans</button>
-      </div>
-    );
-  }
-
-  // Craft + no collections: warm empty state with Bev.
-  if (collections.length === 0) {
-    return (
-      <div style={cardWrap}>
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-          <img src="/bev_neutral.png" alt="" style={{ width: 56, height: "auto", flexShrink: 0, filter: "drop-shadow(0 4px 12px rgba(155,126,200,0.35))" }} />
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY, marginBottom: 6 }}>Start your first collection</div>
-            <div style={{ fontFamily: INTER, fontSize: 12, color: MUTED, lineHeight: 1.55, marginBottom: 12 }}>
-              Track your MKALs, organize multi-part projects, and keep your materials in one place.
-            </div>
-            <button onClick={onStartCollectionImport} style={{
-              background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
-              padding: "9px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer",
-              fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
-            }}>Start a Collection</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Craft + has collections: compact list of up to 3, sorted by recency.
+// Card A: Your Collections summary. Craft-only; renders for Craft users
+// regardless of how many collections they have (an empty state body
+// covers the zero case so the surface stays visible).
+const CollectionsSummaryCard = ({ collections = [], partsByCollection, onOpenCollection }) => {
   const sorted = [...collections].sort((a, b) => {
     const aT = new Date(a.updated_at || a.created_at || 0).getTime();
     const bT = new Date(b.updated_at || b.created_at || 0).getTime();
@@ -580,35 +533,116 @@ const CollectionsPresence = ({ tier, isAnonymous, collections = [], partsByColle
     const el = document.getElementById("your-library");
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-
   return (
-    <div style={cardWrap}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+    <div style={{
+      background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
+      borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
+      padding: 16, boxSizing: "border-box", width: "100%",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: collections.length === 0 ? 8 : 6 }}>
         <span style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY }}>Your Collections</span>
-        <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED }}>{collections.length}</span>
+        {collections.length > 0 && <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED }}>{collections.length}</span>}
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 6 }}>
-        {top.map(c => (
-          <CollectionPresenceRow
-            key={c.id}
-            c={c}
-            parts={partsByCollection?.get?.(c.id) || []}
-            onOpen={() => onOpenCollection?.(c)}
-          />
-        ))}
+      {collections.length === 0 ? (
+        <div style={{ fontFamily: INTER, fontSize: 13, color: MUTED, lineHeight: 1.5 }}>
+          No collections yet.
+        </div>
+      ) : (
+        <>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {top.map(c => (
+              <CollectionPresenceRow
+                key={c.id}
+                c={c}
+                parts={partsByCollection?.get?.(c.id) || []}
+                onOpen={() => onOpenCollection?.(c)}
+              />
+            ))}
+          </div>
+          {more > 0 && (
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 8, paddingTop: 8, borderTop: `1px solid ${T.border}` }}>
+              <button onClick={scrollToLibrary} style={{
+                background: "transparent", border: "none", padding: 0, cursor: "pointer",
+                fontFamily: INTER, fontSize: 12, fontWeight: 600, color: MUTED,
+              }}>See all {collections.length} →</button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+
+// Card B: Start a Collection CTA. Craft → live button. Free/Pro → same
+// shape but greyed + lock icon + "See plans". Anonymous → not rendered
+// (handled in the parent CollectionsPresence wrapper).
+const StartCollectionCard = ({ isCraft, onStartCollectionImport, onOpenUpgrade }) => {
+  const locked = !isCraft;
+  const stack = (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+      <path d="M2 17l10 5 10-5"/>
+      <path d="M2 12l10 5 10-5"/>
+    </svg>
+  );
+  return (
+    <div style={{
+      position: "relative",
+      background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
+      borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
+      padding: 16, boxSizing: "border-box", width: "100%",
+    }}>
+      {/* Lock badge top-right when the feature is gated. The badge itself
+          stays full opacity so the lock is unmistakable; the body content
+          underneath fades to communicate "locked but not hidden". */}
+      {locked && (
+        <div style={{ position: "absolute", top: 12, right: 12, display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: "50%", background: "rgba(155,126,200,0.18)" }}>
+          <LockIconSVG size={14} color={ACCENT} />
+        </div>
+      )}
+      <div style={{ opacity: locked ? 0.55 : 1, pointerEvents: locked ? "none" : "auto" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+          {stack}
+          <span style={{ fontFamily: PF, fontSize: 16, fontWeight: 600, color: NAVY }}>Start a Collection</span>
+        </div>
+        <div style={{ fontFamily: INTER, fontSize: 13, color: MUTED, lineHeight: 1.5, marginBottom: 12 }}>
+          Import an MKAL, MCAL, or multi-part pattern.
+        </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: 8, paddingTop: 10, borderTop: `1px solid ${T.border}` }}>
-        <button onClick={onStartCollectionImport} style={{
-          background: "transparent", border: "none", padding: 0, cursor: "pointer",
-          fontFamily: INTER, fontSize: 12, fontWeight: 600, color: ACCENT,
-        }}>+ Start a new collection</button>
-        {more > 0 && (
-          <button onClick={scrollToLibrary} style={{
-            background: "transparent", border: "none", padding: 0, cursor: "pointer",
-            fontFamily: INTER, fontSize: 12, fontWeight: 600, color: MUTED,
-          }}>See all {collections.length} →</button>
-        )}
-      </div>
+      {/* Button sits outside the dimmed container so locked variant stays
+          clickable on "See plans". */}
+      <button
+        onClick={locked ? onOpenUpgrade : onStartCollectionImport}
+        style={{
+          background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
+          padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer",
+          fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
+        }}
+      >{locked ? "See plans" : "Start a Collection"}</button>
+    </div>
+  );
+};
+
+const CollectionsPresence = ({ tier, isAnonymous, collections = [], partsByCollection, onOpenCollection, onStartCollectionImport, onOpenUpgrade }) => {
+  // Anonymous users don't see this column at all — the caller skips us.
+  if (isAnonymous) return null;
+  const isCraft = !!tier?.isCraft;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12, alignSelf: "start" }}>
+      {/* Card A is Craft-only. Free/Pro users never had collections to
+          summarize; for them the right column is just Card B (locked). */}
+      {isCraft && (
+        <CollectionsSummaryCard
+          collections={collections}
+          partsByCollection={partsByCollection}
+          onOpenCollection={onOpenCollection}
+        />
+      )}
+      <StartCollectionCard
+        isCraft={isCraft}
+        onStartCollectionImport={onStartCollectionImport}
+        onOpenUpgrade={onOpenUpgrade}
+      />
     </div>
   );
 };
@@ -971,7 +1005,7 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
           ) : null;
           if (useTwoCol) {
             return (
-              <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: 24, alignItems: "start", marginTop: 4 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "3fr 2fr", gap: 20, alignItems: "start", marginTop: 4 }}>
                 {leftCol}
                 {rightCol}
               </div>
