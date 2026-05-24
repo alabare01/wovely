@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { T, useBreakpoint, Field } from "./theme.jsx";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseAuth, getSession } from "./supabase.js";
@@ -455,7 +456,6 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade }) =
   const patternId = pattern._supabaseId || pattern.id;
   const sourceFileUrl = pattern.source_file_url || null;
   const isCraft = canAccessChartImages(tier, isAnonymous);
-  const { isDesktop } = useBreakpoint();
 
   // Locked (Pro/Free/Anon) path uses count-only query — keeps the locked card
   // out of the data path when there's nothing to advertise.
@@ -500,118 +500,129 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade }) =
     return () => { cancelled = true; };
   }, [patternId, isCraft, sourceFileUrl]);
 
-  // Locked render: hide entirely when there's nothing to upsell.
+  // Shared full-width band styling for the strip. Lives inside the sticky
+  // header stack (below hero/collection-nav, above the tabs) so it reads as a
+  // first-class asset rather than buried content. Glass treatment, but a band
+  // (square corners + bottom border) since it spans the header width.
+  const bandStyle = {
+    background: "rgba(255,255,255,0.82)",
+    backdropFilter: "blur(16px)",
+    WebkitBackdropFilter: "blur(16px)",
+    borderBottom: "1px solid #EDE4F7",
+    padding: "12px 16px",
+    position: "relative",
+  };
+  const scrollRowStyle = {
+    display: "flex", gap: 10, overflowX: "auto",
+    scrollbarWidth: "none", msOverflowStyle: "none",
+    WebkitOverflowScrolling: "touch",
+  };
+  // Right-edge fade hinting at horizontal scrollability.
+  const rightFade = (
+    <div style={{
+      position: "absolute", top: 0, right: 0, bottom: 0, width: 36,
+      background: "linear-gradient(to right, rgba(255,255,255,0), rgba(248,246,255,0.92))",
+      pointerEvents: "none",
+    }}/>
+  );
+
+  // Locked strip (Pro/Free/Anon): frosted placeholder thumbs behind a compact
+  // upgrade nudge. Same height as the unlocked strip so layout doesn't jump.
   if (!isCraft) {
     if (!lockedCount || lockedCount <= 0) return null;
-    const charts = (lockedCount === 1) ? "1 chart or image" : `${lockedCount} charts and images`;
+    const placeholderCount = Math.min(lockedCount, 5);
+    const charts = (lockedCount === 1) ? "1 chart" : `${lockedCount} charts`;
     return (
-      <div style={{ ...GLASS_CARD, padding: "18px 18px", marginTop: 24, opacity: 0.95 }}>
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 16, color: "#2D2D4E", marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ opacity: 0.6 }}>🔒</span>
-              <span>Charts &amp; Images</span>
-            </div>
-            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#6B6B8A", lineHeight: 1.55 }}>
-              Bev found {charts} in this pattern. Upgrade to Craft to see them on every page.
-            </div>
-          </div>
-          <button
-            onClick={onShowUpgrade}
-            style={{
-              background: "#9B7EC8", color: "#fff", border: "none",
-              borderRadius: 99, padding: "8px 14px",
-              fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600,
-              cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
-            }}
-          >See plans</button>
-        </div>
-      </div>
-    );
-  }
-
-  // Unlocked render. Three loading states:
-  //   images === null   → first fetch in flight, render nothing
-  //   images === []     → no classifications yet (extract-images still running,
-  //                        or pattern has no PDF source) → show Bev spinner copy
-  //                        only when source_file_url exists, otherwise omit.
-  //   images.length > 0 → grid, with per-tile spinner for rows still rendering.
-  if (images === null) return null;
-  if (images.length === 0) {
-    if (!sourceFileUrl) return null;
-    return (
-      <div style={{ ...GLASS_CARD, padding: "18px 18px", marginTop: 24, display: "flex", alignItems: "center", gap: 12 }}>
-        <BevInlineSpinner size={28} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 15, color: "#2D2D4E" }}>Charts &amp; Images</div>
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#6B6B8A", marginTop: 2 }}>Bev is looking through your pattern for charts and reference images…</div>
-        </div>
-      </div>
-    );
-  }
-
-  const cols = isDesktop ? 3 : 2;
-  return (
-    <>
-      <style>{`@keyframes wovelyChartsRing{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}`}</style>
-      <div style={{ ...GLASS_CARD, padding: "18px 18px", marginTop: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-          <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 16, color: "#2D2D4E", flex: 1 }}>Charts &amp; Images</div>
-          {rendering && <BevInlineSpinner size={20} />}
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 12 }}>
-          {images.map((img, i) => (
-            <button
-              key={img.id}
-              onClick={() => img.cloudinary_url && setLightboxIdx(i)}
-              disabled={!img.cloudinary_url}
-              style={{
-                background: "transparent", border: "none", padding: 0,
-                cursor: img.cloudinary_url ? "pointer" : "default",
-                textAlign: "left", fontFamily: "Inter, sans-serif",
-              }}
-              aria-label={img.caption || imageTypeLabel(img.image_type)}
-            >
-              <div style={{
-                position: "relative", width: "100%", aspectRatio: "1",
-                background: "#EDE4F7", borderRadius: 12, overflow: "hidden",
-                border: "1px solid rgba(45,58,124,0.06)",
-              }}>
-                {img.cloudinary_url ? (
-                  <img
-                    src={img.cloudinary_url}
-                    alt={img.caption || imageTypeLabel(img.image_type)}
-                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <BevInlineSpinner size={28} />
-                  </div>
-                )}
-                <div style={{ position: "absolute", top: 8, left: 8 }}>
-                  <ChartTypePill type={img.image_type} />
-                </div>
-              </div>
-              {(img.caption || img.component_name) && (
-                <div style={{ marginTop: 8, fontSize: 12, color: "#2D2D4E", lineHeight: 1.4 }}>
-                  {img.component_name && <div style={{ fontWeight: 600 }}>{img.component_name}</div>}
-                  {img.caption && <div style={{ color: "#6B6B8A", marginTop: 2 }}>{img.caption}</div>}
-                </div>
-              )}
-            </button>
+      <div style={bandStyle}>
+        <div style={{ ...scrollRowStyle, overflowX: "hidden", filter: "blur(1.5px)", opacity: 0.7 }}>
+          {Array.from({ length: placeholderCount }).map((_, i) => (
+            <div key={i} style={{
+              flexShrink: 0, height: 120, width: 92, borderRadius: 12,
+              border: "1px solid #EDE4F7",
+              background: "linear-gradient(135deg, #EDE4F7, #F8F6FF)",
+            }}/>
           ))}
         </div>
-        <div style={{ marginTop: 12, fontSize: 11, color: "#6B6B8A", fontFamily: "Inter, sans-serif", textAlign: "center" }}>
-          Tap any image to view full
+        <div style={{
+          position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", gap: 4,
+          background: "rgba(248,246,255,0.55)",
+          backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
+        }}>
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#2D2D4E", fontWeight: 600 }}>
+            Bev found {charts} in this pattern
+          </div>
+          <button onClick={onShowUpgrade} style={{
+            background: "transparent", border: "none", padding: 0, cursor: "pointer",
+            fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 700, color: "#9B7EC8",
+          }}>See plans</button>
         </div>
       </div>
-      {lightboxIdx != null && (
+    );
+  }
+
+  // Unlocked. Render nothing until classified rows exist (no empty state in the
+  // strip per spec). Rows with a null cloudinary_url are mid-render and show a
+  // spinner placeholder.
+  if (images === null || images.length === 0) return null;
+
+  const ready = images.filter(i => i.cloudinary_url);
+  return (
+    <>
+      <style>{`
+        @keyframes wovelyChartsRing{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+        .wovely-cstrip::-webkit-scrollbar{display:none}
+      `}</style>
+      <div style={bandStyle}>
+        <div className="wovely-cstrip" style={scrollRowStyle}>
+          {images.map((img) => {
+            const tappable = !!img.cloudinary_url;
+            return (
+              <button
+                key={img.id}
+                onClick={() => { if (tappable) { const idx = ready.findIndex(r => r.id === img.id); if (idx >= 0) setLightboxIdx(idx); } }}
+                disabled={!tappable}
+                aria-label={img.caption || imageTypeLabel(img.image_type)}
+                style={{
+                  flexShrink: 0, padding: 0, border: "none", background: "transparent",
+                  cursor: tappable ? "pointer" : "default", height: 120,
+                }}
+              >
+                <div style={{
+                  position: "relative", height: 120, borderRadius: 12, overflow: "hidden",
+                  border: "1px solid #EDE4F7", background: "#EDE4F7",
+                  ...(tappable ? {} : { width: 92, display: "flex", alignItems: "center", justifyContent: "center" }),
+                }}>
+                  {tappable ? (
+                    <img
+                      src={img.cloudinary_url}
+                      alt={img.caption || imageTypeLabel(img.image_type)}
+                      style={{ height: 120, width: "auto", maxWidth: 240, objectFit: "cover", display: "block" }}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <BevInlineSpinner size={24} />
+                  )}
+                  <div style={{ position: "absolute", top: 6, left: 6 }}>
+                    <ChartTypePill type={img.image_type} />
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        {rightFade}
+        <div style={{ marginTop: 6, fontSize: 11, color: "#6B6B8A", fontFamily: "Inter, sans-serif" }}>
+          Tap to enlarge
+        </div>
+      </div>
+      {lightboxIdx != null && createPortal(
         <ChartLightbox
-          images={images.filter(i => i.cloudinary_url)}
-          startIndex={Math.min(lightboxIdx, images.filter(i => i.cloudinary_url).length - 1)}
+          images={ready}
+          startIndex={Math.min(lightboxIdx, ready.length - 1)}
           onClose={() => setLightboxIdx(null)}
-        />
+        />,
+        document.body
       )}
     </>
   );
@@ -819,6 +830,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
               </div>
             );
           })()}
+          <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} />
           <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
             {[["materials","Materials"],["rows","Instructions/Rows"],["notes","My Notes"]].map(([key,label])=>(
               <button key={key} onClick={()=>{setTab(key);localStorage.setItem("yh_last_tab",key);}} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>
@@ -908,7 +920,6 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             <div style={{marginTop:10,fontSize:12,color:T.ink3}}>Source: {p.source}</div>
           </div>
         )}
-        <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} />
         </div>
       </div>
       {/* Floating source pill now rendered inside RowManager */}

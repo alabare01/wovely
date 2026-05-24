@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { T, useBreakpoint } from "./theme.jsx";
 import UpgradeNudge from "./components/UpgradeNudge.jsx";
@@ -16,6 +16,7 @@ import {
   partLabelPlural,
 } from "./utils/collections.js";
 import { TIER_CRAFT } from "./utils/tierUtils.js";
+import { fetchPatternImagesForPatterns } from "./utils/patternImages.js";
 
 // Standard glass card spec used throughout — matches the rest of the
 // app. Kept inline rather than imported so this file is self-contained.
@@ -212,6 +213,70 @@ const CollectionCard = ({ c, onOpen }) => {
 
 // ─── Detail view ─────────────────────────────────────────────────────────
 
+// Hero image layer for the collection detail. Rotates through extracted
+// pattern images (cover → chart → diagram → rest) every 4s with manual dots
+// and swipe. Renders the same blurred-backdrop + centered-image treatment as
+// the single-image fallback, just per slide. Sits behind the gradient + text
+// overlay the parent paints on top.
+const CollectionHeroCarousel = ({ images }) => {
+  const [idx, setIdx] = useState(0);
+  const touchX = useRef(null);
+
+  useEffect(() => {
+    if (images.length <= 1) return;
+    const t = setInterval(() => setIdx(i => (i + 1) % images.length), 4000);
+    return () => clearInterval(t);
+  }, [images.length]);
+
+  // Clamp if the image list shrinks underneath us.
+  const safeIdx = idx % images.length;
+  const cur = images[safeIdx];
+  if (!cur) return null;
+
+  const go = (n) => setIdx(((n % images.length) + images.length) % images.length);
+  const onTouchStart = (e) => { touchX.current = e.touches?.[0]?.clientX ?? null; };
+  const onTouchEnd = (e) => {
+    if (touchX.current == null || images.length <= 1) return;
+    const dx = (e.changedTouches?.[0]?.clientX ?? touchX.current) - touchX.current;
+    touchX.current = null;
+    if (Math.abs(dx) < 40) return;
+    go(safeIdx + (dx < 0 ? 1 : -1));
+  };
+
+  return (
+    <>
+      <style>{`@keyframes wovelyHeroFade{from{opacity:0}to{opacity:1}}`}</style>
+      <div key={safeIdx} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
+        style={{ position: "absolute", inset: 0, animation: "wovelyHeroFade .6s ease" }}>
+        <img src={cur.cloudinary_url} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "blur(20px) saturate(1.2) brightness(0.7)", transform: "scale(1.1)", pointerEvents: "none" }} />
+        <img src={cur.cloudinary_url} alt="" style={{ position: "absolute", left: "50%", top: 0, transform: "translateX(-50%)", height: "100%", width: "auto", objectFit: "contain", zIndex: 1 }} />
+      </div>
+      {images.length > 1 && (
+        <div style={{ position: "absolute", top: 10, left: 0, right: 0, zIndex: 4, display: "flex", justifyContent: "center", gap: 6 }}>
+          {images.map((img, i) => (
+            <button key={img.id || i} onClick={() => go(i)} aria-label={`Image ${i + 1}`}
+              style={{
+                width: i === safeIdx ? 18 : 7, height: 7, borderRadius: 99, border: "none", padding: 0, cursor: "pointer",
+                background: i === safeIdx ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.5)",
+                transition: "width .25s ease, background .25s ease",
+              }} />
+          ))}
+        </div>
+      )}
+    </>
+  );
+};
+
+// Order pattern images for the hero: covers first, then charts, then diagrams,
+// then everything else. Stable within a type by the order they arrived.
+const HERO_TYPE_RANK = { cover: 0, chart: 1, diagram: 2, photo: 3, glossary: 4 };
+const orderHeroImages = (rows) => {
+  return [...(rows || [])]
+    .filter(r => r.cloudinary_url)
+    .sort((a, b) => (HERO_TYPE_RANK[a.image_type] ?? 9) - (HERO_TYPE_RANK[b.image_type] ?? 9))
+    .slice(0, 8);
+};
+
 export const CollectionDetailView = ({ collection: initial, onBack, onOpenPattern, onAddPattern, onImportClue, onCollectionChanged, onCollectionDeleted }) => {
   const { isDesktop } = useBreakpoint();
   const navigate = useNavigate();
@@ -222,6 +287,10 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
   const [draft, setDraft] = useState({ name: initial.name, description: initial.description || "", collection_type: initial.collection_type || "general" });
   const [showMaterials, setShowMaterials] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  // Extracted images across all clues, for the hero carousel. Empty until at
+  // least one clue's charts have been rendered (Craft detail view does that),
+  // so the hero gracefully falls back to the single cover image meanwhile.
+  const [heroImages, setHeroImages] = useState([]);
   // Sibling collections — populated so the user can jump between
   // collections without going back to My Wovely. Empty / single-item
   // arrays hide the pill row; one fetch on mount is plenty.
@@ -237,6 +306,18 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
   };
 
   useEffect(() => { refresh(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [collection.id]);
+
+  // Pull extracted images across every clue for the hero carousel once the
+  // pattern list is known. Re-runs when the clue set changes.
+  useEffect(() => {
+    const ids = patterns.map(p => p.id).filter(Boolean);
+    if (ids.length === 0) { setHeroImages([]); return; }
+    let cancelled = false;
+    fetchPatternImagesForPatterns(ids).then(({ data }) => {
+      if (!cancelled) setHeroImages(orderHeroImages(data));
+    });
+    return () => { cancelled = true; };
+  }, [patterns]);
 
   const isMkal = collection.collection_type === "mkal";
   const progress = aggregatePct(patterns);
@@ -346,14 +427,16 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
         </div>
       )}
 
-      {/* Collection header card with cover banner. The banner uses the
-          same blurred-backdrop + sharp-centered treatment as the pattern
-          detail hero so the visual language stays consistent. Structured
-          as a single image now; the markup below leaves room for a
-          carousel to drop in later. */}
+      {/* Collection header card with cover banner. When Bev has rendered
+          charts/covers across the clues, the banner becomes a rotating
+          carousel of those extracted images; otherwise it falls back to the
+          single cover with the same blurred-backdrop + sharp-centered
+          treatment so the visual language stays consistent. */}
       <div style={{ ...GLASS, marginBottom: 16, overflow: "hidden" }}>
-        <div style={{ position: "relative", height: 200, background: bannerImage ? "transparent" : "linear-gradient(135deg, #EDE4F7 0%, #F5F0FA 100%)", overflow: "hidden" }}>
-          {bannerImage && (
+        <div style={{ position: "relative", height: 200, background: (bannerImage || heroImages.length) ? "transparent" : "linear-gradient(135deg, #EDE4F7 0%, #F5F0FA 100%)", overflow: "hidden" }}>
+          {heroImages.length > 0 ? (
+            <CollectionHeroCarousel images={heroImages} />
+          ) : bannerImage && (
             <>
               {/* Blurred backdrop fills the frame; sharp image sits centered on top. */}
               <img src={bannerImage} alt="" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", filter: "blur(20px) saturate(1.2) brightness(0.7)", transform: "scale(1.1)", pointerEvents: "none" }} />
