@@ -2922,17 +2922,17 @@ export default function Wovely() {
     gateImport("start_collection_import", () => { setPendingImportUrl(null); setPendingMethod("pdf"); setAddOpen(true); });
   };
   // Shared local-state hook fired after a collection delete succeeds on the
-  // backend. The patterns_collection_id FK is set NULL by deleteCollection,
-  // but the user's loaded userPatterns array still holds stale references —
-  // those patterns would stay invisible (filtered out by the
-  // is_collection_part filter in the library grid) until a refetch.
-  // Mirroring the change locally lets them reappear in Your Library
-  // immediately as standalone patterns.
+  // backend. deleteCollection now removes the clue patterns outright, so we
+  // drop them from userPatterns locally rather than releasing them back into
+  // the library. Any non-clue patterns that were loosely linked have their
+  // FK nulled server-side, so we release just those locally.
   const releaseCollectionPatternsLocally = (collectionId) => {
     if (!collectionId) return;
-    setUserPatterns(prev => prev.map(p => (p.collection_id === collectionId
-      ? { ...p, collection_id: null, is_collection_part: false, collection_order: 0 }
-      : p)));
+    setUserPatterns(prev => prev
+      .filter(p => !(p.collection_id === collectionId && p.is_collection_part))
+      .map(p => (p.collection_id === collectionId
+        ? { ...p, collection_id: null, is_collection_part: false, collection_order: 0 }
+        : p)));
     if (selected && selected.collection_id === collectionId) {
       setSelected(prev => prev ? { ...prev, collection_id: null, is_collection_part: false, collection_order: 0 } : prev);
     }

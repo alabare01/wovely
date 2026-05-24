@@ -596,7 +596,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
         <div onClick={() => setConfirmDelete(false)} style={{ position: "fixed", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", fontFamily: T.sans }}>
           <div onClick={e => e.stopPropagation()} className="fu" style={{ ...GLASS, padding: 24, width: "100%", maxWidth: 380, boxShadow: "0 20px 60px rgba(45,58,124,0.28)" }}>
             <div style={{ fontFamily: T.serif, fontSize: 18, fontWeight: 700, color: T.ink, marginBottom: 8 }}>Delete this collection?</div>
-            <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.55, marginBottom: 20 }}>Patterns will stay in your library. Only the collection grouping is removed.</div>
+            <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.55, marginBottom: 20 }}>This permanently deletes the collection and all of its clues. This can't be undone.</div>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button onClick={() => setConfirmDelete(false)} style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "9px 18px", fontSize: 13, color: T.ink2, cursor: "pointer", fontWeight: 600 }}>Cancel</button>
               <button onClick={handleDelete} style={{ background: "#C0544A", color: "#fff", border: "none", borderRadius: 99, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Delete Collection</button>

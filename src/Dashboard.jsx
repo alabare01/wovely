@@ -991,8 +991,8 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
     if (error) { console.warn("[Wovely] deleteCollection failed:", error); return; }
     setCollections(prev => prev.filter(x => x.id !== c.id));
     setDeleteTargetCollection(null);
-    // Parent owns userPatterns — let it release the collection refs so the
-    // formerly-grouped patterns immediately reappear in Your Library.
+    // Parent owns userPatterns — let it drop the deleted clue patterns from
+    // local state so they don't linger in Your Library as orphans.
     onCollectionDeletedLocal?.(c.id);
   };
   const starterPats=visible.filter(p=>p.isStarter);
@@ -1150,7 +1150,7 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
         <div onClick={() => setDeleteTargetCollection(null)} style={{ position: "fixed", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", fontFamily: INTER }}>
           <div onClick={e => e.stopPropagation()} className="fu" style={{ background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur, border: GLASS.border, borderRadius: GLASS.radius, boxShadow: "0 20px 60px rgba(45,58,124,0.28)", padding: 24, width: "100%", maxWidth: 380 }}>
             <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 700, color: INK, marginBottom: 8 }}>Delete this collection?</div>
-            <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.55, marginBottom: 20 }}>Patterns will stay in your library. Only the collection grouping is removed.</div>
+            <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.55, marginBottom: 20 }}>This permanently deletes the collection and all of its clues. This can't be undone.</div>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
               <button onClick={() => setDeleteTargetCollection(null)} style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "9px 18px", fontSize: 13, color: T.ink2, cursor: "pointer", fontWeight: 600 }}>Cancel</button>
               <button onClick={() => handleDeleteCollection(deleteTargetCollection)} style={{ background: "#C0544A", color: "#fff", border: "none", borderRadius: 99, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Delete Collection</button>

@@ -101,18 +101,18 @@ export const updateCollection = async (id, patch) => {
   } catch (e) { return { error: e.message }; }
 };
 
-// Delete the collection row. Patterns linked to it have collection_id
-// set to null by the FK (ON DELETE SET NULL) so they stay in the user's
-// library as unlinked patterns — same behavior as "remove from
-// collection" but for every pattern at once.
+// Delete the collection along with its clue patterns. A standalone "Clue #2"
+// stripped of its collection is meaningless clutter, so the collection-part
+// patterns are deleted outright rather than released back into the library.
+// Their pattern_images cascade-delete via FK. Any non-clue patterns that were
+// loosely linked have their collection_id nulled by the collection FK.
 export const deleteCollection = async (id) => {
   try {
-    // First unlink patterns so the flat library view doesn't keep
-    // is_collection_part=true after the parent collection is gone.
-    await fetch(`${SUPABASE_URL}/rest/v1/patterns?collection_id=eq.${id}`, {
-      method: "PATCH",
+    // Delete the clue patterns first (before the collection row, so the query
+    // still resolves them by collection_id).
+    await fetch(`${SUPABASE_URL}/rest/v1/patterns?collection_id=eq.${id}&is_collection_part=eq.true`, {
+      method: "DELETE",
       headers: { ...headers(), "Prefer": "return=minimal" },
-      body: JSON.stringify({ collection_id: null, is_collection_part: false, collection_order: 0 }),
     });
     const res = await fetch(`${SUPABASE_URL}/rest/v1/collections?id=eq.${id}`, {
       method: "DELETE",
