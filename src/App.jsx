@@ -2542,11 +2542,13 @@ export default function Wovely() {
   // "accept collection suggestion" split.
   const insertComponentPatterns = async ({ p, targetCollection, baseOrder, user, session }) => {
     const components = Array.isArray(p.components) ? p.components : [];
+    console.log("[Wovely] split: inserting", components.length, "components:", components.map(c => c?.name), "baseOrder:", baseOrder);
     const savedIds = [];
     const partLabel = (p._multiPart?.part_label) || targetCollection.part_label || "Part";
     for (let i = 0; i < components.length; i++) {
       const comp = components[i];
       const order = baseOrder + i + 1;
+      console.log(`[Wovely] split: component[${i}] '${comp?.name}' → order ${order}`);
       const compRows = buildRowsFromComponents([comp]);
       const partTitle = (comp.name && comp.name.trim()) || `${partLabel} ${order}`;
       const payload = {

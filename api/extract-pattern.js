@@ -768,7 +768,7 @@ async function runSmartChunkedExtraction({ pdfText, geminiKey, anthropicKey, pdf
   await onPathChange?.('chunked_planning');
   const phasePlanStart = Date.now();
   const planning = await planComponents({ pdfText, geminiKey, anthropicKey });
-  console.log(`[smart-chunk] phase=planning components=${planning?.component_count || 0} (${Date.now() - phasePlanStart}ms)`);
+  console.log(`[smart-chunk] phase=planning components=${planning?.component_count || 0} names=${JSON.stringify((planning?.components || []).map(c => c?.name))} (${Date.now() - phasePlanStart}ms)`);
   await onPlanned?.(planning?.component_count || 0);
 
   // Edge case: planner found nothing. Treat as Tier 1 single-shot (the document
@@ -800,13 +800,28 @@ async function runSmartChunkedExtraction({ pdfText, geminiKey, anthropicKey, pdf
   console.log(`[smart-chunk] phase=shared sliceLen=${sharedSlice.length} (${Date.now() - phaseSharedStart}ms)`);
 
   // ── Phase 3: per-component extraction, sequential, 1 retry per chunk ──
+  // Pre-locate every component's start marker so each slice can fall back to a
+  // positional window (previous start → next start) when its own markers can't
+  // be found verbatim. Without these hints sliceByMarkers returns null on a
+  // marker miss and the component is silently dropped — which was eating the
+  // first clue (its start marker sits right at the shared-context boundary and
+  // often fails to match exactly).
+  const startIdxes = planning.components.map(c => findMarker(pdfText, c.start_marker));
   const componentResults = [];
   for (let i = 0; i < planning.components.length; i++) {
     const comp = planning.components[i];
     const phaseCompStart = Date.now();
-    const slice = sliceByMarkers(pdfText, comp.start_marker, comp.end_marker);
+    // hintStart: this component's located start, else the previous component's
+    // start, else the end of shared context (for the first component).
+    let hintStart = startIdxes[i];
+    if (hintStart < 0) hintStart = (i === 0) ? sharedEnd : (startIdxes[i - 1] >= 0 ? startIdxes[i - 1] : sharedEnd);
+    // hintEnd: the next locatable component's start, else end of document.
+    let hintEnd = -1;
+    for (let j = i + 1; j < startIdxes.length; j++) { if (startIdxes[j] >= 0) { hintEnd = startIdxes[j]; break; } }
+    if (hintEnd < 0) hintEnd = pdfText.length;
+    const slice = sliceByMarkers(pdfText, comp.start_marker, comp.end_marker, hintStart, hintEnd);
     if (!slice || !slice.text || slice.text.length < 20) {
-      console.warn(`[smart-chunk] component[${i + 1}/${planning.components.length}] '${comp.name}' marker miss — skipping`);
+      console.warn(`[smart-chunk] component[${i + 1}/${planning.components.length}] '${comp.name}' marker miss + fallback empty — skipping`);
       continue;
     }
     let attempt = 0;
@@ -1177,10 +1192,10 @@ For every page, return one entry with type set to one of:
 - "chart": a stitch chart or symbol grid (visual pattern diagram with symbols like +, x, o, T arranged in a grid)
 - "cover": cover page with the pattern's main photo or title artwork
 - "diagram": a schematic, assembly diagram, or construction illustration
-- "photo": a photograph of the finished project or work-in-progress
+- "photo": a photograph of the finished project or work-in-progress. ONLY use "photo" when the page clearly shows the finished crochet project. Social media graphics, designer branding/promo pages, collages of unrelated images, watermarks, and advertising belong in "decorative", not "photo".
 - "glossary": an abbreviation table, stitch glossary, or reference key
 - "text": a page that is primarily written instructions (no visual content worth keeping)
-- "decorative": decorative/filler pages with no instructional content
+- "decorative": decorative/filler/promotional pages with no instructional content
 
 For chart, cover, diagram, photo, glossary entries also provide:
 - caption: a short sentence describing what the image shows

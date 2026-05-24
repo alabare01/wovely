@@ -199,8 +199,11 @@ export const ChartLightbox = ({ images, startIndex, onClose, canPin = false, pin
 // (sticky-header) ancestor.
 export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId = null, onTogglePin, pendingLabel }) => {
   const [lightboxIdx, setLightboxIdx] = useState(null);
-  if (!Array.isArray(images) || images.length === 0) return null;
-  const ready = images.filter(i => i.cloudinary_url);
+  // Drop "photo" — Gemini tags decorative pages, social collages, and designer
+  // promo content as photo; they're not useful reference material.
+  const shown = (Array.isArray(images) ? images : []).filter(i => i.image_type !== "photo");
+  if (shown.length === 0) return null;
+  const ready = shown.filter(i => i.cloudinary_url);
 
   const bandStyle = {
     background: "rgba(255,255,255,0.82)",
@@ -224,7 +227,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
       `}</style>
       <div style={bandStyle}>
         <div className="wovely-cstrip" style={scrollRowStyle}>
-          {images.map((img) => {
+          {shown.map((img) => {
             const tappable = !!img.cloudinary_url;
             const label = labelFor ? labelFor(img) : null;
             return (
