@@ -14,6 +14,7 @@ export const FEATURE_GATES = {
   bevCheck:          [TIER_PRO, TIER_CRAFT],
   chunkedImport:     [TIER_PRO, TIER_CRAFT],
   collections:       [TIER_CRAFT],
+  chartImages:       [TIER_CRAFT], // server-side classification always runs; this gates display in PatternDetail
   bevsRead:          [TIER_CRAFT], // future — not exposed in UI yet
 };
 
@@ -44,3 +45,4 @@ export const canAccessCollections = (tier, isAnonymous=false) => canAccess('coll
 export const canAccessBevCheck = (tier, isAnonymous=false) => canAccess('bevCheck', tier, isAnonymous);
 export const canAccessChunkedImport = (tier, isAnonymous=false) => canAccess('chunkedImport', tier, isAnonymous);
 export const canAccessUnlimitedPatterns = (tier, isAnonymous=false) => canAccess('unlimitedPatterns', tier, isAnonymous);
+export const canAccessChartImages = (tier, isAnonymous=false) => canAccess('chartImages', tier, isAnonymous);

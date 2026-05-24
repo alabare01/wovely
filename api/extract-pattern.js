@@ -949,6 +949,7 @@ export default async function handler(req, res) {
   try {
     const { mode = "extract" } = req.body || {};
     if (mode === "bevcheck") return await handleBevCheck(req, res, _url, _key, _t0);
+    if (mode === "extract-images") return await handleExtractImages(req, res, _url, _key, _t0);
 
     const { pdfText, pageCount, pdfMetadataTitle } = req.body || {};
     if (!pdfText) return res.status(400).json({ error: "pdfText required" });
@@ -1156,4 +1157,197 @@ async function handleBevCheck(req, res, _url, _key, _t0) {
     logToSupabase('error', `[bevcheck] failed: ${e.message} (${Date.now() - _t0}ms)`, 500);
     return res.status(500).json({ error: true, message: "bev_tangled", provider: "failed" });
   }
+}
+
+// ─── Image extraction (mode: "extract-images") ──────────────────────────────
+// Fire-and-forget phase the client kicks off after `patterns.insert` succeeds.
+// Sends the PDF to Gemini for per-page classification, then inserts a row in
+// pattern_images for every meaningful page (chart/cover/diagram/photo/glossary).
+// The actual rasterization happens client-side on first Craft-tier detail
+// view — cloudinary_url is null until the page is rendered + uploaded. Keeps
+// this endpoint free of native canvas dependencies that are unreliable in
+// Vercel serverless.
+
+const IMAGE_EXTRACTION_PAGE_CAP = 30;
+const IMAGE_EXTRACTION_MAX_PDF_BYTES = 18 * 1024 * 1024; // Gemini inline cap is 20MB; leave headroom.
+
+const IMAGE_CLASSIFICATION_PROMPT = `You are analyzing a crochet pattern PDF. Look at each page and classify it.
+
+For every page, return one entry with type set to one of:
+- "chart": a stitch chart or symbol grid (visual pattern diagram with symbols like +, x, o, T arranged in a grid)
+- "cover": cover page with the pattern's main photo or title artwork
+- "diagram": a schematic, assembly diagram, or construction illustration
+- "photo": a photograph of the finished project or work-in-progress
+- "glossary": an abbreviation table, stitch glossary, or reference key
+- "text": a page that is primarily written instructions (no visual content worth keeping)
+- "decorative": decorative/filler pages with no instructional content
+
+For chart, cover, diagram, photo, glossary entries also provide:
+- caption: a short sentence describing what the image shows
+- component: which component/section of the pattern it belongs to (e.g. "Clue #1", "Body", "Border"), or null if it's a pattern-level image (cover, glossary)
+
+For text and decorative entries set caption: null and component: null.
+
+Process at most the first ${IMAGE_EXTRACTION_PAGE_CAP} pages. Return ONLY valid JSON, no markdown, no backticks:
+{
+  "pages": [
+    { "page": 1, "type": "cover", "caption": "string or null", "component": "string or null" }
+  ]
+}`;
+
+const MEANINGFUL_IMAGE_TYPES = new Set(['chart', 'cover', 'diagram', 'photo', 'glossary']);
+
+async function classifyPdfPagesWithGemini({ pdfBase64, geminiKey }) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 120000);
+  try {
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${geminiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{
+            parts: [
+              { inline_data: { mime_type: 'application/pdf', data: pdfBase64 } },
+              { text: IMAGE_CLASSIFICATION_PROMPT },
+            ],
+          }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 8192, thinkingConfig: { thinkingBudget: 0 } },
+        }),
+        signal: controller.signal,
+      }
+    );
+    if (!r.ok) {
+      const body = await r.text();
+      throw new Error(`Gemini image-classify ${r.status}: ${body.substring(0, 300)}`);
+    }
+    const data = await r.json();
+    const parts = (data.candidates?.[0]?.content?.parts || []).filter(p => !p.thought);
+    const text = parts.map(p => p.text || '').join('') || data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    if (!text) {
+      throw new Error(`Gemini image-classify empty response, finishReason=${data.candidates?.[0]?.finishReason || 'unknown'}`);
+    }
+    return parseModelJson(text);
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error('Gemini image-classify timeout after 120s');
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+async function handleExtractImages(req, res, supabaseUrl, serviceKey, t0) {
+  const { pattern_id, file_url, user_id } = req.body || {};
+  if (!pattern_id || !file_url || !user_id) {
+    return res.status(400).json({ error: 'pattern_id, file_url, and user_id are required' });
+  }
+  if (!supabaseUrl || !serviceKey) {
+    return res.status(500).json({ error: 'Supabase not configured' });
+  }
+  const geminiKey = process.env.GEMINI_API_KEY;
+  if (!geminiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
+
+  const logFailure = (msg, status) => {
+    if (!supabaseUrl || !serviceKey) return;
+    fetch(`${supabaseUrl}/rest/v1/vercel_logs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}`, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(), level: status >= 500 ? 'error' : 'warn',
+        message: msg, source: 'serverless',
+        request_path: '/api/extract-pattern?mode=extract-images',
+        request_method: 'POST', status_code: status, project_id: 'wovely',
+        user_id,
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  };
+
+  // Only PDF source files are classifiable here. Image-imports (.jpg/.png on
+  // Cloudinary) are already user-uploaded photographs and don't need this pass.
+  if (!file_url.toLowerCase().endsWith('.pdf')) {
+    return res.status(200).json({ ok: true, skipped: 'non-pdf source', images_added: 0 });
+  }
+
+  let pdfBase64;
+  try {
+    const pdfRes = await fetch(file_url);
+    if (!pdfRes.ok) throw new Error(`PDF fetch ${pdfRes.status}`);
+    const buf = await pdfRes.arrayBuffer();
+    if (buf.byteLength > IMAGE_EXTRACTION_MAX_PDF_BYTES) {
+      logFailure(`[extract-images] pattern=${pattern_id} skipped — pdf too large (${buf.byteLength} bytes)`, 200);
+      return res.status(200).json({ ok: true, skipped: 'pdf too large', images_added: 0 });
+    }
+    pdfBase64 = Buffer.from(buf).toString('base64');
+  } catch (fetchErr) {
+    logFailure(`[extract-images] pattern=${pattern_id} pdf fetch failed: ${fetchErr.message}`, 500);
+    return res.status(500).json({ error: 'pdf_fetch_failed', message: fetchErr.message });
+  }
+
+  let classification;
+  try {
+    classification = await classifyPdfPagesWithGemini({ pdfBase64, geminiKey });
+  } catch (geminiErr) {
+    logFailure(`[extract-images] pattern=${pattern_id} gemini failed: ${geminiErr.message}`, 500);
+    return res.status(500).json({ error: 'classify_failed', message: geminiErr.message });
+  }
+
+  const pages = Array.isArray(classification?.pages) ? classification.pages : [];
+  const meaningful = pages
+    .filter(p => p && typeof p.page === 'number' && MEANINGFUL_IMAGE_TYPES.has(p.type))
+    .slice(0, IMAGE_EXTRACTION_PAGE_CAP);
+
+  if (meaningful.length === 0) {
+    return res.status(200).json({ ok: true, images_added: 0, total_pages: pages.length });
+  }
+
+  const rows = meaningful.map((p, i) => ({
+    pattern_id,
+    user_id,
+    cloudinary_url: null,
+    image_type: p.type,
+    page_number: p.page,
+    sort_order: i,
+    caption: p.caption ? String(p.caption).slice(0, 400) : null,
+    component_name: p.component ? String(p.component).slice(0, 120) : null,
+  }));
+
+  try {
+    const insertRes = await fetch(`${supabaseUrl}/rest/v1/pattern_images`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': serviceKey,
+        'Authorization': `Bearer ${serviceKey}`,
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(rows),
+    });
+    if (!insertRes.ok) {
+      const body = await insertRes.text();
+      throw new Error(`insert ${insertRes.status}: ${body.substring(0, 300)}`);
+    }
+  } catch (insertErr) {
+    logFailure(`[extract-images] pattern=${pattern_id} insert failed: ${insertErr.message}`, 500);
+    return res.status(500).json({ error: 'insert_failed', message: insertErr.message });
+  }
+
+  if (supabaseUrl && serviceKey) {
+    fetch(`${supabaseUrl}/rest/v1/vercel_logs`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}`, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({
+        timestamp: new Date().toISOString(), level: 'info',
+        message: `[extract-images] pattern=${pattern_id} images=${rows.length} pages=${pages.length} (${Date.now() - t0}ms)`,
+        source: 'serverless',
+        request_path: '/api/extract-pattern?mode=extract-images',
+        request_method: 'POST', status_code: 200, project_id: 'wovely',
+        user_id,
+      }),
+      keepalive: true,
+    }).catch(() => {});
+  }
+
+  return res.status(200).json({ ok: true, images_added: rows.length, total_pages: pages.length });
 }

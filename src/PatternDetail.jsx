@@ -7,6 +7,8 @@ import PatternHeader from "./PatternHeader.jsx";
 import RowManager, { ensureRepeatBrackets } from "./RowManager.jsx";
 import { uploadPatternFile } from "./AddPatternModal.jsx";
 import { listPatternsInCollection, partLabelFor } from "./utils/collections.js";
+import { canAccessChartImages } from "./utils/featureGates.js";
+import { fetchPatternImages, getPatternImageCount, renderAndUploadPendingImages, imageTypeLabel } from "./utils/patternImages.js";
 
 const YarnSummaryCard = ({label, myKey, myVal, fallback, onSave}) => {
   const display = myVal || fallback;
@@ -270,7 +272,352 @@ const ShareCardModal = ({pattern,onClose,pct,Btn}) => {
   );
 };
 
-const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Photo,Stars,WireframeViewer,Btn,scrollToRow:initialScrollToRow,isAnonymous=false,onSignUp,collectionUpgrade,onCollectionUpgrade,onCollectionUpgradeDismiss}) => {
+// Image-type pill used on each chart card and inside the lightbox header.
+const ChartTypePill = ({ type }) => (
+  <span style={{
+    display: "inline-block",
+    background: T.terra,
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: 600,
+    letterSpacing: "0.06em",
+    padding: "4px 10px",
+    borderRadius: 20,
+    fontFamily: T.sans,
+    lineHeight: 1.2,
+  }}>{imageTypeLabel(type)}</span>
+);
+
+// Fullscreen image viewer with prev/next + swipe navigation. Pinch-zoom is
+// handled natively by the browser via touch-action: pinch-zoom on the image —
+// no custom transform math, no gesture state. Tap outside the image or hit
+// the close button to dismiss.
+const ChartLightbox = ({ images, startIndex, onClose }) => {
+  const [idx, setIdx] = useState(startIndex || 0);
+  const touchStartX = useRef(null);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") setIdx(i => Math.max(0, i - 1));
+      else if (e.key === "ArrowRight") setIdx(i => Math.min(images.length - 1, i + 1));
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [images.length, onClose]);
+
+  if (!images?.length) return null;
+  const img = images[idx];
+  if (!img) return null;
+
+  const goPrev = () => setIdx(i => Math.max(0, i - 1));
+  const goNext = () => setIdx(i => Math.min(images.length - 1, i + 1));
+
+  const onTouchStart = (e) => { touchStartX.current = e.touches?.[0]?.clientX ?? null; };
+  const onTouchEnd = (e) => {
+    if (touchStartX.current == null) return;
+    const endX = e.changedTouches?.[0]?.clientX ?? touchStartX.current;
+    const dx = endX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(dx) < 50) return;
+    if (dx < 0) goNext(); else goPrev();
+  };
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: "fixed", inset: 0, zIndex: 500,
+        background: "rgba(0,0,0,0.9)",
+        display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+        padding: "16px",
+      }}
+      onClick={onClose}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+    >
+      <button
+        onClick={(e) => { e.stopPropagation(); onClose(); }}
+        aria-label="Close"
+        style={{
+          position: "absolute", top: 16, right: 16,
+          background: "rgba(255,255,255,0.15)", color: "#fff", border: "none",
+          borderRadius: 99, width: 40, height: 40, cursor: "pointer",
+          fontSize: 22, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center",
+        }}
+      >×</button>
+      <div onClick={(e) => e.stopPropagation()} style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
+        <ChartTypePill type={img.image_type} />
+        {images.length > 1 && (
+          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontFamily: "Inter, sans-serif" }}>
+            {idx + 1} / {images.length}
+          </span>
+        )}
+      </div>
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{ position: "relative", maxWidth: "90vw", maxHeight: "75vh", display: "flex", alignItems: "center", justifyContent: "center" }}
+      >
+        {images.length > 1 && idx > 0 && (
+          <button
+            onClick={goPrev}
+            aria-label="Previous"
+            style={{
+              position: "absolute", left: -12, top: "50%", transform: "translateY(-50%)",
+              background: "rgba(255,255,255,0.18)", color: "#fff", border: "none",
+              borderRadius: 99, width: 40, height: 40, cursor: "pointer",
+              fontSize: 22, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center",
+              zIndex: 1,
+            }}
+          >‹</button>
+        )}
+        {img.cloudinary_url ? (
+          <img
+            src={img.cloudinary_url}
+            alt={img.caption || imageTypeLabel(img.image_type)}
+            style={{
+              maxWidth: "90vw", maxHeight: "75vh",
+              objectFit: "contain", display: "block",
+              touchAction: "pinch-zoom",
+              borderRadius: 8,
+            }}
+          />
+        ) : (
+          <div style={{
+            color: "rgba(255,255,255,0.7)", fontFamily: "Inter, sans-serif",
+            fontSize: 14, padding: "60px 40px", textAlign: "center",
+          }}>Bev is preparing this image…</div>
+        )}
+        {images.length > 1 && idx < images.length - 1 && (
+          <button
+            onClick={goNext}
+            aria-label="Next"
+            style={{
+              position: "absolute", right: -12, top: "50%", transform: "translateY(-50%)",
+              background: "rgba(255,255,255,0.18)", color: "#fff", border: "none",
+              borderRadius: 99, width: 40, height: 40, cursor: "pointer",
+              fontSize: 22, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center",
+              zIndex: 1,
+            }}
+          >›</button>
+        )}
+      </div>
+      {(img.caption || img.component_name) && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            marginTop: 14, maxWidth: "90vw", textAlign: "center",
+            color: "#fff", fontFamily: "Inter, sans-serif",
+            fontSize: 13, lineHeight: 1.5,
+          }}
+        >
+          {img.component_name && (
+            <div style={{ fontWeight: 600, marginBottom: 4, fontFamily: "'Playfair Display', Georgia, serif", fontSize: 15 }}>
+              {img.component_name}
+            </div>
+          )}
+          {img.caption && <div style={{ opacity: 0.85 }}>{img.caption}</div>}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Standard glass card per CLAUDE.md. Same treatment Dashboard uses.
+const GLASS_CARD = {
+  background: "rgba(255,255,255,0.82)",
+  backdropFilter: "blur(16px)",
+  WebkitBackdropFilter: "blur(16px)",
+  border: "1px solid rgba(255,255,255,0.45)",
+  borderRadius: 16,
+  boxShadow: "0 4px 24px rgba(45,58,124,0.08)",
+};
+
+// Bev-in-spinning-ring loading affordance per CLAUDE.md ("static Bev inside
+// spinning ring"). Stays small so it fits inline with copy.
+const BevInlineSpinner = ({ size = 24 }) => (
+  <div style={{ width: size, height: size, position: "relative", flexShrink: 0 }}>
+    <div style={{
+      position: "absolute", inset: -3, borderRadius: "50%",
+      border: "2px solid transparent",
+      borderTopColor: "#9B7EC8",
+      animation: "wovelyChartsRing 1s linear infinite",
+    }}/>
+    <img
+      src="/bev_neutral.png" alt="Bev"
+      style={{ width: size, height: size, borderRadius: "50%", objectFit: "cover", display: "block" }}
+    />
+  </div>
+);
+
+const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade }) => {
+  const patternId = pattern._supabaseId || pattern.id;
+  const sourceFileUrl = pattern.source_file_url || null;
+  const isCraft = canAccessChartImages(tier, isAnonymous);
+  const { isDesktop } = useBreakpoint();
+
+  // Locked (Pro/Free/Anon) path uses count-only query — keeps the locked card
+  // out of the data path when there's nothing to advertise.
+  const [lockedCount, setLockedCount] = useState(null);
+  // Unlocked (Craft) path loads full rows and tracks the render-in-progress
+  // state so the inline "Bev is extracting" copy can settle when done.
+  const [images, setImages] = useState(null);
+  const [rendering, setRendering] = useState(false);
+  const [lightboxIdx, setLightboxIdx] = useState(null);
+
+  useEffect(() => {
+    if (!patternId) return;
+    let cancelled = false;
+    (async () => {
+      if (!isCraft) {
+        const { data } = await getPatternImageCount(patternId);
+        if (!cancelled) setLockedCount(typeof data === "number" ? data : 0);
+        return;
+      }
+      const { data } = await fetchPatternImages(patternId);
+      if (cancelled) return;
+      const rows = Array.isArray(data) ? data : [];
+      setImages(rows);
+      const hasPending = rows.some(r => !r.cloudinary_url);
+      if (hasPending && sourceFileUrl) {
+        setRendering(true);
+        try {
+          const updated = await renderAndUploadPendingImages({
+            images: rows,
+            sourceFileUrl,
+            onProgress: (row) => {
+              if (cancelled || !row) return;
+              setImages(prev => (prev || []).map(p => p.id === row.id ? { ...p, cloudinary_url: row.cloudinary_url } : p));
+            },
+          });
+          if (!cancelled) setImages(updated);
+        } finally {
+          if (!cancelled) setRendering(false);
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [patternId, isCraft, sourceFileUrl]);
+
+  // Locked render: hide entirely when there's nothing to upsell.
+  if (!isCraft) {
+    if (!lockedCount || lockedCount <= 0) return null;
+    const charts = (lockedCount === 1) ? "1 chart or image" : `${lockedCount} charts and images`;
+    return (
+      <div style={{ ...GLASS_CARD, padding: "18px 18px", marginTop: 24, opacity: 0.95 }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 16, color: "#2D2D4E", marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ opacity: 0.6 }}>🔒</span>
+              <span>Charts &amp; Images</span>
+            </div>
+            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#6B6B8A", lineHeight: 1.55 }}>
+              Bev found {charts} in this pattern. Upgrade to Craft to see them on every page.
+            </div>
+          </div>
+          <button
+            onClick={onShowUpgrade}
+            style={{
+              background: "#9B7EC8", color: "#fff", border: "none",
+              borderRadius: 99, padding: "8px 14px",
+              fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 600,
+              cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0,
+            }}
+          >See plans</button>
+        </div>
+      </div>
+    );
+  }
+
+  // Unlocked render. Three loading states:
+  //   images === null   → first fetch in flight, render nothing
+  //   images === []     → no classifications yet (extract-images still running,
+  //                        or pattern has no PDF source) → show Bev spinner copy
+  //                        only when source_file_url exists, otherwise omit.
+  //   images.length > 0 → grid, with per-tile spinner for rows still rendering.
+  if (images === null) return null;
+  if (images.length === 0) {
+    if (!sourceFileUrl) return null;
+    return (
+      <div style={{ ...GLASS_CARD, padding: "18px 18px", marginTop: 24, display: "flex", alignItems: "center", gap: 12 }}>
+        <BevInlineSpinner size={28} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 15, color: "#2D2D4E" }}>Charts &amp; Images</div>
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 12, color: "#6B6B8A", marginTop: 2 }}>Bev is looking through your pattern for charts and reference images…</div>
+        </div>
+      </div>
+    );
+  }
+
+  const cols = isDesktop ? 3 : 2;
+  return (
+    <>
+      <style>{`@keyframes wovelyChartsRing{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}`}</style>
+      <div style={{ ...GLASS_CARD, padding: "18px 18px", marginTop: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+          <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontWeight: 700, fontSize: 16, color: "#2D2D4E", flex: 1 }}>Charts &amp; Images</div>
+          {rendering && <BevInlineSpinner size={20} />}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: 12 }}>
+          {images.map((img, i) => (
+            <button
+              key={img.id}
+              onClick={() => img.cloudinary_url && setLightboxIdx(i)}
+              disabled={!img.cloudinary_url}
+              style={{
+                background: "transparent", border: "none", padding: 0,
+                cursor: img.cloudinary_url ? "pointer" : "default",
+                textAlign: "left", fontFamily: "Inter, sans-serif",
+              }}
+              aria-label={img.caption || imageTypeLabel(img.image_type)}
+            >
+              <div style={{
+                position: "relative", width: "100%", aspectRatio: "1",
+                background: "#EDE4F7", borderRadius: 12, overflow: "hidden",
+                border: "1px solid rgba(45,58,124,0.06)",
+              }}>
+                {img.cloudinary_url ? (
+                  <img
+                    src={img.cloudinary_url}
+                    alt={img.caption || imageTypeLabel(img.image_type)}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <BevInlineSpinner size={28} />
+                  </div>
+                )}
+                <div style={{ position: "absolute", top: 8, left: 8 }}>
+                  <ChartTypePill type={img.image_type} />
+                </div>
+              </div>
+              {(img.caption || img.component_name) && (
+                <div style={{ marginTop: 8, fontSize: 12, color: "#2D2D4E", lineHeight: 1.4 }}>
+                  {img.component_name && <div style={{ fontWeight: 600 }}>{img.component_name}</div>}
+                  {img.caption && <div style={{ color: "#6B6B8A", marginTop: 2 }}>{img.caption}</div>}
+                </div>
+              )}
+            </button>
+          ))}
+        </div>
+        <div style={{ marginTop: 12, fontSize: 11, color: "#6B6B8A", fontFamily: "Inter, sans-serif", textAlign: "center" }}>
+          Tap any image to view full
+        </div>
+      </div>
+      {lightboxIdx != null && (
+        <ChartLightbox
+          images={images.filter(i => i.cloudinary_url)}
+          startIndex={Math.min(lightboxIdx, images.filter(i => i.cloudinary_url).length - 1)}
+          onClose={() => setLightboxIdx(null)}
+        />
+      )}
+    </>
+  );
+};
+
+const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Photo,Stars,WireframeViewer,Btn,scrollToRow:initialScrollToRow,isAnonymous=false,onSignUp,collectionUpgrade,onCollectionUpgrade,onCollectionUpgradeDismiss,tier,onShowUpgrade}) => {
   const VALID_TABS=["materials","rows","notes"];
   const navigate = useNavigate();
   // Collection context — only populated when this pattern belongs to a
@@ -561,6 +908,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             <div style={{marginTop:10,fontSize:12,color:T.ink3}}>Source: {p.source}</div>
           </div>
         )}
+        <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} />
         </div>
       </div>
       {/* Floating source pill now rendered inside RowManager */}
