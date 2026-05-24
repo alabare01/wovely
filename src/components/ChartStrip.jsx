@@ -197,13 +197,8 @@ export const ChartLightbox = ({ images, startIndex, onClose, canPin = false, pin
 // collection strip to tag the source clue). Pin props are forwarded to the
 // lightbox. Renders the lightbox via portal so it escapes any transformed
 // (sticky-header) ancestor.
-export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId = null, onTogglePin, pendingLabel }) => {
+export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId = null, onTogglePin, pendingLabel, locked = false, lockedCount = 0, onShowUpgrade, showEmptyState = false }) => {
   const [lightboxIdx, setLightboxIdx] = useState(null);
-  // Drop "photo" — Gemini tags decorative pages, social collages, and designer
-  // promo content as photo; they're not useful reference material.
-  const shown = (Array.isArray(images) ? images : []).filter(i => i.image_type !== "photo");
-  if (shown.length === 0) return null;
-  const ready = shown.filter(i => i.cloudinary_url);
 
   const bandStyle = {
     background: "rgba(255,255,255,0.82)",
@@ -218,6 +213,68 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
     scrollbarWidth: "none", msOverflowStyle: "none",
     WebkitOverflowScrolling: "touch",
   };
+  const keyframeStyle = (
+    <style>{`
+      @keyframes wovelyChartsRing{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+      .wovely-cstrip::-webkit-scrollbar{display:none}
+    `}</style>
+  );
+
+  // Locked (Pro/Free): frosted placeholder thumbs behind a compact upgrade
+  // nudge. Same band so the layout matches the unlocked strip.
+  if (locked) {
+    const placeholderCount = Math.min(Math.max(lockedCount || 0, 3), 5);
+    return (
+      <div style={bandStyle}>
+        <div style={{ display: "flex", gap: 10, overflowX: "hidden", filter: "blur(1.5px)", opacity: 0.7 }}>
+          {Array.from({ length: placeholderCount }).map((_, i) => (
+            <div key={i} style={{
+              flexShrink: 0, height: 120, width: 92, borderRadius: 12,
+              border: "1px solid #EDE4F7", background: "linear-gradient(135deg, #EDE4F7, #F8F6FF)",
+            }}/>
+          ))}
+        </div>
+        <div style={{
+          position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", gap: 4,
+          background: "rgba(248,246,255,0.55)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
+        }}>
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#2D2D4E", fontWeight: 600 }}>
+            Bev found charts in this pattern
+          </div>
+          {onShowUpgrade && (
+            <button onClick={onShowUpgrade} style={{
+              background: "transparent", border: "none", padding: 0, cursor: "pointer",
+              fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 700, color: "#9B7EC8",
+            }}>See plans</button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Drop "photo" — Gemini tags decorative pages, social collages, and designer
+  // promo content as photo; they're not useful reference material.
+  const shown = (Array.isArray(images) ? images : []).filter(i => i.image_type !== "photo");
+  const ready = shown.filter(i => i.cloudinary_url);
+
+  // Nothing to show yet. Pattern detail (no showEmptyState) renders nothing;
+  // the collection strip (showEmptyState) keeps the container with a Bev
+  // spinner so the user knows charts are on the way.
+  if (shown.length === 0) {
+    if (!showEmptyState) return null;
+    return (
+      <>
+        {keyframeStyle}
+        <div style={{ ...bandStyle, display: "flex", alignItems: "center", gap: 12, minHeight: 120 }}>
+          <BevInlineSpinner size={28} />
+          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#6B6B8A" }}>
+            {pendingLabel || "Bev is preparing your charts..."}
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

@@ -18,6 +18,7 @@ import {
 import { TIER_CRAFT } from "./utils/tierUtils.js";
 import { fetchPatternImagesForPatterns, renderAndUploadPendingImages } from "./utils/patternImages.js";
 import { ChartStripView } from "./components/ChartStrip.jsx";
+import { canAccessChartImages } from "./utils/featureGates.js";
 
 // Standard glass card spec used throughout — matches the rest of the
 // app. Kept inline rather than imported so this file is self-contained.
@@ -223,7 +224,7 @@ const orderStripImages = (rows) => {
     .sort((a, b) => (a.page_number ?? 9999) - (b.page_number ?? 9999) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
 };
 
-export const CollectionDetailView = ({ collection: initial, onBack, onOpenPattern, onAddPattern, onImportClue, onCollectionChanged, onCollectionDeleted, pinnedImageId, onTogglePin }) => {
+export const CollectionDetailView = ({ collection: initial, onBack, onOpenPattern, onAddPattern, onImportClue, onCollectionChanged, onCollectionDeleted, pinnedImageId, onTogglePin, tier, onShowUpgrade }) => {
   const { isDesktop } = useBreakpoint();
   const navigate = useNavigate();
   const [collection, setCollection] = useState(initial);
@@ -253,6 +254,9 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
 
   useEffect(() => { refresh(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [collection.id]);
 
+  // Chart images are a Craft feature (same gate as pattern detail).
+  const isCraft = canAccessChartImages(tier);
+
   // Pull extracted images across every clue for the combined chart strip once
   // the pattern list is known. Rendered images show immediately; any classified-
   // but-not-yet-rendered images (null cloudinary_url, because the user hasn't
@@ -271,6 +275,8 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
 
       // Kick off background rendering for pending images, one pass per clue
       // (each clue carries the source PDF URL needed to rasterize its pages).
+      // Craft-only — the render + upload is the gated feature.
+      if (!isCraft) return;
       for (const pat of patterns) {
         const patternRows = rows.filter(r => r.pattern_id === pat.id);
         const hasPending = patternRows.some(r => !r.cloudinary_url);
@@ -286,7 +292,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
       }
     })();
     return () => { cancelled = true; };
-  }, [patterns]);
+  }, [patterns, isCraft]);
 
   // Map pattern_id → clue title for the strip's per-thumbnail labels (a clue
   // label since the strip combines images from every clue).
@@ -493,16 +499,23 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
 
       {/* Combined chart strip — every clue's extracted charts/covers in one
           horizontal reference row, each tagged with its clue. Same strip
-          component as the pattern detail page. */}
-      {chartImages.length > 0 && (
+          component as the pattern detail page. Always rendered once the
+          collection has at least one imported pattern; the strip itself shows
+          the right state (uploaded thumbnails, loading spinner, or locked
+          nudge) based on tier and image availability. */}
+      {patterns.length > 0 && (
         <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 16, boxShadow: "0 4px 24px rgba(45,58,124,0.08)" }}>
           <ChartStripView
             images={chartImages}
             labelFor={chartLabelFor}
-            canPin={!!onTogglePin}
+            canPin={isCraft && !!onTogglePin}
             pinnedImageId={pinnedImageId}
             onTogglePin={onTogglePin}
             pendingLabel="Bev is preparing your charts..."
+            showEmptyState={true}
+            locked={!isCraft}
+            lockedCount={chartImages.length}
+            onShowUpgrade={onShowUpgrade}
           />
         </div>
       )}
