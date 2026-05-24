@@ -197,7 +197,7 @@ export const ChartLightbox = ({ images, startIndex, onClose, canPin = false, pin
 // collection strip to tag the source clue). Pin props are forwarded to the
 // lightbox. Renders the lightbox via portal so it escapes any transformed
 // (sticky-header) ancestor.
-export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId = null, onTogglePin }) => {
+export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId = null, onTogglePin, pendingLabel }) => {
   const [lightboxIdx, setLightboxIdx] = useState(null);
   if (!Array.isArray(images) || images.length === 0) return null;
   const ready = images.filter(i => i.cloudinary_url);
@@ -241,7 +241,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
               >
                 <div style={{
                   position: "relative", height: 120, borderRadius: 12, overflow: "hidden",
-                  border: "1px solid #EDE4F7", background: "#EDE4F7",
+                  border: "1px solid #EDE4F7", background: tappable ? "#EDE4F7" : "#F8F6FF",
                   ...(tappable ? {} : { width: 92, display: "flex", alignItems: "center", justifyContent: "center" }),
                 }}>
                   {tappable ? (
@@ -274,7 +274,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
           pointerEvents: "none",
         }}/>
         <div style={{ marginTop: 6, fontSize: 11, color: "#6B6B8A", fontFamily: "Inter, sans-serif" }}>
-          Tap to enlarge
+          {ready.length === 0 && pendingLabel ? pendingLabel : "Tap to enlarge"}
         </div>
       </div>
       {lightboxIdx != null && createPortal(

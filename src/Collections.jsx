@@ -215,11 +215,11 @@ const CollectionCard = ({ c, onOpen }) => {
 // ─── Detail view ─────────────────────────────────────────────────────────
 
 // Order images for the combined collection chart strip: by page_number across
-// all clues (then sort_order as a tiebreaker). Only rendered (uploaded) images
-// are shown. This is the whole collection's visual reference in one row.
+// all clues (then sort_order as a tiebreaker). Includes classified-but-not-yet-
+// rendered rows (null cloudinary_url) so the strip shows loading placeholders
+// immediately on first load, swapping to real thumbnails as they upload.
 const orderStripImages = (rows) => {
   return [...(rows || [])]
-    .filter(r => r.cloudinary_url)
     .sort((a, b) => (a.page_number ?? 9999) - (b.page_number ?? 9999) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
 };
 
@@ -502,6 +502,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
             canPin={!!onTogglePin}
             pinnedImageId={pinnedImageId}
             onTogglePin={onTogglePin}
+            pendingLabel="Bev is preparing your charts..."
           />
         </div>
       )}
