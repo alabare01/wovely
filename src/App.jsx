@@ -3122,6 +3122,7 @@ export default function Wovely() {
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
           {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
           {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
+          {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #EDE4F7",borderTopColor:"#9B7EC8",borderRadius:"50%",margin:"0 auto"}}/></div>}
           {view==="privacy"&&<PrivacyPolicy/>}
           {view==="terms"&&<TermsOfService/>}
           {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:24}}><StitchResultPage/></div>}
@@ -3169,6 +3170,7 @@ export default function Wovely() {
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
         {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
         {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
+          {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #EDE4F7",borderTopColor:"#9B7EC8",borderRadius:"50%",margin:"0 auto"}}/></div>}
         {view==="privacy"&&<PrivacyPolicy/>}
         {view==="terms"&&<TermsOfService/>}
         {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:18}}><StitchResultPage/></div>}

@@ -16,7 +16,7 @@ import {
   partLabelPlural,
 } from "./utils/collections.js";
 import { TIER_CRAFT } from "./utils/tierUtils.js";
-import { fetchPatternImagesForPatterns } from "./utils/patternImages.js";
+import { fetchPatternImagesForPatterns, renderAndUploadPendingImages } from "./utils/patternImages.js";
 
 // Standard glass card spec used throughout — matches the rest of the
 // app. Kept inline rather than imported so this file is self-contained.
@@ -308,14 +308,37 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
   useEffect(() => { refresh(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [collection.id]);
 
   // Pull extracted images across every clue for the hero carousel once the
-  // pattern list is known. Re-runs when the clue set changes.
+  // pattern list is known. Rendered images show immediately; any classified-
+  // but-not-yet-rendered images (null cloudinary_url, because the user hasn't
+  // opened that clue's detail page) are rasterized + uploaded here in the
+  // background so opening the collection page populates ALL clue charts, not
+  // just the ones already visited. Re-runs when the clue set changes.
   useEffect(() => {
     const ids = patterns.map(p => p.id).filter(Boolean);
     if (ids.length === 0) { setHeroImages([]); return; }
     let cancelled = false;
-    fetchPatternImagesForPatterns(ids).then(({ data }) => {
-      if (!cancelled) setHeroImages(orderHeroImages(data));
-    });
+    (async () => {
+      const { data } = await fetchPatternImagesForPatterns(ids);
+      if (cancelled) return;
+      const rows = Array.isArray(data) ? data : [];
+      setHeroImages(orderHeroImages(rows));
+
+      // Kick off background rendering for pending images, one pass per clue
+      // (each clue carries the source PDF URL needed to rasterize its pages).
+      for (const pat of patterns) {
+        const patternRows = rows.filter(r => r.pattern_id === pat.id);
+        const hasPending = patternRows.some(r => !r.cloudinary_url);
+        if (!hasPending || !pat.source_file_url) continue;
+        renderAndUploadPendingImages({
+          images: patternRows,
+          sourceFileUrl: pat.source_file_url,
+          onProgress: (row) => {
+            if (cancelled || !row?.cloudinary_url) return;
+            setHeroImages(prev => orderHeroImages([...prev.filter(x => x.id !== row.id), row]));
+          },
+        }).catch(() => {});
+      }
+    })();
     return () => { cancelled = true; };
   }, [patterns]);
 
@@ -355,6 +378,10 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
     if (error) { console.warn("[Wovely] deleteCollection failed:", error); return; }
     setConfirmDelete(false);
     onCollectionDeleted?.(collection.id);
+    // Leave the now-dead /collections/[id] URL immediately. Don't rely solely
+    // on the parent callback — a refresh on this URL would otherwise blank out
+    // since the collection no longer exists.
+    navigate("/", { replace: true });
   };
 
   const move = async (idx, dir) => {

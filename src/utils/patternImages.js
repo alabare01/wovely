@@ -34,16 +34,17 @@ export const fetchPatternImages = async (patternId) => {
   } catch (e) { return { error: e.message }; }
 };
 
-// All rendered images across a set of patterns (a collection's clues). Only
-// rows with a cloudinary_url are returned since the caller displays them
-// directly. Used by the collection-detail hero carousel.
+// All images across a set of patterns (a collection's clues), including rows
+// that are classified but not yet rendered (null cloudinary_url). The caller
+// displays the rendered ones and kicks off rendering for the pending ones.
+// Used by the collection-detail hero carousel.
 export const fetchPatternImagesForPatterns = async (patternIds) => {
   const ids = (patternIds || []).filter(Boolean);
   if (ids.length === 0) return { data: [] };
   try {
     const inList = ids.join(",");
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/pattern_images?pattern_id=in.(${inList})&cloudinary_url=not.is.null&order=sort_order.asc`,
+      `${SUPABASE_URL}/rest/v1/pattern_images?pattern_id=in.(${inList})&order=sort_order.asc`,
       { headers: headers() },
     );
     if (!res.ok) return { error: await res.text() };

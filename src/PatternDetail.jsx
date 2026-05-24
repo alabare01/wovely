@@ -695,6 +695,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   };
   // Auto-hide header on scroll down, show on scroll up (with iOS momentum debounce)
   const scrollRef=useRef(null);
+  const headerRef=useRef(null);
   const lastScrollY=useRef(0);
   const upAccum=useRef(0);
   const [headerHidden,setHeaderHidden]=useState(false);
@@ -704,8 +705,14 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   useEffect(()=>{
     const onScroll=()=>{
       const y=window.scrollY||window.pageYOffset;
+      // Only hide once the user has scrolled PAST the full header height.
+      // Hiding earlier translates a tall header (hero + chart strip + tabs)
+      // up by its full height while content has barely moved, leaving an
+      // orphaned white gap at the top. Waiting for y > headerHeight means the
+      // content has already scrolled up to fill that space.
+      const hideThreshold=Math.max(10,(headerRef.current?.offsetHeight||0));
       if(y<=0){upAccum.current=0;setHeaderHidden(false);}
-      else if(y>lastScrollY.current){upAccum.current=0;if(y>10) setHeaderHidden(true);}
+      else if(y>lastScrollY.current){upAccum.current=0;if(y>hideThreshold) setHeaderHidden(true);}
       else if(y<lastScrollY.current){upAccum.current+=lastScrollY.current-y;if(upAccum.current>=15) setHeaderHidden(false);}
       lastScrollY.current=y;
     };
@@ -772,7 +779,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
         </div>
       )}
       <div ref={scrollRef} style={{flex:1,WebkitOverflowScrolling:"touch"}}>
-        <div style={{position:"sticky",top:0,zIndex:10,transform:headerHidden?"translateY(-100%)":"translateY(0)",transition:"transform 220ms ease"}}>
+        <div ref={headerRef} style={{position:"sticky",top:0,zIndex:10,transform:headerHidden?"translateY(-100%)":"translateY(0)",transition:"transform 220ms ease"}}>
           <PatternHeader p={p} rows={rows} done={done} editing={editing} draft={draft} setDraft={setDraft} milestone={milestone} setMilestone={setMilestone} onBack={handleBack} backLabel={collectionMeta?.name} onShare={()=>setShowShare(true)} onScale={()=>setShowScale(true)} onEdit={()=>editing?save():setEditing(true)} onSave={save} detailPhoto={detailPhoto} Bar={Bar} Photo={Photo} WireframeViewer={WireframeViewer} onViewSource={handleViewSource}/>
           {collectionMeta && isMkalCollection && sibIndex >= 0 && (() => {
             // Part-to-part navigation. Only shown for MKAL collections —
