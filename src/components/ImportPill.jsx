@@ -77,7 +77,7 @@ export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) 
     onMissing: () => { setActiveImportJob(null); setJobId(null); },
   });
 
-  const { job, currentPhase, phaseElapsed, totalElapsed, isComplete, isFailed, isActive, validationReport, extractedData, coverImageUrl, fileType, retryCount, extractionMethod, errorMessage } = polling;
+  const { job, currentPhase, phaseElapsed, totalElapsed, isComplete, isFailed, isActive, validationReport, extractedData, coverImageUrl, fileType, fileUrl, retryCount, extractionMethod, errorMessage } = polling;
 
   // Detect the completed transition to set the prominent pulse window.
   useEffect(() => {
@@ -102,7 +102,7 @@ export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) 
   const handleTap = () => {
     if (!job) return;
     if (isComplete) {
-      onTapReview?.({ jobId: job.id, fileType, extractedData, coverImageUrl, validationReport });
+      onTapReview?.({ jobId: job.id, fileType, extractedData, coverImageUrl, validationReport, fileUrl });
       dismiss();
       return;
     }

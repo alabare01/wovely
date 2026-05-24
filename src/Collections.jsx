@@ -5,7 +5,6 @@ import UpgradeNudge from "./components/UpgradeNudge.jsx";
 import {
   listCollections,
   listPatternsInCollection,
-  createCollection,
   updateCollection,
   deleteCollection,
   unlinkPatternFromCollection,
@@ -610,58 +609,6 @@ const PatternTile = ({ p, onOpen, onRemove }) => {
         <div style={{ fontSize: 13, fontWeight: 600, color: T.ink, lineHeight: 1.25, marginBottom: 6, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title || "Untitled"}</div>
         <div style={{ background: T.border, borderRadius: 99, height: 3, overflow: "hidden" }}>
           <div style={{ width: `${prog}%`, height: 3, background: prog === 100 ? T.sage : T.terra, borderRadius: 99 }} />
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// ─── Create modal ────────────────────────────────────────────────────────
-
-// Lightweight create modal used by the "+ New Collection" button when
-// the user hasn't picked the multi-file import path. Lets them name a
-// collection and pick the type without committing to a multi-file
-// import session — they can add patterns one at a time from inside the
-// detail view instead.
-export const NewCollectionModal = ({ onClose, onCreated }) => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [type, setType] = useState("mkal");
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
-
-  const submit = async () => {
-    setError(null);
-    setSaving(true);
-    const { data, error: err } = await createCollection({
-      name: name.trim() || "Untitled Collection",
-      description: description.trim() || null,
-      collection_type: type,
-    });
-    setSaving(false);
-    if (err) { setError(err); return; }
-    onCreated?.(data);
-  };
-
-  // Centered overlay on every viewport (matches AuthWallModal style),
-  // capped at 480px wide with breathing room around the edges. Earlier
-  // iteration was a bottom sheet on mobile which read as full-screen.
-  return (
-    <div onClick={onClose} style={{ position: "fixed", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)" }}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#fff", borderRadius: 16, padding: 24, width: "100%", maxWidth: 480, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 20px 60px rgba(28,23,20,0.28)", fontFamily: T.sans, boxSizing: "border-box" }}>
-        <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 6 }}>New collection</div>
-        <div style={{ fontSize: 13, color: T.ink2, marginBottom: 18, lineHeight: 1.5 }}>Name it, pick a type, then add patterns from the collection page.</div>
-        <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Lemon Drop MKAL 2026" style={{ width: "100%", padding: "11px 14px", border: `1.5px solid ${T.border}`, borderRadius: 10, fontSize: 14, color: T.ink, background: T.linen, outline: "none", marginBottom: 10 }} onFocus={e => e.target.style.borderColor = T.terra} onBlur={e => e.target.style.borderColor = T.border} />
-        <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Optional description" rows={2} style={{ width: "100%", padding: "11px 14px", border: `1.5px solid ${T.border}`, borderRadius: 10, fontSize: 13, color: T.ink, background: T.linen, outline: "none", marginBottom: 12, resize: "vertical", fontFamily: T.sans }} />
-        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-          {[{ k: "mkal", label: "MKAL (ordered)" }, { k: "general", label: "General" }].map(o => (
-            <button key={o.k} onClick={() => setType(o.k)} style={{ flex: 1, padding: "10px 12px", borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: "pointer", background: type === o.k ? T.terra : "transparent", color: type === o.k ? "#fff" : T.ink2, border: `1.5px solid ${type === o.k ? T.terra : T.border}` }}>{o.label}</button>
-          ))}
-        </div>
-        {error && <div style={{ fontSize: 12, color: "#C0544A", marginBottom: 10 }}>{String(error).slice(0, 200)}</div>}
-        <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "10px 18px", fontSize: 13, color: T.ink2, cursor: "pointer", fontWeight: 600 }}>Cancel</button>
-          <button onClick={submit} disabled={saving} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: saving ? "wait" : "pointer", opacity: saving ? 0.7 : 1 }}>{saving ? "Creating…" : "Create Collection"}</button>
         </div>
       </div>
     </div>

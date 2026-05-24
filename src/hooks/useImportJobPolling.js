@@ -105,6 +105,7 @@ export function useImportJobPolling(jobId, { onMissing } = {}) {
       validationReport: job?.validation_report || null,
       coverImageUrl: job?.cover_image_url || null,
       fileType: job?.file_type || null,
+      fileUrl: job?.file_url || null,
       extractionMethod: job?.extraction_method || null,
       errorMessage: job?.error_message || null,
       retryCount: job?.retry_count || 0,

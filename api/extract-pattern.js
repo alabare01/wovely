@@ -1237,10 +1237,52 @@ async function classifyPdfPagesWithGemini({ pdfBase64, geminiKey }) {
   }
 }
 
+// Normalize a component / page label for fuzzy matching. Strips punctuation,
+// collapses whitespace, lowercases. "Clue #1" → "clue 1", "Body chart" → "body chart".
+function normalizeComponentLabel(s) {
+  if (!s || typeof s !== 'string') return '';
+  return s.toLowerCase().replace(/[#:_\-]/g, ' ').replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+// Pick which pattern a classified page belongs to. For a single-pattern import
+// everything goes to that pattern. For a multi-pattern (split collection)
+// import, charts/diagrams are routed to the pattern whose component_name best
+// matches the page's component label; covers, glossaries, and unmatched pages
+// fall to the first pattern (clue 1) so shared references live somewhere.
+function assignPatternForPage(page, patterns) {
+  if (patterns.length === 1) return patterns[0];
+  const pageComp = normalizeComponentLabel(page.component);
+  if (pageComp) {
+    // Exact normalized match first, then substring either direction.
+    let match = patterns.find(p => normalizeComponentLabel(p.component_name) === pageComp);
+    if (match) return match;
+    match = patterns.find(p => {
+      const pc = normalizeComponentLabel(p.component_name);
+      return pc && (pc.includes(pageComp) || pageComp.includes(pc));
+    });
+    if (match) return match;
+  }
+  return patterns[0];
+}
+
 async function handleExtractImages(req, res, supabaseUrl, serviceKey, t0) {
-  const { pattern_id, file_url, user_id } = req.body || {};
-  if (!pattern_id || !file_url || !user_id) {
-    return res.status(400).json({ error: 'pattern_id, file_url, and user_id are required' });
+  const body = req.body || {};
+  const { file_url, user_id } = body;
+  // Accept either a single pattern_id (back-compat) or a patterns array of
+  // { id, component_name } for split-collection imports that share one PDF.
+  let patterns = [];
+  if (Array.isArray(body.patterns) && body.patterns.length) {
+    patterns = body.patterns
+      .filter(p => p && p.id)
+      .map(p => ({ id: p.id, component_name: p.component_name || null }));
+  } else if (body.pattern_id) {
+    patterns = [{ id: body.pattern_id, component_name: null }];
+  }
+
+  console.log(`[extract-images] request user=${user_id} patterns=${patterns.length} file=${file_url ? 'yes' : 'no'}`);
+
+  if (patterns.length === 0 || !file_url || !user_id) {
+    return res.status(400).json({ error: 'patterns (or pattern_id), file_url, and user_id are required' });
   }
   if (!supabaseUrl || !serviceKey) {
     return res.status(500).json({ error: 'Supabase not configured' });
@@ -1248,6 +1290,7 @@ async function handleExtractImages(req, res, supabaseUrl, serviceKey, t0) {
   const geminiKey = process.env.GEMINI_API_KEY;
   if (!geminiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
 
+  const firstId = patterns[0].id;
   const logFailure = (msg, status) => {
     if (!supabaseUrl || !serviceKey) return;
     fetch(`${supabaseUrl}/rest/v1/vercel_logs`, {
@@ -1267,6 +1310,7 @@ async function handleExtractImages(req, res, supabaseUrl, serviceKey, t0) {
   // Only PDF source files are classifiable here. Image-imports (.jpg/.png on
   // Cloudinary) are already user-uploaded photographs and don't need this pass.
   if (!file_url.toLowerCase().endsWith('.pdf')) {
+    console.log(`[extract-images] pattern=${firstId} skipped — non-pdf source`);
     return res.status(200).json({ ok: true, skipped: 'non-pdf source', images_added: 0 });
   }
 
@@ -1276,12 +1320,13 @@ async function handleExtractImages(req, res, supabaseUrl, serviceKey, t0) {
     if (!pdfRes.ok) throw new Error(`PDF fetch ${pdfRes.status}`);
     const buf = await pdfRes.arrayBuffer();
     if (buf.byteLength > IMAGE_EXTRACTION_MAX_PDF_BYTES) {
-      logFailure(`[extract-images] pattern=${pattern_id} skipped — pdf too large (${buf.byteLength} bytes)`, 200);
+      logFailure(`[extract-images] pattern=${firstId} skipped — pdf too large (${buf.byteLength} bytes)`, 200);
       return res.status(200).json({ ok: true, skipped: 'pdf too large', images_added: 0 });
     }
     pdfBase64 = Buffer.from(buf).toString('base64');
+    console.log(`[extract-images] pattern=${firstId} pdf fetched ${buf.byteLength} bytes`);
   } catch (fetchErr) {
-    logFailure(`[extract-images] pattern=${pattern_id} pdf fetch failed: ${fetchErr.message}`, 500);
+    logFailure(`[extract-images] pattern=${firstId} pdf fetch failed: ${fetchErr.message}`, 500);
     return res.status(500).json({ error: 'pdf_fetch_failed', message: fetchErr.message });
   }
 
@@ -1289,7 +1334,7 @@ async function handleExtractImages(req, res, supabaseUrl, serviceKey, t0) {
   try {
     classification = await classifyPdfPagesWithGemini({ pdfBase64, geminiKey });
   } catch (geminiErr) {
-    logFailure(`[extract-images] pattern=${pattern_id} gemini failed: ${geminiErr.message}`, 500);
+    logFailure(`[extract-images] pattern=${firstId} gemini failed: ${geminiErr.message}`, 500);
     return res.status(500).json({ error: 'classify_failed', message: geminiErr.message });
   }
 
@@ -1297,21 +1342,30 @@ async function handleExtractImages(req, res, supabaseUrl, serviceKey, t0) {
   const meaningful = pages
     .filter(p => p && typeof p.page === 'number' && MEANINGFUL_IMAGE_TYPES.has(p.type))
     .slice(0, IMAGE_EXTRACTION_PAGE_CAP);
+  console.log(`[extract-images] pattern=${firstId} classified ${pages.length} pages, ${meaningful.length} meaningful`);
 
   if (meaningful.length === 0) {
     return res.status(200).json({ ok: true, images_added: 0, total_pages: pages.length });
   }
 
-  const rows = meaningful.map((p, i) => ({
-    pattern_id,
-    user_id,
-    cloudinary_url: null,
-    image_type: p.type,
-    page_number: p.page,
-    sort_order: i,
-    caption: p.caption ? String(p.caption).slice(0, 400) : null,
-    component_name: p.component ? String(p.component).slice(0, 120) : null,
-  }));
+  // Assign each page to a pattern, then number sort_order per pattern so each
+  // pattern's grid is ordered independently.
+  const perPatternCounter = {};
+  const rows = meaningful.map((p) => {
+    const target = assignPatternForPage(p, patterns);
+    const sortOrder = (perPatternCounter[target.id] = (perPatternCounter[target.id] || 0)) ;
+    perPatternCounter[target.id] = sortOrder + 1;
+    return {
+      pattern_id: target.id,
+      user_id,
+      cloudinary_url: null,
+      image_type: p.type,
+      page_number: p.page,
+      sort_order: sortOrder,
+      caption: p.caption ? String(p.caption).slice(0, 400) : null,
+      component_name: p.component ? String(p.component).slice(0, 120) : null,
+    };
+  });
 
   try {
     const insertRes = await fetch(`${supabaseUrl}/rest/v1/pattern_images`, {
@@ -1325,21 +1379,22 @@ async function handleExtractImages(req, res, supabaseUrl, serviceKey, t0) {
       body: JSON.stringify(rows),
     });
     if (!insertRes.ok) {
-      const body = await insertRes.text();
-      throw new Error(`insert ${insertRes.status}: ${body.substring(0, 300)}`);
+      const errBody = await insertRes.text();
+      throw new Error(`insert ${insertRes.status}: ${errBody.substring(0, 300)}`);
     }
   } catch (insertErr) {
-    logFailure(`[extract-images] pattern=${pattern_id} insert failed: ${insertErr.message}`, 500);
+    logFailure(`[extract-images] pattern=${firstId} insert failed: ${insertErr.message}`, 500);
     return res.status(500).json({ error: 'insert_failed', message: insertErr.message });
   }
 
+  console.log(`[extract-images] pattern=${firstId} inserted ${rows.length} rows across ${patterns.length} pattern(s) (${Date.now() - t0}ms)`);
   if (supabaseUrl && serviceKey) {
     fetch(`${supabaseUrl}/rest/v1/vercel_logs`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}`, 'Prefer': 'return=minimal' },
       body: JSON.stringify({
         timestamp: new Date().toISOString(), level: 'info',
-        message: `[extract-images] pattern=${pattern_id} images=${rows.length} pages=${pages.length} (${Date.now() - t0}ms)`,
+        message: `[extract-images] patterns=${patterns.length} images=${rows.length} pages=${pages.length} (${Date.now() - t0}ms)`,
         source: 'serverless',
         request_path: '/api/extract-pattern?mode=extract-images',
         request_method: 'POST', status_code: 200, project_id: 'wovely',

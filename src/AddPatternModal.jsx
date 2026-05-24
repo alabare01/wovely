@@ -1526,7 +1526,7 @@ const BrowserImport = ({onSave,Btn,Photo}) => {
   );
 };
 
-const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,initialMethod,initialUrl,initialExtracted,initialCoverUrl,initialValidationReport,initialPollingJobId,isCollectionImport=false}) => {
+const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,initialMethod,initialUrl,initialExtracted,initialCoverUrl,initialFileUrl,initialValidationReport,initialPollingJobId,isCollectionImport=false}) => {
   // initialExtracted (from ImportPill queue completion) is wrapped into pdfHandoff
   // so PDFUploadForm lands directly on its review stage. initialCoverUrl is the
   // Cloudinary URL the client rendered & uploaded during the original upload
@@ -1535,7 +1535,14 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
   // initialPollingJobId (S1.5.3) is set when the pill re-opens this modal
   // *during* processing — PDFUploadForm mounts directly into the extracting
   // stage with that job_id so polling resumes seamlessly.
-  const initialHandoff = initialExtracted ? { extracted: initialExtracted, pdfText: "", fileInfo: null, coverUrl: initialCoverUrl || null } : null;
+  // On a pill→modal resume the original upload's fileInfo is gone, but the
+  // import_job carries file_url. Rehydrate fileInfo from it so the saved
+  // pattern keeps its source_file_url (needed for "View Source" AND for Bev's
+  // image extraction, which is skipped when source_file_url is missing).
+  const initialFileInfo = initialFileUrl
+    ? { url: initialFileUrl, name: (initialFileUrl.split("/").pop() || "pattern.pdf"), type: "application/pdf", coverUrl: initialCoverUrl || null }
+    : null;
+  const initialHandoff = initialExtracted ? { extracted: initialExtracted, pdfText: "", fileInfo: initialFileInfo, coverUrl: initialCoverUrl || null } : null;
   const [method,setMethod]=useState((initialExtracted||initialPollingJobId)?"pdf":(initialMethod||null)),[closing,setClosing]=useState(false);
   const [pdfHandoff,setPdfHandoff]=useState(initialHandoff);
   const extractingRef=useRef(false);

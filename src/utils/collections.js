@@ -64,7 +64,7 @@ export const createCollection = async ({ name, description, collection_type, cov
     };
     // Only send optional metadata when present — Supabase rejects unknown
     // columns from older clients otherwise, and we want this helper to
-    // stay usable from the lightweight NewCollectionModal too.
+    // stay usable from the lightweight zero-friction create paths too.
     if (part_label) body.part_label = part_label;
     if (typeof expected_part_count === "number" && expected_part_count > 0) body.expected_part_count = expected_part_count;
     const res = await fetch(`${SUPABASE_URL}/rest/v1/collections`, {
