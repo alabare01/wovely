@@ -25,3 +25,7 @@ npm-debug.log*
 # Claude Code — user-local state stays out, project-scoped commands ship with the repo
 .claude/*
 !.claude/commands/
+
+# Screenshot harness — commit the code, ignore captured output + pulled secrets
+screenshots/20*/
+screenshots/.env.vercel.local
