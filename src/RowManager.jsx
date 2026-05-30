@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo } from "react";
 import { T } from "./theme.jsx";
+import { isReferenceChip } from "./utils/docType.js";
 
 // ─── CLIENT-SIDE REPEAT BRACKET PARSER (for old patterns) ─────────────────
 const parseRepeatBrackets = (text) => {
@@ -246,7 +247,18 @@ const RowManager = ({
           const secDone=countable.filter(r=>r.done).length;
           const secTotal=countable.length;
           const secComplete=secTotal>0&&secDone===secTotal;
-          const defaultOpen=sec.rows.some(r=>!r.done)||!sec.header;
+          // S76: a named part with no rows AND no captured prose is a flat,
+          // non-interactive reference chip — never a toggle that opens to
+          // nothing. A part with captured `body` prose stays a real drill-in.
+          const hasBody=!!(sec.header&&sec.header.body&&String(sec.header.body).trim());
+          const isReference=isReferenceChip(secTotal,hasBody);
+          if(isReference) return (
+            <div key={secKey} style={{marginBottom:8,display:"flex",alignItems:"center",gap:10,padding:"10px 14px",border:`1px dashed ${T.border}`,borderRadius:10,background:T.surface,opacity:.85}}>
+              <span style={{fontSize:10,fontWeight:700,letterSpacing:".06em",color:T.ink3,background:"#fff",border:`1px solid ${T.border}`,borderRadius:6,padding:"2px 6px"}}>REF</span>
+              <span style={{fontSize:13,color:T.ink2,fontWeight:600}}>{sec.header?sec.header.text.replace(/──/g,"").trim():"Reference"}</span>
+            </div>
+          );
+          const defaultOpen=sec.rows.some(r=>!r.done)||!sec.header||hasBody;
           const open=expandedSections[secKey]!==undefined?expandedSections[secKey]:defaultOpen;
           const toggleSec=()=>setExpandedSections(prev=>({...prev,[secKey]:!open}));
           // Guest preview: show only the first 25% of rows in each section.
@@ -265,12 +277,13 @@ const RowManager = ({
                     "Overview, Sizing, Materials") have no progress to track.
                     Label them "Reference" and drop the 0-of-0 line + empty bar
                     instead of showing a misleading "0 of 0 complete" (S76 bug 2). */}
-                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{secTotal===0?"Reference":isAnonymous?`Showing ${visibleRows.length} of ${sec.rows.length} rows`:`${secDone} of ${secTotal} complete`}</div>
+                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{secTotal===0?"Read this part":isAnonymous?`Showing ${visibleRows.length} of ${sec.rows.length} rows`:`${secDone} of ${secTotal} complete`}</div>
               </div>
               {sec.header.makeCount>1&&<div style={{background:T.gold,color:"#fff",borderRadius:99,padding:"2px 8px",fontSize:10,fontWeight:700}}>×{sec.header.makeCount}</div>}
               {secTotal>0&&<div style={{width:60}}><Bar val={secDone/secTotal*100} color={secComplete?T.sage:T.terra} h={3}/></div>}
             </button>}
             {(open||!sec.header)&&<div style={{border:sec.header?`1px solid ${T.border}`:"none",borderTop:"none",borderRadius:sec.header?"0 0 10px 10px":0,overflow:"hidden",position:"relative"}}>
+              {hasBody&&<div style={{padding:"12px 14px",fontSize:13,color:T.ink2,lineHeight:1.7,whiteSpace:"pre-wrap",borderBottom:secTotal>0?`1px solid ${T.border}`:"none"}}>{sec.header.body}</div>}
               {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;return(
         <div key={r.id} id={`row-${i + 1}`} data-row={i + 1} style={{borderBottom:`1px solid ${T.border}`,background:flagStatus==="fail"?"rgba(192,84,74,0.08)":flagStatus==="warning"?"rgba(201,168,76,0.08)":r.isAction&&!rowLocked?"rgba(184,144,44,.06)":"transparent",borderLeft:flagStatus==="fail"?"3px solid #C0544A":flagStatus==="warning"?"3px solid #C9A84C":"none"}}>
           <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:13,alignItems:"flex-start",cursor:isAnonymous||rowLocked?"default":"pointer",background:isCurrent&&!rowLocked&&!isAnonymous?"rgba(155,126,200,.04)":"transparent",padding:"14px 8px",margin:"0 -8px",opacity:rowLocked?.45:1,transition:"opacity .15s"}}>

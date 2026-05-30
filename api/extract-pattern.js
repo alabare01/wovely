@@ -694,9 +694,10 @@ This component: ${componentName}
 Known abbreviations: ${JSON.stringify(sharedAbbreviationsMap || {})}
 
 Return ONLY valid JSON, no markdown, no backticks:
-{"name":"${componentName}","make_count":1,"independent":false,"rows":[{"id":"rnd-1","label":"RND 1","text":"full instruction text","stitch_count":null,"note":null,"action_item":false,"repeat_brackets":[{"sequence":"string","count":2}]}]}
+{"name":"${componentName}","make_count":1,"independent":false,"body":"","rows":[{"id":"rnd-1","label":"RND 1","text":"full instruction text","stitch_count":null,"note":null,"action_item":false,"repeat_brackets":[{"sequence":"string","count":2}]}]}
 
 Rules:
+- REFERENCE SECTIONS: if this section is narrative/reference prose with no checkable rows (e.g. an overview, sizing chart, gauge notes, finishing tips, a backing/lining note), put that prose into "body" as a plain string (preserve line breaks) and leave rows: []. Do NOT fabricate rows for prose. If the section is instructional, leave body: "" and extract rows as usual.
 - Extract EVERY round/row visible as its own entry — never skip or collapse ranges.
 - Use RND for rounds worked in the round, ROW for flat rows.
 - Expand ranges like "RND 10-23" into individual entries RND 10, RND 11... each with the same instruction.
@@ -853,6 +854,9 @@ function assembleChunkedResult({ shared, componentResults, planning }) {
       name: c.name || 'Component',
       make_count: typeof c.make_count === 'number' ? c.make_count : 1,
       independent: !!c.independent,
+      // S76 additive: narrative/reference prose for no-row sections. Optional —
+      // omitted (empty) for instructional sections and on the single-shot path.
+      body: typeof c.body === 'string' ? c.body : '',
       rows: Array.isArray(c.rows) ? c.rows : [],
     })),
     assembly_notes: shared?.assembly_notes || '',

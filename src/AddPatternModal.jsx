@@ -307,7 +307,7 @@ const buildRowsFromComponents = (components) => {
   (components || []).forEach(comp => {
     const makeCount = comp.make_count || 1;
     const label = comp.name + (makeCount > 1 ? ` (MAKE ${makeCount})` : "");
-    rows.push({ id: "header-" + (comp.name || rowId).toLowerCase().replace(/\s+/g, "-"), text: "── " + label.toUpperCase() + " ──", isHeader: true, done: false, note: "", componentName: comp.name, makeCount, independent: !!comp.independent });
+    rows.push({ id: "header-" + (comp.name || rowId).toLowerCase().replace(/\s+/g, "-"), text: "── " + label.toUpperCase() + " ──", isHeader: true, done: false, note: "", componentName: comp.name, makeCount, independent: !!comp.independent, body: comp.body || null });
     (comp.rows || []).forEach(r => {
       const isAction = !!r.action_item;
       const prefix = isAction ? "📌 " : "";

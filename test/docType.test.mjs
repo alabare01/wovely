@@ -12,6 +12,7 @@ import assert from 'node:assert/strict';
 import {
   DOC_TYPES, ROUTE, RENDER, INLINE_SECTION_MAX,
   decideImportRoute, importRouteMismatch, chooseRenderer,
+  resolveChildSourceUrl, isReferenceChip,
 } from '../src/utils/docType.js';
 
 // ── Routing regression fixtures ──────────────────────────────────────────────
@@ -76,4 +77,29 @@ test('renderer: many sections even without charts + Craft → hub', () => {
 test('renderer: graceful degradation — classifier says multi_section but only 2 light sections → inline', () => {
   // Proves the renderer leans on real structure, not the (possibly wrong) label.
   assert.equal(chooseRenderer({ sectionCount: 2, hasCharts: false, userIsCraft: false }), RENDER.INLINE);
+});
+
+// ── Part A regression: clue children inherit the import's source file URL ────
+test('child source url: parent payload wins', () => {
+  assert.equal(resolveChildSourceUrl('https://x/parent.pdf', 'https://x/import.pdf'), 'https://x/parent.pdf');
+});
+test('child source url: falls back to import handoff url when parent is empty', () => {
+  assert.equal(resolveChildSourceUrl('', 'https://x/import.pdf'), 'https://x/import.pdf');
+  assert.equal(resolveChildSourceUrl(null, 'https://x/import.pdf'), 'https://x/import.pdf');
+});
+test('child source url: never undefined (assert non-null when a url exists)', () => {
+  assert.notEqual(resolveChildSourceUrl(null, 'https://x/import.pdf'), null);
+  assert.equal(resolveChildSourceUrl(null, null), null); // genuinely none → null, not undefined
+});
+
+// ── Part D: reference section classification (body field) ────────────────────
+test('section: rows present → drill-in (not a reference chip)', () => {
+  assert.equal(isReferenceChip(8, false), false);
+  assert.equal(isReferenceChip(8, true), false);
+});
+test('section: zero rows but captured body prose → drill-in (not a chip)', () => {
+  assert.equal(isReferenceChip(0, true), false);
+});
+test('section: zero rows and no body → flat reference chip', () => {
+  assert.equal(isReferenceChip(0, false), true);
 });

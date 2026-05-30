@@ -67,6 +67,21 @@ export const INLINE_SECTION_MAX = 3;
 // Reserved for future heavy-section weighting (row-count fan-out tuning).
 export const ROW_THRESHOLD = 15;
 
+// Every clue child of a split inherits the parent import's source file URL.
+// Parent payload wins; fall back to the import handoff's URL when the modal
+// payload didn't carry it (pill→modal resume). Pure so the regression is
+// directly testable (S76 part A).
+export function resolveChildSourceUrl(parentSourceUrl, importFileUrl) {
+  return parentSourceUrl || importFileUrl || null;
+}
+
+// A named section with no rows AND no captured prose is a flat reference chip
+// (do not open an empty drill-in). A section with rows OR a `body` is a real
+// drill-in. Shared by SectionHub (the grid) and RowManager (S76 part D).
+export function isReferenceChip(rowCount, hasBody) {
+  return (rowCount || 0) === 0 && !hasBody;
+}
+
 // Pure renderer decision. STRUCTURAL, not type-driven: `document_type` only feeds
 // in via the section count upstream. Real signals only — the current `components`
 // shape has no per-section materials field, so that term from the original spec

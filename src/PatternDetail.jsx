@@ -517,6 +517,21 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
     return ()=>{cancelled=true;};
   },[p._supabaseId,p.id]);
   const renderMode=chooseRenderer({sectionCount,hasCharts,userIsCraft});
+  // Hub mode is a landing (section grid + unified materials, no tabs) that opens
+  // a scoped section view (instructions + notes). hubSection holds the selected
+  // section's header id. Inline modes keep the Materials | Instructions | Notes
+  // tabs untouched.
+  const [hubSection,setHubSection]=useState(null);
+  const isHub=renderMode===RENDER.HUB;
+  const hubLanding=isHub&&!hubSection;
+  const hubScoped=isHub&&!!hubSection;
+  const showMaterials=hubLanding||(!isHub&&tab==="materials");
+  const showRows=hubScoped||(!isHub&&tab==="rows");
+  const showNotes=hubScoped||(!isHub&&tab==="notes");
+  const hubSectionTitle=hubScoped?((rows.find(r=>r.isHeader&&r.id===hubSection)?.text||"").replace(/──/g,"").trim()):"";
+  // Reset the scoped section when navigating to a different pattern (in case
+  // this view isn't remounted per id).
+  useEffect(()=>{setHubSection(null);},[p.id,p._supabaseId]);
   return (
     <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",background:T.bg}}>
       <CSS/>
@@ -591,11 +606,11 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             );
           })()}
           <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} pinnedImageId={pinnedImageId} onTogglePin={onTogglePin} />
-          <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
+          {!isHub&&<div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
             {[["materials","Materials"],["rows","Instructions/Rows"],["notes","My Notes"]].map(([key,label])=>(
               <button key={key} onClick={()=>{setTab(key);localStorage.setItem("yh_last_tab",key);}} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>
             ))}
-          </div>
+          </div>}
         </div>
         <div style={{padding:`4px 20px ${isAnonymous?220:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
         {collectionUpgrade && (
@@ -628,7 +643,14 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             </div>
           </div>
         )}
-        {tab==="materials"&&(<>
+        {hubLanding&&(
+          <div style={{paddingTop:8}}>
+            <SectionHub rows={rows} onSelect={setHubSection} Bar={Bar}/>
+            <div style={{marginTop:28,fontFamily:T.serif,fontSize:18,color:T.ink,marginBottom:2}}>Materials</div>
+            <div style={{fontSize:12.5,color:T.ink3,marginBottom:6,lineHeight:1.5}}>Everything for the whole project, in one place.</div>
+          </div>
+        )}
+        {showMaterials&&(<>
           {(editing?draft.materials:p.materials).map((m,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${T.border}`}}>
               <div style={{width:6,height:6,borderRadius:99,background:T.terra,flexShrink:0}}/>
@@ -655,8 +677,14 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             <button onClick={()=>setShowScale(true)} style={{marginTop:12,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:10,padding:"10px",fontSize:13,fontWeight:600,cursor:"pointer"}}>⚖️ Scale pattern to different size →</button>
           </div>
         </>)}
-        {tab==="rows"&&(renderMode===RENDER.HUB
-          ? <SectionHub p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>
+        {hubScoped&&(
+          <div style={{paddingTop:4}}>
+            <button onClick={()=>{setHubSection(null);window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:10}}>← All sections</button>
+            {hubSectionTitle&&<div style={{fontFamily:T.serif,fontSize:20,color:T.ink,marginBottom:12,lineHeight:1.25}}>{hubSectionTitle}</div>}
+          </div>
+        )}
+        {showRows&&(hubScoped
+          ? <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp} focusHeaderId={hubSection}/>
           : <>
               {renderMode===RENDER.INLINE_NUDGE&&(
                 <div style={{marginBottom:14,background:"linear-gradient(135deg,#F3EEFA,rgba(255,255,255,0.82))",border:`1px solid ${T.border}`,borderRadius:14,padding:"14px 16px"}}>
@@ -669,7 +697,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             </>
         )}
         {/* Source file direct link */}
-        {tab==="materials"&&(
+        {showMaterials&&(
           <div style={{marginTop:16,borderTop:`1px solid ${T.border}`,paddingTop:14}}>
             <input ref={attachRef} type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleAttachFile} style={{display:"none"}}/>
             {p.source_file_url?(
@@ -683,8 +711,9 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             )}
           </div>
         )}
-        {tab==="notes"&&(
-          <div style={{paddingTop:10}}>
+        {showNotes&&(
+          <div style={{paddingTop:hubScoped?20:10,marginTop:hubScoped?20:0,borderTop:hubScoped?`1px solid ${T.border}`:"none"}}>
+            {hubScoped&&<div style={{fontFamily:T.serif,fontSize:16,color:T.ink,marginBottom:8}}>My Notes</div>}
             {editing?<textarea value={draft.notes} onChange={e=>setDraft({...draft,notes:e.target.value})} style={{width:"100%",minHeight:140,border:`1.5px solid ${T.border}`,borderRadius:12,padding:14,fontSize:14,lineHeight:1.75,resize:"vertical",outline:"none",color:T.ink,background:T.linen}} onFocus={e=>e.target.style.borderColor=T.terra} onBlur={e=>e.target.style.borderColor=T.border}/>
             :p.notes?<p style={{fontFamily:T.serif,fontStyle:"italic",fontSize:15,color:T.ink2,lineHeight:1.9,paddingTop:4,whiteSpace:"pre-wrap"}}>{p.notes}</p>
             :<div role="button" tabIndex={0} onClick={()=>{setDraft({...p});setEditing(true);}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setDraft({...p});setEditing(true);}}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(155,126,200,0.08)";e.currentTarget.style.borderColor=T.terra;}} onMouseLeave={e=>{e.currentTarget.style.background=T.linen;e.currentTarget.style.borderColor=T.border;}} aria-label="Add your first note" style={{background:T.linen,border:`1.5px dashed ${T.border}`,borderRadius:12,padding:"20px 16px",cursor:"pointer",textAlign:"center",transition:"background .15s, border-color .15s",outline:"none"}}>
