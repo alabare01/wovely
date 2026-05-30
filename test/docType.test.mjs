@@ -14,6 +14,7 @@ import {
   decideImportRoute, importRouteMismatch, chooseRenderer,
   resolveChildSourceUrl, isReferenceChip,
   looksLikeRowInstruction, bodyHasTrappedInstructions, clampPartIndex,
+  buildPartStrip, shortPartLabel, isActivePart,
 } from '../src/utils/docType.js';
 
 // ── Routing regression fixtures ──────────────────────────────────────────────
@@ -133,4 +134,35 @@ test('part nav: moves within range and clamps at the ends', () => {
   assert.equal(clampPartIndex(5, -1, 12), 4);  // prev
   assert.equal(clampPartIndex(0, -1, 12), 0);  // clamp at start
   assert.equal(clampPartIndex(11, 1, 12), 11); // clamp at end
+});
+
+// ── Pass 4 Part B: part strip model (current highlight + jump targets) ───────
+const STRIP_HEADERS = [
+  { id: 'h1', text: '── PART 1: OVERVIEW, SIZING ──' },
+  { id: 'h2', text: '── PART 2: GAUGE ──' },
+  { id: 'h3', text: '── PART 5: PETALS ──' },
+];
+test('part strip: one chip per part, in order, with correct numbers + labels', () => {
+  const strip = buildPartStrip(STRIP_HEADERS, 'h2');
+  assert.equal(strip.length, 3);
+  assert.deepEqual(strip.map(c => c.number), [1, 2, 3]);
+  assert.deepEqual(strip.map(c => c.id), ['h1', 'h2', 'h3']);
+  assert.equal(strip[0].label, 'OVERVIEW, SIZING'); // "Part 1:" prefix stripped
+  assert.equal(strip[2].label, 'PETALS');
+});
+test('part strip: exactly the current part is highlighted', () => {
+  const strip = buildPartStrip(STRIP_HEADERS, 'h3');
+  assert.deepEqual(strip.map(c => c.active), [false, false, true]);
+});
+test('part strip: tapping a chip targets that exact part id', () => {
+  // The chip carries the header id the jump handler uses — assert it round-trips.
+  const strip = buildPartStrip(STRIP_HEADERS, 'h1');
+  const tapped = strip.find(c => c.number === 3);
+  assert.equal(tapped.id, 'h3');
+  assert.equal(isActivePart(tapped.id, 'h3'), true);
+  assert.equal(isActivePart(tapped.id, 'h1'), false);
+});
+test('shortPartLabel: strips wrapper and Part-N prefix, keeps bare names', () => {
+  assert.equal(shortPartLabel('── PART 7: HANGING CORDS ──'), 'HANGING CORDS');
+  assert.equal(shortPartLabel('Assembly'), 'Assembly');
 });

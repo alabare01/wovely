@@ -95,6 +95,29 @@ export function clampPartIndex(index, delta, total) {
   return next >= 0 && next < total ? next : index;
 }
 
+// Short label for a part chip: strip the "── ... ──" wrapper and a leading
+// "Part N:" prefix so a chip can show just the distinctive part name.
+export function shortPartLabel(text) {
+  const c = (text || '').replace(/──/g, '').trim();
+  const m = c.match(/^part\s*\d+\s*[:.\-]?\s*(.*)$/i);
+  return (m && m[1].trim()) || c;
+}
+
+export function isActivePart(id, currentId) {
+  return id === currentId;
+}
+
+// Build the scoped-view part strip model from the ordered header rows. Pure so
+// the chip ordering + current-highlight can be tested without a DOM.
+export function buildPartStrip(headers, currentId) {
+  return (headers || []).map((h, i) => ({
+    id: h.id,
+    number: i + 1,
+    label: shortPartLabel(h.text),
+    active: isActivePart(h.id, currentId),
+  }));
+}
+
 // A named section with no rows AND no captured prose is a flat reference chip
 // (do not open an empty drill-in). A section with rows OR a `body` is a real
 // drill-in. Shared by SectionHub (the grid) and RowManager (S76 part D).

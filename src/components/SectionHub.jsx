@@ -44,7 +44,10 @@ const SectionHub = ({ rows, onSelect, Bar }) => {
   const sections = useMemo(() => splitSections(rows), [rows]);
 
   return (
-    <div>
+    // Soft lavender wash behind the grid so the frosted (translucent) cards have
+    // something to blur against — on a flat white page the glass token reads as
+    // a plain white box. This is the backdrop that makes the glass read as glass.
+    <div style={{ background: "linear-gradient(160deg, #F3EEFA 0%, #F8F6FF 70%)", borderRadius: 18, padding: "18px 16px" }}>
       <div style={{ fontFamily: T.serif, fontSize: 18, color: T.ink, marginBottom: 4 }}>The parts</div>
       <div style={{ fontSize: 12.5, color: T.ink3, marginBottom: 14, lineHeight: 1.5 }}>
         Bev laid this project out in {sections.length} parts. Tap one to work it, in any order.
@@ -65,7 +68,7 @@ const SectionHub = ({ rows, onSelect, Bar }) => {
           // (S76 part D cosmetic).
           if (isReference) {
             return (
-              <div key={key} style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: `1px dashed ${T.border}`, borderRadius: 12, background: T.surface, opacity: 0.85 }}>
+              <div key={key} style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed rgba(155,126,200,0.30)", borderRadius: 12, background: "rgba(255,255,255,0.55)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}>
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".06em", color: T.ink3, background: "#fff", border: `1px solid ${T.border}`, borderRadius: 6, padding: "2px 6px" }}>REF</span>
                 <span style={{ fontSize: 13, color: T.ink2, fontWeight: 600 }}>{name}</span>
               </div>
