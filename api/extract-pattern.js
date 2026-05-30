@@ -58,6 +58,48 @@ const SCALAR_METADATA_KEYS = [
 
 const isEmptyish = (v) => v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
 
+// ─── Section detectors (shared) ──────────────────────────────────────────────
+// Heading-oriented keyword sets used to answer one question: "does the SOURCE
+// text contain a materials / abbreviations section?" Deliberately anchored on
+// section-header vocabulary (not bare "yarn"/"hook", which appear inside every
+// pattern row) so they signal a real section rather than firing constantly.
+//
+// Three consumers share these exact regexes so the heuristic can never drift:
+//   1. the recovery pass in runSmartChunkedExtraction (below)
+//   2. the Layer 3 validator post-check in api/cron/process-queue.js
+//   3. the offline repair script in scripts/repair-empty-materials.mjs
+export const MATERIALS_SECTION_KEYWORDS = /\b(materials|supplies|notions|you(?:'ll| will) need|what you(?:'ll| will)? need|hook size|yarn weight)\b/i;
+export const ABBREVIATIONS_SECTION_KEYWORDS = /\b(abbreviations?|stitch (?:key|guide|glossary|abbreviations)|glossary|legend|key to (?:symbols|abbreviations))\b/i;
+
+// Union/dedupe two materials arrays by lowercased+trimmed name. Existing entries
+// win on collision (we only ADD names not already present); blank/nameless items
+// are dropped. Shared by the recovery pass and the legacy mergeChunkResults so
+// both have identical semantics.
+export function mergeMaterials(existing, incoming) {
+  const base = Array.isArray(existing) ? existing.filter(m => (m?.name || '').trim()) : [];
+  const seen = new Set(base.map(m => m.name.toLowerCase().trim()));
+  const add = (Array.isArray(incoming) ? incoming : []).filter(m => {
+    const key = (m?.name || '').toLowerCase().trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  return [...base, ...add];
+}
+
+// Union/dedupe two abbreviation arrays by lowercased+trimmed abbr. Existing wins.
+export function mergeAbbreviationLists(existing, incoming) {
+  const base = Array.isArray(existing) ? existing.filter(a => (a?.abbr || '').trim()) : [];
+  const seen = new Set(base.map(a => a.abbr.toLowerCase().trim()));
+  const add = (Array.isArray(incoming) ? incoming : []).filter(a => {
+    const key = (a?.abbr || '').toLowerCase().trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  return [...base, ...add];
+}
+
 function mergeChunkResults(results) {
   if (!results || results.length === 0) return null;
   if (results.length === 1) return results[0];
@@ -80,18 +122,11 @@ function mergeChunkResults(results) {
       }
     }
 
-    // Materials: concatenate and dedupe by lowercased name. Many real patterns
-    // list yarn/hook/notions across multiple pages — first-wins would drop them.
+    // Materials: union/dedupe by lowercased name via the shared helper. Many
+    // real patterns list yarn/hook/notions across multiple pages — first-wins
+    // would drop them.
     if (Array.isArray(chunk.materials) && chunk.materials.length) {
-      const existingMats = Array.isArray(merged.materials) ? merged.materials : [];
-      const seen = new Set(existingMats.map(m => (m?.name || '').toLowerCase().trim()).filter(Boolean));
-      const newMats = chunk.materials.filter(m => {
-        const key = (m?.name || '').toLowerCase().trim();
-        if (!key || seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-      merged.materials = [...existingMats, ...newMats];
+      merged.materials = mergeMaterials(merged.materials, chunk.materials);
     }
 
     if (Array.isArray(chunk.suggested_resources) && chunk.suggested_resources.length) {
@@ -128,9 +163,7 @@ function mergeChunkResults(results) {
       merged.assembly_notes = [merged.assembly_notes, chunk.assembly_notes].filter(Boolean).join(' ');
     }
     if (chunk.abbreviations?.length) {
-      const existingAbbrs = new Set(merged.abbreviations?.map(a => a.abbr) || []);
-      const newAbbrs = chunk.abbreviations.filter(a => !existingAbbrs.has(a.abbr));
-      merged.abbreviations = [...(merged.abbreviations || []), ...newAbbrs];
+      merged.abbreviations = mergeAbbreviationLists(merged.abbreviations, chunk.abbreviations);
     }
     if (chunk.abbreviations_map) {
       merged.abbreviations_map = { ...(merged.abbreviations_map || {}), ...chunk.abbreviations_map };
@@ -456,6 +489,14 @@ const TIER_SMALL_THRESHOLD = 15000;
 const TIER_OVERSIZED_THRESHOLD = 150000;
 const PER_CALL_TIMEOUT_MS = 90000;
 
+// Shared-slice boundary fallback hardening. When neither the shared-context
+// marker nor the first component's start marker can be located verbatim, the
+// blind 25% slice often cuts a materials section that lives deeper in a large
+// document. Above this size we instead locate the materials section by keyword
+// and snap the boundary to include through it (plus a window).
+const SHARED_FALLBACK_KEYWORD_MIN_CHARS = 50000;
+const MATERIALS_SECTION_WINDOW_CHARS = 4000;
+
 const planningPrompt = `You are analyzing a crochet pattern document. Identify the distinct construction sections so a downstream extractor can process them separately.
 
 A "component" is a body part, shaped piece, OR pattern section the user crochets separately — Body, Head, Tentacle, Wing, Border, Assembly, etc. For MULTI-CLUE / MULTI-PART patterns where each clue or part is a distinct section IN THIS DOCUMENT, EACH CLUE OR PART IS ITS OWN COMPONENT — list every one of them (e.g. "Clue #1", "Clue #2", "Clue #3", "Clue #4" → four components, not one). Never collapse multiple clues or parts into a single component. CRITICAL: "Tentacle (make 8)" counts as ONE component repeated eight times — DO NOT list it eight times. Include the multiplier in the component name when present (e.g. "Tentacle (x8)", "Leg (x2)").
@@ -688,6 +729,69 @@ async function extractComponentSection({ componentName, sectionText, sharedConte
   });
 }
 
+// ─── Focused recovery (materials / abbreviations) ────────────────────────────
+// When the primary pass returns an empty materials or abbreviations field even
+// though the source clearly has the section, we re-run a tiny, focused
+// extraction over the FULL document for just that field. The prompt builders are
+// exported so the offline repair script (scripts/repair-empty-materials.mjs) can
+// recover historical import_jobs with the EXACT same schema the live pass uses.
+
+export const materialsRecoveryPrompt = (text) => `You are a crochet pattern extraction specialist. Extract ONLY the materials, yarn, hook, and notions from the document below. Ignore the round/row instructions entirely — another pass handles those.
+
+Materials/yarn/hook may appear under headings like "Materials", "Supplies", "You will need", "Tools", "What you need", or as inline prose with NO heading at all. Scan the ENTIRE document, not only sections labeled "Materials". If no explicit section exists, infer from the gauge section or pattern body.
+
+yarn_weight: closest canonical name — Lace, Fingering/Sock, Sport, DK, Worsted/Aran, Bulky, Super Bulky. If the pattern gives meterage like "160 m / 50 g" or "270 m / 100 g", normalize to per-100g (160 m/50g = 320 m/100g → Sport; 270 m/100g → DK) and pick the closest. If yarn is named only by brand+line (e.g. "Yarn Art Jeans", "Alize Baby Cotton"), use the meterage. Multiple weights → primary first ("Sport/DK").
+hook_size: any "<number> mm" (e.g. "2.25 mm", "5.0 mm") or "US <letter>" (B/1 through S/19) anywhere, even inline like "2.25 mm crochet hook". Multiple sizes → list all, primary first.
+materials[]: every distinct yarn (preserve brand+line in name, colorways/quantities in amount or notes), hook, and notion (stitch markers, scissors, tapestry needle, stuffing, fishing line, glue gun, safety eyes, etc.) — even when listed as run-on prose instead of bullets.
+
+Return ONLY valid JSON, no markdown, no backticks:
+{"yarn_weight":"string","hook_size":"string","materials":[{"name":"string","amount":"string","notes":"string"}]}
+
+DOCUMENT:
+${text}`;
+
+export const abbreviationsRecoveryPrompt = (text) => `You are a crochet pattern extraction specialist. Extract ONLY the abbreviations / stitch glossary / legend from the document below. Ignore the round/row instructions entirely — another pass handles those.
+
+Abbreviations may appear in a table, legend, glossary, or definition section under headings like "Abbreviations", "Stitch Guide", "Key", or "Glossary". Scan the ENTIRE document. Include EVERY abbreviation defined, even uncommon ones. If the document defines none explicitly, return empty arrays/objects — do NOT invent standard ones here.
+
+Return ONLY valid JSON, no markdown, no backticks:
+{"abbreviations":[{"abbr":"string","meaning":"string"}],"abbreviations_map":{"sc":"single crochet","mr":"magic ring"}}
+
+DOCUMENT:
+${text}`;
+
+// Run focused materials recovery over the full document. Best-effort — callers
+// MUST wrap in try/catch; a failure here can never fail an import. Always returns
+// a normalized shape (materials is always an array).
+export async function recoverMaterials({ pdfText, geminiKey, anthropicKey }) {
+  const out = await callPrimaryWithFallback({
+    prompt: materialsRecoveryPrompt(pdfText),
+    maxTokens: 4000,
+    geminiKey,
+    anthropicKey,
+    label: 'materials-recovery',
+  });
+  return {
+    materials: Array.isArray(out?.materials) ? out.materials : [],
+    yarn_weight: typeof out?.yarn_weight === 'string' ? out.yarn_weight : '',
+    hook_size: typeof out?.hook_size === 'string' ? out.hook_size : '',
+  };
+}
+
+export async function recoverAbbreviations({ pdfText, geminiKey, anthropicKey }) {
+  const out = await callPrimaryWithFallback({
+    prompt: abbreviationsRecoveryPrompt(pdfText),
+    maxTokens: 4000,
+    geminiKey,
+    anthropicKey,
+    label: 'abbreviations-recovery',
+  });
+  return {
+    abbreviations: Array.isArray(out?.abbreviations) ? out.abbreviations : [],
+    abbreviations_map: out?.abbreviations_map && typeof out.abbreviations_map === 'object' ? out.abbreviations_map : {},
+  };
+}
+
 // Slice text from start_marker to end_marker. Falls back to a heuristic split
 // when a marker can't be located so we never lose a whole component to a bad
 // model marker. Returns { text, source } where source is 'markers' | 'fallback'.
@@ -792,7 +896,26 @@ async function runSmartChunkedExtraction({ pdfText, geminiKey, anthropicKey, pdf
     sharedEnd = sharedEndIdx + (planning.shared_context_end_marker?.length || 0);
   } else {
     const firstCompStart = planning.components[0]?.start_marker ? findMarker(pdfText, planning.components[0].start_marker) : -1;
-    sharedEnd = firstCompStart >= 0 ? firstCompStart : Math.floor(pdfText.length * 0.25);
+    if (firstCompStart >= 0) {
+      sharedEnd = firstCompStart;
+    } else {
+      // Neither the shared-context marker nor the first component's start marker
+      // matched verbatim. The blind 25% slice frequently cuts a materials section
+      // that lives deeper in a large document. When the doc is large, locate the
+      // materials section by keyword and snap the boundary to include through it
+      // (plus a window) instead of guessing 25%.
+      const pct25 = Math.floor(pdfText.length * 0.25);
+      if (pdfText.length > SHARED_FALLBACK_KEYWORD_MIN_CHARS) {
+        const m = pdfText.match(MATERIALS_SECTION_KEYWORDS);
+        const kwIdx = m ? m.index : -1;
+        sharedEnd = kwIdx >= 0
+          ? Math.min(pdfText.length, Math.max(pct25, kwIdx + MATERIALS_SECTION_WINDOW_CHARS))
+          : pct25;
+        console.log(`[smart-chunk] shared-boundary fallback: doc=${pdfText.length} kwIdx=${kwIdx} sharedEnd=${sharedEnd}`);
+      } else {
+        sharedEnd = pct25;
+      }
+    }
   }
   const sharedSlice = pdfText.slice(0, sharedEnd);
   const phaseSharedStart = Date.now();
@@ -853,6 +976,44 @@ async function runSmartChunkedExtraction({ pdfText, geminiKey, anthropicKey, pdf
   // ── Phase 4: merge (pure JS) ──
   await onPathChange?.('chunked_merging');
   const merged = assembleChunkedResult({ shared, componentResults, planning });
+
+  // ── Phase 4.5: targeted recovery ──
+  // The shared-context pass occasionally returns empty materials/abbreviations
+  // even though the document clearly has them — usually because the slice
+  // boundary cut the setup section short, or the model skipped the list. When a
+  // field is empty AND its section keywords are present in the FULL text, run a
+  // focused full-document recovery for just that field and union the result in.
+  // Best-effort: a recovery failure never fails the import.
+  const matsEmpty = !Array.isArray(merged.materials) || merged.materials.length === 0;
+  if (matsEmpty && MATERIALS_SECTION_KEYWORDS.test(pdfText)) {
+    try {
+      const rec = await recoverMaterials({ pdfText, geminiKey, anthropicKey });
+      if (rec.materials.length) {
+        merged.materials = mergeMaterials(merged.materials, rec.materials);
+        if (isEmptyish(merged.yarn_weight) && !isEmptyish(rec.yarn_weight)) merged.yarn_weight = rec.yarn_weight;
+        if (isEmptyish(merged.hook_size) && !isEmptyish(rec.hook_size)) merged.hook_size = rec.hook_size;
+      }
+      console.log(`[smart-chunk] phase=recovery field=materials recovered=${rec.materials.length}`);
+    } catch (e) {
+      console.warn(`[smart-chunk] materials recovery failed: ${e.message}`);
+    }
+  }
+  const abbrsEmpty = !Array.isArray(merged.abbreviations) || merged.abbreviations.length === 0;
+  if (abbrsEmpty && ABBREVIATIONS_SECTION_KEYWORDS.test(pdfText)) {
+    try {
+      const rec = await recoverAbbreviations({ pdfText, geminiKey, anthropicKey });
+      const recCount = rec.abbreviations.length + Object.keys(rec.abbreviations_map).length;
+      if (recCount) {
+        merged.abbreviations = mergeAbbreviationLists(merged.abbreviations, rec.abbreviations);
+        // Existing (properly-sliced) map values win over recovered ones.
+        merged.abbreviations_map = { ...rec.abbreviations_map, ...(merged.abbreviations_map || {}) };
+      }
+      console.log(`[smart-chunk] phase=recovery field=abbreviations recovered=${rec.abbreviations.length}`);
+    } catch (e) {
+      console.warn(`[smart-chunk] abbreviations recovery failed: ${e.message}`);
+    }
+  }
+
   const finalized = applyPdfMetadataTitleFallback(merged, pdfMetadataTitle, 'pdf-text-chunked');
   return { data: finalized.data, extractionMethod: finalized.extractionMethod, providerUsed: 'claude', durationMs: Date.now() - t0 };
 }

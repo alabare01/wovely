@@ -15,7 +15,7 @@
 //      - retry_count <= 0 (i.e. first failure → bumped to 1): status='pending', will retry next tick
 //      - retry_count >= 1 (already retried once → bumped to 2): status='failed', error_message set
 
-import { runPdfExtraction, runBevCheck } from '../extract-pattern.js';
+import { runPdfExtraction, runBevCheck, MATERIALS_SECTION_KEYWORDS, ABBREVIATIONS_SECTION_KEYWORDS } from '../extract-pattern.js';
 import { runVisionExtraction } from '../extract-pattern-vision.js';
 
 export const config = { maxDuration: 300 };
@@ -97,6 +97,49 @@ function serializeExtractedForBevCheck(data) {
     }
   }
   return lines.join('\n');
+}
+
+// Layer 3 — deterministic extraction post-checks. Independent of the LLM
+// BevCheck: a pure-JS comparison of what the SOURCE text contains (via the
+// shared section-keyword regexes) against what actually landed in
+// extracted_data. Appended to validation_report so the signal is persisted
+// alongside the structural checks. rawText is '' for image imports (no source
+// text to compare) — those checks report status 'skipped'.
+function buildExtractionPostChecks(data, rawText) {
+  const text = typeof rawText === 'string' ? rawText : '';
+  const haveText = text.trim().length > 0;
+  const mats = Array.isArray(data?.materials) ? data.materials.filter(m => (m?.name || '').trim()) : [];
+  const abbrs = Array.isArray(data?.abbreviations) ? data.abbreviations.filter(a => (a?.abbr || '').trim()) : [];
+
+  const sourceHasMaterials = haveText && MATERIALS_SECTION_KEYWORDS.test(text);
+  const sourceHasAbbrs = haveText && ABBREVIATIONS_SECTION_KEYWORDS.test(text);
+
+  return [
+    {
+      id: 'materials_capture',
+      label: 'Materials captured from source',
+      status: !haveText ? 'skipped' : (sourceHasMaterials && mats.length === 0 ? 'fail' : 'pass'),
+      detail: !haveText
+        ? 'No source text to compare (image import).'
+        : sourceHasMaterials
+          ? (mats.length === 0
+              ? 'Source appears to contain a materials section but no materials were extracted.'
+              : `${mats.length} material(s) extracted.`)
+          : 'No materials section detected in source.',
+    },
+    {
+      id: 'abbreviations_capture',
+      label: 'Abbreviations captured from source',
+      status: !haveText ? 'skipped' : (sourceHasAbbrs && abbrs.length === 0 ? 'fail' : 'pass'),
+      detail: !haveText
+        ? 'No source text to compare (image import).'
+        : sourceHasAbbrs
+          ? (abbrs.length === 0
+              ? 'Source appears to contain an abbreviations/legend section but none were extracted.'
+              : `${abbrs.length} abbreviation(s) extracted.`)
+          : 'No abbreviations section detected in source.',
+    },
+  ];
 }
 
 const POSTHOG_HOST = 'https://us.i.posthog.com';
@@ -493,6 +536,30 @@ export default async function handler(req, res) {
     } catch (bevErr) {
       console.warn(`[process-queue] BevCheck failed for ${claimedJob.id}: ${bevErr.message}`);
       validationReport = { error: bevErr.message.substring(0, 300) };
+    }
+
+    // Layer 3 — append deterministic post-checks to the validation report. These
+    // run regardless of whether BevCheck passed, failed, or was skipped.
+    const postCheckText = claimedJob.file_type === 'pdf' ? (claimedJob.raw_text || '') : '';
+    const postChecks = buildExtractionPostChecks(result.data, postCheckText);
+    if (validationReport && typeof validationReport === 'object') {
+      validationReport.post_checks = postChecks;
+    } else {
+      validationReport = { post_checks: postChecks };
+    }
+
+    // Layer 4 — observability. A field the SOURCE contains came out empty after
+    // assembly (the in-extraction recovery pass also missed it). This is the real
+    // signal worth alerting on, so log each failed post-check to vercel_logs.
+    for (const check of postChecks) {
+      if (check.status === 'fail') {
+        console.warn(`[process-queue] job=${claimedJob.id} post-check ${check.id} FAIL: ${check.detail}`);
+        logToVercelLogs({
+          supabaseUrl, serviceKey, level: 'warn',
+          message: `[process-queue] job=${claimedJob.id} post-check ${check.id} FAIL: ${check.detail}`,
+          status_code: 200, user_id: claimedJob.user_id,
+        });
+      }
     }
 
     await setPhase(PHASE_FINALIZING);
