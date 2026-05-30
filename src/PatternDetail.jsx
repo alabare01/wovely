@@ -10,7 +10,7 @@ import { listPatternsInCollection, partLabelFor } from "./utils/collections.js";
 import { canAccessChartImages } from "./utils/featureGates.js";
 import { fetchPatternImages, getPatternImageCount, renderAndUploadPendingImages } from "./utils/patternImages.js";
 import { ChartStripView } from "./components/ChartStrip.jsx";
-import { chooseRenderer, RENDER } from "./utils/docType.js";
+import { chooseRenderer, RENDER, clampPartIndex } from "./utils/docType.js";
 import SectionHub from "./components/SectionHub.jsx";
 
 const YarnSummaryCard = ({label, myKey, myVal, fallback, onSave}) => {
@@ -529,9 +529,14 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   const showRows=hubScoped||(!isHub&&tab==="rows");
   const showNotes=hubScoped||(!isHub&&tab==="notes");
   const hubSectionTitle=hubScoped?((rows.find(r=>r.isHeader&&r.id===hubSection)?.text||"").replace(/──/g,"").trim()):"";
-  // Reset the scoped section when navigating to a different pattern (in case
+  // Reset the scoped part when navigating to a different pattern (in case
   // this view isn't remounted per id).
   useEffect(()=>{setHubSection(null);},[p.id,p._supabaseId]);
+  // Part-to-part navigation in the scoped view (mirrors MKAL clue nav).
+  const partHeaders=rows.filter(r=>r.isHeader);
+  const hubIndex=hubScoped?partHeaders.findIndex(r=>r.id===hubSection):-1;
+  const hubTotal=partHeaders.length;
+  const goPart=(delta)=>{const ni=clampPartIndex(hubIndex,delta,partHeaders.length);if(ni!==hubIndex){setHubSection(partHeaders[ni].id);window.scrollTo({top:0});}};
   return (
     <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",background:T.bg}}>
       <CSS/>
@@ -679,7 +684,12 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
         </>)}
         {hubScoped&&(
           <div style={{paddingTop:4}}>
-            <button onClick={()=>{setHubSection(null);window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:10}}>← All sections</button>
+            <button onClick={()=>{setHubSection(null);window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:8}}>← All parts</button>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:12}}>
+              <button onClick={()=>goPart(-1)} disabled={hubIndex<=0} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex<=0?T.ink3:T.terra,cursor:hubIndex<=0?"default":"pointer",opacity:hubIndex<=0?0.4:1,fontSize:13,fontWeight:600}}>← Prev</button>
+              <span style={{fontSize:12,color:T.ink2,fontWeight:600}}>Part {hubIndex+1} of {hubTotal}</span>
+              <button onClick={()=>goPart(1)} disabled={hubIndex>=hubTotal-1} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex>=hubTotal-1?T.ink3:T.terra,cursor:hubIndex>=hubTotal-1?"default":"pointer",opacity:hubIndex>=hubTotal-1?0.4:1,fontSize:13,fontWeight:600}}>Next →</button>
+            </div>
             {hubSectionTitle&&<div style={{fontFamily:T.serif,fontSize:20,color:T.ink,marginBottom:12,lineHeight:1.25}}>{hubSectionTitle}</div>}
           </div>
         )}
@@ -689,7 +699,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
               {renderMode===RENDER.INLINE_NUDGE&&(
                 <div style={{marginBottom:14,background:"linear-gradient(135deg,#F3EEFA,rgba(255,255,255,0.82))",border:`1px solid ${T.border}`,borderRadius:14,padding:"14px 16px"}}>
                   <div style={{fontFamily:T.serif,fontSize:14,fontWeight:700,color:T.ink,marginBottom:4,lineHeight:1.3}}>Bev laid this one out in {sectionCount} parts</div>
-                  <div style={{fontSize:12,color:T.ink2,lineHeight:1.55,marginBottom:10}}>On Craft, every part gets its own space with section cards and charts you can jump between.</div>
+                  <div style={{fontSize:12,color:T.ink2,lineHeight:1.55,marginBottom:10}}>On Craft, every part gets its own space with part cards and charts you can jump between.</div>
                   <button onClick={onShowUpgrade} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"8px 16px",fontSize:12,fontWeight:600,cursor:"pointer"}}>See the full layout with Craft</button>
                 </div>
               )}

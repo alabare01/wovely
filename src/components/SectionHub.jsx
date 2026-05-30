@@ -8,18 +8,11 @@ import { isReferenceChip } from "../utils/docType.js";
 // unified materials around it). Tapping a card calls onSelect(headerId) and
 // PatternDetail opens the scoped section view (instructions + notes).
 
-// Per-card identity via a deterministic on-brand tint + index badge — no
-// per-section imagery exists in the payload, and a repeated PDF cover thumbnail
-// on every card was the identical-covers bug, so cards are differentiated by
-// number + accent color only. All tints sit inside the locked palette.
-const PALETTE = [
-  { bg: "#F3EEFA", ring: "#9B7EC8" }, // lavender (primary)
-  { bg: "#EAF1EC", ring: "#5B9B6B" }, // sage
-  { bg: "#FBF3E2", ring: "#C9A84C" }, // gold
-  { bg: "#EAEEF7", ring: "#2D3A7C" }, // navy
-  { bg: "#EFEAF6", ring: "#7A6BB0" }, // muted violet
-  { bg: "#EDF4F1", ring: "#4F8C76" }, // teal-sage
-];
+// Single lavender accent (no loud per-card colors, no repeated cover thumbnail).
+// Cards are Bev's space: glass treatment, Playfair title, a numbered lavender
+// badge, one quiet metadata line.
+const LAV = "#9B7EC8";
+const LAV_BG = "#F3EEFA";
 
 const cleanName = (text) => (text || "").replace(/──/g, "").trim() || "Section";
 
@@ -79,28 +72,28 @@ const SectionHub = ({ rows, onSelect, Bar }) => {
             );
           }
 
-          const tint = PALETTE[i % PALETTE.length];
+          // One consistent metadata line: a step count for instruction parts,
+          // "Reference" for body-only parts (reference chips are handled above).
+          const meta = total === 0 ? "Reference" : `${total} ${total === 1 ? "step" : "steps"}`;
           return (
             <button
               key={key}
               onClick={() => onSelect(sec.header?.id ?? null)}
-              style={{ ...GLASS, padding: "16px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 10, minHeight: 112, borderTop: `3px solid ${tint.ring}` }}
+              style={{ ...GLASS, padding: "14px 16px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, borderLeft: `3px solid ${LAV}` }}
             >
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 34, height: 34, borderRadius: 10, flexShrink: 0, background: tint.bg, color: tint.ring, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: T.serif, fontSize: 16, fontWeight: 700 }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <div style={{ width: 30, height: 30, borderRadius: 9, flexShrink: 0, background: LAV_BG, color: LAV, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: T.serif, fontSize: 15, fontWeight: 700 }}>
                   {complete ? "✓" : i + 1}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: T.ink, lineHeight: 1.3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{name}</div>
-                  <div style={{ fontSize: 11, color: complete ? T.sage : T.ink3, marginTop: 2 }}>
-                    {total === 0 ? "Read this part" : `${done} of ${total} steps`}
-                  </div>
+                  <div style={{ fontFamily: T.serif, fontSize: 15, fontWeight: 700, color: T.ink, lineHeight: 1.3, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", wordBreak: "break-word" }}>{name}</div>
+                  <div style={{ fontSize: 11, color: complete ? T.sage : T.ink3, marginTop: 3 }}>{meta}</div>
                 </div>
                 {sec.header?.makeCount > 1 && (
-                  <div style={{ background: T.gold, color: "#fff", borderRadius: 99, padding: "2px 7px", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>×{sec.header.makeCount}</div>
+                  <div style={{ background: LAV_BG, color: LAV, borderRadius: 99, padding: "2px 7px", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>×{sec.header.makeCount}</div>
                 )}
               </div>
-              {total > 0 && <Bar val={(done / total) * 100} color={complete ? T.sage : tint.ring} h={4} />}
+              {total > 0 && <Bar val={(done / total) * 100} color={complete ? T.sage : LAV} h={4} />}
             </button>
           );
         })}

@@ -13,6 +13,7 @@ import {
   DOC_TYPES, ROUTE, RENDER, INLINE_SECTION_MAX,
   decideImportRoute, importRouteMismatch, chooseRenderer,
   resolveChildSourceUrl, isReferenceChip,
+  looksLikeRowInstruction, bodyHasTrappedInstructions, clampPartIndex,
 } from '../src/utils/docType.js';
 
 // ── Routing regression fixtures ──────────────────────────────────────────────
@@ -102,4 +103,34 @@ test('section: zero rows but captured body prose → drill-in (not a chip)', () 
 });
 test('section: zero rows and no body → flat reference chip', () => {
   assert.equal(isReferenceChip(0, false), true);
+});
+
+// ── Part A guardrail: row instructions must never be trapped in body prose ───
+test('row detection: real stitch instructions are recognized as rows', () => {
+  assert.equal(looksLikeRowInstruction('RND 3: (sc, inc) x 6 (18)'), true);
+  assert.equal(looksLikeRowInstruction('Row 5: sc in each st across'), true);
+  assert.equal(looksLikeRowInstruction('Chain 20, sl st to join'), true);
+  assert.equal(looksLikeRowInstruction('Fasten off and weave in ends'), true);
+  assert.equal(looksLikeRowInstruction('1. Make a magic ring'), true);
+});
+test('row detection: genuine narrative prose is NOT a row', () => {
+  assert.equal(looksLikeRowInstruction('This part forms the flower center.'), false);
+  assert.equal(looksLikeRowInstruction('Gauge is not critical for this project.'), false);
+  assert.equal(looksLikeRowInstruction('Choose any worsted-weight cotton you like.'), false);
+});
+test('body additive: a Petals-style body of stitch instructions is flagged (the pass-2 bug)', () => {
+  const trappedBody = 'RND 1: 6 sc in magic ring (6)\nRND 2: inc around (12)\nRND 3: (sc, inc) x 6 (18)';
+  assert.equal(bodyHasTrappedInstructions(trappedBody), true);
+});
+test('body additive: a reference-only body (overview prose) is clean', () => {
+  const refBody = 'This tieback is worked in several pieces.\nSizing is flexible — block to taste.\nUse a tapestry needle to assemble.';
+  assert.equal(bodyHasTrappedInstructions(refBody), false);
+});
+
+// ── Part C: scoped part-to-part navigation clamps to range ───────────────────
+test('part nav: moves within range and clamps at the ends', () => {
+  assert.equal(clampPartIndex(0, 1, 12), 1);   // next
+  assert.equal(clampPartIndex(5, -1, 12), 4);  // prev
+  assert.equal(clampPartIndex(0, -1, 12), 0);  // clamp at start
+  assert.equal(clampPartIndex(11, 1, 12), 11); // clamp at end
 });

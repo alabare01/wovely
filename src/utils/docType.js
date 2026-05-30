@@ -75,6 +75,26 @@ export function resolveChildSourceUrl(parentSourceUrl, importFileUrl) {
   return parentSourceUrl || importFileUrl || null;
 }
 
+// A line that reads like a workable, checkable stitch instruction (a row), as
+// opposed to narrative prose. Used by the coverage diagnostic to catch the
+// pass-2 failure mode (instructions trapped in `body`). Broad on purpose:
+// catching an instruction hiding in prose matters more than the odd false
+// positive. Shared + tested so the guardrail can't silently drift.
+const ROW_INSTRUCTION_RE = /^\s*(?:r(?:nd|ound|ow)?\.?\s*\d+\b|round\s*\d+\b|row\s*\d+\b|\d+\s*[:.)]\s*\S|ch(?:ain)?\s+\d+\b|fasten\s+off\b|\bfo\b|magic\s+ring\b|\(\s*\d*\s*sc\b|sc\s*\d+\b|\binc\b|\bdec\b|\bsl\s*st\b)/i;
+export function looksLikeRowInstruction(line) {
+  return typeof line === 'string' && ROW_INSTRUCTION_RE.test(line);
+}
+export function bodyHasTrappedInstructions(body) {
+  return (typeof body === 'string' ? body.split(/\r?\n/) : []).some(looksLikeRowInstruction);
+}
+
+// Scoped part-to-part navigation: clamp index+delta to [0, total). Returns the
+// current index unchanged when the move would leave the range.
+export function clampPartIndex(index, delta, total) {
+  const next = index + delta;
+  return next >= 0 && next < total ? next : index;
+}
+
 // A named section with no rows AND no captured prose is a flat reference chip
 // (do not open an empty drill-in). A section with rows OR a `body` is a real
 // drill-in. Shared by SectionHub (the grid) and RowManager (S76 part D).

@@ -697,7 +697,11 @@ Return ONLY valid JSON, no markdown, no backticks:
 {"name":"${componentName}","make_count":1,"independent":false,"body":"","rows":[{"id":"rnd-1","label":"RND 1","text":"full instruction text","stitch_count":null,"note":null,"action_item":false,"repeat_brackets":[{"sequence":"string","count":2}]}]}
 
 Rules:
-- REFERENCE SECTIONS: if this section is narrative/reference prose with no checkable rows (e.g. an overview, sizing chart, gauge notes, finishing tips, a backing/lining note), put that prose into "body" as a plain string (preserve line breaks) and leave rows: []. Do NOT fabricate rows for prose. If the section is instructional, leave body: "" and extract rows as usual.
+- ROWS FIRST (most important): extract EVERY workable stitch instruction as its own checkable entry in "rows" — every numbered round/row ("RND 3: ...", "Row 5: ..."), every "Chain 8" / "Ch 20", every stitch sequence, every increase/decrease step, every "fasten off", and every "sew/attach X to Y" assembly step. These are the checkable items the user ticks off while crocheting.
+- "body" is ADDITIVE and REFERENCE-ONLY. It holds ONLY genuine narrative prose that is NOT itself a stitch instruction: a short intro paragraph, an overview, sizing/gauge discussion, troubleshooting, or general construction notes. NEVER move a stitch instruction out of "rows" into "body". "body" must contain zero row-able instructions.
+- A part MAY have BOTH: a short intro in "body" AND its checkable "rows". Capture both when both exist (this is the common case for an instruction part that opens with a sentence of context).
+- A part that genuinely has NO stitch instructions in the source (e.g. Overview/Sizing, Gauge, a Hidden Backing note) gets "body" filled and rows: []. A part that HAS instructions MUST keep every one of them in "rows", even when it also has an intro paragraph in "body".
+- When unsure whether a line is prose or a row, treat it as a ROW.
 - Extract EVERY round/row visible as its own entry — never skip or collapse ranges.
 - Use RND for rounds worked in the round, ROW for flat rows.
 - Expand ranges like "RND 10-23" into individual entries RND 10, RND 11... each with the same instruction.
