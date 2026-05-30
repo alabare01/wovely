@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "Session 77",
+    date: "2026-05-30",
+    updates: [
+      { emoji: "🔑", text: "Started a pattern as a guest? You can now create an account right from the menu and keep everything you've made — or sign out to switch accounts" },
+      { emoji: "⬆️", text: "My Wovely now opens right at the top after you sign in" },
+      { emoji: "✨", text: "When a project needs Craft, Bev now points you to the right plan" },
+    ]
+  },
+  {
     version: "Session 76",
     date: "2026-05-30",
     updates: [
