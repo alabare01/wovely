@@ -33,6 +33,7 @@ import {
   readCachedIsAnonymous, writeCachedIsAnonymous, clearCachedIsAnonymous,
 } from "./utils/tierUtils.js";
 import { canAccess, requiredTier, ANON_PATTERN_CAP } from "./utils/featureGates.js";
+import { DOC_TYPES, importRouteMismatch } from "./utils/docType.js";
 
 if (typeof document !== "undefined" && !document.getElementById("sb-font")) {
   const l = document.createElement("link");
@@ -2726,14 +2727,31 @@ export default function Wovely() {
     setActiveImportJob(null);
     posthog.capture("pattern_uploaded",{file_type:p.source_file_type||"unknown"});
 
+    // S76 document-type router. `document_type` (from the planner) is additive:
+    // when it is missing or unrecognized we fall through to the existing
+    // structural behavior unchanged. The ONE behavior it changes is
+    // multi_section_pattern — ONE finished object made of named parts (e.g.
+    // Dani's tieback). That must stay a SINGLE pattern with its sections in
+    // `components`; it must NOT be split into a collection and must NOT trigger
+    // the "want to collect this?" suggestion. single_pattern / pattern_book /
+    // mkal keep their existing paths.
+    const docType = p.document_type || null;
+    const componentCount = Array.isArray(p.components) ? p.components.length : 0;
+    // Structural-guard mismatch logging (do not silently override on day one).
+    if (docType && importRouteMismatch(docType, componentCount)) {
+      console.log(`[doc-type-router] classifier=${docType} structural=${componentCount > 1 ? "multi" : "single"} mismatch title="${p.title || ""}"`);
+    }
+    const forceSinglePattern = docType === DOC_TYPES.MULTI_SECTION;
+
     // Multi-component collection import → split. Each component becomes its
     // own pattern row, linked to a single collection. Only kicks in when
     // BOTH conditions hold: this is a collection-flavored import AND the
     // extraction produced more than one component. Standalone imports and
     // single-component collection imports keep the existing single-insert
-    // path below unchanged.
+    // path below unchanged. A multi_section_pattern is never split, even from a
+    // collection surface — it stays one pattern (which becomes one clue).
     const isCollectionImportEarly = !!collectionContext?.id || !!startingCollection;
-    if (isCollectionImportEarly && Array.isArray(p.components) && p.components.length > 1) {
+    if (!forceSinglePattern && isCollectionImportEarly && Array.isArray(p.components) && p.components.length > 1) {
       await runMultiComponentCollectionSave(p);
       return;
     }
@@ -2866,12 +2884,13 @@ export default function Wovely() {
                 navigate("/collections/" + newCollection.id);
               }
               setStartingCollection(false);
-            } else if (p._multiPart && p._multiPart.collection_name) {
+            } else if (!forceSinglePattern && p._multiPart && p._multiPart.collection_name) {
               // Standard import — the planner detected multi-part. Tier
               // gating lives one layer up: Craft sees the post-import
               // "want to start a collection?" prompt; Free/Pro sees the
               // contextual upgrade banner on PatternDetail. Both paths
-              // leave the pattern as a normal standalone import.
+              // leave the pattern as a normal standalone import. Suppressed
+              // for multi_section_pattern (one object, never a collection).
               const linkedPattern = { ...localPattern, id: rows[0].id, _supabaseId: rows[0].id };
               if (tier === TIER_CRAFT) {
                 setCollectionSuggestion({ pattern: linkedPattern, meta: p._multiPart });
