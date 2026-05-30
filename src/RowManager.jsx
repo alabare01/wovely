@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo } from "react";
 import { T } from "./theme.jsx";
+import { isReferenceChip } from "./utils/docType.js";
 
 // ─── CLIENT-SIDE REPEAT BRACKET PARSER (for old patterns) ─────────────────
 const parseRepeatBrackets = (text) => {
@@ -101,6 +102,10 @@ const RowManager = ({
   onViewSource,
   isAnonymous = false,
   onSignUp,
+  // S76 hub: when set, render ONLY the section whose header row has this id (a
+  // focused drill-in). rows/setRows/onSave stay the FULL pattern, so all the
+  // global-index toggle, progress, and milestone logic is unchanged.
+  focusHeaderId = null,
 }) => {
   const [noteEdit,setNoteEdit]=useState(null);
   const [expandedSections,setExpandedSections]=useState({});
@@ -219,7 +224,7 @@ const RowManager = ({
       {/* Pattern Notes — designer's read-only preamble. Reads pattern_notes
           only (post-migration 007 split); notes is the user's journal and
           belongs to My Notes, not here. No fallback between the two. */}
-      {p.pattern_notes&&<div style={{marginBottom:12}}>
+      {!focusHeaderId&&p.pattern_notes&&<div style={{marginBottom:12}}>
         <button onClick={()=>setNoteEdit(noteEdit==="pnotes"?null:"pnotes")} style={{width:"100%",background:T.linen,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 14px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <span style={{fontSize:13,color:T.ink2,fontWeight:500}}>📋 Pattern Notes — tap to expand</span>
           <span style={{fontSize:12,color:T.ink3}}>{noteEdit==="pnotes"?"▼":"▶"}</span>
@@ -236,12 +241,24 @@ const RowManager = ({
       ):(()=>{
         const seenAbbr=new Set();
         return linearSections.map((sec,si)=>{
+          if(focusHeaderId&&sec.header?.id!==focusHeaderId)return null;
           const secKey=sec.header?.id||"sec-"+si;
           const countable=sec.rows.filter(r=>!r.isNoteOnly);
           const secDone=countable.filter(r=>r.done).length;
           const secTotal=countable.length;
           const secComplete=secTotal>0&&secDone===secTotal;
-          const defaultOpen=sec.rows.some(r=>!r.done)||!sec.header;
+          // S76: a named part with no rows AND no captured prose is a flat,
+          // non-interactive reference chip — never a toggle that opens to
+          // nothing. A part with captured `body` prose stays a real drill-in.
+          const hasBody=!!(sec.header&&sec.header.body&&String(sec.header.body).trim());
+          const isReference=isReferenceChip(secTotal,hasBody);
+          if(isReference) return (
+            <div key={secKey} style={{marginBottom:8,display:"flex",alignItems:"center",gap:10,padding:"10px 14px",border:`1px dashed ${T.border}`,borderRadius:10,background:T.surface,opacity:.85}}>
+              <span style={{fontSize:10,fontWeight:700,letterSpacing:".06em",color:T.ink3,background:"#fff",border:`1px solid ${T.border}`,borderRadius:6,padding:"2px 6px"}}>REF</span>
+              <span style={{fontSize:13,color:T.ink2,fontWeight:600}}>{sec.header?sec.header.text.replace(/──/g,"").trim():"Reference"}</span>
+            </div>
+          );
+          const defaultOpen=sec.rows.some(r=>!r.done)||!sec.header||hasBody;
           const open=expandedSections[secKey]!==undefined?expandedSections[secKey]:defaultOpen;
           const toggleSec=()=>setExpandedSections(prev=>({...prev,[secKey]:!open}));
           // Guest preview: show only the first 25% of rows in each section.
@@ -252,19 +269,24 @@ const RowManager = ({
           const visibleRows = sec.rows.slice(0, previewLimit);
           const hiddenRowCount = sec.rows.length - visibleRows.length;
           return (<div key={secKey} style={{marginBottom:8}}>
-            {sec.header&&<button onClick={toggleSec} style={{width:"100%",background:secComplete?T.sageLt:T.linen,border:`1px solid ${secComplete?"rgba(92,122,94,.3)":T.border}`,borderRadius:open?"10px 10px 0 0":10,padding:"12px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,textAlign:"left"}}>
+            {sec.header&&!focusHeaderId&&<button onClick={toggleSec} style={{width:"100%",background:secComplete?T.sageLt:T.linen,border:`1px solid ${secComplete?"rgba(92,122,94,.3)":T.border}`,borderRadius:open?"10px 10px 0 0":10,padding:"12px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,textAlign:"left"}}>
               <span style={{fontSize:12,color:T.ink3}}>{open?"▼":"▶"}</span>
               <div style={{flex:1}}>
                 <div style={{fontSize:13,fontWeight:700,color:secComplete?T.sage:T.terra}}>{sec.header.text.replace(/──/g,"").trim()}{secComplete?" ✓":""}</div>
-                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{isAnonymous?`Showing ${visibleRows.length} of ${sec.rows.length} rows`:`${secDone} of ${secTotal} complete`}</div>
+                {/* Narrative sections (a named part with no checkable rows — e.g.
+                    "Overview, Sizing, Materials") have no progress to track.
+                    Label them "Reference" and drop the 0-of-0 line + empty bar
+                    instead of showing a misleading "0 of 0 complete" (S76 bug 2). */}
+                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{secTotal===0?"Read this part":isAnonymous?`Showing ${visibleRows.length} of ${sec.rows.length} rows`:`${secDone} of ${secTotal} complete`}</div>
               </div>
               {sec.header.makeCount>1&&<div style={{background:T.gold,color:"#fff",borderRadius:99,padding:"2px 8px",fontSize:10,fontWeight:700}}>×{sec.header.makeCount}</div>}
-              <div style={{width:60}}><Bar val={secTotal?secDone/secTotal*100:0} color={secComplete?T.sage:T.terra} h={3}/></div>
+              {secTotal>0&&<div style={{width:60}}><Bar val={secDone/secTotal*100} color={secComplete?T.sage:T.terra} h={3}/></div>}
             </button>}
-            {(open||!sec.header)&&<div style={{border:sec.header?`1px solid ${T.border}`:"none",borderTop:"none",borderRadius:sec.header?"0 0 10px 10px":0,overflow:"hidden",position:"relative"}}>
+            {(open||!sec.header||focusHeaderId)&&<div style={{border:sec.header&&!focusHeaderId?`1px solid ${T.border}`:"none",borderTop:"none",borderRadius:sec.header&&!focusHeaderId?"0 0 10px 10px":0,overflow:"hidden",position:"relative"}}>
+              {hasBody&&<div style={{padding:"12px 14px",fontSize:13,color:T.ink2,lineHeight:1.7,whiteSpace:"pre-wrap",borderBottom:secTotal>0?`1px solid ${T.border}`:"none"}}>{sec.header.body}</div>}
               {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;return(
-        <div key={r.id} id={`row-${i + 1}`} data-row={i + 1} style={{borderBottom:`1px solid ${T.border}`,background:flagStatus==="fail"?"rgba(192,84,74,0.08)":flagStatus==="warning"?"rgba(201,168,76,0.08)":r.isAction&&!rowLocked?"rgba(184,144,44,.06)":"transparent",borderLeft:flagStatus==="fail"?"3px solid #C0544A":flagStatus==="warning"?"3px solid #C9A84C":"none"}}>
-          <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:13,alignItems:"flex-start",cursor:isAnonymous||rowLocked?"default":"pointer",background:isCurrent&&!rowLocked&&!isAnonymous?"rgba(155,126,200,.04)":"transparent",padding:"14px 8px",margin:"0 -8px",opacity:rowLocked?.45:1,transition:"opacity .15s"}}>
+        <div key={r.id} id={`row-${i + 1}`} data-row={i + 1} style={{borderBottom:`1px solid ${focusHeaderId?"rgba(237,228,247,0.55)":T.border}`,background:flagStatus==="fail"?"rgba(192,84,74,0.08)":flagStatus==="warning"?"rgba(201,168,76,0.08)":r.isAction&&!rowLocked?"rgba(184,144,44,.06)":"transparent",borderLeft:flagStatus==="fail"?"3px solid #C0544A":flagStatus==="warning"?"3px solid #C9A84C":"none"}}>
+          <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:13,alignItems:"flex-start",cursor:isAnonymous||rowLocked?"default":"pointer",background:isCurrent&&!rowLocked&&!isAnonymous?"rgba(155,126,200,.04)":"transparent",padding:focusHeaderId?"17px 8px":"14px 8px",margin:"0 -8px",opacity:rowLocked?.45:1,transition:"opacity .15s"}}>
             <div style={{width:26,height:26,borderRadius:7,flexShrink:0,marginTop:1,background:r.done?T.terra:rowLocked?"#E8E4DF":T.surface,border:"1.5px solid "+(r.done?T.terra:isCurrent&&!rowLocked&&!isAnonymous?T.terra:rowLocked?"#D5D0CA":T.border),display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",boxShadow:r.done?"0 2px 8px rgba(155,126,200,.3)":isCurrent&&!rowLocked&&!isAnonymous?"0 0 0 3px rgba(155,126,200,.15)":"none"}}>
               {r.done&&<span style={{color:"#fff",fontSize:13,fontWeight:700}}>✓</span>}{!r.done&&isCurrent&&!rowLocked&&!isAnonymous&&<div style={{width:8,height:8,borderRadius:99,background:T.terra}}/>}
             </div>
@@ -301,7 +323,7 @@ const RowManager = ({
           </div>);
         });
       })()}
-      {isAnonymous ? (
+      {!focusHeaderId && (isAnonymous ? (
         // Guest preview wall — fade overlay above a glass CTA card. Renders
         // after the truncated rows so the page reads "first taste, then a
         // gentle nudge to convert". onSignUp opens the AuthWallModal in
@@ -377,10 +399,10 @@ const RowManager = ({
           <input value={newRow} onChange={e=>setNewRow(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addRow()} placeholder="Add a row or step…" style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:11,padding:"10px 14px",fontSize:13,color:T.ink,background:T.linen,outline:"none"}} onFocus={e=>e.target.style.borderColor=T.terra} onBlur={e=>e.target.style.borderColor=T.border}/>
           <button onClick={addRow} style={{background:T.terra,color:"#fff",border:"none",borderRadius:11,padding:"10px 18px",fontSize:22,cursor:"pointer",lineHeight:1,boxShadow:"0 4px 12px rgba(155,126,200,.35)"}}>+</button>
         </div>
-      )}
+      ))}
       {/* Floating source pattern pill — hidden for guests so it doesn't
           collide with the sticky signup bar at the same screen position. */}
-      {p.source_file_url&&onViewSource&&!isAnonymous&&<button onClick={onViewSource} style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:200,background:T.terra,color:"#fff",border:"none",borderRadius:999,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.4)",whiteSpace:"nowrap"}}>📄 View Source Pattern →</button>}
+      {p.source_file_url&&onViewSource&&!isAnonymous&&!focusHeaderId&&<button onClick={onViewSource} style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:200,background:T.terra,color:"#fff",border:"none",borderRadius:999,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.4)",whiteSpace:"nowrap"}}>📄 View Source Pattern →</button>}
     </>
   );
 };

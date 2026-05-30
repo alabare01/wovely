@@ -10,6 +10,8 @@ import { listPatternsInCollection, partLabelFor } from "./utils/collections.js";
 import { canAccessChartImages } from "./utils/featureGates.js";
 import { fetchPatternImages, getPatternImageCount, renderAndUploadPendingImages } from "./utils/patternImages.js";
 import { ChartStripView } from "./components/ChartStrip.jsx";
+import { chooseRenderer, RENDER, clampPartIndex, buildPartStrip } from "./utils/docType.js";
+import SectionHub from "./components/SectionHub.jsx";
 
 const YarnSummaryCard = ({label, myKey, myVal, fallback, onSave}) => {
   const display = myVal || fallback;
@@ -499,6 +501,47 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   const skeinDisplay=estSkeins(p)>0?"~"+estSkeins(p)+(p.skeins>0?" skeins":" skeins (est.)"):"Not listed";
   const saveMyField=(key,val)=>{const updated={...p,rows,[key]:val||null};onSave(updated);};
   const detailPhoto=p.cover_image_url||pdfThumbUrl(p.source_file_url)||p.photo;
+  // S76 renderer selection — STRUCTURAL (section count + charts + tier), so it
+  // degrades gracefully if the classifier was wrong. sectionCount comes from the
+  // header rows (the named parts); hasCharts reuses the same displayable count as
+  // the chart strip. inline / inline_with_upgrade_nudge keep the existing view;
+  // hub is the Craft hub-and-spoke for complex multi-section objects.
+  const userIsCraft=canAccessChartImages(tier,isAnonymous);
+  const sectionCount=rows.filter(r=>r.isHeader).length||(Array.isArray(p.components)?p.components.length:0);
+  const [hasCharts,setHasCharts]=useState(false);
+  useEffect(()=>{
+    const pid=p._supabaseId||p.id;
+    if(!pid){setHasCharts(false);return;}
+    let cancelled=false;
+    (async()=>{const{data}=await getPatternImageCount(pid);if(!cancelled)setHasCharts((typeof data==="number"?data:0)>0);})();
+    return ()=>{cancelled=true;};
+  },[p._supabaseId,p.id]);
+  const renderMode=chooseRenderer({sectionCount,hasCharts,userIsCraft});
+  // Hub mode is a landing (section grid + unified materials, no tabs) that opens
+  // a scoped section view (instructions + notes). hubSection holds the selected
+  // section's header id. Inline modes keep the Materials | Instructions | Notes
+  // tabs untouched.
+  const [hubSection,setHubSection]=useState(null);
+  const isHub=renderMode===RENDER.HUB;
+  const hubLanding=isHub&&!hubSection;
+  const hubScoped=isHub&&!!hubSection;
+  const showMaterials=hubLanding||(!isHub&&tab==="materials");
+  const showRows=hubScoped||(!isHub&&tab==="rows");
+  const showNotes=hubScoped||(!isHub&&tab==="notes");
+  const hubSectionTitle=hubScoped?((rows.find(r=>r.isHeader&&r.id===hubSection)?.text||"").replace(/──/g,"").trim()):"";
+  // Reset the scoped part when navigating to a different pattern (in case
+  // this view isn't remounted per id).
+  useEffect(()=>{setHubSection(null);},[p.id,p._supabaseId]);
+  // Part-to-part navigation in the scoped view (mirrors MKAL clue nav).
+  const partHeaders=rows.filter(r=>r.isHeader);
+  const hubIndex=hubScoped?partHeaders.findIndex(r=>r.id===hubSection):-1;
+  const hubTotal=partHeaders.length;
+  const jumpToPart=(id)=>{if(id&&id!==hubSection){setHubSection(id);window.scrollTo({top:0});}};
+  const goPart=(delta)=>{const ni=clampPartIndex(hubIndex,delta,partHeaders.length);if(ni!==hubIndex)jumpToPart(partHeaders[ni].id);};
+  const partStrip=buildPartStrip(partHeaders,hubSection);
+  // Scroll the current chip into view when the scoped part changes.
+  const activeChipRef=useRef(null);
+  useEffect(()=>{if(hubScoped)activeChipRef.current?.scrollIntoView({inline:"center",block:"nearest"});},[hubSection,hubScoped]);
   return (
     <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",background:T.bg}}>
       <CSS/>
@@ -573,11 +616,11 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             );
           })()}
           <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} pinnedImageId={pinnedImageId} onTogglePin={onTogglePin} />
-          <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
+          {!isHub&&<div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
             {[["materials","Materials"],["rows","Instructions/Rows"],["notes","My Notes"]].map(([key,label])=>(
               <button key={key} onClick={()=>{setTab(key);localStorage.setItem("yh_last_tab",key);}} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>
             ))}
-          </div>
+          </div>}
         </div>
         <div style={{padding:`4px 20px ${isAnonymous?220:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
         {collectionUpgrade && (
@@ -610,7 +653,14 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             </div>
           </div>
         )}
-        {tab==="materials"&&(<>
+        {hubLanding&&(
+          <div style={{paddingTop:8}}>
+            <SectionHub rows={rows} onSelect={setHubSection} Bar={Bar}/>
+            <div style={{marginTop:28,fontFamily:T.serif,fontSize:18,color:T.ink,marginBottom:2}}>Materials</div>
+            <div style={{fontSize:12.5,color:T.ink3,marginBottom:6,lineHeight:1.5}}>Everything for the whole project, in one place.</div>
+          </div>
+        )}
+        {showMaterials&&(<>
           {(editing?draft.materials:p.materials).map((m,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${T.border}`}}>
               <div style={{width:6,height:6,borderRadius:99,background:T.terra,flexShrink:0}}/>
@@ -625,18 +675,60 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
           </div>}
           <div style={{marginTop:showYarnTip?12:20,background:`linear-gradient(135deg,${T.terraLt},${T.card})`,borderRadius:14,padding:"14px 16px",border:`1px solid ${T.border}`}}>
             <div style={{fontFamily:T.serif,fontSize:14,color:T.ink,marginBottom:10}}>Yarn Summary</div>
+            {/* Only surface a field the source actually specified (or one the
+                user has logged for themselves). Hiding unset fields beats a wall
+                of "Not listed" cards next to the real ones (S76 bug 4). */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-              <YarnSummaryCard label="Total yardage" myKey="my_yardage" myVal={p.my_yardage} fallback={yardDisplay} onSave={saveMyField}/>
-              <YarnSummaryCard label="Skeins needed" myKey="my_skeins" myVal={p.my_skeins} fallback={skeinDisplay} onSave={saveMyField}/>
-              <YarnSummaryCard label="Hook size" myKey="my_hook_size" myVal={p.my_hook_size} fallback={p.hook||"Not listed"} onSave={saveMyField}/>
-              <YarnSummaryCard label="Yarn weight" myKey="my_yarn_weight" myVal={p.my_yarn_weight} fallback={p.weight||"Not listed"} onSave={saveMyField}/>
+              {(p.my_yardage||estYards(p)>0)&&<YarnSummaryCard label="Total yardage" myKey="my_yardage" myVal={p.my_yardage} fallback={estYards(p)>0?yardDisplay:""} onSave={saveMyField}/>}
+              {(p.my_skeins||estSkeins(p)>0)&&<YarnSummaryCard label="Skeins needed" myKey="my_skeins" myVal={p.my_skeins} fallback={estSkeins(p)>0?skeinDisplay:""} onSave={saveMyField}/>}
+              {(p.my_hook_size||p.hook)&&<YarnSummaryCard label="Hook size" myKey="my_hook_size" myVal={p.my_hook_size} fallback={p.hook||""} onSave={saveMyField}/>}
+              {(p.my_yarn_weight||p.weight)&&<YarnSummaryCard label="Yarn weight" myKey="my_yarn_weight" myVal={p.my_yarn_weight} fallback={p.weight||""} onSave={saveMyField}/>}
             </div>
             <button onClick={()=>setShowScale(true)} style={{marginTop:12,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:10,padding:"10px",fontSize:13,fontWeight:600,cursor:"pointer"}}>⚖️ Scale pattern to different size →</button>
           </div>
         </>)}
-        {tab==="rows"&&<RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>}
+        {hubScoped&&(
+          <div style={{paddingTop:4}}>
+            <button onClick={()=>{setHubSection(null);window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:8}}>← All parts</button>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:12}}>
+              <button onClick={()=>goPart(-1)} disabled={hubIndex<=0} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex<=0?T.ink3:T.terra,cursor:hubIndex<=0?"default":"pointer",opacity:hubIndex<=0?0.4:1,fontSize:13,fontWeight:600}}>← Prev</button>
+              <span style={{fontSize:12,color:T.ink2,fontWeight:600}}>Part {hubIndex+1} of {hubTotal}</span>
+              <button onClick={()=>goPart(1)} disabled={hubIndex>=hubTotal-1} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex>=hubTotal-1?T.ink3:T.terra,cursor:hubIndex>=hubTotal-1?"default":"pointer",opacity:hubIndex>=hubTotal-1?0.4:1,fontSize:13,fontWeight:600}}>Next →</button>
+            </div>
+            {/* Persistent part strip — every part one tap away, so a "see Part 5"
+                reference from Part 2 doesn't mean clicking Next three times. */}
+            {partStrip.length>1&&(
+              <div style={{display:"flex",gap:8,overflowX:"auto",padding:"2px 0 12px",WebkitOverflowScrolling:"touch"}}>
+                {partStrip.map(chip=>(
+                  <button key={chip.id} ref={chip.active?activeChipRef:null} onClick={()=>jumpToPart(chip.id)}
+                    style={{flexShrink:0,display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:99,cursor:"pointer",maxWidth:170,
+                      background:chip.active?T.terra:"rgba(255,255,255,0.72)",color:chip.active?"#fff":T.ink2,
+                      border:`1px solid ${chip.active?T.terra:T.border}`,backdropFilter:"blur(10px)",WebkitBackdropFilter:"blur(10px)",
+                      fontSize:12,fontWeight:chip.active?700:600,whiteSpace:"nowrap"}}>
+                    <span style={{fontFamily:T.serif,fontWeight:700}}>{chip.number}</span>
+                    {chip.label&&<span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textTransform:"capitalize"}}>{chip.label.toLowerCase()}</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+            {hubSectionTitle&&<div style={{fontFamily:T.serif,fontSize:20,color:T.ink,marginBottom:12,lineHeight:1.25}}>{hubSectionTitle}</div>}
+          </div>
+        )}
+        {showRows&&(hubScoped
+          ? <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp} focusHeaderId={hubSection}/>
+          : <>
+              {renderMode===RENDER.INLINE_NUDGE&&(
+                <div style={{marginBottom:14,background:"linear-gradient(135deg,#F3EEFA,rgba(255,255,255,0.82))",border:`1px solid ${T.border}`,borderRadius:14,padding:"14px 16px"}}>
+                  <div style={{fontFamily:T.serif,fontSize:14,fontWeight:700,color:T.ink,marginBottom:4,lineHeight:1.3}}>Bev laid this one out in {sectionCount} parts</div>
+                  <div style={{fontSize:12,color:T.ink2,lineHeight:1.55,marginBottom:10}}>On Craft, every part gets its own space with part cards and charts you can jump between.</div>
+                  <button onClick={onShowUpgrade} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"8px 16px",fontSize:12,fontWeight:600,cursor:"pointer"}}>See the full layout with Craft</button>
+                </div>
+              )}
+              <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>
+            </>
+        )}
         {/* Source file direct link */}
-        {tab==="materials"&&(
+        {showMaterials&&(
           <div style={{marginTop:16,borderTop:`1px solid ${T.border}`,paddingTop:14}}>
             <input ref={attachRef} type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={handleAttachFile} style={{display:"none"}}/>
             {p.source_file_url?(
@@ -650,8 +742,9 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             )}
           </div>
         )}
-        {tab==="notes"&&(
-          <div style={{paddingTop:10}}>
+        {showNotes&&(
+          <div style={{paddingTop:hubScoped?20:10,marginTop:hubScoped?20:0,borderTop:hubScoped?`1px solid ${T.border}`:"none"}}>
+            {hubScoped&&<div style={{fontFamily:T.serif,fontSize:16,color:T.ink,marginBottom:8}}>My Notes</div>}
             {editing?<textarea value={draft.notes} onChange={e=>setDraft({...draft,notes:e.target.value})} style={{width:"100%",minHeight:140,border:`1.5px solid ${T.border}`,borderRadius:12,padding:14,fontSize:14,lineHeight:1.75,resize:"vertical",outline:"none",color:T.ink,background:T.linen}} onFocus={e=>e.target.style.borderColor=T.terra} onBlur={e=>e.target.style.borderColor=T.border}/>
             :p.notes?<p style={{fontFamily:T.serif,fontStyle:"italic",fontSize:15,color:T.ink2,lineHeight:1.9,paddingTop:4,whiteSpace:"pre-wrap"}}>{p.notes}</p>
             :<div role="button" tabIndex={0} onClick={()=>{setDraft({...p});setEditing(true);}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setDraft({...p});setEditing(true);}}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(155,126,200,0.08)";e.currentTarget.style.borderColor=T.terra;}} onMouseLeave={e=>{e.currentTarget.style.background=T.linen;e.currentTarget.style.borderColor=T.border;}} aria-label="Add your first note" style={{background:T.linen,border:`1.5px dashed ${T.border}`,borderRadius:12,padding:"20px 16px",cursor:"pointer",textAlign:"center",transition:"background .15s, border-color .15s",outline:"none"}}>

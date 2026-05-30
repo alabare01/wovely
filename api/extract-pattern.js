@@ -497,7 +497,20 @@ const PER_CALL_TIMEOUT_MS = 90000;
 const SHARED_FALLBACK_KEYWORD_MIN_CHARS = 50000;
 const MATERIALS_SECTION_WINDOW_CHARS = 4000;
 
-const planningPrompt = `You are analyzing a crochet pattern document. Identify the distinct construction sections so a downstream extractor can process them separately.
+// S76 doc-type architecture: document_type is classified in this single planning
+// prompt (classify-first ordering — Bev commits to the frame, then enumerates).
+// S75 checkpoint: after ~10-15 real imports, revisit whether one prompt is enough.
+// If multi_section_pattern vs pattern_book misclassification is high, split the
+// classification into its own dedicated call.
+const planningPrompt = `You are analyzing a crochet pattern document. First decide WHAT KIND of document it is, then identify the distinct construction sections so a downstream extractor can process them separately.
+
+═══ DOCUMENT TYPE (decide this FIRST) ═══
+Classify the document as exactly one of:
+- single_pattern: one finished object, one continuous run of instructions.
+- multi_section_pattern: ONE finished object assembled from multiple named parts present together in the document (e.g. a tieback = flower + leaves + band + ties). All parts shipped at once. NOT time-released.
+- pattern_book: MULTIPLE independent finished objects in one document. Each could stand alone as its own pattern.
+- mkal: ONE object revealed as time-released clues (Clue 1, Clue 2...).
+The hardest call is multi_section_pattern vs pattern_book. Discriminator: do the parts assemble into ONE object (multi_section_pattern) or are they N separate objects (pattern_book)? When unsure, prefer keeping parts together (multi_section_pattern).
 
 A "component" is a body part, shaped piece, OR pattern section the user crochets separately — Body, Head, Tentacle, Wing, Border, Assembly, etc. For MULTI-CLUE / MULTI-PART patterns where each clue or part is a distinct section IN THIS DOCUMENT, EACH CLUE OR PART IS ITS OWN COMPONENT — list every one of them (e.g. "Clue #1", "Clue #2", "Clue #3", "Clue #4" → four components, not one). Never collapse multiple clues or parts into a single component. CRITICAL: "Tentacle (make 8)" counts as ONE component repeated eight times — DO NOT list it eight times. Include the multiplier in the component name when present (e.g. "Tentacle (x8)", "Leg (x2)").
 
@@ -505,8 +518,9 @@ The "shared_context_end_marker" marks the boundary where the setup section (mate
 
 Markers (start_marker, end_marker, shared_context_end_marker) must be LITERAL substrings copied verbatim from the document — about 30 characters each, enough to be unique. If a marker isn't actually present in the text, the downstream slice will fail.
 
-Return ONLY valid JSON, no markdown, no backticks, no commentary:
+Return ONLY valid JSON, no markdown, no backticks, no commentary. document_type comes FIRST:
 {
+  "document_type": "single_pattern or multi_section_pattern or pattern_book or mkal",
   "pattern_name": "string",
   "component_count": number,
   "components": [
@@ -680,9 +694,14 @@ This component: ${componentName}
 Known abbreviations: ${JSON.stringify(sharedAbbreviationsMap || {})}
 
 Return ONLY valid JSON, no markdown, no backticks:
-{"name":"${componentName}","make_count":1,"independent":false,"rows":[{"id":"rnd-1","label":"RND 1","text":"full instruction text","stitch_count":null,"note":null,"action_item":false,"repeat_brackets":[{"sequence":"string","count":2}]}]}
+{"name":"${componentName}","make_count":1,"independent":false,"body":"","rows":[{"id":"rnd-1","label":"RND 1","text":"full instruction text","stitch_count":null,"note":null,"action_item":false,"repeat_brackets":[{"sequence":"string","count":2}]}]}
 
 Rules:
+- ROWS FIRST (most important): extract EVERY workable stitch instruction as its own checkable entry in "rows" — every numbered round/row ("RND 3: ...", "Row 5: ..."), every "Chain 8" / "Ch 20", every stitch sequence, every increase/decrease step, every "fasten off", and every "sew/attach X to Y" assembly step. These are the checkable items the user ticks off while crocheting.
+- "body" is ADDITIVE and REFERENCE-ONLY. It holds ONLY genuine narrative prose that is NOT itself a stitch instruction: a short intro paragraph, an overview, sizing/gauge discussion, troubleshooting, or general construction notes. NEVER move a stitch instruction out of "rows" into "body". "body" must contain zero row-able instructions.
+- A part MAY have BOTH: a short intro in "body" AND its checkable "rows". Capture both when both exist (this is the common case for an instruction part that opens with a sentence of context).
+- A part that genuinely has NO stitch instructions in the source (e.g. Overview/Sizing, Gauge, a Hidden Backing note) gets "body" filled and rows: []. A part that HAS instructions MUST keep every one of them in "rows", even when it also has an intro paragraph in "body".
+- When unsure whether a line is prose or a row, treat it as a ROW.
 - Extract EVERY round/row visible as its own entry — never skip or collapse ranges.
 - Use RND for rounds worked in the round, ROW for flat rows.
 - Expand ranges like "RND 10-23" into individual entries RND 10, RND 11... each with the same instruction.
@@ -839,10 +858,18 @@ function assembleChunkedResult({ shared, componentResults, planning }) {
       name: c.name || 'Component',
       make_count: typeof c.make_count === 'number' ? c.make_count : 1,
       independent: !!c.independent,
+      // S76 additive: narrative/reference prose for no-row sections. Optional —
+      // omitted (empty) for instructional sections and on the single-shot path.
+      body: typeof c.body === 'string' ? c.body : '',
       rows: Array.isArray(c.rows) ? c.rows : [],
     })),
     assembly_notes: shared?.assembly_notes || '',
     image_description: shared?.image_description || '',
+    // S76 document type from the planning pass. Drives import routing in the
+    // client (App.jsx handleAddPattern). Null/undefined → router falls back to
+    // the existing structural behavior, so this is safe on the single-shot path
+    // (no planner) and on historical jobs.
+    document_type: planning?.document_type || null,
     // Multi-part detection — passed straight through from the planning
     // pass. Null when the planner determined this is a standalone pattern.
     collection_name: planning?.collection_name || null,

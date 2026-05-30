@@ -33,6 +33,7 @@ import {
   readCachedIsAnonymous, writeCachedIsAnonymous, clearCachedIsAnonymous,
 } from "./utils/tierUtils.js";
 import { canAccess, requiredTier, ANON_PATTERN_CAP } from "./utils/featureGates.js";
+import { DOC_TYPES, importRouteMismatch, resolveChildSourceUrl } from "./utils/docType.js";
 
 if (typeof document !== "undefined" && !document.getElementById("sb-font")) {
   const l = document.createElement("link");
@@ -862,6 +863,35 @@ const CollectionSuggestionPrompt = ({ pattern, meta, onYes, onNo }) => {
     </div>
   );
 };
+
+// S76: multi_section announcement. Bev tells the user she found a multi-part
+// project and laid it out part by part. This is an ANNOUNCEMENT, not a
+// collection offer — the pattern stays ONE record and renders as the hub.
+// Adaptive by tier: Craft gets the hub pitch; Free/Pro get the same opening
+// with a gentle Craft upsell tail.
+const MultiSectionAnnouncePrompt = ({ count, isCraft, onGo, onSeeCraft }) => (
+  <div style={{ position: "fixed", inset: 0, zIndex: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", fontFamily: T.sans }}>
+    <div className="fu" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.45)", borderRadius: 16, boxShadow: "0 20px 60px rgba(45,58,124,0.28)", padding: 24, width: "100%", maxWidth: 440 }}>
+      <div style={{ fontFamily: T.serif, fontSize: 20, fontWeight: 700, color: T.ink, marginBottom: 8, lineHeight: 1.25 }}>A project worth its own workspace</div>
+      <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.6, marginBottom: 18 }}>
+        This one's big. {count} parts, each made on its own, then assembled into the finished piece. Bev laid every part out separately so you can work them in any order and always know where you left off.
+        {isCraft
+          ? " Tap any part to start."
+          : " On Craft, Bev breaks a project like this into parts you can work one at a time, instead of scrolling a long PDF."}
+      </div>
+      <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+        {isCraft ? (
+          <button onClick={onGo} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)" }}>Show me the parts</button>
+        ) : (
+          <>
+            <button onClick={onGo} style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "10px 18px", fontSize: 13, color: T.ink2, cursor: "pointer", fontWeight: 600 }}>Open the pattern</button>
+            <button onClick={onSeeCraft} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)" }}>See Craft</button>
+          </>
+        )}
+      </div>
+    </div>
+  </div>
+);
 
 // PRO_FEATURES + ProInfoModal removed — both upgrade flows now route
 // through TieredUpgradeModal above. Callers pass `reason='paywall'` for
@@ -1876,6 +1906,7 @@ export default function Wovely() {
   // (modal-ish prompt) and are populated by handleAddPattern after a
   // standard import comes back with multi-part metadata.
   const [collectionSuggestion,setCollectionSuggestion]=useState(null); // { pattern, meta } — Craft only
+  const [multiSectionNotice,setMultiSectionNotice]=useState(null); // { count, pattern } — S76 multi_section announcement
   const [collectionUpgradeBanner,setCollectionUpgradeBanner]=useState(null); // { patternId, meta } — Free/Pro
   const [collectionContext,setCollectionContext]=useState(null);
   const [collectionsRefreshNonce,setCollectionsRefreshNonce]=useState(0);
@@ -2540,11 +2571,16 @@ export default function Wovely() {
   // [{ id, component_name }] for the rows that saved. Shared by the
   // "Start a Collection" / existing-collection import path and the post-import
   // "accept collection suggestion" split.
-  const insertComponentPatterns = async ({ p, targetCollection, baseOrder, user, session }) => {
+  const insertComponentPatterns = async ({ p, targetCollection, baseOrder, user, session, importFileUrl = null }) => {
     const components = Array.isArray(p.components) ? p.components : [];
     console.log("[Wovely] split: inserting", components.length, "components:", components.map(c => c?.name), "baseOrder:", baseOrder);
     const savedIds = [];
     const partLabel = (p._multiPart?.part_label) || targetCollection.part_label || "Part";
+    // S76: every clue child inherits the parent import's source file URL, so the
+    // file linkage survives the split (Replace, re-extraction, repair scripts,
+    // and the extract-images gate all depend on it). Fall back to the import
+    // handoff's URL when the modal payload didn't carry it (pill→modal resume).
+    const childSourceUrl = resolveChildSourceUrl(p.source_file_url, importFileUrl);
     for (let i = 0; i < components.length; i++) {
       const comp = components[i];
       const order = baseOrder + i + 1;
@@ -2579,9 +2615,9 @@ export default function Wovely() {
         dimensions: p.dimensions || {},
         weight: p.weight || "",
         hook: p.hook || "",
-        source_file_url: p.source_file_url || null,
-        source_file_name: p.source_file_name || null,
-        source_file_type: p.source_file_type || null,
+        source_file_url: childSourceUrl,
+        source_file_name: p.source_file_name || (childSourceUrl ? (childSourceUrl.split("/").pop() || null) : null),
+        source_file_type: p.source_file_type || (childSourceUrl && childSourceUrl.toLowerCase().endsWith(".pdf") ? "application/pdf" : null),
         extracted_by_ai: !!p.extracted_by_ai,
         components: [comp],
         validation_flags: p.validation_flags || null,
@@ -2703,11 +2739,12 @@ export default function Wovely() {
     }
 
     // 2) Insert one pattern per component (+ refresh count).
-    const savedIds = await insertComponentPatterns({ p, targetCollection, baseOrder, user, session });
+    const importFileUrl = p.source_file_url || pendingExtractedHandoff?.fileUrl || null;
+    const savedIds = await insertComponentPatterns({ p, targetCollection, baseOrder, user, session, importFileUrl });
 
     // 3) Image extraction — fire ONCE for the shared PDF. The server matches
     // each classified page to the right clue by component_name.
-    fireImageExtraction(savedIds, p.source_file_url, user.id);
+    fireImageExtraction(savedIds, importFileUrl, user.id);
 
     // 4) Cleanup flow flags + navigate to the collection detail.
     setStartingCollection(false);
@@ -2726,14 +2763,31 @@ export default function Wovely() {
     setActiveImportJob(null);
     posthog.capture("pattern_uploaded",{file_type:p.source_file_type||"unknown"});
 
+    // S76 document-type router. `document_type` (from the planner) is additive:
+    // when it is missing or unrecognized we fall through to the existing
+    // structural behavior unchanged. The ONE behavior it changes is
+    // multi_section_pattern — ONE finished object made of named parts (e.g.
+    // Dani's tieback). That must stay a SINGLE pattern with its sections in
+    // `components`; it must NOT be split into a collection and must NOT trigger
+    // the "want to collect this?" suggestion. single_pattern / pattern_book /
+    // mkal keep their existing paths.
+    const docType = p.document_type || null;
+    const componentCount = Array.isArray(p.components) ? p.components.length : 0;
+    // Structural-guard mismatch logging (do not silently override on day one).
+    if (docType && importRouteMismatch(docType, componentCount)) {
+      console.log(`[doc-type-router] classifier=${docType} structural=${componentCount > 1 ? "multi" : "single"} mismatch title="${p.title || ""}"`);
+    }
+    const forceSinglePattern = docType === DOC_TYPES.MULTI_SECTION;
+
     // Multi-component collection import → split. Each component becomes its
     // own pattern row, linked to a single collection. Only kicks in when
     // BOTH conditions hold: this is a collection-flavored import AND the
     // extraction produced more than one component. Standalone imports and
     // single-component collection imports keep the existing single-insert
-    // path below unchanged.
+    // path below unchanged. A multi_section_pattern is never split, even from a
+    // collection surface — it stays one pattern (which becomes one clue).
     const isCollectionImportEarly = !!collectionContext?.id || !!startingCollection;
-    if (isCollectionImportEarly && Array.isArray(p.components) && p.components.length > 1) {
+    if (!forceSinglePattern && isCollectionImportEarly && Array.isArray(p.components) && p.components.length > 1) {
       await runMultiComponentCollectionSave(p);
       return;
     }
@@ -2779,6 +2833,12 @@ export default function Wovely() {
       setPendingScrollToRow(p._reviewRowNumber);
       setAddOpen(false);
       setTimeout(()=>{startAndOpenPattern(localPattern);},100);
+    } else if (forceSinglePattern) {
+      // multi_section: announce the multi-part layout instead of the standard
+      // created overlay. "Show me the parts" opens the pattern (which renders
+      // as the hub). The pattern stays ONE record.
+      setAddOpen(false);
+      setMultiSectionNotice({ count: componentCount, pattern: localPattern });
     } else {
       setCreatedPattern(localPattern);
     }
@@ -2866,12 +2926,13 @@ export default function Wovely() {
                 navigate("/collections/" + newCollection.id);
               }
               setStartingCollection(false);
-            } else if (p._multiPart && p._multiPart.collection_name) {
+            } else if (!forceSinglePattern && p._multiPart && p._multiPart.collection_name) {
               // Standard import — the planner detected multi-part. Tier
               // gating lives one layer up: Craft sees the post-import
               // "want to start a collection?" prompt; Free/Pro sees the
               // contextual upgrade banner on PatternDetail. Both paths
-              // leave the pattern as a normal standalone import.
+              // leave the pattern as a normal standalone import. Suppressed
+              // for multi_section_pattern (one object, never a collection).
               const linkedPattern = { ...localPattern, id: rows[0].id, _supabaseId: rows[0].id };
               if (tier === TIER_CRAFT) {
                 setCollectionSuggestion({ pattern: linkedPattern, meta: p._multiPart });
@@ -3004,8 +3065,9 @@ export default function Wovely() {
       } catch (e) { console.warn("[Wovely] Suggestion split: original delete failed:", e?.message); }
       setUserPatterns(prev => prev.filter(x => x.id !== linkId && x._supabaseId !== linkId));
 
-      const savedIds = await insertComponentPatterns({ p: pat, targetCollection: newCollection, baseOrder: 0, user, session });
-      fireImageExtraction(savedIds, pat.source_file_url, user.id);
+      const acceptFileUrl = pat.source_file_url || pendingExtractedHandoff?.fileUrl || null;
+      const savedIds = await insertComponentPatterns({ p: pat, targetCollection: newCollection, baseOrder: 0, user, session, importFileUrl: acceptFileUrl });
+      fireImageExtraction(savedIds, acceptFileUrl, user.id);
       setSelectedCollection(newCollection);
       navigate("/collections/" + newCollection.id);
       return;
@@ -3121,6 +3183,7 @@ export default function Wovely() {
       {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
       {addMenuOpen&&menuAnchor&&<><div onClick={()=>{setAddMenuOpen(false);setMenuAnchor(null);}} style={{position:"fixed",inset:0,zIndex:49}}/><div style={{position:"fixed",top:menuAnchor.top,left:menuAnchor.left,zIndex:50,background:"#fff",border:`1px solid ${T.border}`,borderRadius:14,boxShadow:"0 8px 32px rgba(45,45,78,.12)",minWidth:220,padding:"6px 0",fontFamily:"Inter,sans-serif"}}>{[{icon:"📄",label:"Add PDF",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openImageImport();}},{icon:"🔗",label:"Paste a URL",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 16px",cursor:"pointer",fontSize:13,fontWeight:500,color:T.ink,transition:"background .12s"}} onMouseEnter={e=>e.currentTarget.style.background=T.linen} onMouseLeave={e=>e.currentTarget.style.background="transparent"}><span style={{fontSize:16,width:22,textAlign:"center"}}>{item.icon}</span>{item.label}</div>))}</div></>}
       {createdPattern&&<PatternCreatedOverlay pattern={createdPattern} onStartBuilding={()=>{const p=createdPattern;const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);startAndOpenPattern(p);}} onGoToHive={()=>{const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);if(ctx?.id){setSelectedCollection(ctx);navigate("/collections/"+ctx.id);}else{navigateToView("collection");}}}/>}
+      {multiSectionNotice&&<MultiSectionAnnouncePrompt count={multiSectionNotice.count} isCraft={tier===TIER_CRAFT} onGo={()=>{const pat=multiSectionNotice.pattern;setMultiSectionNotice(null);if(pat)startAndOpenPattern(pat);}} onSeeCraft={()=>{setMultiSectionNotice(null);setShowPaywall(true);}}/>}
       {pinnedImage?.image && <PinnedThumbnail image={pinnedImage.image} onOpen={()=>setPinnedLightboxOpen(true)} onUnpin={()=>{setPinnedImage(null);setPinnedLightboxOpen(false);}} />}
       {pinnedLightboxOpen && pinnedImage?.image && <ChartLightbox images={[pinnedImage.image]} startIndex={0} onClose={()=>setPinnedLightboxOpen(false)} canPin={true} pinnedImageId={pinnedImage.image.id} onTogglePin={(img)=>{togglePin(img,pinnedImage.collectionId);setPinnedLightboxOpen(false);}} />}
       {readyPromptPattern&&<ReadyToBuildPrompt pattern={readyPromptPattern} onStartBuilding={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);startAndOpenPattern(p);}} onViewDetails={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);setSelected(p);navigateToView("detail",p._supabaseId||p.id);}} onDismiss={()=>setReadyPromptPattern(null)}/>}
@@ -3175,6 +3238,7 @@ export default function Wovely() {
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id}/>}
       {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
       {createdPattern&&<PatternCreatedOverlay pattern={createdPattern} onStartBuilding={()=>{const p=createdPattern;const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);startAndOpenPattern(p);}} onGoToHive={()=>{const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);if(ctx?.id){setSelectedCollection(ctx);navigate("/collections/"+ctx.id);}else{navigateToView("collection");}}}/>}
+      {multiSectionNotice&&<MultiSectionAnnouncePrompt count={multiSectionNotice.count} isCraft={tier===TIER_CRAFT} onGo={()=>{const pat=multiSectionNotice.pattern;setMultiSectionNotice(null);if(pat)startAndOpenPattern(pat);}} onSeeCraft={()=>{setMultiSectionNotice(null);setShowPaywall(true);}}/>}
       {pinnedImage?.image && <PinnedThumbnail image={pinnedImage.image} onOpen={()=>setPinnedLightboxOpen(true)} onUnpin={()=>{setPinnedImage(null);setPinnedLightboxOpen(false);}} />}
       {pinnedLightboxOpen && pinnedImage?.image && <ChartLightbox images={[pinnedImage.image]} startIndex={0} onClose={()=>setPinnedLightboxOpen(false)} canPin={true} pinnedImageId={pinnedImage.image.id} onTogglePin={(img)=>{togglePin(img,pinnedImage.collectionId);setPinnedLightboxOpen(false);}} />}
       {readyPromptPattern&&<ReadyToBuildPrompt pattern={readyPromptPattern} onStartBuilding={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);startAndOpenPattern(p);}} onViewDetails={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);setSelected(p);navigateToView("detail",p._supabaseId||p.id);}} onDismiss={()=>setReadyPromptPattern(null)}/>}
