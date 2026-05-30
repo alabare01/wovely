@@ -10,6 +10,8 @@ import { listPatternsInCollection, partLabelFor } from "./utils/collections.js";
 import { canAccessChartImages } from "./utils/featureGates.js";
 import { fetchPatternImages, getPatternImageCount, renderAndUploadPendingImages } from "./utils/patternImages.js";
 import { ChartStripView } from "./components/ChartStrip.jsx";
+import { chooseRenderer, RENDER } from "./utils/docType.js";
+import SectionHub from "./components/SectionHub.jsx";
 
 const YarnSummaryCard = ({label, myKey, myVal, fallback, onSave}) => {
   const display = myVal || fallback;
@@ -499,6 +501,22 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   const skeinDisplay=estSkeins(p)>0?"~"+estSkeins(p)+(p.skeins>0?" skeins":" skeins (est.)"):"Not listed";
   const saveMyField=(key,val)=>{const updated={...p,rows,[key]:val||null};onSave(updated);};
   const detailPhoto=p.cover_image_url||pdfThumbUrl(p.source_file_url)||p.photo;
+  // S76 renderer selection — STRUCTURAL (section count + charts + tier), so it
+  // degrades gracefully if the classifier was wrong. sectionCount comes from the
+  // header rows (the named parts); hasCharts reuses the same displayable count as
+  // the chart strip. inline / inline_with_upgrade_nudge keep the existing view;
+  // hub is the Craft hub-and-spoke for complex multi-section objects.
+  const userIsCraft=canAccessChartImages(tier,isAnonymous);
+  const sectionCount=rows.filter(r=>r.isHeader).length||(Array.isArray(p.components)?p.components.length:0);
+  const [hasCharts,setHasCharts]=useState(false);
+  useEffect(()=>{
+    const pid=p._supabaseId||p.id;
+    if(!pid){setHasCharts(false);return;}
+    let cancelled=false;
+    (async()=>{const{data}=await getPatternImageCount(pid);if(!cancelled)setHasCharts((typeof data==="number"?data:0)>0);})();
+    return ()=>{cancelled=true;};
+  },[p._supabaseId,p.id]);
+  const renderMode=chooseRenderer({sectionCount,hasCharts,userIsCraft});
   return (
     <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",background:T.bg}}>
       <CSS/>
@@ -625,16 +643,31 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
           </div>}
           <div style={{marginTop:showYarnTip?12:20,background:`linear-gradient(135deg,${T.terraLt},${T.card})`,borderRadius:14,padding:"14px 16px",border:`1px solid ${T.border}`}}>
             <div style={{fontFamily:T.serif,fontSize:14,color:T.ink,marginBottom:10}}>Yarn Summary</div>
+            {/* Only surface a field the source actually specified (or one the
+                user has logged for themselves). Hiding unset fields beats a wall
+                of "Not listed" cards next to the real ones (S76 bug 4). */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-              <YarnSummaryCard label="Total yardage" myKey="my_yardage" myVal={p.my_yardage} fallback={yardDisplay} onSave={saveMyField}/>
-              <YarnSummaryCard label="Skeins needed" myKey="my_skeins" myVal={p.my_skeins} fallback={skeinDisplay} onSave={saveMyField}/>
-              <YarnSummaryCard label="Hook size" myKey="my_hook_size" myVal={p.my_hook_size} fallback={p.hook||"Not listed"} onSave={saveMyField}/>
-              <YarnSummaryCard label="Yarn weight" myKey="my_yarn_weight" myVal={p.my_yarn_weight} fallback={p.weight||"Not listed"} onSave={saveMyField}/>
+              {(p.my_yardage||estYards(p)>0)&&<YarnSummaryCard label="Total yardage" myKey="my_yardage" myVal={p.my_yardage} fallback={estYards(p)>0?yardDisplay:""} onSave={saveMyField}/>}
+              {(p.my_skeins||estSkeins(p)>0)&&<YarnSummaryCard label="Skeins needed" myKey="my_skeins" myVal={p.my_skeins} fallback={estSkeins(p)>0?skeinDisplay:""} onSave={saveMyField}/>}
+              {(p.my_hook_size||p.hook)&&<YarnSummaryCard label="Hook size" myKey="my_hook_size" myVal={p.my_hook_size} fallback={p.hook||""} onSave={saveMyField}/>}
+              {(p.my_yarn_weight||p.weight)&&<YarnSummaryCard label="Yarn weight" myKey="my_yarn_weight" myVal={p.my_yarn_weight} fallback={p.weight||""} onSave={saveMyField}/>}
             </div>
             <button onClick={()=>setShowScale(true)} style={{marginTop:12,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:10,padding:"10px",fontSize:13,fontWeight:600,cursor:"pointer"}}>⚖️ Scale pattern to different size →</button>
           </div>
         </>)}
-        {tab==="rows"&&<RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>}
+        {tab==="rows"&&(renderMode===RENDER.HUB
+          ? <SectionHub p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>
+          : <>
+              {renderMode===RENDER.INLINE_NUDGE&&(
+                <div style={{marginBottom:14,background:"linear-gradient(135deg,#F3EEFA,rgba(255,255,255,0.82))",border:`1px solid ${T.border}`,borderRadius:14,padding:"14px 16px"}}>
+                  <div style={{fontFamily:T.serif,fontSize:14,fontWeight:700,color:T.ink,marginBottom:4,lineHeight:1.3}}>Bev laid this one out in {sectionCount} parts</div>
+                  <div style={{fontSize:12,color:T.ink2,lineHeight:1.55,marginBottom:10}}>On Craft, every part gets its own space with section cards and charts you can jump between.</div>
+                  <button onClick={onShowUpgrade} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"8px 16px",fontSize:12,fontWeight:600,cursor:"pointer"}}>See the full layout with Craft</button>
+                </div>
+              )}
+              <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>
+            </>
+        )}
         {/* Source file direct link */}
         {tab==="materials"&&(
           <div style={{marginTop:16,borderTop:`1px solid ${T.border}`,paddingTop:14}}>

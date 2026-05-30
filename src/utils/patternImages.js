@@ -53,12 +53,15 @@ export const fetchPatternImagesForPatterns = async (patternIds) => {
 };
 
 // Count-only query for the locked nudge on Pro/Free tiers — avoids pulling
-// row bodies the locked UI never renders.
+// row bodies the locked UI never renders. Excludes `photo` rows so the count
+// matches what ChartStripView would actually display (chart/cover/diagram/
+// glossary). Without this, a photo-only pattern shows a "Bev found N charts"
+// nudge over empty frames (S76 bug 5).
 export const getPatternImageCount = async (patternId) => {
   if (!patternId) return { data: 0 };
   try {
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/pattern_images?pattern_id=eq.${patternId}&select=id`,
+      `${SUPABASE_URL}/rest/v1/pattern_images?pattern_id=eq.${patternId}&image_type=neq.photo&select=id`,
       { headers: { ...headers(), "Prefer": "count=exact" } },
     );
     if (!res.ok) return { error: await res.text() };

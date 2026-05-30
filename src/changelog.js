@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "Session 76",
+    date: "2026-05-30",
+    updates: [
+      { emoji: "🧩", text: "Patterns made of multiple parts now stay together in one place, with each part in its own space" },
+      { emoji: "🧶", text: "Big multi-part patterns get section cards you can tap to focus one part at a time" },
+      { emoji: "✨", text: "Cleaner Materials view that only shows the yarn details a pattern actually lists, no empty cards" },
+    ]
+  },
+  {
     version: "Session 42",
     date: "2026-04-09",
     updates: [

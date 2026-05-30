@@ -101,6 +101,10 @@ const RowManager = ({
   onViewSource,
   isAnonymous = false,
   onSignUp,
+  // S76 hub: when set, render ONLY the section whose header row has this id (a
+  // focused drill-in). rows/setRows/onSave stay the FULL pattern, so all the
+  // global-index toggle, progress, and milestone logic is unchanged.
+  focusHeaderId = null,
 }) => {
   const [noteEdit,setNoteEdit]=useState(null);
   const [expandedSections,setExpandedSections]=useState({});
@@ -219,7 +223,7 @@ const RowManager = ({
       {/* Pattern Notes — designer's read-only preamble. Reads pattern_notes
           only (post-migration 007 split); notes is the user's journal and
           belongs to My Notes, not here. No fallback between the two. */}
-      {p.pattern_notes&&<div style={{marginBottom:12}}>
+      {!focusHeaderId&&p.pattern_notes&&<div style={{marginBottom:12}}>
         <button onClick={()=>setNoteEdit(noteEdit==="pnotes"?null:"pnotes")} style={{width:"100%",background:T.linen,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 14px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <span style={{fontSize:13,color:T.ink2,fontWeight:500}}>📋 Pattern Notes — tap to expand</span>
           <span style={{fontSize:12,color:T.ink3}}>{noteEdit==="pnotes"?"▼":"▶"}</span>
@@ -236,6 +240,7 @@ const RowManager = ({
       ):(()=>{
         const seenAbbr=new Set();
         return linearSections.map((sec,si)=>{
+          if(focusHeaderId&&sec.header?.id!==focusHeaderId)return null;
           const secKey=sec.header?.id||"sec-"+si;
           const countable=sec.rows.filter(r=>!r.isNoteOnly);
           const secDone=countable.filter(r=>r.done).length;
@@ -256,10 +261,14 @@ const RowManager = ({
               <span style={{fontSize:12,color:T.ink3}}>{open?"▼":"▶"}</span>
               <div style={{flex:1}}>
                 <div style={{fontSize:13,fontWeight:700,color:secComplete?T.sage:T.terra}}>{sec.header.text.replace(/──/g,"").trim()}{secComplete?" ✓":""}</div>
-                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{isAnonymous?`Showing ${visibleRows.length} of ${sec.rows.length} rows`:`${secDone} of ${secTotal} complete`}</div>
+                {/* Narrative sections (a named part with no checkable rows — e.g.
+                    "Overview, Sizing, Materials") have no progress to track.
+                    Label them "Reference" and drop the 0-of-0 line + empty bar
+                    instead of showing a misleading "0 of 0 complete" (S76 bug 2). */}
+                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{secTotal===0?"Reference":isAnonymous?`Showing ${visibleRows.length} of ${sec.rows.length} rows`:`${secDone} of ${secTotal} complete`}</div>
               </div>
               {sec.header.makeCount>1&&<div style={{background:T.gold,color:"#fff",borderRadius:99,padding:"2px 8px",fontSize:10,fontWeight:700}}>×{sec.header.makeCount}</div>}
-              <div style={{width:60}}><Bar val={secTotal?secDone/secTotal*100:0} color={secComplete?T.sage:T.terra} h={3}/></div>
+              {secTotal>0&&<div style={{width:60}}><Bar val={secDone/secTotal*100} color={secComplete?T.sage:T.terra} h={3}/></div>}
             </button>}
             {(open||!sec.header)&&<div style={{border:sec.header?`1px solid ${T.border}`:"none",borderTop:"none",borderRadius:sec.header?"0 0 10px 10px":0,overflow:"hidden",position:"relative"}}>
               {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;return(
@@ -301,7 +310,7 @@ const RowManager = ({
           </div>);
         });
       })()}
-      {isAnonymous ? (
+      {!focusHeaderId && (isAnonymous ? (
         // Guest preview wall — fade overlay above a glass CTA card. Renders
         // after the truncated rows so the page reads "first taste, then a
         // gentle nudge to convert". onSignUp opens the AuthWallModal in
@@ -377,10 +386,10 @@ const RowManager = ({
           <input value={newRow} onChange={e=>setNewRow(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addRow()} placeholder="Add a row or step…" style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:11,padding:"10px 14px",fontSize:13,color:T.ink,background:T.linen,outline:"none"}} onFocus={e=>e.target.style.borderColor=T.terra} onBlur={e=>e.target.style.borderColor=T.border}/>
           <button onClick={addRow} style={{background:T.terra,color:"#fff",border:"none",borderRadius:11,padding:"10px 18px",fontSize:22,cursor:"pointer",lineHeight:1,boxShadow:"0 4px 12px rgba(155,126,200,.35)"}}>+</button>
         </div>
-      )}
+      ))}
       {/* Floating source pattern pill — hidden for guests so it doesn't
           collide with the sticky signup bar at the same screen position. */}
-      {p.source_file_url&&onViewSource&&!isAnonymous&&<button onClick={onViewSource} style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:200,background:T.terra,color:"#fff",border:"none",borderRadius:999,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.4)",whiteSpace:"nowrap"}}>📄 View Source Pattern →</button>}
+      {p.source_file_url&&onViewSource&&!isAnonymous&&!focusHeaderId&&<button onClick={onViewSource} style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:200,background:T.terra,color:"#fff",border:"none",borderRadius:999,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.4)",whiteSpace:"nowrap"}}>📄 View Source Pattern →</button>}
     </>
   );
 };
