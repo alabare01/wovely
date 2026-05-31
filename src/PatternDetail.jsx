@@ -10,7 +10,7 @@ import { listPatternsInCollection, partLabelFor } from "./utils/collections.js";
 import { canAccessChartImages } from "./utils/featureGates.js";
 import { fetchPatternImages, getPatternImageCount, renderAndUploadPendingImages } from "./utils/patternImages.js";
 import { ChartStripView } from "./components/ChartStrip.jsx";
-import { chooseRenderer, RENDER, clampPartIndex, buildPartStrip } from "./utils/docType.js";
+import { clampPartIndex, buildPartStrip, scopeAssetsToSection } from "./utils/docType.js";
 import SectionHub from "./components/SectionHub.jsx";
 
 const YarnSummaryCard = ({label, myKey, myVal, fallback, onSave}) => {
@@ -278,7 +278,15 @@ const ShareCardModal = ({pattern,onClose,pct,Btn}) => {
 // ChartTypePill, ChartLightbox, BevInlineSpinner, and the strip view now live
 // in components/ChartStrip.jsx (shared with the collection detail page).
 
-const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pinnedImageId, onTogglePin }) => {
+// Persistent, scope-aware asset carousel. Lives above the tabs / below the header
+// and is visible regardless of the active tab. SCOPE: when a section is selected
+// (a multi-part part is open, or — implicitly — an MKAL clue, which is its own
+// pattern so the fetch is already scoped to it) it narrows to that section's
+// reliably-matched assets; with no section selected it shows ALL of the pattern's
+// assets. Unmatched assets + cover/glossary always live at the top level. The
+// strip is collapsible (default collapsed on touch) so the tall header never
+// pushes the rows below the fold on iPhone Safari.
+const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pinnedImageId, onTogglePin, scopeHeaderText }) => {
   const patternId = pattern._supabaseId || pattern.id;
   const sourceFileUrl = pattern.source_file_url || null;
   const isCraft = canAccessChartImages(tier, isAnonymous);
@@ -287,6 +295,13 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
   // loads the full rows and renders any pending ones.
   const [lockedCount, setLockedCount] = useState(null);
   const [images, setImages] = useState(null);
+
+  const isMobile = typeof navigator !== "undefined" && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const [expanded, setExpanded] = useState(() => {
+    try { const s = localStorage.getItem("yh_charts_expanded"); return s == null ? !isMobile : s === "1"; }
+    catch { return !isMobile; }
+  });
+  const toggleExpanded = () => setExpanded(v => { const n = !v; try { localStorage.setItem("yh_charts_expanded", n ? "1" : "0"); } catch { /* ignore */ } return n; });
 
   useEffect(() => {
     if (!patternId) return;
@@ -317,51 +332,42 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
     return () => { cancelled = true; };
   }, [patternId, isCraft, sourceFileUrl]);
 
-  // Locked strip (Pro/Free/Anon): frosted placeholder thumbs behind a compact
-  // upgrade nudge. Same band height as the unlocked strip so layout doesn't jump.
+  // Locked strip (Pro/Free/Anon): ChartStripView's existing locked mode. Locked
+  // users can't open a part, so this is always the top-level (all) view.
   if (!isCraft) {
     if (!lockedCount || lockedCount <= 0) return null;
-    const placeholderCount = Math.min(lockedCount, 5);
-    const charts = (lockedCount === 1) ? "1 chart" : `${lockedCount} charts`;
-    return (
-      <div style={{ background: "rgba(255,255,255,0.82)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid #EDE4F7", padding: "12px 16px", position: "relative" }}>
-        <div style={{ display: "flex", gap: 10, overflowX: "hidden", filter: "blur(1.5px)", opacity: 0.7 }}>
-          {Array.from({ length: placeholderCount }).map((_, i) => (
-            <div key={i} style={{
-              flexShrink: 0, height: 120, width: 92, borderRadius: 12,
-              border: "1px solid #EDE4F7",
-              background: "linear-gradient(135deg, #EDE4F7, #F8F6FF)",
-            }}/>
-          ))}
-        </div>
-        <div style={{
-          position: "absolute", inset: 0, display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", gap: 4,
-          background: "rgba(248,246,255,0.55)",
-          backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
-        }}>
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#2D2D4E", fontWeight: 600 }}>
-            Bev found {charts} in this pattern
-          </div>
-          <button onClick={onShowUpgrade} style={{
-            background: "transparent", border: "none", padding: 0, cursor: "pointer",
-            fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 700, color: "#9B7EC8",
-          }}>See plans</button>
-        </div>
-      </div>
-    );
+    return <ChartStripView locked lockedCount={lockedCount} onShowUpgrade={onShowUpgrade} />;
   }
 
-  // Unlocked. Render nothing until classified rows exist (no empty state in the
-  // strip per spec). The shared strip handles thumbs, spinners, and lightbox.
-  if (images === null || images.length === 0) return null;
+  // Unlocked. Render nothing until classified rows exist (no empty state per spec).
+  if (images === null) return null;
+  const scoped = scopeAssetsToSection(images, scopeHeaderText);
+  const shownCount = scoped.filter(i => i.image_type !== "photo").length;
+  if (shownCount === 0) return null;
+  const title = scopeHeaderText ? "Charts for this part" : "Charts & diagrams";
+
   return (
-    <ChartStripView
-      images={images}
-      canPin={isCraft}
-      pinnedImageId={pinnedImageId}
-      onTogglePin={onTogglePin}
-    />
+    <div style={{ background: "rgba(255,255,255,0.82)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid #EDE4F7" }}>
+      <button
+        onClick={toggleExpanded}
+        aria-expanded={expanded}
+        style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, padding: "8px 16px", background: "transparent", border: "none", cursor: "pointer", fontFamily: "Inter, sans-serif" }}
+      >
+        <span style={{ fontSize: 12, fontWeight: 600, color: "#2D2D4E", display: "flex", alignItems: "center", gap: 6 }}>
+          <span aria-hidden>🧵</span>{title} · {shownCount}
+        </span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#9B7EC8" }}>{expanded ? "Hide ▾" : "Show ▸"}</span>
+      </button>
+      {expanded && (
+        <ChartStripView
+          images={scoped}
+          canPin={isCraft}
+          pinnedImageId={pinnedImageId}
+          onTogglePin={onTogglePin}
+          thumbHeight={isMobile ? 96 : 120}
+        />
+      )}
+    </div>
   );
 };
 
@@ -501,40 +507,30 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   const skeinDisplay=estSkeins(p)>0?"~"+estSkeins(p)+(p.skeins>0?" skeins":" skeins (est.)"):"Not listed";
   const saveMyField=(key,val)=>{const updated={...p,rows,[key]:val||null};onSave(updated);};
   const detailPhoto=p.cover_image_url||pdfThumbUrl(p.source_file_url)||p.photo;
-  // S76 renderer selection — STRUCTURAL (section count + charts + tier), so it
-  // degrades gracefully if the classifier was wrong. sectionCount comes from the
-  // header rows (the named parts); hasCharts reuses the same displayable count as
-  // the chart strip. inline / inline_with_upgrade_nudge keep the existing view;
-  // hub is the Craft hub-and-spoke for complex multi-section objects.
+  // Unified shell: every pattern uses Materials | Instructions | Notes. The
+  // Instructions tab varies by STRUCTURE (single → rows; multi-part → parts grid
+  // ⇄ scoped part) and TIER (Craft drives the interactive grid; Free/Pro see a
+  // visible LOCKED grid showcase with the rows still fully readable beneath).
+  // Never paywall the read.
   const userIsCraft=canAccessChartImages(tier,isAnonymous);
   const sectionCount=rows.filter(r=>r.isHeader).length||(Array.isArray(p.components)?p.components.length:0);
-  const [hasCharts,setHasCharts]=useState(false);
-  useEffect(()=>{
-    const pid=p._supabaseId||p.id;
-    if(!pid){setHasCharts(false);return;}
-    let cancelled=false;
-    (async()=>{const{data}=await getPatternImageCount(pid);if(!cancelled)setHasCharts((typeof data==="number"?data:0)>0);})();
-    return ()=>{cancelled=true;};
-  },[p._supabaseId,p.id]);
-  const renderMode=chooseRenderer({sectionCount,hasCharts,userIsCraft});
-  // Hub mode is a landing (section grid + unified materials, no tabs) that opens
-  // a scoped section view (instructions + notes). hubSection holds the selected
-  // section's header id. Inline modes keep the Materials | Instructions | Notes
-  // tabs untouched.
+  const isMultiPart=sectionCount>1;
   const [hubSection,setHubSection]=useState(null);
-  const isHub=renderMode===RENDER.HUB;
-  const hubLanding=isHub&&!hubSection;
-  const hubScoped=isHub&&!!hubSection;
-  const showMaterials=hubLanding||(!isHub&&tab==="materials");
-  const showRows=hubScoped||(!isHub&&tab==="rows");
-  const showNotes=hubScoped||(!isHub&&tab==="notes");
-  const hubSectionTitle=hubScoped?((rows.find(r=>r.isHeader&&r.id===hubSection)?.text||"").replace(/──/g,"").trim()):"";
-  // Reset the scoped part when navigating to a different pattern (in case
-  // this view isn't remounted per id).
+  const canHub=isMultiPart&&userIsCraft;        // interactive grid + scoped parts
+  const partOpen=canHub&&!!hubSection;          // a Craft part is open
+  const hubScoped=partOpen;                      // alias kept for the (untouched) Notes block
+  const showMaterials=tab==="materials";
+  const showRows=tab==="rows";
+  const showNotes=tab==="notes";
+  const hubSectionTitle=partOpen?((rows.find(r=>r.isHeader&&r.id===hubSection)?.text||"").replace(/──/g,"").trim()):"";
+  // The open section drives BOTH the scoped row view and the asset carousel scope.
+  const scopeHeaderText=partOpen?(rows.find(r=>r.isHeader&&r.id===hubSection)?.text||null):null;
+  // Reset the scoped part when navigating to a different pattern (defensive — the
+  // key prop already remounts Detail per pattern).
   useEffect(()=>{setHubSection(null);},[p.id,p._supabaseId]);
   // Part-to-part navigation in the scoped view (mirrors MKAL clue nav).
   const partHeaders=rows.filter(r=>r.isHeader);
-  const hubIndex=hubScoped?partHeaders.findIndex(r=>r.id===hubSection):-1;
+  const hubIndex=partOpen?partHeaders.findIndex(r=>r.id===hubSection):-1;
   const hubTotal=partHeaders.length;
   const jumpToPart=(id)=>{if(id&&id!==hubSection){setHubSection(id);window.scrollTo({top:0});}};
   const goPart=(delta)=>{const ni=clampPartIndex(hubIndex,delta,partHeaders.length);if(ni!==hubIndex)jumpToPart(partHeaders[ni].id);};
@@ -615,12 +611,12 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
               </div>
             );
           })()}
-          <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} pinnedImageId={pinnedImageId} onTogglePin={onTogglePin} />
-          {!isHub&&<div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
+          <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} pinnedImageId={pinnedImageId} onTogglePin={onTogglePin} scopeHeaderText={scopeHeaderText} />
+          <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
             {[["materials","Materials"],["rows","Instructions/Rows"],["notes","My Notes"]].map(([key,label])=>(
               <button key={key} onClick={()=>{setTab(key);localStorage.setItem("yh_last_tab",key);}} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>
             ))}
-          </div>}
+          </div>
         </div>
         <div style={{padding:`4px 20px ${isAnonymous?220:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
         {collectionUpgrade && (
@@ -653,13 +649,6 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             </div>
           </div>
         )}
-        {hubLanding&&(
-          <div style={{paddingTop:8}}>
-            <SectionHub rows={rows} onSelect={setHubSection} Bar={Bar}/>
-            <div style={{marginTop:28,fontFamily:T.serif,fontSize:18,color:T.ink,marginBottom:2}}>Materials</div>
-            <div style={{fontSize:12.5,color:T.ink3,marginBottom:6,lineHeight:1.5}}>Everything for the whole project, in one place.</div>
-          </div>
-        )}
         {showMaterials&&(<>
           {(editing?draft.materials:p.materials).map((m,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${T.border}`}}>
@@ -687,45 +676,57 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             <button onClick={()=>setShowScale(true)} style={{marginTop:12,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:10,padding:"10px",fontSize:13,fontWeight:600,cursor:"pointer"}}>⚖️ Scale pattern to different size →</button>
           </div>
         </>)}
-        {hubScoped&&(
-          <div style={{paddingTop:4}}>
-            <button onClick={()=>{setHubSection(null);window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:8}}>← All parts</button>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:12}}>
-              <button onClick={()=>goPart(-1)} disabled={hubIndex<=0} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex<=0?T.ink3:T.terra,cursor:hubIndex<=0?"default":"pointer",opacity:hubIndex<=0?0.4:1,fontSize:13,fontWeight:600}}>← Prev</button>
-              <span style={{fontSize:12,color:T.ink2,fontWeight:600}}>Part {hubIndex+1} of {hubTotal}</span>
-              <button onClick={()=>goPart(1)} disabled={hubIndex>=hubTotal-1} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex>=hubTotal-1?T.ink3:T.terra,cursor:hubIndex>=hubTotal-1?"default":"pointer",opacity:hubIndex>=hubTotal-1?0.4:1,fontSize:13,fontWeight:600}}>Next →</button>
-            </div>
-            {/* Persistent part strip — every part one tap away, so a "see Part 5"
-                reference from Part 2 doesn't mean clicking Next three times. */}
-            {partStrip.length>1&&(
-              <div style={{display:"flex",gap:8,overflowX:"auto",padding:"2px 0 12px",WebkitOverflowScrolling:"touch"}}>
-                {partStrip.map(chip=>(
-                  <button key={chip.id} ref={chip.active?activeChipRef:null} onClick={()=>jumpToPart(chip.id)}
-                    style={{flexShrink:0,display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:99,cursor:"pointer",maxWidth:170,
-                      background:chip.active?T.terra:"rgba(255,255,255,0.72)",color:chip.active?"#fff":T.ink2,
-                      border:`1px solid ${chip.active?T.terra:T.border}`,backdropFilter:"blur(10px)",WebkitBackdropFilter:"blur(10px)",
-                      fontSize:12,fontWeight:chip.active?700:600,whiteSpace:"nowrap"}}>
-                    <span style={{fontFamily:T.serif,fontWeight:700}}>{chip.number}</span>
-                    {chip.label&&<span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textTransform:"capitalize"}}>{chip.label.toLowerCase()}</span>}
-                  </button>
-                ))}
-              </div>
-            )}
-            {hubSectionTitle&&<div style={{fontFamily:T.serif,fontSize:20,color:T.ink,marginBottom:12,lineHeight:1.25}}>{hubSectionTitle}</div>}
-          </div>
-        )}
-        {showRows&&(hubScoped
-          ? <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp} focusHeaderId={hubSection}/>
-          : <>
-              {renderMode===RENDER.INLINE_NUDGE&&(
-                <div style={{marginBottom:14,background:"linear-gradient(135deg,#F3EEFA,rgba(255,255,255,0.82))",border:`1px solid ${T.border}`,borderRadius:14,padding:"14px 16px"}}>
-                  <div style={{fontFamily:T.serif,fontSize:14,fontWeight:700,color:T.ink,marginBottom:4,lineHeight:1.3}}>Bev laid this one out in {sectionCount} parts</div>
-                  <div style={{fontSize:12,color:T.ink2,lineHeight:1.55,marginBottom:10}}>On Craft, every part gets its own space with part cards and charts you can jump between.</div>
-                  <button onClick={onShowUpgrade} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"8px 16px",fontSize:12,fontWeight:600,cursor:"pointer"}}>See the full layout with Craft</button>
+        {showRows&&(
+          !isMultiPart ? (
+            // Single part → the row checklist directly, no part chrome.
+            <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>
+          ) : canHub ? (
+            partOpen ? (
+              // Multi-part (Craft), a part open → part nav + strip + that part's rows.
+              // (The part's charts ride in the persistent carousel above the tabs,
+              // which has already narrowed to this part.)
+              <div style={{paddingTop:4}}>
+                <button onClick={()=>{setHubSection(null);window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:8}}>← All parts</button>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:12}}>
+                  <button onClick={()=>goPart(-1)} disabled={hubIndex<=0} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex<=0?T.ink3:T.terra,cursor:hubIndex<=0?"default":"pointer",opacity:hubIndex<=0?0.4:1,fontSize:13,fontWeight:600}}>← Prev</button>
+                  <span style={{fontSize:12,color:T.ink2,fontWeight:600}}>Part {hubIndex+1} of {hubTotal}</span>
+                  <button onClick={()=>goPart(1)} disabled={hubIndex>=hubTotal-1} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex>=hubTotal-1?T.ink3:T.terra,cursor:hubIndex>=hubTotal-1?"default":"pointer",opacity:hubIndex>=hubTotal-1?0.4:1,fontSize:13,fontWeight:600}}>Next →</button>
                 </div>
-              )}
+                {/* Persistent part strip — every part one tap away, so a "see Part 5"
+                    reference from Part 2 doesn't mean clicking Next three times. */}
+                {partStrip.length>1&&(
+                  <div style={{display:"flex",gap:8,overflowX:"auto",padding:"2px 0 12px",WebkitOverflowScrolling:"touch"}}>
+                    {partStrip.map(chip=>(
+                      <button key={chip.id} ref={chip.active?activeChipRef:null} onClick={()=>jumpToPart(chip.id)}
+                        style={{flexShrink:0,display:"flex",alignItems:"center",gap:6,padding:"6px 12px",borderRadius:99,cursor:"pointer",maxWidth:170,
+                          background:chip.active?T.terra:"rgba(255,255,255,0.72)",color:chip.active?"#fff":T.ink2,
+                          border:`1px solid ${chip.active?T.terra:T.border}`,backdropFilter:"blur(10px)",WebkitBackdropFilter:"blur(10px)",
+                          fontSize:12,fontWeight:chip.active?700:600,whiteSpace:"nowrap"}}>
+                        <span style={{fontFamily:T.serif,fontWeight:700}}>{chip.number}</span>
+                        {chip.label&&<span style={{overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",textTransform:"capitalize"}}>{chip.label.toLowerCase()}</span>}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {hubSectionTitle&&<div style={{fontFamily:T.serif,fontSize:20,color:T.ink,marginBottom:12,lineHeight:1.25}}>{hubSectionTitle}</div>}
+                <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp} focusHeaderId={hubSection}/>
+              </div>
+            ) : (
+              // Multi-part (Craft), no part open → the parts grid.
+              <div style={{paddingTop:8}}>
+                <SectionHub rows={rows} onSelect={setHubSection} Bar={Bar}/>
+              </div>
+            )
+          ) : (
+            // Multi-part (Free/Pro) → visible LOCKED grid showcase + Craft upsell,
+            // with the full row checklist still readable beneath. Never paywall the read.
+            <>
+              <div style={{paddingTop:8,marginBottom:18}}>
+                <SectionHub rows={rows} onSelect={()=>{}} locked onUpgrade={onShowUpgrade} Bar={Bar}/>
+              </div>
               <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>
             </>
+          )
         )}
         {/* Source file direct link */}
         {showMaterials&&(

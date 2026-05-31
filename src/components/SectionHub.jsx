@@ -40,7 +40,7 @@ const splitSections = (rows) => {
   return secs;
 };
 
-const SectionHub = ({ rows, onSelect, Bar }) => {
+const SectionHub = ({ rows, onSelect, Bar, locked = false, onUpgrade }) => {
   const sections = useMemo(() => splitSections(rows), [rows]);
 
   return (
@@ -49,9 +49,16 @@ const SectionHub = ({ rows, onSelect, Bar }) => {
     // a plain white box. This is the backdrop that makes the glass read as glass.
     <div style={{ background: "linear-gradient(160deg, #F3EEFA 0%, #F8F6FF 70%)", borderRadius: 18, padding: "18px 16px" }}>
       <div style={{ fontFamily: T.serif, fontSize: 18, color: T.ink, marginBottom: 4 }}>The parts</div>
-      <div style={{ fontSize: 12.5, color: T.ink3, marginBottom: 14, lineHeight: 1.5 }}>
-        Bev laid this project out in {sections.length} parts. Tap one to work it, in any order.
+      <div style={{ fontSize: 12.5, color: T.ink3, marginBottom: locked ? 10 : 14, lineHeight: 1.5 }}>
+        {locked
+          ? `Bev laid this project out in ${sections.length} parts. Craft gives each part its own space — part cards, per-part progress, and charts you can jump between.`
+          : `Bev laid this project out in ${sections.length} parts. Tap one to work it, in any order.`}
       </div>
+      {locked && (
+        <button onClick={onUpgrade} style={{ marginBottom: 14, background: LAV, color: "#fff", border: "none", borderRadius: 99, padding: "8px 16px", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: T.sans }}>
+          See the full layout with Craft
+        </button>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
         {sections.map((sec, i) => {
           const key = sec.header?.id || "sec-" + i;
@@ -81,8 +88,10 @@ const SectionHub = ({ rows, onSelect, Bar }) => {
           return (
             <button
               key={key}
-              onClick={() => onSelect(sec.header?.id ?? null)}
-              style={{ ...GLASS, padding: "14px 16px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, borderLeft: `3px solid ${LAV}` }}
+              onClick={locked ? undefined : () => onSelect(sec.header?.id ?? null)}
+              disabled={locked}
+              aria-disabled={locked}
+              style={{ ...GLASS, padding: "14px 16px", textAlign: "left", cursor: locked ? "default" : "pointer", display: "flex", flexDirection: "column", gap: 8, borderLeft: `3px solid ${LAV}`, opacity: locked ? 0.85 : 1, position: "relative" }}
             >
               <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 9, flexShrink: 0, background: LAV_BG, color: LAV, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: T.serif, fontSize: 15, fontWeight: 700 }}>
@@ -94,6 +103,9 @@ const SectionHub = ({ rows, onSelect, Bar }) => {
                 </div>
                 {sec.header?.makeCount > 1 && (
                   <div style={{ background: LAV_BG, color: LAV, borderRadius: 99, padding: "2px 7px", fontSize: 10, fontWeight: 700, flexShrink: 0 }}>×{sec.header.makeCount}</div>
+                )}
+                {locked && (
+                  <div style={{ background: LAV_BG, color: LAV, borderRadius: 99, padding: "2px 7px", fontSize: 10, fontWeight: 700, flexShrink: 0 }} aria-hidden>🔒</div>
                 )}
               </div>
               {total > 0 && <Bar val={(done / total) * 100} color={complete ? T.sage : LAV} h={4} />}

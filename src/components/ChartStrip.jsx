@@ -197,7 +197,7 @@ export const ChartLightbox = ({ images, startIndex, onClose, canPin = false, pin
 // collection strip to tag the source clue). Pin props are forwarded to the
 // lightbox. Renders the lightbox via portal so it escapes any transformed
 // (sticky-header) ancestor.
-export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId = null, onTogglePin, pendingLabel, locked = false, lockedCount = 0, onShowUpgrade, showEmptyState = false }) => {
+export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId = null, onTogglePin, pendingLabel, locked = false, lockedCount = 0, onShowUpgrade, showEmptyState = false, thumbHeight = 120 }) => {
   const [lightboxIdx, setLightboxIdx] = useState(null);
 
   const bandStyle = {
@@ -300,7 +300,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
                 }}
               >
                 <div style={{
-                  position: "relative", height: 120, borderRadius: 12, overflow: "hidden",
+                  position: "relative", height: thumbHeight, borderRadius: 12, overflow: "hidden",
                   border: "1px solid #EDE4F7", background: tappable ? "#EDE4F7" : "#F8F6FF",
                   ...(tappable ? {} : { width: 92, display: "flex", alignItems: "center", justifyContent: "center" }),
                 }}>
@@ -308,7 +308,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
                     <img
                       src={img.cloudinary_url}
                       alt={img.caption || imageTypeLabel(img.image_type)}
-                      style={{ height: 120, width: "auto", maxWidth: 240, objectFit: "cover", display: "block" }}
+                      style={{ height: thumbHeight, width: "auto", maxWidth: 240, objectFit: "cover", display: "block" }}
                       loading="lazy"
                     />
                   ) : (

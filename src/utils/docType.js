@@ -55,17 +55,11 @@ export function importRouteMismatch(documentType, componentCount) {
   return false;
 }
 
-// Renderer modes.
-export const RENDER = {
-  INLINE: 'inline',                          // sections in one scroll, with headers
-  INLINE_NUDGE: 'inline_with_upgrade_nudge', // inline + a (non-blocking) Craft nudge
-  HUB: 'hub',                                // hub-and-spoke section cards (Craft)
-};
-
-// A multi-section object stays inline up to this many light sections.
-export const INLINE_SECTION_MAX = 3;
-// Reserved for future heavy-section weighting (row-count fan-out tuning).
-export const ROW_THRESHOLD = 15;
+// Renderer modes (RENDER / INLINE_SECTION_MAX / chooseRenderer) were retired with
+// the unified pattern-detail shell: every pattern now uses one shell (Materials |
+// Instructions | Notes), and the Instructions tab varies by STRUCTURE (single →
+// rows; multi-part → parts grid ⇄ scoped part) gated by TIER, rather than by a
+// pre-computed renderer mode. Import routing (decideImportRoute) is unchanged.
 
 // Every clue child of a split inherits the parent import's source file URL.
 // Parent payload wins; fall back to the import handoff's URL when the modal
@@ -125,16 +119,51 @@ export function isReferenceChip(rowCount, hasBody) {
   return (rowCount || 0) === 0 && !hasBody;
 }
 
-// Pure renderer decision. STRUCTURAL, not type-driven: `document_type` only feeds
-// in via the section count upstream. Real signals only — the current `components`
-// shape has no per-section materials field, so that term from the original spec
-// is intentionally omitted rather than invented.
-export function chooseRenderer({ sectionCount, hasCharts, userIsCraft }) {
-  const n = sectionCount || 0;
-  if (n <= 1) return RENDER.INLINE;
-  if (n <= INLINE_SECTION_MAX && !hasCharts) return RENDER.INLINE; // light multi-section
-  // Complex multi-section object. Hub is the Craft presentation; everyone else
-  // still gets a fully usable inline pattern with a nudge (never paywall the read).
-  if (!userIsCraft) return RENDER.INLINE_NUDGE;
-  return RENDER.HUB;
+// ── Asset (chart/diagram) scoping for the unified shell ──────────────────────
+// The persistent asset carousel narrows to the open section when one is selected
+// and widens to the whole pattern otherwise. Narrowing degrades by DATA QUALITY:
+// an MKAL clue→asset link is reliable (each clue is its own pattern, so the fetch
+// is already scoped), while a multi-part part→chart link is NOT (component_name is
+// free-text sub-component — MOUTH, RIBS, SOULS — that often matches no part). So
+// we narrow ONLY on a reliable normalized match; anything without one stays in the
+// top-level view and is never dropped, never force-matched. cover/glossary (no
+// component_name) are always top-level.
+const PART_STOP_WORDS = new Set(['MAKE', 'PART', 'THE', 'AND', 'OF', 'FOR', 'A', 'AN']);
+
+export function normalizePartName(s) {
+  return String(s || '')
+    .toUpperCase()
+    .replace(/──/g, ' ')
+    .replace(/\bPART\s*\d+\s*[:.\-]?/g, ' ')
+    .replace(/\(\s*MAKE\s*\d+\s*\)/g, ' ')
+    .replace(/[^A-Z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function partTokens(s) {
+  return normalizePartName(s).split(' ').filter(t => t && !PART_STOP_WORDS.has(t));
+}
+
+// Reliable match only: one side's significant tokens are a subset of the other's,
+// AND they share at least one token of length >= 3 (so a stray short token can't
+// force a match). cover/glossary never scope to a part.
+export function imageMatchesPart(image, partHeaderText) {
+  if (!image) return false;
+  if (image.image_type === 'cover' || image.image_type === 'glossary') return false;
+  const ct = partTokens(image.component_name);
+  const pt = partTokens(partHeaderText);
+  if (ct.length === 0 || pt.length === 0) return false;
+  const cs = new Set(ct), ps = new Set(pt);
+  const subset = (a, b) => a.every(t => b.has(t));
+  const shareStrong = ct.some(t => ps.has(t) && t.length >= 3);
+  return shareStrong && (subset(ct, ps) || subset(pt, cs));
+}
+
+// No section selected → all assets. A section selected → only its reliably matched
+// assets (everything else remains visible at the top level when you back out).
+export function scopeAssetsToSection(images, partHeaderText) {
+  const list = Array.isArray(images) ? images : [];
+  if (!partHeaderText) return list;
+  return list.filter(img => imageMatchesPart(img, partHeaderText));
 }

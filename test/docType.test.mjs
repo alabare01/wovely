@@ -10,11 +10,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  DOC_TYPES, ROUTE, RENDER, INLINE_SECTION_MAX,
-  decideImportRoute, importRouteMismatch, chooseRenderer,
+  DOC_TYPES, ROUTE,
+  decideImportRoute, importRouteMismatch,
   resolveChildSourceUrl, isReferenceChip,
   looksLikeRowInstruction, bodyHasTrappedInstructions, clampPartIndex,
   buildPartStrip, shortPartLabel, isActivePart,
+  normalizePartName, imageMatchesPart, scopeAssetsToSection,
 } from '../src/utils/docType.js';
 
 // ── Routing regression fixtures ──────────────────────────────────────────────
@@ -59,26 +60,49 @@ test('mismatch: agreeing cases → not flagged', () => {
   assert.equal(importRouteMismatch(DOC_TYPES.BOOK, 5), false);
 });
 
-// ── Renderer decision (structural; degrades gracefully against classifier) ───
-test('renderer: <= 1 section → inline', () => {
-  assert.equal(chooseRenderer({ sectionCount: 0, hasCharts: false, userIsCraft: true }), RENDER.INLINE);
-  assert.equal(chooseRenderer({ sectionCount: 1, hasCharts: true, userIsCraft: true }), RENDER.INLINE);
+// ── Asset scoping for the unified shell (data-quality-aware narrowing) ────────
+// The renderer-mode decision (chooseRenderer/RENDER/INLINE_SECTION_MAX) was
+// retired with the unified shell; what's deterministic now is how the persistent
+// asset carousel narrows to the open section vs. falls back to the top level.
+test('asset scope: no section selected → all assets (top-level view)', () => {
+  const imgs = [
+    { id: 1, image_type: 'cover', component_name: null },
+    { id: 2, image_type: 'chart', component_name: 'PETALS' },
+  ];
+  assert.equal(scopeAssetsToSection(imgs, null).length, 2);
 });
-test('renderer: light multi-section (<= max, no charts) → inline', () => {
-  assert.equal(chooseRenderer({ sectionCount: INLINE_SECTION_MAX, hasCharts: false, userIsCraft: true }), RENDER.INLINE);
+test('asset scope: reliable normalized match narrows to the part (ignores Part-N / Make-N)', () => {
+  const imgs = [
+    { id: 1, image_type: 'diagram', component_name: 'ARMS' },
+    { id: 2, image_type: 'diagram', component_name: 'HORNS' },
+  ];
+  const scoped = scopeAssetsToSection(imgs, '── ARMS (MAKE 2) ──');
+  assert.deepEqual(scoped.map(i => i.id), [1]);
 });
-test('renderer: complex multi-section + below Craft → inline_with_upgrade_nudge', () => {
-  assert.equal(chooseRenderer({ sectionCount: 8, hasCharts: true, userIsCraft: false }), RENDER.INLINE_NUDGE);
+test('asset scope: unmatched sub-component assets fall back to top-level (never forced into a part)', () => {
+  // MOUTH/RIBS match no part header → excluded from the narrowed view...
+  const imgs = [
+    { id: 1, image_type: 'diagram', component_name: 'MOUTH' },
+    { id: 2, image_type: 'diagram', component_name: 'RIBS' },
+  ];
+  assert.equal(scopeAssetsToSection(imgs, 'HEAD & BODY').length, 0);
+  // ...but they're all still present at the top level.
+  assert.equal(scopeAssetsToSection(imgs, null).length, 2);
 });
-test('renderer: complex multi-section + Craft → hub', () => {
-  assert.equal(chooseRenderer({ sectionCount: 8, hasCharts: true, userIsCraft: true }), RENDER.HUB);
+test('asset scope: cover/glossary are always top-level, never scoped to a part', () => {
+  const imgs = [
+    { id: 1, image_type: 'cover', component_name: 'PETALS' },
+    { id: 2, image_type: 'glossary', component_name: null },
+  ];
+  assert.equal(scopeAssetsToSection(imgs, '── PART 5: PETALS ──').length, 0);
 });
-test('renderer: many sections even without charts + Craft → hub', () => {
-  assert.equal(chooseRenderer({ sectionCount: 12, hasCharts: false, userIsCraft: true }), RENDER.HUB);
+test('normalizePartName: strips wrapper, Part-N prefix, and Make-N suffix', () => {
+  assert.equal(normalizePartName('── PART 5: PETALS (MAKE 8) ──'), 'PETALS');
+  assert.equal(normalizePartName('HEAD & BODY'), 'HEAD BODY');
 });
-test('renderer: graceful degradation — classifier says multi_section but only 2 light sections → inline', () => {
-  // Proves the renderer leans on real structure, not the (possibly wrong) label.
-  assert.equal(chooseRenderer({ sectionCount: 2, hasCharts: false, userIsCraft: false }), RENDER.INLINE);
+test('imageMatchesPart: requires a strong shared token (no trivial short-token matches)', () => {
+  assert.equal(imageMatchesPart({ image_type: 'chart', component_name: 'A' }, 'PART 1: A BORDER'), false);
+  assert.equal(imageMatchesPart({ image_type: 'chart', component_name: 'PETALS' }, '── PART 5: PETALS ──'), true);
 });
 
 // ── Part A regression: clue children inherit the import's source file URL ────
