@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test \"test/**/*.test.mjs\""
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "screenshots": "node screenshots/run.js",
+    "screenshots:quick": "node screenshots/run.js --quick",
+    "screenshots:reset": "node screenshots/reset.js",
+    "screenshots:seed-audit": "node screenshots/seed-audit.mjs"
   },
   "dependencies": {
     "@posthog/react": "^1.8.2",
@@ -21,6 +25,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
+    "playwright": "^1.60.0",
     "vite": "^5.0.0"
   }
 }

@@ -11,6 +11,12 @@ node_modules/
 dist/
 build/
 
+# Screenshot harness output (committed code, not captures)
+screenshots/20*/
+screenshots/.env.vercel.local
+audit-s77/
+audit-archive-pre-s77/
+
 # Vite
 *.local
 
