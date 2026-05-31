@@ -936,6 +936,12 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
       setEditTitle(sanitizeTitle(result.title)||"");setEditDesigner(result.designer||"");
       setEditHook(result.hook_size||"");setEditWeight(result.yarn_weight||"");
       if(polling.coverImageUrl) setCoverUrl(polling.coverImageUrl);
+      // Thread the queue job's file_url into fileInfo so the saved pattern keeps
+      // source_file_url. The pill-RESUME path mounts with no initialFileInfo, so
+      // without this fileInfo stays null and handleSave persists an empty
+      // source_file_url — which silently skips Bev's image classification (and
+      // "View Source"). `prev||` so we never clobber a live-upload/review fileInfo.
+      if(polling.fileUrl) setFileInfo(prev=>prev||{url:polling.fileUrl,name:(polling.fileUrl.split("/").pop()||"pattern.pdf"),type:"application/pdf",coverUrl:polling.coverImageUrl||null});
       // Server-side BevCheck result (S66). When validation_report has an
       // error key, surface failure UI; otherwise drop it into state for the
       // review panel. {skipped:true} (no text to validate) reads as no

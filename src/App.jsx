@@ -2882,10 +2882,15 @@ export default function Wovely() {
     // Persist to Supabase
     if(user&&session){
       try{
+        // Defense-in-depth: the pattern object can arrive with an empty
+        // source_file_url on some queue/resume paths even though the import job
+        // carried a file_url. Backfill from the pill→modal handoff so the row
+        // (and Bev's image classification, which is gated on it) isn't starved.
+        const resolvedSourceUrl=p.source_file_url||pendingExtractedHandoff?.fileUrl||null;
         const res=await fetch(`${SUPABASE_URL}/rest/v1/patterns`,{
           method:"POST",
           headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${session.access_token}`,"Content-Type":"application/json","Prefer":"return=representation"},
-          body:JSON.stringify({user_id:user.id,title:dedupTitle,cat:p.cat||"",source:p.source||"",source_url:p.source_url||"",notes:p.notes||"",pattern_notes:p.pattern_notes||null,difficulty:p.difficulty||"",yarn_weight:p.weight||"",hook_size:p.hook||"",gauge:p.gauge||{},tags:p.tags||[],is_ai_generated:!!p.is_ai_generated,is_starter:!!p.isStarter,image_url:p.image_url||"",photo:p.photo||"",cover_image_url:p.cover_image_url||null,row_count:(p.rows||[]).length,materials:p.materials||[],rows:p.rows||[],rating:p.rating||0,yardage:p.yardage||0,skeins:p.skeins||0,skein_yards:p.skeinYards||200,dimensions:p.dimensions||{},weight:p.weight||"",hook:p.hook||"",source_file_url:p.source_file_url||null,source_file_name:p.source_file_name||null,source_file_type:p.source_file_type||null,extracted_by_ai:!!p.extracted_by_ai,components:p.components||null,validation_flags:p.validation_flags||null,validation_report:p.validation_report||null}),
+          body:JSON.stringify({user_id:user.id,title:dedupTitle,cat:p.cat||"",source:p.source||"",source_url:p.source_url||"",notes:p.notes||"",pattern_notes:p.pattern_notes||null,difficulty:p.difficulty||"",yarn_weight:p.weight||"",hook_size:p.hook||"",gauge:p.gauge||{},tags:p.tags||[],is_ai_generated:!!p.is_ai_generated,is_starter:!!p.isStarter,image_url:p.image_url||"",photo:p.photo||"",cover_image_url:p.cover_image_url||null,row_count:(p.rows||[]).length,materials:p.materials||[],rows:p.rows||[],rating:p.rating||0,yardage:p.yardage||0,skeins:p.skeins||0,skein_yards:p.skeinYards||200,dimensions:p.dimensions||{},weight:p.weight||"",hook:p.hook||"",source_file_url:resolvedSourceUrl,source_file_name:p.source_file_name||(resolvedSourceUrl?(resolvedSourceUrl.split("/").pop()||null):null),source_file_type:p.source_file_type||(resolvedSourceUrl&&resolvedSourceUrl.toLowerCase().endsWith(".pdf")?"application/pdf":null),extracted_by_ai:!!p.extracted_by_ai,components:p.components||null,validation_flags:p.validation_flags||null,validation_report:p.validation_report||null}),
         });
         console.log("[Wovely] INSERT response status:", res.status);
         if(res.ok){
@@ -2900,7 +2905,7 @@ export default function Wovely() {
             // Server inserts pattern_images rows with cloudinary_url=null;
             // PatternDetail (Craft tier) lazy-renders + uploads them on view.
             // Single-pattern import → one entry, no component routing needed.
-            fireImageExtraction([{ id: rows[0].id, component_name: null }], p.source_file_url, user.id);
+            fireImageExtraction([{ id: rows[0].id, component_name: null }], resolvedSourceUrl, user.id);
             // Collection linkage — when the import was launched from a
             // collection detail view (or a greyed clue slot), persist
             // collection_id / collection_order so the new pattern shows
