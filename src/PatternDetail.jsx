@@ -287,6 +287,10 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
   // loads the full rows and renders any pending ones.
   const [lockedCount, setLockedCount] = useState(null);
   const [images, setImages] = useState(null);
+  // S78: non-blocking notice when the lazy render reports a failure (telemetry
+  // also goes to /api/client-error). Lets the Craft user know a chart didn't
+  // prepare instead of it silently staying blank.
+  const [renderNote, setRenderNote] = useState(null);
 
   useEffect(() => {
     if (!patternId) return;
@@ -309,6 +313,10 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
           onProgress: (row) => {
             if (cancelled || !row) return;
             setImages(prev => (prev || []).map(p => p.id === row.id ? { ...p, cloudinary_url: row.cloudinary_url } : p));
+          },
+          onError: ({ stage }) => {
+            if (cancelled) return;
+            setRenderNote(`Some charts couldn't be prepared (${stage}) — Bev logged the details.`);
           },
         });
         if (!cancelled) setImages(updated);
@@ -356,12 +364,19 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
   // strip per spec). The shared strip handles thumbs, spinners, and lightbox.
   if (images === null || images.length === 0) return null;
   return (
-    <ChartStripView
-      images={images}
-      canPin={isCraft}
-      pinnedImageId={pinnedImageId}
-      onTogglePin={onTogglePin}
-    />
+    <>
+      {renderNote && (
+        <div style={{ background: "#FFF7F6", borderBottom: "1px solid #EDE4F7", padding: "6px 16px", fontFamily: "Inter, sans-serif", fontSize: 11, color: "#C0544A" }}>
+          {renderNote}
+        </div>
+      )}
+      <ChartStripView
+        images={images}
+        canPin={isCraft}
+        pinnedImageId={pinnedImageId}
+        onTogglePin={onTogglePin}
+      />
+    </>
   );
 };
 

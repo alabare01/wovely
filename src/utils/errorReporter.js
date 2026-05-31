@@ -23,6 +23,15 @@ function report(message, source, stack, extra = {}) {
   }).catch(() => {}); // swallow network errors silently
 }
 
+// Public helper for reporting a HANDLED (caught) error from anywhere in the app.
+// Reuses the same /api/client-error sink + user context as the global handlers,
+// so swallowed failures (e.g. the lazy chart render) become observable in the
+// logs instead of dying in a console.warn. `context` fields are persisted under
+// the log row's context jsonb.
+export function reportClientError(message, context = {}) {
+  report(message, context.source || 'handled', context.stack || null, context);
+}
+
 export function initErrorReporter() {
   window.onerror = function(message, source, lineno, colno, error) {
     report(

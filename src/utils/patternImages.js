@@ -6,6 +6,7 @@
 // PATCHes the row. Subsequent visits hit the cached Cloudinary URL.
 
 import { SUPABASE_URL, SUPABASE_ANON_KEY, getSession } from "../supabase.js";
+import { reportClientError } from "./errorReporter.js";
 
 const CLOUDINARY_CLOUD = "dmaupzhcx";
 const CLOUDINARY_PRESET = "yarnhive_patterns";
@@ -152,37 +153,58 @@ const uploadDataUrlToCloudinary = async (dataUrl, publicId) => {
 // cloudinary_url, fire onProgress as each row resolves. Errors per-row are
 // swallowed so one bad page doesn't tank the whole batch. Returns the updated
 // list. Safe to call repeatedly — already-resolved rows are skipped.
-export const renderAndUploadPendingImages = async ({ images, sourceFileUrl, onProgress }) => {
+export const renderAndUploadPendingImages = async ({ images, sourceFileUrl, onProgress, onError }) => {
   if (!Array.isArray(images) || images.length === 0) return [];
   const pending = images.filter(i => !i.cloudinary_url);
   if (pending.length === 0) return images;
-  if (!sourceFileUrl) return images;
+  const patternId = images[0]?.pattern_id || null;
+
+  // INSTRUMENTATION (S78): this render path used to swallow every failure with a
+  // console.warn, so a stuck render (cloudinary_url stays null) was invisible.
+  // `note` makes each failure observable — which STAGE, which PAGE, which
+  // PATTERN — via /api/client-error (persisted) + console.error (devtools), and
+  // surfaces a non-blocking notice to the caller via onError. The render logic
+  // itself is unchanged; this only adds reporting.
+  const note = (stage, detail = {}) => {
+    const msg = `[patternImages] render failed at "${stage}" (pattern=${patternId}${detail.pageNumber != null ? `, page=${detail.pageNumber}` : ""})`;
+    console.error(msg, detail);
+    reportClientError(msg, { source: `patternImages:${stage}`, stage, patternId, ...detail });
+    onError?.({ stage, patternId, ...detail });
+  };
+
+  if (!sourceFileUrl) {
+    note("no_source_url", { pending: pending.length });
+    return images;
+  }
 
   let pdfDoc;
   try {
     pdfDoc = await loadPdfDoc(sourceFileUrl);
   } catch (e) {
-    console.warn("[patternImages] PDF load failed:", e?.message);
+    note("pdf_load", { message: e?.message || String(e), sourceFileUrl });
     return images;
   }
 
   const updated = [...images];
   for (const row of pending) {
-    if (!row.page_number || row.page_number < 1 || row.page_number > pdfDoc.numPages) continue;
+    if (!row.page_number || row.page_number < 1 || row.page_number > pdfDoc.numPages) {
+      note("page_out_of_range", { imageId: row.id, pageNumber: row.page_number ?? null, numPages: pdfDoc.numPages });
+      continue;
+    }
     try {
       const dataUrl = await renderPageToDataUrl(pdfDoc, row.page_number);
       const publicId = `${row.pattern_id}_p${row.page_number}`;
       const cloudUrl = await uploadDataUrlToCloudinary(dataUrl, publicId);
       const { error } = await updatePatternImageUrl(row.id, cloudUrl);
       if (error) {
-        console.warn("[patternImages] PATCH failed:", error);
+        note("db_patch", { imageId: row.id, pageNumber: row.page_number, message: String(error).slice(0, 200) });
         continue;
       }
       const idx = updated.findIndex(u => u.id === row.id);
       if (idx >= 0) updated[idx] = { ...updated[idx], cloudinary_url: cloudUrl };
       onProgress?.(updated[idx]);
     } catch (e) {
-      console.warn(`[patternImages] page ${row.page_number} render/upload failed:`, e?.message);
+      note("render_upload", { imageId: row.id, pageNumber: row.page_number, message: e?.message || String(e) });
     }
   }
   return updated;
