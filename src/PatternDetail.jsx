@@ -10,7 +10,7 @@ import { listPatternsInCollection, partLabelFor } from "./utils/collections.js";
 import { canAccessChartImages } from "./utils/featureGates.js";
 import { fetchPatternImages, getPatternImageCount, renderAndUploadPendingImages } from "./utils/patternImages.js";
 import { ChartStripView } from "./components/ChartStrip.jsx";
-import { chooseRenderer, RENDER, clampPartIndex, buildPartStrip } from "./utils/docType.js";
+import { clampPartIndex, buildPartStrip } from "./utils/docType.js";
 import SectionHub from "./components/SectionHub.jsx";
 
 const YarnSummaryCard = ({label, myKey, myVal, fallback, onSave}) => {
@@ -473,7 +473,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   },[]);
   const _initRows=ensureRepeatBrackets(p.rows);
   const _isFreshPattern=_initRows.filter(r=>!r.isHeader).every(r=>!r.done);
-  const [rows,setRows]=useState(_initRows),[tab,setTab]=useState(()=>{if(initialScrollToRow!=null) return "rows";if(_isFreshPattern) return "materials";const saved=localStorage.getItem("yh_last_tab");return VALID_TABS.includes(saved)?saved:"materials";}),[editing,setEditing]=useState(false),[draft,setDraft]=useState({...p}),[showScale,setShowScale]=useState(false),[showShare,setShowShare]=useState(false),[milestone,setMilestone]=useState(null);
+  const [rows,setRows]=useState(_initRows),[tab,setTab]=useState(()=>{if(initialScrollToRow!=null) return "rows";return "materials";}),[editing,setEditing]=useState(false),[draft,setDraft]=useState({...p}),[showScale,setShowScale]=useState(false),[showShare,setShowShare]=useState(false),[milestone,setMilestone]=useState(null);
   useEffect(()=>{
     if(initialScrollToRow!=null&&tab==="rows"){
       setTimeout(()=>{
@@ -516,33 +516,21 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   const skeinDisplay=estSkeins(p)>0?"~"+estSkeins(p)+(p.skeins>0?" skeins":" skeins (est.)"):"Not listed";
   const saveMyField=(key,val)=>{const updated={...p,rows,[key]:val||null};onSave(updated);};
   const detailPhoto=p.cover_image_url||pdfThumbUrl(p.source_file_url)||p.photo;
-  // S76 renderer selection — STRUCTURAL (section count + charts + tier), so it
-  // degrades gracefully if the classifier was wrong. sectionCount comes from the
-  // header rows (the named parts); hasCharts reuses the same displayable count as
-  // the chart strip. inline / inline_with_upgrade_nudge keep the existing view;
-  // hub is the Craft hub-and-spoke for complex multi-section objects.
-  const userIsCraft=canAccessChartImages(tier,isAnonymous);
+  // Unified shell (S78): EVERY pattern, every tier renders the SAME three tabs —
+  // Materials | Instructions | Notes. Structure is derived SYNCHRONOUSLY from the
+  // rows/components (isMultiPart), never from an async charts probe — so the
+  // layout is correct on first render after import and never flips once mounted.
+  // (The old chooseRenderer/hasCharts fork resolved a beat after mount and could
+  // swap hub↔inline — that was the "stale layout until you back out and in" bug.)
   const sectionCount=rows.filter(r=>r.isHeader).length||(Array.isArray(p.components)?p.components.length:0);
-  const [hasCharts,setHasCharts]=useState(false);
-  useEffect(()=>{
-    const pid=p._supabaseId||p.id;
-    if(!pid){setHasCharts(false);return;}
-    let cancelled=false;
-    (async()=>{const{data}=await getPatternImageCount(pid);if(!cancelled)setHasCharts((typeof data==="number"?data:0)>0);})();
-    return ()=>{cancelled=true;};
-  },[p._supabaseId,p.id]);
-  const renderMode=chooseRenderer({sectionCount,hasCharts,userIsCraft});
-  // Hub mode is a landing (section grid + unified materials, no tabs) that opens
-  // a scoped section view (instructions + notes). hubSection holds the selected
-  // section's header id. Inline modes keep the Materials | Instructions | Notes
-  // tabs untouched.
+  const isMultiPart=sectionCount>1;
   const [hubSection,setHubSection]=useState(null);
-  const isHub=renderMode===RENDER.HUB;
-  const hubLanding=isHub&&!hubSection;
-  const hubScoped=isHub&&!!hubSection;
-  const showMaterials=hubLanding||(!isHub&&tab==="materials");
-  const showRows=hubScoped||(!isHub&&tab==="rows");
-  const showNotes=hubScoped||(!isHub&&tab==="notes");
+  const hubScoped=isMultiPart&&!!hubSection;  // a part is open (alias kept for the Notes block)
+  const showMaterials=tab==="materials";
+  const showRows=tab==="rows";
+  const showNotes=tab==="notes";
+  // Tapping a part in the Materials-tab parts card loads it under Instructions.
+  const openPart=(id)=>{setHubSection(id);setTab("rows");window.scrollTo({top:0});};
   const hubSectionTitle=hubScoped?((rows.find(r=>r.isHeader&&r.id===hubSection)?.text||"").replace(/──/g,"").trim()):"";
   // Reset the scoped part when navigating to a different pattern (in case
   // this view isn't remounted per id).
@@ -631,11 +619,11 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             );
           })()}
           <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} pinnedImageId={pinnedImageId} onTogglePin={onTogglePin} />
-          {!isHub&&<div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
-            {[["materials","Materials"],["rows","Instructions/Rows"],["notes","My Notes"]].map(([key,label])=>(
-              <button key={key} onClick={()=>{setTab(key);localStorage.setItem("yh_last_tab",key);}} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>
+          <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
+            {[["materials","Materials"],["rows","Instructions"],["notes","Notes"]].map(([key,label])=>(
+              <button key={key} onClick={()=>setTab(key)} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>
             ))}
-          </div>}
+          </div>
         </div>
         <div style={{padding:`4px 20px ${isAnonymous?220:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
         {collectionUpgrade && (
@@ -668,14 +656,17 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             </div>
           </div>
         )}
-        {hubLanding&&(
-          <div style={{paddingTop:8}}>
-            <SectionHub rows={rows} onSelect={setHubSection} Bar={Bar}/>
-            <div style={{marginTop:28,fontFamily:T.serif,fontSize:18,color:T.ink,marginBottom:2}}>Materials</div>
-            <div style={{fontSize:12.5,color:T.ink3,marginBottom:6,lineHeight:1.5}}>Everything for the whole project, in one place.</div>
-          </div>
-        )}
         {showMaterials&&(<>
+          {/* Multi-part: the existing "The parts" card lives at the top of the
+              Materials tab. Tapping a part jumps to Instructions with it loaded.
+              Single-part patterns have no parts card — just the materials. */}
+          {isMultiPart&&(
+            <div style={{paddingTop:8,marginBottom:22}}>
+              <SectionHub rows={rows} onSelect={openPart} Bar={Bar}/>
+              <div style={{marginTop:24,fontFamily:T.serif,fontSize:18,color:T.ink,marginBottom:2}}>Materials</div>
+              <div style={{fontSize:12.5,color:T.ink3,marginBottom:6,lineHeight:1.5}}>Everything for the whole project, in one place.</div>
+            </div>
+          )}
           {(editing?draft.materials:p.materials).map((m,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${T.border}`}}>
               <div style={{width:6,height:6,borderRadius:99,background:T.terra,flexShrink:0}}/>
@@ -702,9 +693,9 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             <button onClick={()=>setShowScale(true)} style={{marginTop:12,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:10,padding:"10px",fontSize:13,fontWeight:600,cursor:"pointer"}}>⚖️ Scale pattern to different size →</button>
           </div>
         </>)}
-        {hubScoped&&(
+        {showRows&&hubScoped&&(
           <div style={{paddingTop:4}}>
-            <button onClick={()=>{setHubSection(null);window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:8}}>← All parts</button>
+            <button onClick={()=>{setHubSection(null);setTab("materials");window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:8}}>← All parts</button>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:12}}>
               <button onClick={()=>goPart(-1)} disabled={hubIndex<=0} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex<=0?T.ink3:T.terra,cursor:hubIndex<=0?"default":"pointer",opacity:hubIndex<=0?0.4:1,fontSize:13,fontWeight:600}}>← Prev</button>
               <span style={{fontSize:12,color:T.ink2,fontWeight:600}}>Part {hubIndex+1} of {hubTotal}</span>
@@ -729,19 +720,10 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             {hubSectionTitle&&<div style={{fontFamily:T.serif,fontSize:20,color:T.ink,marginBottom:12,lineHeight:1.25}}>{hubSectionTitle}</div>}
           </div>
         )}
-        {showRows&&(hubScoped
-          ? <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp} focusHeaderId={hubSection}/>
-          : <>
-              {renderMode===RENDER.INLINE_NUDGE&&(
-                <div style={{marginBottom:14,background:"linear-gradient(135deg,#F3EEFA,rgba(255,255,255,0.82))",border:`1px solid ${T.border}`,borderRadius:14,padding:"14px 16px"}}>
-                  <div style={{fontFamily:T.serif,fontSize:14,fontWeight:700,color:T.ink,marginBottom:4,lineHeight:1.3}}>Bev laid this one out in {sectionCount} parts</div>
-                  <div style={{fontSize:12,color:T.ink2,lineHeight:1.55,marginBottom:10}}>On Craft, every part gets its own space with part cards and charts you can jump between.</div>
-                  <button onClick={onShowUpgrade} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"8px 16px",fontSize:12,fontWeight:600,cursor:"pointer"}}>See the full layout with Craft</button>
-                </div>
-              )}
-              <RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp}/>
-            </>
-        )}
+        {/* Instructions = the rows. focusHeaderId scopes to the open part; null
+            (no part / single-part) renders the full row checklist with its inline
+            section accordions. RowManager is reused unchanged. */}
+        {showRows&&<RowManager p={p} rows={rows} setRows={setRows} onSave={onSave} editing={editing} setEditing={setEditing} setMilestone={setMilestone} Bar={Bar} onViewSource={handleViewSource} isAnonymous={isAnonymous} onSignUp={onSignUp} focusHeaderId={hubSection}/>}
         {/* Source file direct link */}
         {showMaterials&&(
           <div style={{marginTop:16,borderTop:`1px solid ${T.border}`,paddingTop:14}}>

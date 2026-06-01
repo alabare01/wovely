@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
   // RLS via user JWT — only returns row if user_id = auth.uid()
   const r = await fetch(
-    `${supabaseUrl}/rest/v1/import_jobs?id=eq.${encodeURIComponent(jobId)}&select=id,status,extracted_data,error_message,extraction_method,file_type,retry_count,created_at,updated_at,cover_image_url,validation_report,current_phase,phase_timestamps`,
+    `${supabaseUrl}/rest/v1/import_jobs?id=eq.${encodeURIComponent(jobId)}&select=id,status,extracted_data,error_message,extraction_method,file_type,file_url,retry_count,created_at,updated_at,cover_image_url,validation_report,current_phase,phase_timestamps`,
     {
       headers: {
         'apikey': anonKey,
@@ -55,6 +55,11 @@ export default async function handler(req, res) {
     error_message: job.error_message,
     extraction_method: job.extraction_method,
     file_type: job.file_type,
+    // file_url is required by the client so the saved pattern keeps its
+    // source_file_url on the queue/pill-resume path — without it Bev's image
+    // classification is silently skipped (the polling hook reads job.file_url,
+    // which was previously never returned here).
+    file_url: job.file_url,
     retry_count: job.retry_count,
     created_at: job.created_at,
     updated_at: job.updated_at,
