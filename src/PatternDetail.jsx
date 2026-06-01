@@ -360,9 +360,26 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
     );
   }
 
-  // Unlocked. Render nothing until classified rows exist (no empty state in the
-  // strip per spec). The shared strip handles thumbs, spinners, and lightbox.
-  if (images === null || images.length === 0) return null;
+  // Unlocked (Craft). PRESENCE is derived SYNCHRONOUSLY from the pattern: a
+  // PDF-sourced pattern is expected to carry assets, so on first paint — before
+  // the async image fetch resolves — render the band with the EXISTING Bev
+  // "preparing" spinner instead of nothing. This is the "ribbon blank until you
+  // back out and in" fix. Once the fetch resolves we show the real strip, or
+  // nothing if the pattern genuinely has no assets.
+  if (images === null) {
+    if (!sourceFileUrl) return null;
+    return (
+      <ChartStripView
+        images={[]}
+        showEmptyState
+        pendingLabel="Bev is preparing your charts…"
+        canPin={isCraft}
+        pinnedImageId={pinnedImageId}
+        onTogglePin={onTogglePin}
+      />
+    );
+  }
+  if (images.length === 0) return null;
   return (
     <>
       {renderNote && (
@@ -524,7 +541,10 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   // swap hub↔inline — that was the "stale layout until you back out and in" bug.)
   const sectionCount=rows.filter(r=>r.isHeader).length||(Array.isArray(p.components)?p.components.length:0);
   const isMultiPart=sectionCount>1;
-  const [hubSection,setHubSection]=useState(null);
+  // Default the open part to the FIRST part synchronously, so the Instructions
+  // tab paints the scoped single-part view + pill strip on first render rather
+  // than stacking every part (the all-parts-on-first-paint bug). Single-part → null.
+  const [hubSection,setHubSection]=useState(()=>{const h=rows.filter(r=>r.isHeader);return h.length>1?h[0].id:null;});
   const hubScoped=isMultiPart&&!!hubSection;  // a part is open (alias kept for the Notes block)
   const showMaterials=tab==="materials";
   const showRows=tab==="rows";
@@ -534,7 +554,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   const hubSectionTitle=hubScoped?((rows.find(r=>r.isHeader&&r.id===hubSection)?.text||"").replace(/──/g,"").trim()):"";
   // Reset the scoped part when navigating to a different pattern (in case
   // this view isn't remounted per id).
-  useEffect(()=>{setHubSection(null);},[p.id,p._supabaseId]);
+  useEffect(()=>{const h=rows.filter(r=>r.isHeader);setHubSection(h.length>1?h[0].id:null);},[p.id,p._supabaseId]);// eslint-disable-line react-hooks/exhaustive-deps
   // Part-to-part navigation in the scoped view (mirrors MKAL clue nav).
   const partHeaders=rows.filter(r=>r.isHeader);
   const hubIndex=hubScoped?partHeaders.findIndex(r=>r.id===hubSection):-1;
@@ -695,7 +715,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
         </>)}
         {showRows&&hubScoped&&(
           <div style={{paddingTop:4}}>
-            <button onClick={()=>{setHubSection(null);setTab("materials");window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:8}}>← All parts</button>
+            <button onClick={()=>{setTab("materials");window.scrollTo({top:0});}} style={{display:"flex",alignItems:"center",gap:6,background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:"4px 0",marginBottom:8}}>← All parts</button>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:12}}>
               <button onClick={()=>goPart(-1)} disabled={hubIndex<=0} style={{display:"flex",alignItems:"center",gap:4,background:"none",border:"none",padding:"4px 6px",color:hubIndex<=0?T.ink3:T.terra,cursor:hubIndex<=0?"default":"pointer",opacity:hubIndex<=0?0.4:1,fontSize:13,fontWeight:600}}>← Prev</button>
               <span style={{fontSize:12,color:T.ink2,fontWeight:600}}>Part {hubIndex+1} of {hubTotal}</span>
