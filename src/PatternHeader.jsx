@@ -1,16 +1,5 @@
 import { T, useBreakpoint } from "./theme.jsx";
 
-// Build the small uppercase breadcrumb above the title. Each segment is shown
-// only when its source field is populated — empty hook / weight / generic
-// "Uncategorized" category all drop out, no trailing separator or empty slot.
-const buildBreadcrumb = (p, includeHook) => {
-  const segs = [];
-  if (p.cat && p.cat.toLowerCase() !== "uncategorized") segs.push(p.cat);
-  if (includeHook && p.hook) segs.push(`Hook ${p.hook}`);
-  if (p.weight) segs.push(p.weight);
-  return segs.join(" · ");
-};
-
 const PatternHeader = ({
   p,
   rows,
@@ -69,7 +58,6 @@ const PatternHeader = ({
               <Photo src={detailPhoto} alt={p.title} style={{width:"100%",height:"100%",objectFit:"cover",objectPosition:"center top"}}/>
               <div style={{position:"absolute",inset:0,background:"linear-gradient(to top,rgba(14,10,8,.85) 0%,transparent 45%)"}}/>
               <div style={{position:"absolute",bottom:14,left:14,right:0}}>
-                <div style={{fontSize:9,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:".1em",marginBottom:3}}>{buildBreadcrumb(p, false)}</div>
                 {editing
                   ?<input value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})} style={{width:"90%",background:"rgba(255,255,255,.12)",border:"1px solid rgba(255,255,255,.3)",borderRadius:8,padding:"5px 8px",color:"#fff",fontSize:16,fontFamily:T.serif,outline:"none"}}/>
                   :<div style={{fontFamily:T.serif,fontSize:isDesktop?20:15,fontWeight:700,color:"#fff",lineHeight:1.2,paddingRight:8}}>{p.title}</div>}
@@ -114,7 +102,6 @@ const PatternHeader = ({
             </div>
           </div>
           <div style={{position:"absolute",bottom:0,left:0,right:0,padding:"0 20px 14px",zIndex:3}}>
-            <div style={{fontSize:10,color:"rgba(255,255,255,.5)",textTransform:"uppercase",letterSpacing:".09em",marginBottom:4}}>{buildBreadcrumb(p, true)}</div>
             {editing
               ?<input value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})} style={{width:"100%",background:"rgba(255,255,255,.12)",border:"1px solid rgba(255,255,255,.3)",borderRadius:8,padding:"6px 10px",color:"#fff",fontSize:19,fontFamily:T.serif,outline:"none"}}/>
               :<div style={{fontFamily:T.serif,fontSize:isDesktop?24:20,fontWeight:700,color:"#fff",lineHeight:1.2}}>{p.title}</div>}
