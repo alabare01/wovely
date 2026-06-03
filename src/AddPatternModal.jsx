@@ -1094,7 +1094,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
                 // instead of the generic "stumped" retry copy.
                 if (jobRes.status === 402 && errBody.error === 'chunked_import_requires_paid_tier') {
                   setErrorType('tier_gated_chunked');
-                  setErrorMsg(errBody.message || 'This pattern is a big one. Pro members get full support for complex patterns.');
+                  setErrorMsg(errBody.message || 'This pattern is a big one. Craft members get full support for complex patterns.');
                 } else {
                   setErrorType('extraction_failed');
                   setErrorMsg(errBody.error || 'We couldn’t start your import. Try again.');
@@ -1315,7 +1315,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
           <div style={{fontSize:36,textAlign:"center",marginBottom:12}}>🧶</div>
           <div style={{fontFamily:T.serif,fontSize:17,color:T.ink,textAlign:"center",marginBottom:6}}>This pattern is a big one</div>
           <div style={{fontSize:13,color:T.ink2,textAlign:"center",lineHeight:1.7,marginBottom:20,padding:"0 8px"}}>
-            {errorMsg||"Pro members get full support for complex patterns. Bev handles everything from setup to finishing."}
+            {errorMsg||"Craft members get full support for complex patterns. Bev handles everything from setup to finishing."}
           </div>
           {onUpgrade && (
             <div style={{marginBottom:8}}>
@@ -1458,7 +1458,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
               </div>
               <div style={{borderTop:`1px solid ${T.border}`,marginTop:8,paddingTop:8}}>
                 <div style={{fontSize:10,color:T.ink3,marginBottom:6}}>🔒 Unlock full report</div>
-                <button onClick={()=>onUpgrade&&onUpgrade()} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"6px 16px",fontSize:10,fontWeight:600,cursor:"pointer"}}>Upgrade to Pro</button>
+                <button onClick={()=>onUpgrade&&onUpgrade()} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"6px 16px",fontSize:10,fontWeight:600,cursor:"pointer"}}>Upgrade to Craft</button>
               </div>
             </div>
           );})():(

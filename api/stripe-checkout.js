@@ -1,9 +1,8 @@
 // api/stripe-checkout.js
-// Creates a Stripe Checkout session for a Wovely paid tier (pro | craft).
+// Creates a Stripe Checkout session for the Wovely paid tier (craft).
 //
 // Env vars (required for the tier-aware flow):
 //   STRIPE_SECRET_KEY     — Stripe API key
-//   STRIPE_PRO_PRICE_ID   — recurring price for the $4.99 Pro tier
 //   STRIPE_CRAFT_PRICE_ID — recurring price for the $8.99 Craft tier
 //
 // If a tier's price ID isn't configured we 500 with a clear message
@@ -16,7 +15,6 @@ import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const PRICE_ENV = {
-  pro:   'STRIPE_PRO_PRICE_ID',
   craft: 'STRIPE_CRAFT_PRICE_ID',
 };
 
@@ -34,10 +32,12 @@ export default async function handler(req, res) {
   const { userId, email, tier: rawTier } = req.body || {};
   if (!userId || !email) return res.status(400).json({ error: 'Missing userId or email' });
 
-  // Default to 'pro' if the client didn't send a tier — preserves the
-  // legacy single-Pro flow for any cached client that hasn't picked up
-  // the three-tier modal yet.
-  const tier = (rawTier === 'pro' || rawTier === 'craft') ? rawTier : 'pro';
+  // Craft is the only purchasable tier now. Reject any explicit tier param
+  // that isn't 'craft'; otherwise default to 'craft' unconditionally.
+  if (rawTier != null && rawTier !== 'craft') {
+    return res.status(400).json({ error: `Unknown tier "${rawTier}". The only purchasable tier is "craft".` });
+  }
+  const tier = 'craft';
   const priceEnvKey = PRICE_ENV[tier];
   const priceId = process.env[priceEnvKey];
 

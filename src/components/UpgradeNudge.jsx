@@ -10,15 +10,15 @@ import { requiredTier } from "../utils/featureGates.js";
 const NUDGE_COPY = {
   patternCap: {
     headline: "Your pattern box is full",
-    body: "Pro members get unlimited patterns. Add as many as you can stitch.",
+    body: "Craft gives you a much larger library. Add far more patterns than Free.",
   },
   bevCheck: {
     headline: "Bev checked this pattern",
-    body: "The full report is part of Pro. Catch off-counts and broken rounds before you start crocheting.",
+    body: "The full report is part of Craft. Catch off-counts and broken rounds before you start crocheting.",
   },
   chunkedImport: {
     headline: "This pattern is a big one",
-    body: "Pro members get full support for complex patterns with lots of components.",
+    body: "Craft members get full support for complex patterns with lots of components.",
   },
   collections: {
     headline: "Organize pattern books and MKALs",

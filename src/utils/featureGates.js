@@ -10,9 +10,9 @@
 import { TIER_FREE, TIER_PRO, TIER_CRAFT } from './tierUtils.js';
 
 export const FEATURE_GATES = {
-  unlimitedPatterns: [TIER_PRO, TIER_CRAFT],
-  bevCheck:          [TIER_PRO, TIER_CRAFT],
-  chunkedImport:     [TIER_PRO, TIER_CRAFT],
+  unlimitedPatterns: [TIER_CRAFT],
+  bevCheck:          [TIER_CRAFT],
+  chunkedImport:     [TIER_CRAFT],
   collections:       [TIER_CRAFT],
   chartImages:       [TIER_CRAFT], // server-side classification always runs; this gates display in PatternDetail
   bevsRead:          [TIER_CRAFT], // future — not exposed in UI yet

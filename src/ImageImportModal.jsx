@@ -574,7 +574,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
               </div>
               <div style={{borderTop:`1px solid ${T.border}`,marginTop:8,paddingTop:8}}>
                 <div style={{fontSize:10,color:T.ink3,marginBottom:6}}>🔒 Unlock full report</div>
-                <button onClick={()=>onUpgrade&&onUpgrade()} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"6px 16px",fontSize:10,fontWeight:600,cursor:"pointer"}}>Upgrade to Pro</button>
+                <button onClick={()=>onUpgrade&&onUpgrade()} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"6px 16px",fontSize:10,fontWeight:600,cursor:"pointer"}}>Upgrade to Craft</button>
               </div>
             </div>
           );})():(

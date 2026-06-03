@@ -23,17 +23,16 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-const PRO_PRICE_ID = process.env.STRIPE_PRO_PRICE_ID;
 const CRAFT_PRICE_ID = process.env.STRIPE_CRAFT_PRICE_ID;
 
-// Map a Stripe price_id back to a Wovely tier string. Falls back to 'pro'
-// when nothing matches — better to give a paying user a paid tier than
-// to leave them on free while we figure out the env var mismatch.
+// Map a Stripe price_id back to a Wovely tier string. Craft is the only paid
+// tier now, so any paid subscription event on this account resolves to craft.
+// Falls back to 'craft' when nothing matches — better to give a paying user a
+// paid tier than to leave them on free while we figure out an env var mismatch.
 function tierFromPriceId(priceId, fallbackMeta) {
   if (priceId && CRAFT_PRICE_ID && priceId === CRAFT_PRICE_ID) return 'craft';
-  if (priceId && PRO_PRICE_ID && priceId === PRO_PRICE_ID) return 'pro';
-  if (fallbackMeta === 'craft' || fallbackMeta === 'pro') return fallbackMeta;
-  return 'pro';
+  if (fallbackMeta === 'craft') return fallbackMeta;
+  return 'craft';
 }
 
 function getRawBody(req) {
@@ -96,7 +95,7 @@ export default async function handler(req, res) {
     const subscriptionId = session.subscription;
     // The session's line_items isn't expanded by default; fetch the
     // subscription to get the price id we need to derive the tier from.
-    let purchasedTier = session.metadata?.tier || 'pro';
+    let purchasedTier = session.metadata?.tier || 'craft';
     if (subscriptionId) {
       try {
         const sub = await stripe.subscriptions.retrieve(subscriptionId);
