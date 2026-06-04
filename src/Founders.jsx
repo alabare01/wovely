@@ -111,7 +111,7 @@ export default function Founders() {
   const totalPatterns = userPatterns.length;
   const totalStitches = data.stitches.length;
   const proCount = USERS.filter(u => u.is_pro).length;
-  const mrr = "$8.99";
+  const mrr = "$6.99";
 
   // Per-user enrichment
   const enrichedUsers = USERS.map(u => {

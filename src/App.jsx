@@ -114,6 +114,10 @@ const collectionIdFromPath = (pathname) => {
 // signup. Survives remounts (OAuth round-trip, page reload during the
 // auth flow) so the post-signup auto-checkout finds the right tier.
 const PENDING_UPGRADE_KEY = "wovely_pending_upgrade_tier";
+// Mirrors the picked billing cadence alongside PENDING_UPGRADE_KEY so an
+// anonymous user who picks Annual is charged annually after signup, not the
+// monthly default. Survives OAuth round-trips / remounts the same way.
+const PENDING_UPGRADE_CADENCE_KEY = "wovely_pending_upgrade_cadence";
 
 // PHOTOS, PILL imported from ./constants.js
 
@@ -122,14 +126,13 @@ const PENDING_UPGRADE_KEY = "wovely_pending_upgrade_tier";
 // APP_VERSION imported from ./constants.js
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 
-// Three-tier pricing. patternCap is the only cap that varies between tiers
-// today; per-feature gating lives in src/utils/featureGates.js. Pro and
-// Craft both get unlimited patterns — Craft adds Collections (and future
-// Craft-only features) on top.
+// Two-tier pricing. patternCap is the only cap that varies between tiers
+// today; per-feature gating lives in src/utils/featureGates.js. Craft has a
+// large fair-use ceiling (100) rather than truly unlimited, and adds
+// Collections (and future Craft-only features) on top of Free.
 const TIER_CONFIG = {
-  free:  { patternCap: 5,        priceLabel: "Free" },
-  pro:   { patternCap: Infinity, priceMonthly: 4.99, priceLabel: "$4.99/mo" },
-  craft: { patternCap: Infinity, priceMonthly: 8.99, priceLabel: "$8.99/mo" },
+  free:  { patternCap: 5,   priceLabel: "Free" },
+  craft: { patternCap: 100, priceMonthly: 6.99, priceAnnual: 59.99, priceLabelMonthly: "$6.99/mo", priceLabelAnnual: "$59.99/yr" },
 };
 
 // useTier returns gating info for the active session. Pass the user's tier
@@ -138,9 +141,13 @@ const TIER_CONFIG = {
 const useTier = (tier, userCount, starterCount=0) => {
   const realCount = userCount - starterCount;
   const paid = isPaidTier(tier);
+  // Every tier now has a finite patternCap (Free 5, Craft 100 fair-use
+  // ceiling), so the cap is authoritative for all tiers — paid no longer
+  // bypasses it. The at-cap UX is branched by tier downstream: Free hits the
+  // upgrade paywall, Craft hits a fair-use message with no upgrade CTA.
   const cap = TIER_CONFIG[tier]?.patternCap ?? TIER_CONFIG.free.patternCap;
-  const atCap  = !paid && realCount >= cap;
-  const canAdd = paid  || realCount  < cap;
+  const atCap  = realCount >= cap;
+  const canAdd = realCount  < cap;
   const hasFeature = () => canAdd;
   return { tier, isPro: paid, isCraft: isCraftTier(tier), atCap, canAdd, hasFeature, userCount: realCount };
 };
@@ -480,42 +487,71 @@ export const UPGRADE_TIER_DEFS = [
     ],
   },
   {
-    key: 'pro',
-    name: 'Pro',
-    priceMain: '$4.99',
-    priceSub: '/month',
-    blurb: 'For serious crafters.',
-    features: [
-      { label: 'Unlimited patterns', sub: 'No cap. Save every pattern you make' },
-      { label: 'Big patterns welcome', sub: 'Full support for complex multi-component imports' },
-      { label: 'BevCheck quality scoring', sub: 'Catch off-counts and broken rounds before you start' },
-    ],
-  },
-  {
     key: 'craft',
+    // priceMain/priceSub intentionally omitted — the Craft card price is
+    // cadence-driven and read from TIER_CONFIG.craft in TieredUpgradeModal.
     name: 'Craft',
-    priceMain: '$8.99',
-    priceSub: '/month',
     blurb: 'For makers who want it all.',
     features: [
-      { label: 'Everything in Pro', sub: 'Unlimited patterns, big imports, BevCheck' },
+      { label: 'Everything in Free, plus', sub: 'A large library, big imports, and BevCheck' },
+      { label: 'A large library', sub: 'Room to save plenty of patterns' },
+      { label: 'Big patterns welcome', sub: 'Full support for complex multi-component imports' },
+      { label: 'BevCheck quality scoring', sub: 'Catch off-counts and broken rounds before you start' },
       { label: 'Collections', sub: 'Organize pattern books and MKALs (3 per month)' },
       { label: 'More Craft features coming', sub: 'First in line as Craft grows' },
     ],
   },
 ];
 
+// Fair-use wall — shown when a Craft user hits the pattern ceiling. Craft is
+// already the only paid tier, so there's nothing to upsell: this is a plain
+// support message with NO upgrade CTA, unlike the Free paywall (TieredUpgradeModal).
+const FairUseWall = ({ onClose, cap }) => {
+  const { isDesktop } = useBreakpoint();
+  return (
+    <div style={{position:"fixed",inset:0,zIndex:600,display:"flex",alignItems:isDesktop?"center":"flex-end",justifyContent:"center"}} onClick={onClose}>
+      <div className="dim-in" style={{position:"absolute",inset:0,background:"rgba(28,23,20,.65)",backdropFilter:"blur(6px)"}}/>
+      <div className={isDesktop?"":"su"} onClick={e=>e.stopPropagation()} style={{
+        position:"relative",
+        background:T.surface,
+        borderRadius:isDesktop?20:"24px 24px 0 0",
+        width:isDesktop?"min(420px, 92vw)":"100%",
+        zIndex:1,
+        padding:isDesktop?"28px 28px 26px":"24px 22px 34px",
+        boxShadow:isDesktop?"0 24px 80px rgba(28,23,20,.35)":"0 -12px 48px rgba(28,23,20,.28)",
+        fontFamily:T.sans,
+      }}>
+        <button onClick={onClose} aria-label="Close" style={{position:"absolute",top:14,right:16,background:T.linen,border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:18,color:T.ink3,lineHeight:1,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
+        <div style={{fontFamily:T.serif,fontSize:isDesktop?22:20,fontWeight:700,color:T.ink,lineHeight:1.2,marginBottom:10,paddingRight:32}}>Your pattern box is full</div>
+        <div style={{fontSize:14,color:T.ink2,lineHeight:1.6}}>You've reached {cap} patterns, our fair-use ceiling. Email <a href="mailto:support@wovely.app" style={{color:T.terra,fontWeight:600,textDecoration:"none"}}>support@wovely.app</a> and we'll lift it for you.</div>
+      </div>
+    </div>
+  );
+};
+
 const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false, onSignupRequired, recommendedTier = null }) => {
   const { isDesktop } = useBreakpoint();
   const [checkingOut, setCheckingOut] = useState(null); // tier key in flight
   const safeTier = normalizeTier(currentTier);
-  // Default step-up: Pro is the natural pick for Free, Craft for Pro; Craft users
-  // see no recommendation. But when the modal was opened by a Craft-only
-  // capability (multi-section/MKAL hub, collections), recommendedTier carries the
-  // capability's requiredTier (Craft) so we recommend the plan that actually
-  // unlocks it — not the generic next step up.
-  const defaultRec = safeTier === TIER_FREE ? TIER_PRO : safeTier === TIER_PRO ? TIER_CRAFT : null;
+  // Default step-up: Craft is the natural pick for Free; Craft users see no
+  // recommendation (there's no higher tier). When the modal was opened by a
+  // Craft-only capability (multi-section/MKAL hub, collections), recommendedTier
+  // carries the capability's requiredTier (Craft) so we recommend the plan that
+  // actually unlocks it — same target either way now.
+  const defaultRec = safeTier === TIER_FREE ? TIER_CRAFT : null;
   const recommendedKey = (recommendedTier && recommendedTier !== safeTier) ? recommendedTier : defaultRec;
+
+  // Billing cadence toggle. Default to annual — it's the better value and the
+  // plan we want to surface first. All price/savings numbers are derived from
+  // TIER_CONFIG.craft so there's a single source of truth.
+  const [cadence, setCadence] = useState('annual');
+  const craftCfg = TIER_CONFIG.craft;
+  const annualSavings = Math.round(craftCfg.priceMonthly * 12 - craftCfg.priceAnnual);
+  // Exactly what the CTA will charge, by cadence. Used verbatim in the button
+  // so the amount + cadence are never ambiguous.
+  const chargeLabel = cadence === 'annual'
+    ? `$${craftCfg.priceAnnual}/year`
+    : `$${craftCfg.priceMonthly}/month`;
 
   const handleCheckout = async (tierKey) => {
     posthog.capture("upgrade_clicked", { tier: tierKey, reason: reason || 'general', anonymous: isAnonymous });
@@ -523,7 +559,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
     // on file. Hand control back to App.jsx so it can open the signup
     // flow with the picked tier stashed; checkout fires after conversion.
     if (isAnonymous) {
-      if (onSignupRequired) onSignupRequired(tierKey);
+      if (onSignupRequired) onSignupRequired(tierKey, cadence);
       return;
     }
     setCheckingOut(tierKey);
@@ -535,7 +571,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
       const res = await fetch("/api/stripe-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: uid || user.id, email: user.email, tier: tierKey }),
+        body: JSON.stringify({ userId: uid || user.id, email: user.email, tier: tierKey, cadence }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Checkout failed");
@@ -580,18 +616,50 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
           <button onClick={onClose} aria-label="Close" style={{background:T.linen,border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:18,color:T.ink3,lineHeight:1,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
         </div>
 
+        {/* Monthly/annual segmented toggle. Annual is the default; the savings
+            badge and all card prices read from TIER_CONFIG.craft. */}
+        <div style={{flexShrink:0,padding:isDesktop?"4px 28px 10px":"4px 22px 10px",display:"flex",flexDirection:"column",alignItems:"center",gap:7}}>
+          <div role="group" aria-label="Billing cadence" style={{display:"inline-flex",background:T.linen,borderRadius:99,padding:3,gap:2}}>
+            {[['annual','Annual'],['monthly','Monthly']].map(([key,label])=>(
+              <button key={key} onClick={()=>setCadence(key)} aria-pressed={cadence===key} style={{
+                border:"none",cursor:"pointer",borderRadius:99,padding:"7px 20px",fontSize:13,fontWeight:600,
+                background:cadence===key?T.terra:"transparent",
+                color:cadence===key?"#fff":T.ink2,
+                boxShadow:cadence===key?"0 2px 8px rgba(155,126,200,.3)":"none",
+                transition:"background .15s,color .15s",
+              }}>{label}</button>
+            ))}
+          </div>
+          <div style={{fontSize:11,fontWeight:700,color:T.terra,letterSpacing:"0.02em"}}>Best value · save ${annualSavings}/yr</div>
+        </div>
+
         <div style={{
           flex:1,
           overflowY:"auto",
           padding:isDesktop?"20px 28px 28px":"18px 18px 36px",
           display:"grid",
-          gridTemplateColumns: isDesktop ? "1fr 1fr 1fr" : "1fr",
+          gridTemplateColumns: isDesktop ? "1fr 1fr" : "1fr",
           gap: isDesktop ? 16 : 14,
         }}>
           {UPGRADE_TIER_DEFS.map(def => {
             const isCurrent = safeTier === def.key;
             const isRecommended = recommendedKey === def.key;
             const isCheckingOut = checkingOut === def.key;
+            // Paid cards show a cadence-driven price read from TIER_CONFIG;
+            // Free keeps its static priceMain/priceSub.
+            const isPaidCard = def.key !== TIER_FREE;
+            const cfg = TIER_CONFIG[def.key];
+            let priceMain = def.priceMain, priceSub = def.priceSub, priceNote = null;
+            if (isPaidCard && cfg) {
+              if (cadence === 'annual') {
+                priceMain = `$${cfg.priceAnnual}`;
+                priceSub = '/year';
+                priceNote = `about $${Math.round(cfg.priceAnnual / 12)}/mo, billed yearly`;
+              } else {
+                priceMain = `$${cfg.priceMonthly}`;
+                priceSub = '/month';
+              }
+            }
             const cardStyle = {
               background: "rgba(255,255,255,0.82)",
               backdropFilter: "blur(16px)",
@@ -617,9 +685,12 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
                   <div style={{fontFamily:T.serif,fontSize:22,fontWeight:700,color:T.ink,lineHeight:1.1,marginBottom:4}}>{def.name}</div>
                   <div style={{fontSize:12,color:T.ink3,lineHeight:1.5}}>{def.blurb}</div>
                 </div>
-                <div style={{display:"flex",alignItems:"baseline",gap:4}}>
-                  <span style={{fontFamily:T.serif,fontSize:28,fontWeight:700,color:T.ink}}>{def.priceMain}</span>
-                  <span style={{fontSize:12,color:T.ink3}}>{def.priceSub}</span>
+                <div>
+                  <div style={{display:"flex",alignItems:"baseline",gap:4}}>
+                    <span style={{fontFamily:T.serif,fontSize:28,fontWeight:700,color:T.ink}}>{priceMain}</span>
+                    <span style={{fontSize:12,color:T.ink3}}>{priceSub}</span>
+                  </div>
+                  {priceNote && <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{priceNote}</div>}
                 </div>
                 <div style={{display:"flex",flexDirection:"column",gap:10,flex:1}}>
                   {def.features.map((f, i) => (
@@ -675,7 +746,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
                         boxShadow: isRecommended ? "0 4px 16px rgba(155,126,200,.3)" : "none",
                         opacity: isCheckingOut ? 0.7 : 1,
                       }}
-                    >{isCheckingOut ? "Opening checkout..." : isAnonymous ? `Create account & get ${def.name}` : `Upgrade to ${def.name}`}</button>
+                    >{isCheckingOut ? "Opening checkout..." : `${isAnonymous ? "Create account & get" : "Get"} ${def.name} — ${chargeLabel}`}</button>
                   )}
                 </div>
               </div>
@@ -697,7 +768,7 @@ const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,o
   const wipCount=allPatterns.filter(p=>!p.isStarter&&(p.status==="in_progress"||p.started)).filter(p=>pct(p)<100).length;
   // For anonymous users, surface Pro items without the padlock/"Pro feature" visual — the gate fires
   // on click. Showing the lock pre-gate suggests "sign up and you still can't have this" which kills conversion.
-  const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Pro feature");
+  const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Craft feature");
   // Collections is no longer a sibling destination — it lives inside My Wovely
   // as a section below the pattern grid. The tier gating and lock teaser are
   // handled there. Plans modal remains the marketing surface for guests.
@@ -706,7 +777,7 @@ const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,o
   // Anonymous users get the same subtitle as Free — the modal explains the
   // signup-before-Stripe step itself. Mismatched copy ("Sign up to compare
   // plans") was killing the click intent before the modal could open.
-  const planSub = isPro ? `You're on ${tierLabel(tier)}` : "Compare Free, Pro, Craft";
+  const planSub = isPro ? `You're on ${tierLabel(tier)}` : "Compare Free and Craft";
   // Always open the upgrade modal. The modal is the single source of truth
   // for plan comparison; the AuthWall used to be wedged in front of it for
   // guests, which hid the comparison before they ever saw it.
@@ -772,13 +843,13 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
   const go=v=>{onNavigate(v);dismiss();};
   if(!open) return null;
   // See SidebarNav for rationale: hide pre-gate padlocks from anonymous users to not kill conversion motivation.
-  const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Pro feature");
+  const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Craft feature");
   const ITEMS=[{key:"collection",label:"My Wovely",sub:count+" patterns",icon:"🧶"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs",icon:"🛒"}];
   const planLabel = isPro ? "My plan" : "See plans";
   // Same rationale as SidebarNav: the modal is the single source of truth
   // for plan comparison, including for anonymous users. The modal itself
   // gates the Stripe step on signup.
-  const planSub = isPro ? `You're on ${tierLabel(tier)}` : "Compare Free, Pro, Craft";
+  const planSub = isPro ? `You're on ${tierLabel(tier)}` : "Compare Free and Craft";
   const handlePlansClick = () => { onUpgrade(); dismiss(); };
   return (
     <div style={{position:"fixed",inset:0,zIndex:100}}>
@@ -1049,19 +1120,18 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
       {DIVIDER}
 
       {isPro
-        ? <div style={{...SECTION,background:`linear-gradient(135deg,#2D3A7C,${tier==='craft'?T.terra:'#1A2456'})`,border:"none"}}>
+        ? <div style={{...SECTION,background:`linear-gradient(135deg,#2D3A7C,${T.terra})`,border:"none"}}>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <span style={{fontSize:18}}>✨</span>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:14,fontWeight:700,color:"#fff"}}>Wovely {tierLabel(tier)}</div>
-                <div style={{fontSize:12,color:"rgba(255,255,255,.7)",marginTop:2}}>{tier==='craft'?"Every feature active, including Collections":"Unlimited patterns, big imports, BevCheck"}</div>
+                <div style={{fontSize:12,color:"rgba(255,255,255,.7)",marginTop:2}}>Every feature active, including Collections</div>
               </div>
-              {tier==='pro' && <div onClick={onOpenProModal} style={{background:"rgba(255,255,255,.2)",borderRadius:10,padding:"6px 12px",fontSize:11,fontWeight:700,color:"#fff",cursor:"pointer",flexShrink:0}}>Upgrade to Craft</div>}
             </div>
           </div>
         : <div style={{...SECTION,background:`linear-gradient(135deg,#2D3A7C,${T.terra})`,border:"none"}}>
             <div style={{fontSize:14,fontWeight:700,color:"#fff",marginBottom:4}}>✨ Upgrade your plan</div>
-            <div style={{fontSize:12,color:"rgba(255,255,255,.75)",lineHeight:1.5,marginBottom:12}}>Pro members get unlimited patterns, big-pattern support, and BevCheck. Craft members add Collections on top.</div>
+            <div style={{fontSize:12,color:"rgba(255,255,255,.75)",lineHeight:1.5,marginBottom:12}}>Craft gives you big imports, a large library, Collections, and BevCheck.</div>
             <div onClick={onOpenProModal} style={{background:"rgba(255,255,255,.2)",borderRadius:10,padding:"10px",textAlign:"center",fontSize:14,fontWeight:700,color:"#fff",cursor:"pointer"}}>See plans</div>
           </div>
       }
@@ -1078,7 +1148,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
         <div onClick={onOpenProModal} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"4px 0"}}>
           <div>
             <div style={{fontSize:14,color:T.ink}}>{isPro ? `Wovely ${tierLabel(tier)}` : 'Free plan'}</div>
-            <div style={{...SC_LABEL,marginTop:4}}>{isPro ? 'Tap to manage or compare plans' : 'See what Pro and Craft include'}</div>
+            <div style={{...SC_LABEL,marginTop:4}}>{isPro ? 'Tap to manage or compare plans' : 'See what Craft includes'}</div>
           </div>
           <div style={{fontSize:13,fontWeight:600,color:T.terra,whiteSpace:"nowrap"}}>{isPro ? 'Manage plan ›' : 'See plans ›'}</div>
         </div>
@@ -1871,7 +1941,7 @@ export default function Wovely() {
   const [starterPatterns,setStarterPatterns]=useState(()=>makeStarterPatterns());
   // Derive view from URL path instead of state
   const view = viewFromPath(location.pathname);
-  const [selected,setSelected]=useState(null),[navOpen,setNavOpen]=useState(false),[addOpen,setAddOpen]=useState(false),[imageImportOpen,setImageImportOpen]=useState(false),[addMenuOpen,setAddMenuOpen]=useState(false),[menuAnchor,setMenuAnchor]=useState(null),[showPaywall,setShowPaywall]=useState(false),[cat,setCat]=useState("All"),[search,setSearch]=useState("");
+  const [selected,setSelected]=useState(null),[navOpen,setNavOpen]=useState(false),[addOpen,setAddOpen]=useState(false),[imageImportOpen,setImageImportOpen]=useState(false),[addMenuOpen,setAddMenuOpen]=useState(false),[menuAnchor,setMenuAnchor]=useState(null),[showPaywall,setShowPaywall]=useState(false),[showFairUseWall,setShowFairUseWall]=useState(false),[cat,setCat]=useState("All"),[search,setSearch]=useState("");
   const [showWelcomeBanner,setShowWelcomeBanner]=useState(false);
   const [showWelcomeToast,setShowWelcomeToast]=useState(false);
   const [showProModal,setShowProModal]=useState(false);
@@ -1930,6 +2000,9 @@ export default function Wovely() {
   // Mirrored to sessionStorage (PENDING_UPGRADE_KEY) so OAuth or any
   // full-page redirect path that remounts the React tree doesn't lose it.
   const [pendingUpgradeTier,setPendingUpgradeTier]=useState(null);
+  // Billing cadence the user picked alongside pendingUpgradeTier (see
+  // PENDING_UPGRADE_CADENCE_KEY). Defaults to monthly when absent.
+  const [pendingUpgradeCadence,setPendingUpgradeCadence]=useState(null);
   // Anonymous mode: set when user clicks "Try it free" on landing. Persists in sessionStorage so
   // refresh/nav within the tab keeps them in the app shell instead of bouncing to the landing.
   const [anonymousMode,setAnonymousMode]=useState(()=>{try{return sessionStorage.getItem("wovely_anonymous_mode")==="1";}catch{return false;}});
@@ -1986,7 +2059,7 @@ export default function Wovely() {
   // waitForSession() in the AuthWallModal avoids that race entirely.
   // Navigates the page on success, returns false on failure so the
   // caller can decide how to recover.
-  const fireUpgradeCheckout = async (tierKey, passedUser) => {
+  const fireUpgradeCheckout = async (tierKey, passedUser, cadence) => {
     try {
       let email, userId;
       if (passedUser?.email) {
@@ -2006,7 +2079,7 @@ export default function Wovely() {
       const res = await fetch("/api/stripe-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, email, tier: tierKey }),
+        body: JSON.stringify({ userId, email, tier: tierKey, cadence: cadence || 'monthly' }),
       });
       const data = await res.json();
       if (!res.ok) { console.error("[Wovely] Checkout error:", data?.error || data); return false; }
@@ -2022,21 +2095,27 @@ export default function Wovely() {
   // (paid or free). Closes the modal, stashes the picked tier, and opens
   // the AuthWall in convert mode with copy that matches the intent.
   // Passing null means the user picked Free — signup only, no Stripe.
-  const handleUpgradeSignupRequired = (tierKey) => {
+  const handleUpgradeSignupRequired = (tierKey, cadence) => {
     setShowPaywall(false);
     setShowProModal(false);
     setPendingUpgradeTier(tierKey || null);
+    setPendingUpgradeCadence(tierKey ? (cadence || 'monthly') : null);
     // Mirror to sessionStorage so the tier survives any remount path —
     // most importantly OAuth, which round-trips through the provider and
     // returns to a fresh app instance with no React state to read from.
     try {
-      if (tierKey) sessionStorage.setItem(PENDING_UPGRADE_KEY, tierKey);
-      else sessionStorage.removeItem(PENDING_UPGRADE_KEY);
+      if (tierKey) {
+        sessionStorage.setItem(PENDING_UPGRADE_KEY, tierKey);
+        sessionStorage.setItem(PENDING_UPGRADE_CADENCE_KEY, cadence || 'monthly');
+      } else {
+        sessionStorage.removeItem(PENDING_UPGRADE_KEY);
+        sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);
+      }
     } catch {}
     setAuthWallContext({
       title: tierKey ? `Create your account to subscribe` : "Create your free account",
       subtitle: tierKey
-        ? `One step to get Wovely ${tierKey === TIER_PRO ? 'Pro' : 'Craft'}. Your guest pattern carries over.`
+        ? `One step to get Wovely Craft. Your guest pattern carries over.`
         : "Your guest pattern carries over to your new account.",
       intent: tierKey ? `upgrade_signup_${tierKey}` : "upgrade_signup_free",
       requiresPro: false,
@@ -2087,16 +2166,20 @@ export default function Wovely() {
     let tierKey = null;
     try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
     if (!tierKey) tierKey = pendingUpgradeTier;
+    let pendingCadence = null;
+    try { pendingCadence = sessionStorage.getItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
+    if (!pendingCadence) pendingCadence = pendingUpgradeCadence;
     if (tierKey) {
       // Clear both stores immediately so a failed Stripe call doesn't
       // produce a redirect loop on the next mount.
-      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
       setPendingUpgradeTier(null);
+      setPendingUpgradeCadence(null);
       // 500ms gives the rotated JWT + profile fetch enough headroom to
       // settle in localStorage. Pass `user` directly so the checkout
       // call doesn't depend on the session read — robust to any
       // remaining lag in the anonymous-to-real conversion flip.
-      setTimeout(() => { fireUpgradeCheckout(tierKey, user); }, 500);
+      setTimeout(() => { fireUpgradeCheckout(tierKey, user, pendingCadence); }, 500);
     }
   };
 
@@ -2124,12 +2207,15 @@ export default function Wovely() {
     let tierKey = null;
     try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
     if (!tierKey) return;
-    try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+    let pendingCadence = null;
+    try { pendingCadence = sessionStorage.getItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
+    try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
     setPendingUpgradeTier(null);
+    setPendingUpgradeCadence(null);
     // Same 100ms settle delay as the AuthWall path for JWT + profile
     // localStorage writes. Stripe checkout failure is logged but not
     // retried; the user can re-open "See plans" and pick again.
-    setTimeout(() => { fireUpgradeCheckout(tierKey); }, 500);
+    setTimeout(() => { fireUpgradeCheckout(tierKey, undefined, pendingCadence); }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authChecked, authed, isAnonymous, tier]);
 
@@ -2993,6 +3079,13 @@ export default function Wovely() {
   // routed to the AuthWall with copy that nudges them to convert rather than
   // pushed to the paid-tier paywall. Free/Pro/Craft users keep the existing
   // behavior (cap → tier paywall, else proceed).
+  // At-cap routing. Free hits the upgrade paywall — there's a higher tier to
+  // sell. Craft is already on the only paid tier, so hitting the fair-use
+  // ceiling shows a plain support message with no upgrade CTA.
+  const triggerAtCap = () => {
+    if (tier === TIER_CRAFT) setShowFairUseWall(true);
+    else setShowPaywall(true);
+  };
   const gateImport = async (intent, proceedCallback) => {
     const cb = typeof proceedCallback === "function" ? proceedCallback : () => {};
     if (!authed) {
@@ -3005,7 +3098,7 @@ export default function Wovely() {
         console.warn("[Wovely] Anonymous sign-in failed, falling back to AuthWall:", error?.message || error);
         gateAction(
           { intent: intent || "import_pattern", title: "Create a free account to save patterns", subtitle: "Your imports and progress stay with you across devices." },
-          () => { if(tierGate.atCap){setShowPaywall(true);return;} cb(); }
+          () => { if(tierGate.atCap){triggerAtCap();return;} cb(); }
         );
         return;
       }
@@ -3036,7 +3129,7 @@ export default function Wovely() {
       setAuthWallOpen(true);
       return;
     }
-    if (tierGate.atCap) { setShowPaywall(true); return; }
+    if (tierGate.atCap) { triggerAtCap(); return; }
     cb();
   };
 
@@ -3156,7 +3249,7 @@ export default function Wovely() {
   // Generic "see Pro features" entry: routes anonymous users through AuthWall first.
   // Use for locked nav items, BevCheck-style Pro triggers, and any CTA that previously called setShowProModal directly.
   const openProGate=(intent)=>gateAction(
-    { requiresPro: true, intent: intent || "unlock_pro", title: "Create a free account to unlock Pro", subtitle: "Sign up free, then upgrade to Pro anytime." },
+    { requiresPro: true, intent: intent || "unlock_pro", title: "Create a free account to unlock Craft", subtitle: "Sign up free, then upgrade to Craft anytime." },
     () => {}
   );
   const updatePatternStatus=(p,status)=>{
@@ -3215,10 +3308,11 @@ export default function Wovely() {
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:"transparent",fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
+      {showFairUseWall&&<FairUseWall cap={TIER_CONFIG.craft.patternCap} onClose={()=>setShowFairUseWall(false)}/>}
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>{setShowProModal(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       {collectionSuggestion && <CollectionSuggestionPrompt pattern={collectionSuggestion.pattern} meta={collectionSuggestion.meta} onYes={handleAcceptCollectionSuggestion} onNo={()=>setCollectionSuggestion(null)} />}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id}/>}
@@ -3232,7 +3326,7 @@ export default function Wovely() {
       {deleteTarget&&<DeleteConfirmModal pattern={deleteTarget} isPro={isPro} onCancel={()=>setDeleteTarget(null)} onDelete={confirmDelete} onPark={parkInsteadOfDelete} onGoPro={()=>{setDeleteTarget(null);setShowProModal(true);}}/>}
       {coverPickerTarget&&<CoverImagePicker pattern={coverPickerTarget} onConfirm={handleCoverConfirm} onClose={()=>setCoverPickerTarget(null)} pdfThumbUrl={pdfThumbUrl} CAT_IMG={CAT_IMG} ALL_CAT_ENTRIES={ALL_CAT_ENTRIES}/>}
       <WelcomeToast visible={showWelcomeToast}/>
-      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?"Welcome to Wovely Pro!":"No worries — you can upgrade anytime"}</div>}
+      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
       <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e?.currentTarget?.getBoundingClientRect();if(r)setMenuAnchor({top:r.bottom+8,left:r.left});setAddMenuOpen(true);}} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall} userPatterns={userPatterns} allPatterns={allPatterns}/>
       <div ref={mainScrollRef} style={{flex:1,minWidth:0,overflowY:"auto",display:"flex",flexDirection:"column",background:"transparent"}}>
         <WelcomeBanner visible={showWelcomeBanner}/>
@@ -3240,7 +3334,7 @@ export default function Wovely() {
           <div onClick={isAdam?handleLogoTap:undefined} style={{fontFamily:T.serif,fontSize:28,fontWeight:700,color:T.ink,cursor:isAdam?"pointer":"default"}}>{TITLE_MAP[view]!==null?TITLE_MAP[view]:""}</div>
           <div style={{display:"flex",alignItems:"center",gap:12,position:"relative"}}>
             <FeedbackWidget user={supabaseAuth.getUser()}/>
-            {isPro&&<div style={{background:T.terraLt,borderRadius:9999,padding:"4px 10px",fontSize:11,fontWeight:600,color:T.terra}}>✨ Pro</div>}
+            {isPro&&<div style={{background:T.terraLt,borderRadius:9999,padding:"4px 10px",fontSize:11,fontWeight:600,color:T.terra}}>✨ {tierLabel(tier)}</div>}
             <button onClick={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e.currentTarget.getBoundingClientRect();setMenuAnchor({top:r.bottom+8,left:r.right-220});setAddMenuOpen(true);}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:9999,padding:"10px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)",display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:18}}>+</span> Add Pattern</button>
           </div>
         </div>
@@ -3268,13 +3362,14 @@ export default function Wovely() {
     <div style={{fontFamily:T.sans,background:"transparent",minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
-      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?"Welcome to Wovely Pro!":"No worries — you can upgrade anytime"}</div>}
+      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
       <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall}/>
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
+      {showFairUseWall&&<FairUseWall cap={TIER_CONFIG.craft.patternCap} onClose={()=>setShowFairUseWall(false)}/>}
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>{setShowProModal(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       {collectionSuggestion && <CollectionSuggestionPrompt pattern={collectionSuggestion.pattern} meta={collectionSuggestion.meta} onYes={handleAcceptCollectionSuggestion} onNo={()=>setCollectionSuggestion(null)} />}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id}/>}
@@ -3291,7 +3386,7 @@ export default function Wovely() {
         <div onClick={isAdam?handleLogoTap:undefined} style={{fontFamily:T.serif,fontSize:20,fontWeight:700,color:T.ink,cursor:isAdam?"pointer":"default"}}>{TITLE_MAP[view]!==null?TITLE_MAP[view]:""}</div>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <FeedbackWidget user={supabaseAuth.getUser()}/>
-          <button onClick={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} style={{background:T.terra,border:"none",borderRadius:9999,width:34,height:34,cursor:"pointer",color:"#fff",fontSize:20,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(155,126,200,.4)"}}>+</button>
+          <button onClick={()=>{if(tierGate.atCap){triggerAtCap();return;}setAddMenuOpen(v=>!v);}} style={{background:T.terra,border:"none",borderRadius:9999,width:34,height:34,cursor:"pointer",color:"#fff",fontSize:20,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(155,126,200,.4)"}}>+</button>
         </div>
       </div>
       {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Inter,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}

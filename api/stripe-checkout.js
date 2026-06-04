@@ -1,10 +1,10 @@
 // api/stripe-checkout.js
-// Creates a Stripe Checkout session for a Wovely paid tier (pro | craft).
+// Creates a Stripe Checkout session for the Wovely paid tier (craft).
 //
 // Env vars (required for the tier-aware flow):
-//   STRIPE_SECRET_KEY     — Stripe API key
-//   STRIPE_PRO_PRICE_ID   — recurring price for the $4.99 Pro tier
-//   STRIPE_CRAFT_PRICE_ID — recurring price for the $8.99 Craft tier
+//   STRIPE_SECRET_KEY            — Stripe API key
+//   STRIPE_CRAFT_PRICE_ID        — recurring price for the $6.99/mo Craft tier
+//   STRIPE_CRAFT_ANNUAL_PRICE_ID — recurring price for the $59.99/yr Craft tier
 //
 // If a tier's price ID isn't configured we 500 with a clear message
 // rather than silently creating an ad-hoc line item — tier shipping
@@ -16,8 +16,10 @@ import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const PRICE_ENV = {
-  pro:   'STRIPE_PRO_PRICE_ID',
-  craft: 'STRIPE_CRAFT_PRICE_ID',
+  craft: {
+    monthly: 'STRIPE_CRAFT_PRICE_ID',
+    annual:  'STRIPE_CRAFT_ANNUAL_PRICE_ID',
+  },
 };
 
 export default async function handler(req, res) {
@@ -31,14 +33,23 @@ export default async function handler(req, res) {
   const _key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const _t0 = Date.now();
 
-  const { userId, email, tier: rawTier } = req.body || {};
+  const { userId, email, tier: rawTier, cadence: rawCadence } = req.body || {};
   if (!userId || !email) return res.status(400).json({ error: 'Missing userId or email' });
 
-  // Default to 'pro' if the client didn't send a tier — preserves the
-  // legacy single-Pro flow for any cached client that hasn't picked up
-  // the three-tier modal yet.
-  const tier = (rawTier === 'pro' || rawTier === 'craft') ? rawTier : 'pro';
-  const priceEnvKey = PRICE_ENV[tier];
+  // Craft is the only purchasable tier now. Reject any explicit tier param
+  // that isn't 'craft'; otherwise default to 'craft' unconditionally.
+  if (rawTier != null && rawTier !== 'craft') {
+    return res.status(400).json({ error: `Unknown tier "${rawTier}". The only purchasable tier is "craft".` });
+  }
+  const tier = 'craft';
+
+  // Billing cadence selects which Stripe price we charge. Defaults to monthly
+  // for any client that hasn't sent the field yet; reject anything else.
+  if (rawCadence != null && rawCadence !== 'monthly' && rawCadence !== 'annual') {
+    return res.status(400).json({ error: `Unknown cadence "${rawCadence}". Use "monthly" or "annual".` });
+  }
+  const cadence = rawCadence || 'monthly';
+  const priceEnvKey = PRICE_ENV[tier][cadence];
   const priceId = process.env[priceEnvKey];
 
   if (!priceId) {
@@ -52,8 +63,8 @@ export default async function handler(req, res) {
       payment_method_types: ['card'],
       customer_email: email,
       line_items: [{ price: priceId, quantity: 1 }],
-      metadata: { userId, tier },
-      success_url: `https://wovely.app?upgrade=success&tier=${tier}`,
+      metadata: { userId, tier, cadence },
+      success_url: `https://wovely.app?upgrade=success&tier=${tier}&cadence=${cadence}`,
       cancel_url: 'https://wovely.app?upgrade=cancelled',
     });
 
@@ -61,7 +72,7 @@ export default async function handler(req, res) {
       await fetch(`${_url}/rest/v1/vercel_logs`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'apikey': _key, 'Authorization': `Bearer ${_key}`, 'Prefer': 'return=minimal' },
-        body: JSON.stringify({ timestamp: new Date().toISOString(), level: 'info', message: `POST /api/stripe-checkout tier=${tier} → 200 (${Date.now() - _t0}ms)`, source: 'serverless', request_path: '/api/stripe-checkout', request_method: 'POST', status_code: 200, project_id: 'wovely', user_id: userId })
+        body: JSON.stringify({ timestamp: new Date().toISOString(), level: 'info', message: `POST /api/stripe-checkout tier=${tier} cadence=${cadence} → 200 (${Date.now() - _t0}ms)`, source: 'serverless', request_path: '/api/stripe-checkout', request_method: 'POST', status_code: 200, project_id: 'wovely', user_id: userId })
       }).catch(() => {});
     }
     res.json({ url: session.url, tier });

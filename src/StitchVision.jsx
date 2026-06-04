@@ -173,8 +173,8 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
     <div style={{ padding: "60px 20px", textAlign: "center", maxWidth: 400, margin: "0 auto" }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
       <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: "#2D3A7C", marginBottom: 8 }}>You've used your 3 free identifications this month</div>
-      <div style={{ fontSize: 14, color: T.ink2, lineHeight: 1.7, marginBottom: 24 }}>Upgrade to Pro for unlimited Stitch-O-Vision.</div>
-      {onUpgrade && <button onClick={onUpgrade} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,.3)", marginBottom: 12 }}>Upgrade to Pro</button>}
+      <div style={{ fontSize: 14, color: T.ink2, lineHeight: 1.7, marginBottom: 24 }}>Upgrade to Craft for unlimited Stitch-O-Vision.</div>
+      {onUpgrade && <button onClick={onUpgrade} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,.3)", marginBottom: 12 }}>Upgrade to Craft</button>}
       <div><button onClick={reset} style={{ background: "none", border: "none", color: T.terra, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: 8 }}>← Back</button></div>
     </div>
   );

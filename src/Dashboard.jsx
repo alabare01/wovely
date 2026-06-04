@@ -189,8 +189,8 @@ const BevCorner = ({ patterns, isMobile, isPro }) => {
       "You saved patterns you haven't touched yet. Bev calls this 'aspirational crafting.' She does it too."
     ]);
 
-    // PRO
-    if (isPro) pool.push(...["Pro crafter. Bev has high expectations and full confidence you'll meet them. 💜", "Full access unlocked. Bev thinks you made an excellent decision. 💜", "Wovely Pro. Bev's favorite tier, not that she plays favorites. (She does.) 💜"]);
+    // PAID
+    if (isPro) pool.push(...["Craft crafter. Bev has high expectations and full confidence you'll meet them. 💜", "Full access unlocked. Bev thinks you made an excellent decision. 💜", "Wovely Craft. Bev's favorite tier, not that she plays favorites. (She does.) 💜"]);
 
     // GENERAL POOL
     pool.push(...[
