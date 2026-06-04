@@ -114,6 +114,10 @@ const collectionIdFromPath = (pathname) => {
 // signup. Survives remounts (OAuth round-trip, page reload during the
 // auth flow) so the post-signup auto-checkout finds the right tier.
 const PENDING_UPGRADE_KEY = "wovely_pending_upgrade_tier";
+// Mirrors the picked billing cadence alongside PENDING_UPGRADE_KEY so an
+// anonymous user who picks Annual is charged annually after signup, not the
+// monthly default. Survives OAuth round-trips / remounts the same way.
+const PENDING_UPGRADE_CADENCE_KEY = "wovely_pending_upgrade_cadence";
 
 // PHOTOS, PILL imported from ./constants.js
 
@@ -128,7 +132,7 @@ const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 // Collections (and future Craft-only features) on top of Free.
 const TIER_CONFIG = {
   free:  { patternCap: 5,   priceLabel: "Free" },
-  craft: { patternCap: 100, priceMonthly: 8.99, priceLabel: "$8.99/mo" },
+  craft: { patternCap: 100, priceMonthly: 6.99, priceAnnual: 59.99, priceLabelMonthly: "$6.99/mo", priceLabelAnnual: "$59.99/yr" },
 };
 
 // useTier returns gating info for the active session. Pass the user's tier
@@ -484,9 +488,9 @@ export const UPGRADE_TIER_DEFS = [
   },
   {
     key: 'craft',
+    // priceMain/priceSub intentionally omitted — the Craft card price is
+    // cadence-driven and read from TIER_CONFIG.craft in TieredUpgradeModal.
     name: 'Craft',
-    priceMain: '$8.99',
-    priceSub: '/month',
     blurb: 'For makers who want it all.',
     features: [
       { label: 'Everything in Free, plus', sub: 'A large library, big imports, and BevCheck' },
@@ -537,13 +541,25 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
   const defaultRec = safeTier === TIER_FREE ? TIER_CRAFT : null;
   const recommendedKey = (recommendedTier && recommendedTier !== safeTier) ? recommendedTier : defaultRec;
 
+  // Billing cadence toggle. Default to annual — it's the better value and the
+  // plan we want to surface first. All price/savings numbers are derived from
+  // TIER_CONFIG.craft so there's a single source of truth.
+  const [cadence, setCadence] = useState('annual');
+  const craftCfg = TIER_CONFIG.craft;
+  const annualSavings = Math.round(craftCfg.priceMonthly * 12 - craftCfg.priceAnnual);
+  // Exactly what the CTA will charge, by cadence. Used verbatim in the button
+  // so the amount + cadence are never ambiguous.
+  const chargeLabel = cadence === 'annual'
+    ? `$${craftCfg.priceAnnual}/year`
+    : `$${craftCfg.priceMonthly}/month`;
+
   const handleCheckout = async (tierKey) => {
     posthog.capture("upgrade_clicked", { tier: tierKey, reason: reason || 'general', anonymous: isAnonymous });
     // Anonymous users can't have a Stripe subscription — there's no email
     // on file. Hand control back to App.jsx so it can open the signup
     // flow with the picked tier stashed; checkout fires after conversion.
     if (isAnonymous) {
-      if (onSignupRequired) onSignupRequired(tierKey);
+      if (onSignupRequired) onSignupRequired(tierKey, cadence);
       return;
     }
     setCheckingOut(tierKey);
@@ -555,7 +571,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
       const res = await fetch("/api/stripe-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: uid || user.id, email: user.email, tier: tierKey }),
+        body: JSON.stringify({ userId: uid || user.id, email: user.email, tier: tierKey, cadence }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Checkout failed");
@@ -600,6 +616,23 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
           <button onClick={onClose} aria-label="Close" style={{background:T.linen,border:"none",borderRadius:"50%",width:32,height:32,cursor:"pointer",fontSize:18,color:T.ink3,lineHeight:1,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}}>×</button>
         </div>
 
+        {/* Monthly/annual segmented toggle. Annual is the default; the savings
+            badge and all card prices read from TIER_CONFIG.craft. */}
+        <div style={{flexShrink:0,padding:isDesktop?"4px 28px 10px":"4px 22px 10px",display:"flex",flexDirection:"column",alignItems:"center",gap:7}}>
+          <div role="group" aria-label="Billing cadence" style={{display:"inline-flex",background:T.linen,borderRadius:99,padding:3,gap:2}}>
+            {[['annual','Annual'],['monthly','Monthly']].map(([key,label])=>(
+              <button key={key} onClick={()=>setCadence(key)} aria-pressed={cadence===key} style={{
+                border:"none",cursor:"pointer",borderRadius:99,padding:"7px 20px",fontSize:13,fontWeight:600,
+                background:cadence===key?T.terra:"transparent",
+                color:cadence===key?"#fff":T.ink2,
+                boxShadow:cadence===key?"0 2px 8px rgba(155,126,200,.3)":"none",
+                transition:"background .15s,color .15s",
+              }}>{label}</button>
+            ))}
+          </div>
+          <div style={{fontSize:11,fontWeight:700,color:T.terra,letterSpacing:"0.02em"}}>Best value · save ${annualSavings}/yr</div>
+        </div>
+
         <div style={{
           flex:1,
           overflowY:"auto",
@@ -612,6 +645,21 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
             const isCurrent = safeTier === def.key;
             const isRecommended = recommendedKey === def.key;
             const isCheckingOut = checkingOut === def.key;
+            // Paid cards show a cadence-driven price read from TIER_CONFIG;
+            // Free keeps its static priceMain/priceSub.
+            const isPaidCard = def.key !== TIER_FREE;
+            const cfg = TIER_CONFIG[def.key];
+            let priceMain = def.priceMain, priceSub = def.priceSub, priceNote = null;
+            if (isPaidCard && cfg) {
+              if (cadence === 'annual') {
+                priceMain = `$${cfg.priceAnnual}`;
+                priceSub = '/year';
+                priceNote = `about $${Math.round(cfg.priceAnnual / 12)}/mo, billed yearly`;
+              } else {
+                priceMain = `$${cfg.priceMonthly}`;
+                priceSub = '/month';
+              }
+            }
             const cardStyle = {
               background: "rgba(255,255,255,0.82)",
               backdropFilter: "blur(16px)",
@@ -637,9 +685,12 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
                   <div style={{fontFamily:T.serif,fontSize:22,fontWeight:700,color:T.ink,lineHeight:1.1,marginBottom:4}}>{def.name}</div>
                   <div style={{fontSize:12,color:T.ink3,lineHeight:1.5}}>{def.blurb}</div>
                 </div>
-                <div style={{display:"flex",alignItems:"baseline",gap:4}}>
-                  <span style={{fontFamily:T.serif,fontSize:28,fontWeight:700,color:T.ink}}>{def.priceMain}</span>
-                  <span style={{fontSize:12,color:T.ink3}}>{def.priceSub}</span>
+                <div>
+                  <div style={{display:"flex",alignItems:"baseline",gap:4}}>
+                    <span style={{fontFamily:T.serif,fontSize:28,fontWeight:700,color:T.ink}}>{priceMain}</span>
+                    <span style={{fontSize:12,color:T.ink3}}>{priceSub}</span>
+                  </div>
+                  {priceNote && <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{priceNote}</div>}
                 </div>
                 <div style={{display:"flex",flexDirection:"column",gap:10,flex:1}}>
                   {def.features.map((f, i) => (
@@ -695,7 +746,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
                         boxShadow: isRecommended ? "0 4px 16px rgba(155,126,200,.3)" : "none",
                         opacity: isCheckingOut ? 0.7 : 1,
                       }}
-                    >{isCheckingOut ? "Opening checkout..." : isAnonymous ? `Create account & get ${def.name}` : `Upgrade to ${def.name}`}</button>
+                    >{isCheckingOut ? "Opening checkout..." : `${isAnonymous ? "Create account & get" : "Get"} ${def.name} — ${chargeLabel}`}</button>
                   )}
                 </div>
               </div>
@@ -1949,6 +2000,9 @@ export default function Wovely() {
   // Mirrored to sessionStorage (PENDING_UPGRADE_KEY) so OAuth or any
   // full-page redirect path that remounts the React tree doesn't lose it.
   const [pendingUpgradeTier,setPendingUpgradeTier]=useState(null);
+  // Billing cadence the user picked alongside pendingUpgradeTier (see
+  // PENDING_UPGRADE_CADENCE_KEY). Defaults to monthly when absent.
+  const [pendingUpgradeCadence,setPendingUpgradeCadence]=useState(null);
   // Anonymous mode: set when user clicks "Try it free" on landing. Persists in sessionStorage so
   // refresh/nav within the tab keeps them in the app shell instead of bouncing to the landing.
   const [anonymousMode,setAnonymousMode]=useState(()=>{try{return sessionStorage.getItem("wovely_anonymous_mode")==="1";}catch{return false;}});
@@ -2005,7 +2059,7 @@ export default function Wovely() {
   // waitForSession() in the AuthWallModal avoids that race entirely.
   // Navigates the page on success, returns false on failure so the
   // caller can decide how to recover.
-  const fireUpgradeCheckout = async (tierKey, passedUser) => {
+  const fireUpgradeCheckout = async (tierKey, passedUser, cadence) => {
     try {
       let email, userId;
       if (passedUser?.email) {
@@ -2025,7 +2079,7 @@ export default function Wovely() {
       const res = await fetch("/api/stripe-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, email, tier: tierKey }),
+        body: JSON.stringify({ userId, email, tier: tierKey, cadence: cadence || 'monthly' }),
       });
       const data = await res.json();
       if (!res.ok) { console.error("[Wovely] Checkout error:", data?.error || data); return false; }
@@ -2041,16 +2095,22 @@ export default function Wovely() {
   // (paid or free). Closes the modal, stashes the picked tier, and opens
   // the AuthWall in convert mode with copy that matches the intent.
   // Passing null means the user picked Free — signup only, no Stripe.
-  const handleUpgradeSignupRequired = (tierKey) => {
+  const handleUpgradeSignupRequired = (tierKey, cadence) => {
     setShowPaywall(false);
     setShowProModal(false);
     setPendingUpgradeTier(tierKey || null);
+    setPendingUpgradeCadence(tierKey ? (cadence || 'monthly') : null);
     // Mirror to sessionStorage so the tier survives any remount path —
     // most importantly OAuth, which round-trips through the provider and
     // returns to a fresh app instance with no React state to read from.
     try {
-      if (tierKey) sessionStorage.setItem(PENDING_UPGRADE_KEY, tierKey);
-      else sessionStorage.removeItem(PENDING_UPGRADE_KEY);
+      if (tierKey) {
+        sessionStorage.setItem(PENDING_UPGRADE_KEY, tierKey);
+        sessionStorage.setItem(PENDING_UPGRADE_CADENCE_KEY, cadence || 'monthly');
+      } else {
+        sessionStorage.removeItem(PENDING_UPGRADE_KEY);
+        sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);
+      }
     } catch {}
     setAuthWallContext({
       title: tierKey ? `Create your account to subscribe` : "Create your free account",
@@ -2106,16 +2166,20 @@ export default function Wovely() {
     let tierKey = null;
     try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
     if (!tierKey) tierKey = pendingUpgradeTier;
+    let pendingCadence = null;
+    try { pendingCadence = sessionStorage.getItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
+    if (!pendingCadence) pendingCadence = pendingUpgradeCadence;
     if (tierKey) {
       // Clear both stores immediately so a failed Stripe call doesn't
       // produce a redirect loop on the next mount.
-      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
       setPendingUpgradeTier(null);
+      setPendingUpgradeCadence(null);
       // 500ms gives the rotated JWT + profile fetch enough headroom to
       // settle in localStorage. Pass `user` directly so the checkout
       // call doesn't depend on the session read — robust to any
       // remaining lag in the anonymous-to-real conversion flip.
-      setTimeout(() => { fireUpgradeCheckout(tierKey, user); }, 500);
+      setTimeout(() => { fireUpgradeCheckout(tierKey, user, pendingCadence); }, 500);
     }
   };
 
@@ -2143,12 +2207,15 @@ export default function Wovely() {
     let tierKey = null;
     try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
     if (!tierKey) return;
-    try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+    let pendingCadence = null;
+    try { pendingCadence = sessionStorage.getItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
+    try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
     setPendingUpgradeTier(null);
+    setPendingUpgradeCadence(null);
     // Same 100ms settle delay as the AuthWall path for JWT + profile
     // localStorage writes. Stripe checkout failure is logged but not
     // retried; the user can re-open "See plans" and pick again.
-    setTimeout(() => { fireUpgradeCheckout(tierKey); }, 500);
+    setTimeout(() => { fireUpgradeCheckout(tierKey, undefined, pendingCadence); }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authChecked, authed, isAnonymous, tier]);
 
@@ -3241,7 +3308,7 @@ export default function Wovely() {
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:"transparent",fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
@@ -3295,7 +3362,7 @@ export default function Wovely() {
     <div style={{fontFamily:T.sans,background:"transparent",minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
