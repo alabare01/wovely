@@ -1,10 +1,12 @@
 // api/stripe-webhook.js
-// Handles Stripe webhook events for Wovely subscriptions (Pro + Craft).
+// Handles Stripe webhook events for Wovely subscriptions (Craft).
 // Requires Vercel env vars:
-//   STRIPE_SECRET_KEY      — from Stripe dashboard
-//   STRIPE_WEBHOOK_SECRET  — from Stripe webhook endpoint config
-//   STRIPE_PRO_PRICE_ID    — recurring price for $4.99 Pro tier
-//   STRIPE_CRAFT_PRICE_ID  — recurring price for $8.99 Craft tier
+//   STRIPE_SECRET_KEY            — from Stripe dashboard
+//   STRIPE_WEBHOOK_SECRET        — from Stripe webhook endpoint config
+//   STRIPE_CRAFT_PRICE_ID        — recurring price for the $6.99/mo Craft tier;
+//                                  matched to derive tier. The $59.99/yr annual
+//                                  price resolves to Craft via fallback, so the
+//                                  webhook doesn't need the annual price id.
 //   SUPABASE_SERVICE_ROLE_KEY — bypasses RLS so we can write tier on any row
 //   VITE_SUPABASE_URL      — Supabase project URL
 //
