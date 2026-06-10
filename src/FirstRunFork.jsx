@@ -3,9 +3,10 @@ import { useState } from "react";
 // First-run fork. Shown in place of the empty library for both fresh signups
 // and guests who have not saved anything yet. Two warm choices in Bev's voice:
 // bring your own pattern in, or start with one of ours. Picking one of ours
-// runs the import experience (the "Bev is setting up your pattern" beat) and
-// drops the user into a real, owned copy of the pattern. Styling follows the
-// guide: lavender, navy, Playfair headings, glass cards.
+// runs the same loading sequence as a real import (App drives the floating
+// ImportPill beat, then the reveal) and drops the user into a real, owned copy
+// of the pattern. Styling follows the guide: lavender, navy, Playfair headings,
+// glass cards.
 
 const LAV = "#9B7EC8";
 const NAVY = "#2D3A7C";
@@ -22,20 +23,6 @@ const GLASS = {
   borderRadius: 20,
   boxShadow: "0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(155,126,200,0.13)",
 };
-
-// The "Bev is setting up your pattern" progress beat. Rendered as a full-screen
-// overlay by App so it survives the library re-render and the navigation into
-// the new pattern. Static Bev inside a spinning ring, per the loading rule.
-export const StarterCloneBeat = () => (
-  <div style={{ position: "fixed", inset: 0, zIndex: 700, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(248,246,255,0.92)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", padding: 24, textAlign: "center" }}>
-    <div style={{ position: "relative", width: 92, height: 92, marginBottom: 22 }}>
-      <div className="spinner" style={{ position: "absolute", inset: 0, border: "3px solid #EDE4F7", borderTopColor: LAV, borderRadius: "50%" }} />
-      <img src="/bev_neutral.png" alt="Bev" style={{ position: "absolute", inset: 12, width: 68, height: 68, objectFit: "contain" }} />
-    </div>
-    <div style={{ fontFamily: PF, fontSize: 22, fontWeight: 700, color: NAVY, marginBottom: 8 }}>Bev is setting up your pattern</div>
-    <div style={{ fontFamily: INTER, fontSize: 14, color: MUTED, maxWidth: 320, lineHeight: 1.5 }}>Just a moment while I get everything ready for you.</div>
-  </div>
-);
 
 const ForkCard = ({ title, body, cta, onClick, primary }) => {
   const [hover, setHover] = useState(false);

@@ -14,7 +14,8 @@ import PatternHeader from "./PatternHeader.jsx";
 import RowManager, { ensureRepeatBrackets } from "./RowManager.jsx";
 import AddPatternModal, { uploadPatternFile, buildRowsFromComponents } from "./AddPatternModal.jsx";
 import CollectionView, { PatternCard } from "./Dashboard.jsx";
-import FirstRunFork, { StarterCloneBeat } from "./FirstRunFork.jsx";
+import FirstRunFork from "./FirstRunFork.jsx";
+import { STARTER_SETUP_COPY, STARTER_REASSURANCE_LINE } from "./utils/importPhaseCopy.js";
 import { CollectionDetailView } from "./Collections.jsx";
 import { linkPatternToCollection, listPatternsInCollection, createCollection } from "./utils/collections.js";
 import Detail, { CoverImagePicker, DeleteConfirmModal, ReadyToBuildPrompt, PatternCreatedOverlay } from "./PatternDetail.jsx";
@@ -1946,7 +1947,13 @@ export default function Wovely() {
   const [showcaseCatalog,setShowcaseCatalog]=useState([]);
   const [showcaseLoading,setShowcaseLoading]=useState(false);
   const [showcaseError,setShowcaseError]=useState(false);
-  const [starterCloneBeat,setStarterCloneBeat]=useState(false);
+  // Starter clone runs through the real import loading surface (ImportPill).
+  // starterImport is the synthetic "local job" we feed the pill: null normally,
+  // { status:'loading'|'ready', title, sub, startedAt, onOpen } while a pick is
+  // setting up. starterLandedRef guards the land-in-pattern step from firing
+  // twice (reveal timer + a tap on the "Pattern ready!" pill).
+  const [starterImport,setStarterImport]=useState(null);
+  const starterLandedRef=useRef(false);
   // Derive view from URL path instead of state
   const view = viewFromPath(location.pathname);
   const [selected,setSelected]=useState(null),[navOpen,setNavOpen]=useState(false),[addOpen,setAddOpen]=useState(false),[imageImportOpen,setImageImportOpen]=useState(false),[addMenuOpen,setAddMenuOpen]=useState(false),[menuAnchor,setMenuAnchor]=useState(null),[showPaywall,setShowPaywall]=useState(false),[showFairUseWall,setShowFairUseWall]=useState(false),[cat,setCat]=useState("All"),[search,setSearch]=useState("");
@@ -3214,23 +3221,50 @@ export default function Wovely() {
   // patterns POST in handleAddPattern (same REST insert, no new API file) but
   // is its own path so we can: suppress the pattern_uploaded activation event
   // (a clone is not a real activation — see detailOnSave for the honest signal),
-  // show the "Bev is setting up your pattern" beat, and drop the user straight
+  // walk the user through the REAL import loading sequence (the floating
+  // ImportPill beat, then the "Pattern ready!" reveal), and drop them straight
   // into the new pattern's detail view. It always succeeds — a copy has no
   // extraction step to fail.
+  //
+  // It's instant underneath, so we hold the loading beat for a believable dwell
+  // to match import pacing, rotate the setup copy once the way real phases
+  // breathe, then reveal and land.
   const cloneStarterPattern = async (showcaseRow) => {
+    const STARTER_LOADING_MS = 3200, STARTER_COPY_ROTATE_MS = 1500, STARTER_REVEAL_MS = 1400;
     const clone = mapShowcaseToPattern(showcaseRow);
-    setStarterCloneBeat(true);
     const startedAt = Date.now();
+    starterLandedRef.current = false;
+    // Start the loading beat in the floating pill (synthetic local job — same
+    // treatment as a real import, honest setup copy).
+    setStarterImport({ status: "loading", title: STARTER_SETUP_COPY[0], sub: STARTER_REASSURANCE_LINE, startedAt });
+    const copyTimer = setTimeout(() => {
+      setStarterImport(prev => (prev && prev.status === "loading") ? { ...prev, title: STARTER_SETUP_COPY[1] || prev.title } : prev);
+    }, STARTER_COPY_ROTATE_MS);
     const user = supabaseAuth.getUser();
     const session = getSession();
     const localId = "local_" + Date.now();
     const localPattern = { ...clone, id: localId, status: "active", started: false };
     setUserPatterns(prev => [localPattern, ...prev]);
-    // Keep the beat visible for a beat even on a fast insert, then drop the
-    // user INTO the pattern so their next move is checking a row.
+    // Drop the user INTO the new pattern (their next move is checking a row).
+    // Guarded so the reveal timer and a tap on the "Pattern ready!" pill can't
+    // both fire it.
+    const land = (savedPat) => {
+      if (starterLandedRef.current) return;
+      starterLandedRef.current = true;
+      clearTimeout(copyTimer);
+      setStarterImport(null);
+      setFirstRunMode("fork");
+      startAndOpenPattern(savedPat);
+    };
+    // Hold the loading beat for the believable dwell, flip the pill to the
+    // "Pattern ready!" reveal, then auto-land (still tappable to open now).
     const finish = (savedPat) => {
-      const wait = Math.max(0, 900 - (Date.now() - startedAt));
-      setTimeout(() => { setStarterCloneBeat(false); setFirstRunMode("fork"); startAndOpenPattern(savedPat); }, wait);
+      const wait = Math.max(0, STARTER_LOADING_MS - (Date.now() - startedAt));
+      setTimeout(() => {
+        clearTimeout(copyTimer);
+        setStarterImport({ status: "ready", title: "Pattern ready!", sub: "Opening your pattern...", onOpen: () => land(savedPat) });
+        setTimeout(() => land(savedPat), STARTER_REVEAL_MS);
+      }, wait);
     };
     if (!user || !session) { finish(localPattern); return; }
     try {
@@ -3457,9 +3491,8 @@ export default function Wovely() {
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:"transparent",fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      {starterCloneBeat&&<StarterCloneBeat/>}
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
-      {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
+      {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume} localJob={starterImport}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       {showFairUseWall&&<FairUseWall cap={TIER_CONFIG.craft.patternCap} onClose={()=>setShowFairUseWall(false)}/>}
@@ -3512,9 +3545,8 @@ export default function Wovely() {
     <div style={{fontFamily:T.sans,background:"transparent",minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      {starterCloneBeat&&<StarterCloneBeat/>}
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
-      {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
+      {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume} localJob={starterImport}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}

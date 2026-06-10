@@ -47,7 +47,7 @@ export const setActiveImportJob = (jobId) => {
   } catch {}
 };
 
-export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) {
+export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume, localJob = null }) {
   const { isMobile } = useBreakpoint();
   const [jobId, setJobId] = useState(() => {
     try { return sessionStorage.getItem(SESSION_KEY) || null; } catch { return null; }
@@ -121,6 +121,63 @@ export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) 
     setJobId(null);
     onTapResume?.({ jobId: job.id, fileType });
   };
+
+  // ── Synthetic local job (starter clone) ─────────────────────────────────────
+  // A starter pick has no extraction and no import_job to poll, but it should
+  // walk the SAME post-submit sequence as a real import: this loading beat, the
+  // "Pattern ready!" reveal, then landing in the pattern. The caller (App) owns
+  // the rhythm and the honest copy; we reuse the pill's own treatment — Bev +
+  // spinning ring, elapsed counter, then the prominent reveal — so it reads as
+  // one import experience, not a parallel flow. localJob = { status:
+  // 'loading'|'ready', title, sub, startedAt, onOpen }.
+  if (localJob) {
+    const ready = localJob.status === "ready";
+    const lElapsed = localJob.startedAt ? Math.max(0, Math.floor((Date.now() - localJob.startedAt) / 1000)) : 0;
+    const lLabel = lElapsed >= 60 ? `${Math.floor(lElapsed / 60)}m ${lElapsed % 60}s` : `${lElapsed}s`;
+    const lWidth = isMobile ? 240 : 320;
+    const lStyle = {
+      position: "fixed",
+      bottom: isMobile ? `calc(16px + env(safe-area-inset-bottom, 0px))` : "24px",
+      right: isMobile ? "16px" : "24px",
+      width: lWidth,
+      zIndex: 50,
+      borderRadius: 16,
+      padding: 12,
+      transition: "transform .25s ease",
+      cursor: ready ? "pointer" : "default",
+      fontFamily: T.sans,
+      color: ready ? "#FFFFFF" : T.ink,
+      ...(ready ? PROMINENT_STYLE : SETTLED_STYLE),
+      ...(ready && { animation: "wovelyPillPulse 1.2s ease-in-out infinite" }),
+    };
+    return (
+      <>
+        <PillKeyframes />
+        <div role="status" aria-live="polite" onClick={ready ? () => localJob.onOpen?.() : undefined} style={lStyle}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <BevAvatar spinning={!ready} prominent={ready} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{
+                fontSize: 13, fontWeight: 600,
+                color: ready ? "#FFFFFF" : T.ink,
+                whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+              }}>{localJob.title}</div>
+              <div style={{
+                fontSize: 11,
+                color: ready ? "rgba(255,255,255,0.85)" : T.ink2,
+                marginTop: 2, lineHeight: 1.35, whiteSpace: "normal",
+              }}>{localJob.sub}</div>
+            </div>
+            {!ready && (
+              <div style={{
+                fontSize: 11, color: T.ink3, fontVariantNumeric: "tabular-nums", flexShrink: 0,
+              }}>{lLabel}</div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
 
   if (!jobId || !job) return null;
   if (!isActive && !isComplete && !isFailed) return null;
