@@ -14,6 +14,7 @@ import PatternHeader from "./PatternHeader.jsx";
 import RowManager, { ensureRepeatBrackets } from "./RowManager.jsx";
 import AddPatternModal, { uploadPatternFile, buildRowsFromComponents } from "./AddPatternModal.jsx";
 import CollectionView, { PatternCard } from "./Dashboard.jsx";
+import FirstRunFork, { StarterCloneBeat } from "./FirstRunFork.jsx";
 import { CollectionDetailView } from "./Collections.jsx";
 import { linkPatternToCollection, listPatternsInCollection, createCollection } from "./utils/collections.js";
 import Detail, { CoverImagePicker, DeleteConfirmModal, ReadyToBuildPrompt, PatternCreatedOverlay } from "./PatternDetail.jsx";
@@ -1939,6 +1940,13 @@ export default function Wovely() {
   const [userPatterns,setUserPatterns]=useState([]);
   const [patternsFetched,setPatternsFetched]=useState(false);
   const [starterPatterns,setStarterPatterns]=useState(()=>makeStarterPatterns());
+  // Guided first-run: the empty-library fork (pick a starter OR import your
+  // own), the showcase catalog it reads, and the clone-in-progress beat.
+  const [firstRunMode,setFirstRunMode]=useState("fork"); // "fork" | "gallery"
+  const [showcaseCatalog,setShowcaseCatalog]=useState([]);
+  const [showcaseLoading,setShowcaseLoading]=useState(false);
+  const [showcaseError,setShowcaseError]=useState(false);
+  const [starterCloneBeat,setStarterCloneBeat]=useState(false);
   // Derive view from URL path instead of state
   const view = viewFromPath(location.pathname);
   const [selected,setSelected]=useState(null),[navOpen,setNavOpen]=useState(false),[addOpen,setAddOpen]=useState(false),[imageImportOpen,setImageImportOpen]=useState(false),[addMenuOpen,setAddMenuOpen]=useState(false),[menuAnchor,setMenuAnchor]=useState(null),[showPaywall,setShowPaywall]=useState(false),[showFairUseWall,setShowFairUseWall]=useState(false),[cat,setCat]=useState("All"),[search,setSearch]=useState("");
@@ -2626,6 +2634,19 @@ export default function Wovely() {
     const withTimestamp={...u,updated_at:new Date().toISOString()};
     setUserPatterns(prev=>prev.map(p=>p.id===u.id?withTimestamp:p));setStarterPatterns(prev=>prev.map(p=>p.id===u.id?withTimestamp:p));setSelected(withTimestamp);
     const user=supabaseAuth.getUser();const session=getSession();
+    // Honest activation signal: the first time a user checks/tracks a row on
+    // ANY pattern (their own OR a starter clone). Fires once per user. Starter
+    // clones suppress pattern_uploaded, so this is the real "they're using it".
+    try{
+      const checkedAny=(u.rows||[]).some(r=>r.done&&!r.isHeader&&!r.isNoteOnly);
+      if(checkedAny&&user){
+        const akey="wovely_activated_"+user.id;
+        if(!localStorage.getItem(akey)){
+          localStorage.setItem(akey,"1");
+          posthog.capture("pattern_activated",{pattern_id:String(u._supabaseId||u.id||""),is_starter:!!u.isStarter});
+        }
+      }
+    }catch{}
     const pid=u._supabaseId||u.id;
     if(user&&session&&typeof pid==="string"&&!pid.startsWith("local_")&&!pid.startsWith("onboard_")&&!pid.startsWith("starter_")){
       fetch(`${SUPABASE_URL}/rest/v1/patterns?id=eq.${pid}&user_id=eq.${user.id}`,{
@@ -3114,7 +3135,7 @@ export default function Wovely() {
       cb();
       return;
     }
-    if (isAnonymous && userPatterns.length >= ANON_PATTERN_CAP) {
+    if (isAnonymous && (userPatterns.length - userStarterCount) >= ANON_PATTERN_CAP) {
       // Guest already used their 1 import. Show the AuthWall with copy
       // that emphasizes "create an account to keep importing", not a
       // paid-tier upsell.
@@ -3135,6 +3156,134 @@ export default function Wovely() {
 
   const openAddModal=(method)=>{
     gateImport("import_pattern", () => { setPendingImportUrl(null); setPendingMethod(method||null); setAddOpen(true); });
+  };
+
+  // ── Guided first-run: starter catalog + clone-on-pick ──────────────────────
+  // Read the showcase catalog (patterns flagged is_showcase=true). RLS lets
+  // both anon and authenticated sessions SELECT these rows; we send the user's
+  // bearer when present, else the anon key. We never write these rows.
+  const fetchShowcaseCatalog = async () => {
+    setShowcaseLoading(true); setShowcaseError(false);
+    try {
+      const session = getSession();
+      const headers = { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${session?.access_token || SUPABASE_ANON_KEY}`, "Range": "0-99" };
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/patterns?is_showcase=eq.true&status=neq.deleted&order=created_at.desc&select=*`, { headers });
+      if (res.ok || res.status === 206) {
+        const data = await res.json();
+        setShowcaseCatalog(Array.isArray(data) ? data : []);
+      } else {
+        console.error("[Wovely] Showcase fetch failed:", res.status, await res.text().catch(()=>""));
+        setShowcaseError(true);
+      }
+    } catch (e) {
+      console.error("[Wovely] Showcase fetch error:", e?.message);
+      setShowcaseError(true);
+    } finally {
+      setShowcaseLoading(false);
+    }
+  };
+  const openStarterGallery = () => { setFirstRunMode("gallery"); fetchShowcaseCatalog(); };
+
+  // Map a showcase DB row into the client pattern shape, with a fresh
+  // (unchecked) copy of the rows so the user starts from zero.
+  const mapShowcaseToPattern = (r) => ({
+    title: r.title || "Starter pattern",
+    cat: r.cat || "",
+    source: r.source || "Wovely",
+    notes: "",
+    pattern_notes: r.pattern_notes || "",
+    difficulty: r.difficulty || "",
+    weight: r.weight || r.yarn_weight || "",
+    hook: r.hook || r.hook_size || "",
+    gauge: r.gauge || {},
+    tags: r.tags || [],
+    isStarter: true,
+    image_url: r.image_url || "",
+    photo: r.cover_image_url || r.photo || "",
+    cover_image_url: r.cover_image_url || null,
+    materials: r.materials || [],
+    rows: (r.rows || []).map(row => ({ ...row, done: false })),
+    components: r.components || null,
+    yardage: r.yardage || 0,
+    skeins: r.skeins || 0,
+    skeinYards: r.skein_yards || 200,
+    dimensions: r.dimensions || {},
+  });
+
+  // Clone the chosen showcase pattern into the user's own library. Mirrors the
+  // patterns POST in handleAddPattern (same REST insert, no new API file) but
+  // is its own path so we can: suppress the pattern_uploaded activation event
+  // (a clone is not a real activation — see detailOnSave for the honest signal),
+  // show the "Bev is setting up your pattern" beat, and drop the user straight
+  // into the new pattern's detail view. It always succeeds — a copy has no
+  // extraction step to fail.
+  const cloneStarterPattern = async (showcaseRow) => {
+    const clone = mapShowcaseToPattern(showcaseRow);
+    setStarterCloneBeat(true);
+    const startedAt = Date.now();
+    const user = supabaseAuth.getUser();
+    const session = getSession();
+    const localId = "local_" + Date.now();
+    const localPattern = { ...clone, id: localId, status: "active", started: false };
+    setUserPatterns(prev => [localPattern, ...prev]);
+    // Keep the beat visible for a beat even on a fast insert, then drop the
+    // user INTO the pattern so their next move is checking a row.
+    const finish = (savedPat) => {
+      const wait = Math.max(0, 900 - (Date.now() - startedAt));
+      setTimeout(() => { setStarterCloneBeat(false); setFirstRunMode("fork"); startAndOpenPattern(savedPat); }, wait);
+    };
+    if (!user || !session) { finish(localPattern); return; }
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/patterns`, {
+        method: "POST",
+        headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${session.access_token}`, "Content-Type": "application/json", "Prefer": "return=representation" },
+        body: JSON.stringify({ user_id:user.id, title:clone.title, cat:clone.cat||"", source:clone.source||"", source_url:"", notes:"", pattern_notes:clone.pattern_notes||null, difficulty:clone.difficulty||"", yarn_weight:clone.weight||"", hook_size:clone.hook||"", gauge:clone.gauge||{}, tags:clone.tags||[], is_ai_generated:false, is_starter:true, image_url:clone.image_url||"", photo:clone.photo||"", cover_image_url:clone.cover_image_url||null, row_count:(clone.rows||[]).length, materials:clone.materials||[], rows:clone.rows||[], rating:0, yardage:clone.yardage||0, skeins:clone.skeins||0, skein_yards:clone.skeinYards||200, dimensions:clone.dimensions||{}, weight:clone.weight||"", hook:clone.hook||"", components:clone.components||null }),
+      });
+      if (res.ok) {
+        const rows = await res.json();
+        if (rows[0]?.id) {
+          const savedPat = { ...localPattern, id: rows[0].id, _supabaseId: rows[0].id };
+          setUserPatterns(prev => prev.map(pat => pat.id === localId ? savedPat : pat));
+          try { posthog.capture("starter_cloned", { showcase_id: showcaseRow?.id || null }); } catch {}
+          finish(savedPat);
+          return;
+        }
+      }
+      console.error("[Wovely] Starter clone insert failed:", res.status, await res.text().catch(()=>""));
+      finish(localPattern);
+    } catch (e) {
+      console.error("[Wovely] Starter clone error:", e?.message);
+      finish(localPattern);
+    }
+  };
+
+  // Pick handler from the starter gallery. Guests in anonymous browsing mode
+  // with no Supabase session yet are signed in anonymously FIRST (mirrors the
+  // gateImport anon path) so the clone has a real user_id to attach to and
+  // survives a reload; then we clone.
+  const handlePickStarter = async (showcaseRow) => {
+    if (!showcaseRow) return;
+    const session = getSession();
+    if (anonymousMode && !session) {
+      try { posthog.capture("guest_starter_pick", {}); } catch {}
+      const { error } = await supabaseAuth.signInAnonymously();
+      if (error) {
+        console.warn("[Wovely] Anonymous sign-in for starter failed:", error?.message || error);
+        gateAction(
+          { intent: "starter_pick", title: "Create a free account to keep your pattern", subtitle: "Your starter stays with you across devices." },
+          () => cloneStarterPattern(showcaseRow)
+        );
+        return;
+      }
+      setAuthed(true);
+      document.cookie = "wovely_authed=1;path=/;max-age=31536000";
+      setIsAnonymous(true);
+      try { sessionStorage.removeItem("wovely_anonymous_mode"); } catch {}
+      setAnonymousMode(false);
+      const u = supabaseAuth.getUser();
+      if (u) posthog.identify(u.id, { email: u.email || "guest" });
+    }
+    cloneStarterPattern(showcaseRow);
   };
   // Zero-friction collection creation: open the standard PDF picker but
   // flip the startingCollection flag so handleAddPattern promotes the
@@ -3308,6 +3457,7 @@ export default function Wovely() {
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:"transparent",fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
+      {starterCloneBeat&&<StarterCloneBeat/>}
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
@@ -3339,7 +3489,7 @@ export default function Wovely() {
           </div>
         </div>
         <div style={{flex:1,padding:"0 32px",minHeight:"100vh"}}>
-          {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
+          {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} catalog={showcaseCatalog} loading={showcaseLoading} error={showcaseError} isMobile={!isDesktop} onImportOwn={()=>openAddModal()} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>)}
           {view==="wip"&&<div style={{padding:"24px 0 80px"}}><button onClick={()=>navigateToView("collection")} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Back</button>{inProgress.length===0?<div style={{textAlign:"center",padding:"80px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:20,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
           {view==="detail"&&selected&&<div style={{margin:"0 -40px"}}><Detail key={selected._supabaseId||selected.id} p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selected?.collection_id ?? null)} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>{setPaywallRecommend(requiredTier('collections'));setShowProModal(true);}} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/></div>}
           {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
@@ -3362,6 +3512,7 @@ export default function Wovely() {
     <div style={{fontFamily:T.sans,background:"transparent",minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
+      {starterCloneBeat&&<StarterCloneBeat/>}
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
@@ -3391,7 +3542,7 @@ export default function Wovely() {
       </div>
       {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Inter,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}
       <div ref={mainScrollRef} style={{flex:1,overflowY:"auto",paddingBottom:100,minHeight:"100vh"}}>
-        {view==="collection"&&<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>}
+        {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} catalog={showcaseCatalog} loading={showcaseLoading} error={showcaseError} isMobile={!isDesktop} onImportOwn={()=>openAddModal()} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>)}
         {view==="wip"&&<div style={{padding:"16px 18px 80px"}}>{inProgress.length===0?<div style={{textAlign:"center",padding:"60px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
         {view==="detail"&&selected&&<Detail key={selected._supabaseId||selected.id} p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selected?.collection_id ?? null)} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>{setPaywallRecommend(requiredTier('collections'));setShowProModal(true);}} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/>}
         {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
