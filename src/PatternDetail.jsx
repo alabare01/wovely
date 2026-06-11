@@ -8,7 +8,7 @@ import RowManager, { ensureRepeatBrackets } from "./RowManager.jsx";
 import { uploadPatternFile } from "./AddPatternModal.jsx";
 import { listPatternsInCollection, partLabelFor } from "./utils/collections.js";
 import { canAccessChartImages } from "./utils/featureGates.js";
-import { fetchPatternImages, getPatternImageCount, renderAndUploadPendingImages } from "./utils/patternImages.js";
+import { fetchPatternImages, getPatternImageCount, renderAndUploadPendingImages, isImagesPending, clearImagesPending, componentLabelsMatch } from "./utils/patternImages.js";
 import { ChartStripView } from "./components/ChartStrip.jsx";
 import { clampPartIndex, buildPartStrip } from "./utils/docType.js";
 import SectionHub from "./components/SectionHub.jsx";
@@ -278,7 +278,9 @@ const ShareCardModal = ({pattern,onClose,pct,Btn}) => {
 // ChartTypePill, ChartLightbox, BevInlineSpinner, and the strip view now live
 // in components/ChartStrip.jsx (shared with the collection detail page).
 
-const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pinnedImageId, onTogglePin }) => {
+const IMG_POLL_MS = 5000;
+
+const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pinnedImageId, onTogglePin, activeTab, scopedPartName, isMultiPart = false }) => {
   const patternId = pattern._supabaseId || pattern.id;
   const sourceFileUrl = pattern.source_file_url || null;
   const isCraft = canAccessChartImages(tier, isAnonymous);
@@ -287,6 +289,11 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
   // loads the full rows and renders any pending ones.
   const [lockedCount, setLockedCount] = useState(null);
   const [images, setImages] = useState(null);
+  // S83: classification-in-flight marker. fireImageExtraction stamps a
+  // sessionStorage key when it kicks the server; while that key is fresh
+  // (<3 min) and the fetch returns 0 rows we render a pending band and poll
+  // every 5s, so the ribbon populates live without leaving the screen.
+  const [classifyPending, setClassifyPending] = useState(() => isImagesPending(patternId));
   // S78: non-blocking notice when the lazy render reports a failure (telemetry
   // also goes to /api/client-error). Lets the Craft user know a chart didn't
   // prepare instead of it silently staying blank.
@@ -295,40 +302,101 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
   useEffect(() => {
     if (!patternId) return;
     let cancelled = false;
-    (async () => {
+    let timer = null;
+
+    const tick = async () => {
+      if (cancelled) return;
       if (!isCraft) {
         const { data } = await getPatternImageCount(patternId);
-        if (!cancelled) setLockedCount(typeof data === "number" ? data : 0);
-        return;
+        if (cancelled) return;
+        const n = typeof data === "number" ? data : 0;
+        setLockedCount(n);
+        if (n > 0) {
+          clearImagesPending(patternId);
+          setClassifyPending(false);
+          return;
+        }
+      } else {
+        const { data } = await fetchPatternImages(patternId);
+        if (cancelled) return;
+        const rows = Array.isArray(data) ? data : [];
+        setImages(rows);
+        if (rows.length > 0) {
+          clearImagesPending(patternId);
+          setClassifyPending(false);
+          // Rows with cloudinary_url=null go through the existing lazy
+          // render — per-asset Bev spinners cover that window in the strip.
+          const hasPending = rows.some(r => !r.cloudinary_url);
+          if (hasPending && sourceFileUrl) {
+            const updated = await renderAndUploadPendingImages({
+              images: rows,
+              sourceFileUrl,
+              onProgress: (row) => {
+                if (cancelled || !row) return;
+                setImages(prev => (prev || []).map(p => p.id === row.id ? { ...p, cloudinary_url: row.cloudinary_url } : p));
+              },
+              onError: ({ stage }) => {
+                if (cancelled) return;
+                setRenderNote(`Some charts couldn't be prepared (${stage}) — Bev logged the details.`);
+              },
+            });
+            if (!cancelled) setImages(updated);
+          }
+          return;
+        }
       }
-      const { data } = await fetchPatternImages(patternId);
-      if (cancelled) return;
-      const rows = Array.isArray(data) ? data : [];
-      setImages(rows);
-      const hasPending = rows.some(r => !r.cloudinary_url);
-      if (hasPending && sourceFileUrl) {
-        const updated = await renderAndUploadPendingImages({
-          images: rows,
-          sourceFileUrl,
-          onProgress: (row) => {
-            if (cancelled || !row) return;
-            setImages(prev => (prev || []).map(p => p.id === row.id ? { ...p, cloudinary_url: row.cloudinary_url } : p));
-          },
-          onError: ({ stage }) => {
-            if (cancelled) return;
-            setRenderNote(`Some charts couldn't be prepared (${stage}) — Bev logged the details.`);
-          },
-        });
-        if (!cancelled) setImages(updated);
+      // Zero rows. Keep polling while the classification marker is fresh;
+      // once it ages out (or was never set) settle into the asset-free state.
+      if (isImagesPending(patternId)) {
+        setClassifyPending(true);
+        timer = setTimeout(tick, IMG_POLL_MS);
+      } else {
+        setClassifyPending(false);
       }
-    })();
-    return () => { cancelled = true; };
+    };
+
+    tick();
+    return () => { cancelled = true; if (timer) clearTimeout(timer); };
   }, [patternId, isCraft, sourceFileUrl]);
 
   // Locked strip (Pro/Free/Anon): frosted placeholder thumbs behind a compact
   // upgrade nudge. Same band height as the unlocked strip so layout doesn't jump.
   if (!isCraft) {
-    if (!lockedCount || lockedCount <= 0) return null;
+    if (!lockedCount || lockedCount <= 0) {
+      // Classification still in flight: same locked frame, gathering copy.
+      // Anon CTA labels signup; onShowUpgrade already routes anonymous users
+      // through the signup-required path of the upgrade modal.
+      if (classifyPending && sourceFileUrl) {
+        return (
+          <div style={{ background: "rgba(255,255,255,0.82)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid #EDE4F7", padding: "12px 16px", position: "relative" }}>
+            <div style={{ display: "flex", gap: 10, overflowX: "hidden", filter: "blur(1.5px)", opacity: 0.7 }}>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} style={{
+                  flexShrink: 0, height: 120, width: 92, borderRadius: 12,
+                  border: "1px solid #EDE4F7",
+                  background: "linear-gradient(135deg, #EDE4F7, #F8F6FF)",
+                }}/>
+              ))}
+            </div>
+            <div style={{
+              position: "absolute", inset: 0, display: "flex", flexDirection: "column",
+              alignItems: "center", justifyContent: "center", gap: 4,
+              background: "rgba(248,246,255,0.55)",
+              backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
+            }}>
+              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#2D2D4E", fontWeight: 600 }}>
+                Bev is gathering this pattern's charts…
+              </div>
+              <button onClick={onShowUpgrade} style={{
+                background: "transparent", border: "none", padding: 0, cursor: "pointer",
+                fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 700, color: "#9B7EC8",
+              }}>{isAnonymous ? "Create a free account" : "See plans"}</button>
+            </div>
+          </div>
+        );
+      }
+      return null;
+    }
     const placeholderCount = Math.min(lockedCount, 5);
     const charts = (lockedCount === 1) ? "1 chart" : `${lockedCount} charts`;
     return (
@@ -379,7 +447,40 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
       />
     );
   }
-  if (images.length === 0) return null;
+
+  // S83 Part B — section scoping. Materials and Notes show ALL assets. On the
+  // Instructions tab of a multi-part pattern with a part open, show assets
+  // whose component_name fuzzy-matches the part (same semantics the classifier
+  // used to assign them) plus pattern-level glossary/key reference assets.
+  // Charts/diagrams tagged for OTHER parts are hidden in that scope. The
+  // pinned asset stays reachable: Materials always shows everything, and the
+  // floating pinned thumbnail at the App level is independent of this strip.
+  const inInstructionsScope = activeTab === "rows" && isMultiPart && !!scopedPartName;
+  const scoped = inInstructionsScope
+    ? images.filter(img => img.component_name
+        ? componentLabelsMatch(img.component_name, scopedPartName)
+        : (img.image_type === "glossary" || img.image_type === "key"))
+    : images;
+  const scopedShown = scoped.filter(i => i.image_type !== "photo");
+
+  if (scopedShown.length === 0) {
+    // Empty in this scope. If classification is still in flight show the
+    // preparing band (live population); otherwise hide the band entirely —
+    // no empty shell, exactly the pre-S83 behavior for asset-free patterns.
+    if (classifyPending && sourceFileUrl && images.length === 0) {
+      return (
+        <ChartStripView
+          images={[]}
+          showEmptyState
+          pendingLabel="Bev is preparing your charts…"
+          canPin={isCraft}
+          pinnedImageId={pinnedImageId}
+          onTogglePin={onTogglePin}
+        />
+      );
+    }
+    return null;
+  }
   return (
     <>
       {renderNote && (
@@ -388,7 +489,7 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
         </div>
       )}
       <ChartStripView
-        images={images}
+        images={scoped}
         canPin={isCraft}
         pinnedImageId={pinnedImageId}
         onTogglePin={onTogglePin}
@@ -638,7 +739,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
               </div>
             );
           })()}
-          <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} pinnedImageId={pinnedImageId} onTogglePin={onTogglePin} />
+          <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} pinnedImageId={pinnedImageId} onTogglePin={onTogglePin} activeTab={tab} scopedPartName={hubScoped?hubSectionTitle:null} isMultiPart={isMultiPart} />
           <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
             {[["materials","Materials"],["rows","Instructions"],["notes","Notes"]].map(([key,label])=>(
               <button key={key} onClick={()=>setTab(key)} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>

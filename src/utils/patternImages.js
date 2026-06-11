@@ -210,6 +210,56 @@ export const renderAndUploadPendingImages = async ({ images, sourceFileUrl, onPr
   return updated;
 };
 
+// ── Live-population pending marker (S83 ribbon fix) ─────────────────────────
+// fireImageExtraction (App.jsx) stamps this key when it kicks the server-side
+// page classification; the detail ribbon polls while the key is fresh so the
+// strip populates live instead of staying blank until a remount. The key ages
+// out after 3 minutes — a classification that hasn't landed by then isn't
+// coming (extract-images runs in seconds), so the ribbon goes back to
+// rendering nothing for genuinely asset-free patterns.
+const IMG_PENDING_TTL_MS = 3 * 60 * 1000;
+const imgPendingKey = (patternId) => `wovely_img_pending_${patternId}`;
+
+export const markImagesPending = (patternId) => {
+  if (!patternId) return;
+  try { sessionStorage.setItem(imgPendingKey(patternId), String(Date.now())); } catch {}
+};
+
+export const isImagesPending = (patternId) => {
+  if (!patternId) return false;
+  try {
+    const v = sessionStorage.getItem(imgPendingKey(patternId));
+    if (!v) return false;
+    const ts = parseInt(v, 10);
+    if (!Number.isFinite(ts) || Date.now() - ts > IMG_PENDING_TTL_MS) {
+      sessionStorage.removeItem(imgPendingKey(patternId));
+      return false;
+    }
+    return true;
+  } catch { return false; }
+};
+
+export const clearImagesPending = (patternId) => {
+  if (!patternId) return;
+  try { sessionStorage.removeItem(imgPendingKey(patternId)); } catch {}
+};
+
+// ── Section scoping (S83 ribbon fix, Part B) ────────────────────────────────
+// Ported from normalizeComponentLabel in api/extract-pattern.js (the
+// extract-images classifier) so the ribbon scopes assets with the SAME
+// semantics used to assign them: exact normalized match first, then
+// substring either way. "Clue #1" → "clue 1", "Body chart" → "body chart".
+export const normalizeComponentLabel = (s) => {
+  if (!s || typeof s !== "string") return "";
+  return s.toLowerCase().replace(/[#:_\-]/g, " ").replace(/[^\w\s]/g, "").replace(/\s+/g, " ").trim();
+};
+
+export const componentLabelsMatch = (a, b) => {
+  const na = normalizeComponentLabel(a), nb = normalizeComponentLabel(b);
+  if (!na || !nb) return false;
+  return na === nb || na.includes(nb) || nb.includes(na);
+};
+
 // User-facing pill label per image type. Stays short so the pill fits
 // inside the card without wrapping.
 export const imageTypeLabel = (type) => ({
