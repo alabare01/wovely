@@ -59,18 +59,32 @@ export default async function handler(req, res) {
     }
   } catch {}
 
-  if (isAnonymous && serviceKey && supabaseUrl) {
+  const { file_url, file_type, raw_text, cover_image_url, pdf_metadata_title } = req.body || {};
+  if (!file_url || !file_type) return res.status(400).json({ error: "file_url and file_type required" });
+  if (file_type !== 'pdf' && file_type !== 'image') return res.status(400).json({ error: "file_type must be 'pdf' or 'image'" });
+  if (file_type === 'pdf' && !raw_text) return res.status(400).json({ error: "raw_text required for pdf jobs" });
+
+  // S83: starter imports live under pattern-files/starters/ (a folder only
+  // Wovely seeds — user uploads always land under <user_id>/). Starters
+  // neither consume nor are blocked by the guest cap: the incoming request
+  // skips the cap when it IS a starter, and starter jobs are excluded from
+  // the count when a later own-PDF import is checked.
+  const STARTER_FOLDER_MARKER = '/pattern-files/starters/';
+  const isStarterFileUrl = (u) => typeof u === 'string' && u.includes(STARTER_FOLDER_MARKER);
+
+  if (isAnonymous && !isStarterFileUrl(file_url) && serviceKey && supabaseUrl) {
     try {
-      // Count this user's existing import_jobs. Anything > 0 means they've
-      // already used their guest import — block here so the friendly modal
-      // message surfaces instead of the worker silently doing the work and
-      // the client hitting tier paywall on save.
-      const countRes = await fetch(`${supabaseUrl}/rest/v1/import_jobs?user_id=eq.${userId}&select=id`, {
+      // Count this user's existing non-starter import_jobs. Anything > 0
+      // means they've already used their guest import — block here so the
+      // friendly modal message surfaces instead of the worker silently doing
+      // the work and the client hitting tier paywall on save.
+      const countRes = await fetch(`${supabaseUrl}/rest/v1/import_jobs?user_id=eq.${userId}&select=id,file_url`, {
         headers: { 'apikey': serviceKey, 'Authorization': `Bearer ${serviceKey}`, 'Prefer': 'count=exact' },
       });
       if (countRes.ok) {
         const existing = await countRes.json();
-        if (Array.isArray(existing) && existing.length >= 1) {
+        const nonStarter = Array.isArray(existing) ? existing.filter(j => !isStarterFileUrl(j.file_url)) : [];
+        if (nonStarter.length >= 1) {
           return res.status(402).json({
             error: 'guest_import_cap_reached',
             message: "Create a free account to keep importing. Your guest pattern stays attached.",
@@ -81,11 +95,6 @@ export default async function handler(req, res) {
       console.warn('[import-job] guest cap check failed, letting through:', e.message);
     }
   }
-
-  const { file_url, file_type, raw_text, cover_image_url, pdf_metadata_title } = req.body || {};
-  if (!file_url || !file_type) return res.status(400).json({ error: "file_url and file_type required" });
-  if (file_type !== 'pdf' && file_type !== 'image') return res.status(400).json({ error: "file_type must be 'pdf' or 'image'" });
-  if (file_type === 'pdf' && !raw_text) return res.status(400).json({ error: "raw_text required for pdf jobs" });
 
   // Chunked-import gate (free tier). PDFs over the smart-chunking
   // threshold (15KB raw_text) take the planning → per-component path

@@ -2,11 +2,12 @@ import { useState } from "react";
 
 // First-run fork. Shown in place of the empty library for both fresh signups
 // and guests who have not saved anything yet. Two warm choices in Bev's voice:
-// bring your own pattern in, or start with one of ours. Picking one of ours
-// runs the same loading sequence as a real import (App drives the floating
-// ImportPill beat, then the reveal) and drops the user into a real, owned copy
-// of the pattern. Styling follows the guide: lavender, navy, Playfair headings,
-// glass cards.
+// bring your own pattern in, or start with ours. Picking the starter runs the
+// REAL import pipeline (S83): App fetches the starter PDF from storage, runs
+// the same client-side extraction as an upload, and enqueues a real import
+// job — the floating ImportPill walks the real worker phases from there.
+// One hardcoded starter (the STARTER constant in App.jsx) — no table reads.
+// Styling follows the guide: lavender, navy, Playfair headings, glass cards.
 
 const LAV = "#9B7EC8";
 const NAVY = "#2D3A7C";
@@ -53,25 +54,27 @@ const ForkCard = ({ title, body, cta, onClick, primary }) => {
   );
 };
 
-const StarterTile = ({ row, onPick }) => {
+const StarterTile = ({ starter, busy, onPick }) => {
   const [hover, setHover] = useState(false);
-  const cover = row.cover_image_url || row.photo || "";
-  const title = row.title || "Starter pattern";
+  const cover = starter.coverUrl || "";
+  const title = starter.title || "Starter pattern";
   return (
     <button
-      onClick={() => onPick(row)}
+      onClick={busy ? undefined : onPick}
+      disabled={busy}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ ...GLASS, padding: 0, overflow: "hidden", cursor: "pointer", textAlign: "left", display: "flex", flexDirection: "column", transition: "transform .16s ease, box-shadow .16s ease", transform: hover ? "translateY(-3px)" : "none", boxShadow: hover ? "0 12px 36px rgba(155,126,200,0.22)" : GLASS.boxShadow }}
+      style={{ ...GLASS, padding: 0, overflow: "hidden", cursor: busy ? "default" : "pointer", textAlign: "left", display: "flex", flexDirection: "column", transition: "transform .16s ease, box-shadow .16s ease", transform: hover && !busy ? "translateY(-3px)" : "none", boxShadow: hover && !busy ? "0 12px 36px rgba(155,126,200,0.22)" : GLASS.boxShadow, opacity: busy ? 0.7 : 1 }}
     >
-      <div style={{ height: 168, background: "linear-gradient(135deg,#EDE4F7 0%,#F5F0FA 100%)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      <div style={{ height: 200, background: "linear-gradient(135deg,#EDE4F7 0%,#F5F0FA 100%)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
         {cover
           ? <img src={cover} alt={title} style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
           : <span style={{ fontFamily: PF, fontSize: 40, color: LAV, opacity: 0.5 }}>{(title || "?")[0]}</span>}
       </div>
-      <div style={{ padding: "14px 16px 16px" }}>
-        <div style={{ fontFamily: PF, fontSize: 15, fontWeight: 600, color: NAVY, lineHeight: 1.3, marginBottom: 6, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{title}</div>
-        <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 600, color: LAV }}>Start this one</span>
+      <div style={{ padding: "16px 18px 18px" }}>
+        <div style={{ fontFamily: PF, fontSize: 17, fontWeight: 600, color: NAVY, lineHeight: 1.3, marginBottom: 6 }}>{title}</div>
+        {starter.blurb && <div style={{ fontFamily: INTER, fontSize: 13, color: MUTED, lineHeight: 1.55, marginBottom: 10 }}>{starter.blurb}</div>}
+        <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 600, color: "#fff", background: LAV, borderRadius: 10, padding: "9px 16px", display: "inline-block" }}>{busy ? "Getting it ready..." : "Start this one"}</span>
       </div>
     </button>
   );
@@ -81,43 +84,25 @@ const Wrap = ({ children }) => (
   <div style={{ maxWidth: 860, margin: "0 auto", padding: "40px 20px 80px", width: "100%", boxSizing: "border-box" }}>{children}</div>
 );
 
-export default function FirstRunFork({ mode = "fork", catalog = [], loading = false, error = false, onImportOwn, onShowGallery, onBack, onPickStarter, isMobile = false }) {
+export default function FirstRunFork({ mode = "fork", starter = null, busy = false, error = false, onImportOwn, onShowGallery, onBack, onPickStarter, isMobile = false }) {
   if (mode === "gallery") {
     return (
       <Wrap>
         <button onClick={onBack} style={{ background: "none", border: "none", color: LAV, cursor: "pointer", fontSize: 13, fontWeight: 600, fontFamily: INTER, padding: 0, marginBottom: 18 }}>← Back</button>
-        <h1 style={{ fontFamily: PF, fontSize: 28, fontWeight: 700, color: NAVY, marginBottom: 8, lineHeight: 1.2 }}>Pick a pattern to start with</h1>
-        <p style={{ fontFamily: INTER, fontSize: 15, color: MUTED, marginBottom: 28, lineHeight: 1.5 }}>Choose one and I will add it to your library so you can start stitching right away.</p>
+        <h1 style={{ fontFamily: PF, fontSize: 28, fontWeight: 700, color: NAVY, marginBottom: 8, lineHeight: 1.2 }}>Start with this one</h1>
+        <p style={{ fontFamily: INTER, fontSize: 15, color: MUTED, marginBottom: 28, lineHeight: 1.5 }}>Pick it and Bev will bring it in just like a real import — you can start stitching as soon as she's done.</p>
 
-        {loading && (
-          <div style={{ textAlign: "center", padding: "60px 20px" }}>
-            <div style={{ position: "relative", width: 64, height: 64, margin: "0 auto 16px" }}>
-              <div className="spinner" style={{ position: "absolute", inset: 0, border: "3px solid #EDE4F7", borderTopColor: LAV, borderRadius: "50%" }} />
-              <img src="/bev_neutral.png" alt="Bev" style={{ position: "absolute", inset: 9, width: 46, height: 46, objectFit: "contain" }} />
-            </div>
-            <div style={{ fontFamily: INTER, fontSize: 14, color: MUTED }}>Finding patterns for you...</div>
-          </div>
-        )}
-
-        {!loading && error && (
-          <div style={{ ...GLASS, padding: "28px 24px", textAlign: "center" }}>
-            <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 600, color: NAVY, marginBottom: 8 }}>I could not load those just now</div>
-            <p style={{ fontFamily: INTER, fontSize: 14, color: MUTED, marginBottom: 18, lineHeight: 1.5 }}>Let us try your own pattern instead. You can always come back to these.</p>
+        {error && (
+          <div style={{ ...GLASS, padding: "28px 24px", textAlign: "center", marginBottom: 20 }}>
+            <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 600, color: NAVY, marginBottom: 8 }}>I could not get that one ready</div>
+            <p style={{ fontFamily: INTER, fontSize: 14, color: MUTED, marginBottom: 18, lineHeight: 1.5 }}>Give it another try, or bring in a pattern of your own and I will set it up.</p>
             <button onClick={onImportOwn} style={{ background: LAV, color: "#fff", border: "none", borderRadius: 12, padding: "11px 22px", fontSize: 14, fontWeight: 600, fontFamily: INTER, cursor: "pointer" }}>Import my own pattern</button>
           </div>
         )}
 
-        {!loading && !error && catalog.length === 0 && (
-          <div style={{ ...GLASS, padding: "28px 24px", textAlign: "center" }}>
-            <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 600, color: NAVY, marginBottom: 8 }}>No starters here just yet</div>
-            <p style={{ fontFamily: INTER, fontSize: 14, color: MUTED, marginBottom: 18, lineHeight: 1.5 }}>More are on the way. For now, bring in a pattern of your own and I will set it up.</p>
-            <button onClick={onImportOwn} style={{ background: LAV, color: "#fff", border: "none", borderRadius: 12, padding: "11px 22px", fontSize: 14, fontWeight: 600, fontFamily: INTER, cursor: "pointer" }}>Import my own pattern</button>
-          </div>
-        )}
-
-        {!loading && !error && catalog.length > 0 && (
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(3,1fr)", gap: isMobile ? 14 : 20 }}>
-            {catalog.map((row) => <StarterTile key={row.id} row={row} onPick={onPickStarter} />)}
+        {starter && (
+          <div style={{ maxWidth: isMobile ? 340 : 380, margin: "0 auto" }}>
+            <StarterTile starter={starter} busy={busy} onPick={onPickStarter} />
           </div>
         )}
       </Wrap>
@@ -143,7 +128,7 @@ export default function FirstRunFork({ mode = "fork", catalog = [], loading = fa
         <ForkCard
           title="Start with one of ours"
           body="Not ready to import yet? Grab a ready made pattern and start stitching in a few taps."
-          cta="Browse starters"
+          cta="See the starter"
           onClick={onShowGallery}
         />
       </div>

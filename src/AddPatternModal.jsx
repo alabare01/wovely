@@ -79,7 +79,9 @@ const fileToBase64 = (file) => new Promise((resolve, reject) => {
 // returns an empty title — common on chunked PDFs whose title page is
 // image-only. Returned as { text, metadataTitle } so the caller can forward
 // metadataTitle through /api/import-job without re-parsing the file.
-const extractTextFromPDF = async (file) => {
+// Exported (S83): the starter pick in App.jsx runs this same extraction on
+// the starter PDF so its import-job body is identical to a user upload's.
+export const extractTextFromPDF = async (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -864,7 +866,7 @@ const URLImportForm = ({onSave,Btn,Photo,initialUrl,onExtractionStart,onExtracti
   );
 };
 
-const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onExtractionEnd,onBevCheckActive,onReviewActive,initialExtracted,initialValidationReport,initialPollingJobId,isCollectionImport=false}) => {
+const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onExtractionEnd,onBevCheckActive,onReviewActive,initialExtracted,initialValidationReport,initialPollingJobId,isCollectionImport=false,isStarterImport=false}) => {
   // initialPollingJobId (S1.5.3): when the ImportPill re-opens the modal
   // mid-import, land directly in the extracting stage and let polling
   // resume against the existing job_id. The hook computes totalElapsed
@@ -1236,6 +1238,10 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
         expected_part_count: typeof extracted.expected_part_count === "number" ? extracted.expected_part_count : null,
         current_part_number: typeof extracted.current_part_number === "number" ? extracted.current_part_number : null,
       } : null,
+      // S83: starter pick rides the real import pipeline end to end; this flag
+      // is the only divergence — handleAddPattern maps it to is_starter so the
+      // row is excluded from caps/stats and shows the Free Starter badge.
+      isStarter: !!isStarterImport,
     });
   };
   const handleFallbackSave=()=>{onSave({id:Date.now(),title:extracted?.title||"Imported Pattern",source:"PDF Import",cat:"Uncategorized",hook:"",weight:"",notes:"",yardage:0,rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},materials:[],rows:[],photo:fileInfo?.coverUrl||PILL[Math.floor(Math.random()*PILL.length)],cover_image_url:fileInfo?.coverUrl||null,source_file_url:fileInfo?.url||"",source_file_name:fileInfo?.name||"",source_file_type:fileInfo?.type||""});};
@@ -1534,7 +1540,7 @@ const BrowserImport = ({onSave,Btn,Photo}) => {
   );
 };
 
-const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,initialMethod,initialUrl,initialExtracted,initialCoverUrl,initialFileUrl,initialValidationReport,initialPollingJobId,isCollectionImport=false}) => {
+const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,initialMethod,initialUrl,initialExtracted,initialCoverUrl,initialFileUrl,initialValidationReport,initialPollingJobId,isCollectionImport=false,initialIsStarter=false}) => {
   // initialExtracted (from ImportPill queue completion) is wrapped into pdfHandoff
   // so PDFUploadForm lands directly on its review stage. initialCoverUrl is the
   // Cloudinary URL the client rendered & uploaded during the original upload
@@ -1653,7 +1659,7 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
       {!method&&<MethodList/>}
       {method==="manual"&&<ManualEntryForm onSave={handleSave} Btn={Btn}/>}
       {method==="url"&&<URLImportForm onSave={handleSave} Btn={Btn} Photo={Photo} initialUrl={initialUrl} onExtractionStart={()=>{extractingRef.current=true;}} onExtractionEnd={()=>{extractingRef.current=false;}} onBevCheckActive={(v)=>{bevCheckActiveRef.current=v;setBevCheckActiveTick(v);}} onReviewActive={(v)=>{reviewActiveRef.current=v;setReviewActiveTick(v);}} onPdfHandoff={(handoffData)=>{setPdfHandoff(handoffData);setMethod('pdf');}}/>}
-      {method==="pdf"&&<PDFUploadForm onSave={handleSave} onClose={dismiss} Btn={Btn} isPro={isPro} onUpgrade={()=>{if(onUpgrade){dismiss();onUpgrade();}}} onExtractionStart={()=>{extractingRef.current=true;}} onExtractionEnd={()=>{extractingRef.current=false;}} onBevCheckActive={(v)=>{bevCheckActiveRef.current=v;setBevCheckActiveTick(v);}} onReviewActive={(v)=>{reviewActiveRef.current=v;setReviewActiveTick(v);}} initialExtracted={pdfHandoff} initialValidationReport={initialValidationReport} initialPollingJobId={initialPollingJobId} isCollectionImport={isCollectionImport}/>}
+      {method==="pdf"&&<PDFUploadForm onSave={handleSave} onClose={dismiss} Btn={Btn} isPro={isPro} onUpgrade={()=>{if(onUpgrade){dismiss();onUpgrade();}}} onExtractionStart={()=>{extractingRef.current=true;}} onExtractionEnd={()=>{extractingRef.current=false;}} onBevCheckActive={(v)=>{bevCheckActiveRef.current=v;setBevCheckActiveTick(v);}} onReviewActive={(v)=>{reviewActiveRef.current=v;setReviewActiveTick(v);}} initialExtracted={pdfHandoff} initialValidationReport={initialValidationReport} initialPollingJobId={initialPollingJobId} isCollectionImport={isCollectionImport} isStarterImport={initialIsStarter}/>}
       {method==="browser"&&<BrowserImport onSave={handleSave} Btn={Btn} Photo={Photo}/>}
       {method==="snap"&&<HiveVisionForm onSave={handleSave} Btn={Btn} Bar={Bar} WireframeViewer={WireframeViewer}/>}
     </div>

@@ -33,18 +33,6 @@ export const PHASE_COPY_POOLS = {
 
 export const REASSURANCE_LINE = "Bev's working in the background. Feel free to navigate away — I'll let you know when she's done.";
 
-// Starter clone copy. A starter pick is NOT an extraction — nothing is being
-// read or counted — so it must NOT borrow the extraction-implying lines above.
-// Honest setup copy in Bev's voice, played in the SAME loading treatment as a
-// real import (the floating pill) so the pacing feels the same. The reassurance
-// keeps the "look around" promise, which is honest: the pill never blocks.
-export const STARTER_SETUP_COPY = [
-  "Getting your pattern ready...",
-  "Setting up your starter...",
-];
-
-export const STARTER_REASSURANCE_LINE = "Bev's getting it ready. Feel free to look around.";
-
 export function pickPhaseCopy(phase) {
   const pool = phase && PHASE_COPY_POOLS[phase];
   if (!pool || pool.length === 0) return null;
