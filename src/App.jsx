@@ -3220,9 +3220,20 @@ export default function Wovely() {
       }
       const { job_id } = await jobRes.json();
       try { sessionStorage.setItem(STARTER_JOB_KEY, job_id); } catch {}
-      setActiveImportJob(job_id); // ImportPill picks this up and walks the real phases
+      setActiveImportJob(job_id); // pill is hidden while the modal is open; this survives a mid-import reload
       try { posthog.capture("starter_import_started", { starter: STARTER.storagePath }); } catch {}
+      // Open the full modal in its loading state — identical to a user upload
+      // post-submit. Same handoff handlePillResume uses: PDFUploadForm mounts
+      // straight into the extracting stage polling this job, and
+      // initialIsStarter resolves true via isStarterJobId(pendingResumeJobId).
+      // Closing the modal mid-import re-arms the corner pill through the
+      // existing unmount handoff, same as a real import. firstRunMode resets
+      // so the fork (not the stale gallery) sits behind the modal.
+      setPendingExtractedHandoff(null);
+      setPendingResumeJobId({ jobId: job_id, fileType: 'pdf' });
+      setPendingMethod('pdf');
       setFirstRunMode("fork");
+      setAddOpen(true);
     } catch (e) {
       console.error("[Wovely] Starter import error:", e?.message);
       setStarterError(true);
