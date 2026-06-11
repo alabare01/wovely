@@ -34,6 +34,7 @@ import {
 } from "./utils/tierUtils.js";
 import { canAccess, requiredTier, ANON_PATTERN_CAP } from "./utils/featureGates.js";
 import { DOC_TYPES, importRouteMismatch, resolveChildSourceUrl } from "./utils/docType.js";
+import { markImagesPending } from "./utils/patternImages.js";
 
 if (typeof document !== "undefined" && !document.getElementById("sb-font")) {
   const l = document.createElement("link");
@@ -2678,6 +2679,11 @@ export default function Wovely() {
       return;
     }
     console.log("[Wovely] extract-images firing for", list.length, "pattern(s), file:", fileUrl);
+    // Stamp the pending marker per pattern BEFORE the kick, so a detail view
+    // mounted immediately after save polls the rows in live (S83 ribbon fix).
+    // Centralized here so every caller (single import, collection split,
+    // suggestion-accept split) gets the marker without per-site wiring.
+    list.forEach(pt => markImagesPending(pt.id));
     fetch("/api/extract-pattern", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
