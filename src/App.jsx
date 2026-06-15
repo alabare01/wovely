@@ -2606,6 +2606,14 @@ export default function Wovely() {
   useEffect(()=>{
     if(lastUrlRestoreRef.current) return;
     if(!authed||!authChecked) return;
+    // Boot-only one-shot: latch the moment auth is ready so this restore can
+    // only run during the initial load. Otherwise a later user-initiated
+    // navigation to "/" (e.g. clicking My Wovely from inside a pattern) re-runs
+    // this effect, finds the still-fresh wovely_redirect_intent that the
+    // last-URL-memory effect keeps writing while a pattern is open, and bounces
+    // the route straight back into the pattern — the first click then appears
+    // to do nothing and a second click is needed.
+    lastUrlRestoreRef.current = true;
     if(location.pathname!=="/"&&location.pathname!=="/hive") return;
     try {
       const raw = sessionStorage.getItem("wovely_redirect_intent");
