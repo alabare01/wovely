@@ -54,3 +54,26 @@ body::after {
   z-index: 1;
   min-height: 100vh;
 }
+
+/* Build Manager — current (waiting-for-tap) row indicator.
+   Keyframes live here because inline styles cannot express @keyframes.
+   Animate transform + opacity ONLY (no box-shadow / width / height) so it
+   stays smooth on older devices. */
+@keyframes wovely-row-throb {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.10); }
+}
+@keyframes wovely-row-halo {
+  0%, 100% { opacity: 0;    transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(1.4); }
+}
+
+.wovely-current-ring { animation: wovely-row-throb 1.8s ease-in-out infinite; }
+.wovely-current-halo { animation: wovely-row-halo 1.8s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* Zero-motion fallback: a clearly distinct static waiting ring
+     (heavier primary border, empty center) — no pulse, no halo. */
+  .wovely-current-ring { animation: none; border-width: 2.5px !important; }
+  .wovely-current-halo { animation: none; opacity: 0; }
+}
