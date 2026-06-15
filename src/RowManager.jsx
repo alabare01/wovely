@@ -61,24 +61,24 @@ const SubCounter = ({row, globalIdx, onDotTap, onRepeatDone}) => {
 
 // ─── STITCH DICTIONARY & PILL MATCHING ────────────────────────────────────
 const STITCH_DICT = {
-  "SC":{full:"Single Crochet",url:"https://www.youtube.com/watch?v=JhBBqGBYAHo"},
-  "HDC":{full:"Half Double Crochet",url:"https://www.youtube.com/watch?v=Ej-HjuFGUyQ"},
-  "DC":{full:"Double Crochet",url:"https://www.youtube.com/watch?v=E4SqvLk0BPI"},
-  "TR":{full:"Treble Crochet",url:"https://www.youtube.com/watch?v=6VNbHiHKntY"},
-  "SL ST":{full:"Slip Stitch",url:"https://www.youtube.com/watch?v=sGnKTTPvFDA"},
-  "SS":{full:"Slip Stitch",url:"https://www.youtube.com/watch?v=sGnKTTPvFDA"},
-  "CH":{full:"Chain Stitch",url:"https://www.youtube.com/watch?v=fHAMQBhy09g"},
-  "INC":{full:"Increase (2 sc in same st)",url:"https://www.youtube.com/watch?v=IQYHE6jt3_4"},
-  "DEC":{full:"Decrease",url:"https://www.youtube.com/watch?v=QYbMPbcqQbE"},
-  "SC2TOG":{full:"Single Crochet 2 Together",url:"https://www.youtube.com/watch?v=QYbMPbcqQbE"},
-  "MR":{full:"Magic Ring",url:"https://www.youtube.com/watch?v=bUyaQiTOmVA"},
-  "MC":{full:"Magic Circle",url:"https://www.youtube.com/watch?v=bUyaQiTOmVA"},
-  "FO":{full:"Fasten Off",url:"https://www.youtube.com/watch?v=5w9hr_KNOBU"},
-  "BLO":{full:"Back Loop Only",url:"https://www.youtube.com/watch?v=WP2grOxSdz0"},
-  "FLO":{full:"Front Loop Only",url:"https://www.youtube.com/watch?v=WP2grOxSdz0"},
-  "YO":{full:"Yarn Over",url:"https://www.youtube.com/watch?v=S0jxQ0vaMZk"},
-  "PM":{full:"Place Marker",url:"https://www.youtube.com/watch?v=kHhBaJFDmgE"},
-  "SM":{full:"Slip Marker",url:"https://www.youtube.com/watch?v=kHhBaJFDmgE"},
+  "SC":{full:"Single Crochet"},
+  "HDC":{full:"Half Double Crochet"},
+  "DC":{full:"Double Crochet"},
+  "TR":{full:"Treble Crochet"},
+  "SL ST":{full:"Slip Stitch"},
+  "SS":{full:"Slip Stitch"},
+  "CH":{full:"Chain Stitch"},
+  "INC":{full:"Increase (2 sc in same st)"},
+  "DEC":{full:"Decrease"},
+  "SC2TOG":{full:"Single Crochet 2 Together"},
+  "MR":{full:"Magic Ring"},
+  "MC":{full:"Magic Circle"},
+  "FO":{full:"Fasten Off"},
+  "BLO":{full:"Back Loop Only"},
+  "FLO":{full:"Front Loop Only"},
+  "YO":{full:"Yarn Over"},
+  "PM":{full:"Place Marker"},
+  "SM":{full:"Slip Marker"},
 };
 const ABBR_PATTERN=new RegExp("\\b("+Object.keys(STITCH_DICT).sort((a,b)=>b.length-a.length).map(k=>k.replace(/\s+/g,"\\s+")).join("|")+")\\b","gi");
 const findNewAbbr=(text,seenAbbr)=>{
@@ -310,7 +310,7 @@ const RowManager = ({
           </div>
           {!isAnonymous&&!r.done&&!rowLocked&&((r.repeat_brackets||[]).some(b=>b.count>1)||r.repeat_done)&&<div style={{padding:"0 8px 10px 47px"}}><SubCounter row={r} globalIdx={globalIdx} onDotTap={handleDotTap} onRepeatDone={handleRepeatDone}/></div>}
           {r.note&&noteEdit!==r.id&&!rowLocked&&<div onClick={e=>{e.stopPropagation();setNoteEdit(r.id);}} style={{padding:"0 8px 10px 47px",fontSize:12,color:T.ink3,lineHeight:1.5,cursor:"pointer"}}><span style={{fontSize:11}}>📌</span> <span style={{fontStyle:"italic"}}>{r.note}</span></div>}
-          {newAbbr.length>0&&!rowLocked&&<div style={{padding:"0 8px 10px 47px",display:"flex",flexWrap:"wrap",gap:4}} onClick={e=>e.stopPropagation()}>{newAbbr.map(a=><button key={a.raw} onClick={e=>{e.stopPropagation();window.open(a.url,"_blank","noopener,noreferrer");}} style={{background:"transparent",color:T.terra,border:"1px solid rgba(155,126,200,0.4)",borderRadius:4,padding:"2px 6px",fontSize:10,fontWeight:500,cursor:"pointer"}}>{a.raw}</button>)}</div>}
+          {newAbbr.length>0&&!rowLocked&&<div style={{padding:"0 8px 10px 47px",display:"flex",flexWrap:"wrap",gap:4}} onClick={e=>e.stopPropagation()}>{newAbbr.map(a=><button key={a.raw} onClick={e=>{e.stopPropagation();window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(a.full + " crochet tutorial"),"_blank","noopener,noreferrer");}} style={{background:"transparent",color:T.terra,border:"1px solid rgba(155,126,200,0.4)",borderRadius:4,padding:"2px 6px",fontSize:10,fontWeight:500,cursor:"pointer"}}>{a.raw}</button>)}</div>}
           {noteEdit===r.id&&!rowLocked&&<div style={{padding:"0 8px 12px 47px",display:"flex",alignItems:"center",gap:8}}><input value={r.note} onChange={e=>updateNote(r.id,e.target.value)} placeholder="Add a note for this row…" style={{flex:1,padding:"9px 12px",background:T.linen,border:`1.5px solid ${T.terra}`,borderRadius:9,fontSize:13,color:T.ink,outline:"none"}}/>{noteSaved&&<span style={{fontSize:11,color:T.sage,fontWeight:600,flexShrink:0}}>Note saved</span>}</div>}
         </div>
       );})}
