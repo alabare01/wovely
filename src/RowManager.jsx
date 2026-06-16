@@ -61,24 +61,24 @@ const SubCounter = ({row, globalIdx, onDotTap, onRepeatDone}) => {
 
 // ─── STITCH DICTIONARY & PILL MATCHING ────────────────────────────────────
 const STITCH_DICT = {
-  "SC":{full:"Single Crochet",url:"https://www.youtube.com/watch?v=JhBBqGBYAHo"},
-  "HDC":{full:"Half Double Crochet",url:"https://www.youtube.com/watch?v=Ej-HjuFGUyQ"},
-  "DC":{full:"Double Crochet",url:"https://www.youtube.com/watch?v=E4SqvLk0BPI"},
-  "TR":{full:"Treble Crochet",url:"https://www.youtube.com/watch?v=6VNbHiHKntY"},
-  "SL ST":{full:"Slip Stitch",url:"https://www.youtube.com/watch?v=sGnKTTPvFDA"},
-  "SS":{full:"Slip Stitch",url:"https://www.youtube.com/watch?v=sGnKTTPvFDA"},
-  "CH":{full:"Chain Stitch",url:"https://www.youtube.com/watch?v=fHAMQBhy09g"},
-  "INC":{full:"Increase (2 sc in same st)",url:"https://www.youtube.com/watch?v=IQYHE6jt3_4"},
-  "DEC":{full:"Decrease",url:"https://www.youtube.com/watch?v=QYbMPbcqQbE"},
-  "SC2TOG":{full:"Single Crochet 2 Together",url:"https://www.youtube.com/watch?v=QYbMPbcqQbE"},
-  "MR":{full:"Magic Ring",url:"https://www.youtube.com/watch?v=bUyaQiTOmVA"},
-  "MC":{full:"Magic Circle",url:"https://www.youtube.com/watch?v=bUyaQiTOmVA"},
-  "FO":{full:"Fasten Off",url:"https://www.youtube.com/watch?v=5w9hr_KNOBU"},
-  "BLO":{full:"Back Loop Only",url:"https://www.youtube.com/watch?v=WP2grOxSdz0"},
-  "FLO":{full:"Front Loop Only",url:"https://www.youtube.com/watch?v=WP2grOxSdz0"},
-  "YO":{full:"Yarn Over",url:"https://www.youtube.com/watch?v=S0jxQ0vaMZk"},
-  "PM":{full:"Place Marker",url:"https://www.youtube.com/watch?v=kHhBaJFDmgE"},
-  "SM":{full:"Slip Marker",url:"https://www.youtube.com/watch?v=kHhBaJFDmgE"},
+  "SC":{full:"Single Crochet"},
+  "HDC":{full:"Half Double Crochet"},
+  "DC":{full:"Double Crochet"},
+  "TR":{full:"Treble Crochet"},
+  "SL ST":{full:"Slip Stitch"},
+  "SS":{full:"Slip Stitch"},
+  "CH":{full:"Chain Stitch"},
+  "INC":{full:"Increase (2 sc in same st)"},
+  "DEC":{full:"Decrease"},
+  "SC2TOG":{full:"Single Crochet 2 Together"},
+  "MR":{full:"Magic Ring"},
+  "MC":{full:"Magic Circle"},
+  "FO":{full:"Fasten Off"},
+  "BLO":{full:"Back Loop Only"},
+  "FLO":{full:"Front Loop Only"},
+  "YO":{full:"Yarn Over"},
+  "PM":{full:"Place Marker"},
+  "SM":{full:"Slip Marker"},
 };
 const ABBR_PATTERN=new RegExp("\\b("+Object.keys(STITCH_DICT).sort((a,b)=>b.length-a.length).map(k=>k.replace(/\s+/g,"\\s+")).join("|")+")\\b","gi");
 const findNewAbbr=(text,seenAbbr)=>{
@@ -286,10 +286,12 @@ const RowManager = ({
               {hasBody&&<div style={{padding:"12px 14px",fontSize:13,color:T.ink2,lineHeight:1.7,whiteSpace:"pre-wrap",borderBottom:secTotal>0?`1px solid ${T.border}`:"none"}}>{sec.header.body}</div>}
               {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;return(
         <div key={r.id} id={`row-${i + 1}`} data-row={i + 1} style={{borderBottom:`1px solid ${focusHeaderId?"rgba(237,228,247,0.55)":T.border}`,background:flagStatus==="fail"?"rgba(192,84,74,0.08)":flagStatus==="warning"?"rgba(201,168,76,0.08)":r.isAction&&!rowLocked?"rgba(184,144,44,.06)":"transparent",borderLeft:flagStatus==="fail"?"3px solid #C0544A":flagStatus==="warning"?"3px solid #C9A84C":"none"}}>
-          <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:13,alignItems:"flex-start",cursor:isAnonymous||rowLocked?"default":"pointer",background:isCurrent&&!rowLocked&&!isAnonymous?"rgba(155,126,200,.04)":"transparent",padding:focusHeaderId?"17px 8px":"14px 8px",margin:"0 -8px",opacity:rowLocked?.45:1,transition:"opacity .15s"}}>
-            <div style={{width:26,height:26,borderRadius:7,flexShrink:0,marginTop:1,background:r.done?T.terra:rowLocked?"#E8E4DF":T.surface,border:"1.5px solid "+(r.done?T.terra:isCurrent&&!rowLocked&&!isAnonymous?T.terra:rowLocked?"#D5D0CA":T.border),display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",boxShadow:r.done?"0 2px 8px rgba(155,126,200,.3)":isCurrent&&!rowLocked&&!isAnonymous?"0 0 0 3px rgba(155,126,200,.15)":"none"}}>
-              {r.done&&<span style={{color:"#fff",fontSize:13,fontWeight:700}}>✓</span>}{!r.done&&isCurrent&&!rowLocked&&!isAnonymous&&<div style={{width:8,height:8,borderRadius:99,background:T.terra}}/>}
-            </div>
+          <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:13,alignItems:"center",cursor:isAnonymous||rowLocked?"default":"pointer",background:isCurrent&&!rowLocked&&!isAnonymous?"rgba(155,126,200,.04)":"transparent",padding:focusHeaderId?"17px 14px":"14px 14px",margin:"0 -8px",opacity:rowLocked?.45:1,transition:"opacity .15s"}}>
+            <button type="button" className={!r.done&&isCurrent&&!rowLocked&&!isAnonymous?"wovely-current-ring":undefined} aria-label={r.done?"Mark row incomplete":"Mark row complete"} disabled={isAnonymous||rowLocked} onClick={e=>{e.stopPropagation();if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{position:"relative",overflow:"visible",width:18,height:18,borderRadius:99,flexShrink:0,padding:0,background:r.done?T.terra:rowLocked?"#E8E4DF":T.surface,border:"1.5px solid "+(r.done?T.terra:isCurrent&&!rowLocked&&!isAnonymous?T.terra:rowLocked?"#D5D0CA":T.border),display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",cursor:isAnonymous||rowLocked?"default":"pointer",boxShadow:r.done?"0 2px 8px rgba(155,126,200,.3)":isCurrent&&!rowLocked&&!isAnonymous?"0 0 0 3px rgba(155,126,200,.15)":"none"}}>
+              <span aria-hidden="true" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:44,height:44}}/>
+              {!r.done&&isCurrent&&!rowLocked&&!isAnonymous&&<span aria-hidden="true" className="wovely-current-halo" style={{position:"absolute",top:0,left:0,right:0,bottom:0,margin:"auto",width:18,height:18,boxSizing:"border-box",borderRadius:99,border:`1.5px solid ${T.terra}`,opacity:0,pointerEvents:"none"}}/>}
+              {r.done&&<span style={{color:"#fff",fontSize:9,fontWeight:700,lineHeight:1}}>✓</span>}
+            </button>
             <div style={{flex:1,minWidth:0}}>
               {isCurrent&&!rowLocked&&!isAnonymous&&<div style={{fontSize:10,color:T.terra,fontWeight:600,letterSpacing:".06em",marginBottom:2}}>CURRENT ROW</div>}
               {(!isCurrent||isAnonymous)&&r.isAction&&!rowLocked&&<div style={{fontSize:10,color:T.gold,fontWeight:600,letterSpacing:".06em",marginBottom:2}}>ACTION</div>}
@@ -310,7 +312,10 @@ const RowManager = ({
           </div>
           {!isAnonymous&&!r.done&&!rowLocked&&((r.repeat_brackets||[]).some(b=>b.count>1)||r.repeat_done)&&<div style={{padding:"0 8px 10px 47px"}}><SubCounter row={r} globalIdx={globalIdx} onDotTap={handleDotTap} onRepeatDone={handleRepeatDone}/></div>}
           {r.note&&noteEdit!==r.id&&!rowLocked&&<div onClick={e=>{e.stopPropagation();setNoteEdit(r.id);}} style={{padding:"0 8px 10px 47px",fontSize:12,color:T.ink3,lineHeight:1.5,cursor:"pointer"}}><span style={{fontSize:11}}>📌</span> <span style={{fontStyle:"italic"}}>{r.note}</span></div>}
-          {newAbbr.length>0&&!rowLocked&&<div style={{padding:"0 8px 10px 47px",display:"flex",flexWrap:"wrap",gap:4}} onClick={e=>e.stopPropagation()}>{newAbbr.map(a=><button key={a.raw} onClick={e=>{e.stopPropagation();window.open(a.url,"_blank","noopener,noreferrer");}} style={{background:"transparent",color:T.terra,border:"1px solid rgba(155,126,200,0.4)",borderRadius:4,padding:"2px 6px",fontSize:10,fontWeight:500,cursor:"pointer"}}>{a.raw}</button>)}</div>}
+          {newAbbr.length>0&&!rowLocked&&<div style={{padding:"0 8px 10px 47px"}} onClick={e=>e.stopPropagation()}>
+            <div style={{fontFamily:T.sans,fontSize:11,color:T.ink3,marginBottom:6}}>Tap a stitch for a video tutorial</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{newAbbr.map(a=><button key={a.raw} type="button" onClick={e=>{e.stopPropagation();window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(a.full + " crochet tutorial"),"_blank","noopener,noreferrer");}} onMouseEnter={e=>{e.currentTarget.style.background=T.border;}} onMouseLeave={e=>{e.currentTarget.style.background=T.surface;}} style={{display:"inline-flex",alignItems:"center",gap:5,background:T.surface,color:T.navy,border:`1px solid ${T.border}`,borderRadius:20,padding:"4px 10px",fontFamily:T.sans,fontSize:11,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",transition:"background .15s"}}><svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true" style={{flexShrink:0,display:"block"}}><path d="M3 2.2 L10 6 L3 9.8 Z" fill={T.terra}/></svg>{a.raw}</button>)}</div>
+          </div>}
           {noteEdit===r.id&&!rowLocked&&<div style={{padding:"0 8px 12px 47px",display:"flex",alignItems:"center",gap:8}}><input value={r.note} onChange={e=>updateNote(r.id,e.target.value)} placeholder="Add a note for this row…" style={{flex:1,padding:"9px 12px",background:T.linen,border:`1.5px solid ${T.terra}`,borderRadius:9,fontSize:13,color:T.ink,outline:"none"}}/>{noteSaved&&<span style={{fontSize:11,color:T.sage,fontWeight:600,flexShrink:0}}>Note saved</span>}</div>}
         </div>
       );})}
