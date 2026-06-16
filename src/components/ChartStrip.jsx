@@ -253,9 +253,10 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
     );
   }
 
-  // Drop "photo" — Gemini tags decorative pages, social collages, and designer
-  // promo content as photo; they're not useful reference material.
-  const shown = (Array.isArray(images) ? images : []).filter(i => i.image_type !== "photo");
+  // Show every meaningful row, photos included. The classifier now routes
+  // decorative pages / social collages / promo content to "decorative" (never
+  // stored), so "photo" rows are genuine finished-project and component shots.
+  const shown = Array.isArray(images) ? images : [];
   const ready = shown.filter(i => i.cloudinary_url);
 
   // Nothing to show yet. Pattern detail (no showEmptyState) renders nothing;

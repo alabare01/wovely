@@ -461,7 +461,10 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
         ? componentLabelsMatch(img.component_name, scopedPartName)
         : (img.image_type === "glossary" || img.image_type === "key"))
     : images;
-  const scopedShown = scoped.filter(i => i.image_type !== "photo");
+  // Band-visibility guard. Photos are real assets now, so the band renders
+  // whenever the scoped set is non-empty (the scope above already excludes
+  // other parts' assets, null-component photos, and the cover on Instructions).
+  const scopedShown = scoped;
 
   if (scopedShown.length === 0) {
     // Empty in this scope. If classification is still in flight show the
