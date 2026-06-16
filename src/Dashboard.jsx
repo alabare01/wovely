@@ -265,6 +265,11 @@ const BevCorner = ({ patterns, isMobile, isPro }) => {
     <div style={{
       gridColumn: "1 / -1",
       display: "flex", alignItems: "flex-start", gap: 12, width: "100%",
+      // box-sizing:border-box — there is no global border-box reset, so
+      // width:100% + 24px horizontal padding would otherwise overflow the
+      // column by 48px and (with overflow:hidden) clip the typewriter text
+      // at the right edge ("What ar…"). border-box folds the padding in.
+      boxSizing: "border-box",
       padding: "20px 24px", overflow: "hidden",
       background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
       borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
@@ -468,7 +473,7 @@ const BragShelf = ({ patterns, pct, isMobile }) => {
           <div style={{ fontFamily: PF, fontSize: 20, color: ACCENT, fontWeight: 600, lineHeight: 1.1 }}>
             {s.value === null ? skeleton : s.value}
           </div>
-          <div style={{ fontFamily: INTER, fontSize: 9, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", maxWidth: "100%" }}>{s.label}</div>
+          <div style={{ fontFamily: INTER, fontSize: 9, color: MUTED, letterSpacing: "0.08em", textTransform: "uppercase", lineHeight: 1.25, wordBreak: "break-word", maxWidth: "100%" }}>{s.label}</div>
         </div>
       ))}
     </div>
