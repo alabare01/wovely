@@ -55,22 +55,29 @@ body::after {
   min-height: 100vh;
 }
 
-/* Build Manager — current (waiting-for-tap) row indicator. The breathing is a
-   CONTAINED inner pulse: it scales no further than the indicator cell's own
-   box, so the list/scroll container can't clip it even when the current row is
-   the first row at the top. Keyframes live here because inline styles cannot
-   express @keyframes. transform + opacity ONLY (no box-shadow / width / height)
-   so it stays smooth on older devices. */
+/* Build Manager — current (waiting-for-tap) row indicator. The breathing reads
+   primarily through OPACITY: the ring itself pulses 0.4 -> 1.0 -> 0.4, which is
+   clearly visible and has no geometry cost so it cannot overshoot or clip. A
+   small contained scale (<= 1.06, box-sizing:border-box) rides on top for a
+   gentle size breath that never exceeds the indicator's own box, so it stays
+   uncut even when the current row is the first row. Keyframes live here because
+   inline styles cannot express @keyframes. transform + opacity ONLY (no
+   box-shadow / width / height) so it stays smooth on older devices. */
+@keyframes wovely-row-breathe {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
 @keyframes wovely-row-halo {
-  0%, 100% { opacity: 0;   transform: scale(1); }
-  50%      { opacity: 0.5; transform: scale(1.08); }
+  0%, 100% { opacity: 0;    transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(1.06); }
 }
 
-.wovely-current-halo { animation: wovely-row-halo 1.8s ease-in-out infinite; }
+.wovely-current-ring { animation: wovely-row-breathe 2s ease-in-out infinite; }
+.wovely-current-halo { animation: wovely-row-halo 2s ease-in-out infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   /* Zero-motion fallback: a clearly distinct static waiting ring
-     (heavier primary border, empty center) — no pulse. */
-  .wovely-current-ring { border-width: 2.5px !important; }
+     (heavier primary border, full opacity, empty center) — no pulse. */
+  .wovely-current-ring { animation: none; opacity: 1; border-width: 2.5px !important; }
   .wovely-current-halo { animation: none; opacity: 0; }
 }
