@@ -14,7 +14,12 @@ body::before {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  /* 100% (not 100vw) for fixed elements: 100vw includes the scrollbar gutter /
+     sub-pixel safe-area on Chrome and can be a hair wider than the visual
+     viewport, which forces horizontal overflow. 100% on a fixed element
+     resolves to the initial containing block (visual viewport) and stays
+     exactly viewport-wide on both Chrome and Safari. */
+  width: 100%;
   height: 100vh;
   background-image: url('/wovely_landing_bg_v1.png');
   background-size: cover;
@@ -28,7 +33,7 @@ body::after {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background: linear-gradient(
     160deg,
