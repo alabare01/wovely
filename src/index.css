@@ -1,5 +1,16 @@
 html {
   height: 100%;
+  /* Document-root horizontal-overflow guard. The page must never scroll
+     sideways on any device. A prior guard sat on the inner mobile scroll
+     container only, so any overflow that originates at the document root
+     (viewport-unit / safe-area rounding, or a flex min-content floor on
+     #root) slipped past it. Clipping html/body/#root catches it at the
+     correct level. `hidden` is the broadly-supported fallback; `clip`
+     (where supported — the affected browser, Chrome) overrides it so no
+     scroll container is created and position:sticky keeps working.
+     No layout change on desktop (there is no horizontal overflow to clip). */
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -7,6 +18,9 @@ body {
   min-height: 100vh;
   background-color: #FAF8F5;
   position: relative;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body::before {
@@ -14,7 +28,12 @@ body::before {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  /* 100% (not 100vw) for fixed elements: 100vw includes the scrollbar gutter /
+     sub-pixel safe-area on Chrome and can be a hair wider than the visual
+     viewport, which forces horizontal overflow. 100% on a fixed element
+     resolves to the initial containing block (visual viewport) and stays
+     exactly viewport-wide on both Chrome and Safari. */
+  width: 100%;
   height: 100vh;
   background-image: url('/wovely_landing_bg_v1.png');
   background-size: cover;
@@ -28,7 +47,7 @@ body::after {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   background: linear-gradient(
     160deg,
@@ -53,6 +72,9 @@ body::after {
   position: relative;
   z-index: 1;
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Build Manager — current (waiting-for-tap) row indicator. The breathing reads
