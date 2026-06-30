@@ -189,67 +189,80 @@ const DesktopShowcase = () => {
       subtitle: "12-clue MKAL? Unify materials, track each clue, see your progress together.",
       mockup: (
         <div style={{
-          background: "rgba(255,255,255,0.85)",
-          backdropFilter: "blur(16px)",
-          border: "1px solid rgba(155,126,200,0.2)",
+          background: `url('/wovely_landing_bg_v1.png')`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           borderRadius: 16,
           padding: 16,
           maxWidth: 340,
           margin: "0 auto",
-          animation: "slideUp 600ms ease-out"
+          animation: "slideUp 600ms ease-out",
+          position: "relative"
         }}>
           <div style={{
-            fontFamily: T.serif,
-            fontSize: 13,
-            fontWeight: 700,
-            color: T.ink,
-            marginBottom: 12
-          }}>Spring MKAL 2025 • 3/12 clues done</div>
-          {[
-            { name: "Clue 1: Foundation", progress: 100, done: true },
-            { name: "Clue 2: Center Design", progress: 75, done: false },
-            { name: "Clue 3: Border", progress: 40, done: false }
-          ].map((clue, i) => (
-            <div key={i} style={{ marginBottom: i < 2 ? 12 : 0 }}>
-              <div style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 4
-              }}>
-                <div style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: T.ink
-                }}>{clue.name}</div>
-                <div style={{
-                  fontSize: 10,
-                  color: T.terra,
-                  fontWeight: 600
-                }}>{clue.progress}%</div>
-              </div>
-              <div style={{
-                height: 6,
-                background: "#EDE4F7",
-                borderRadius: 3,
-                overflow: "hidden"
-              }}>
-                <div style={{
-                  height: "100%",
-                  width: `${clue.progress}%`,
-                  background: clue.done ? T.sage : T.terra,
-                  transition: "width 0.3s"
-                }} />
-              </div>
-            </div>
-          ))}
+            position: "absolute",
+            inset: 0,
+            background: "rgba(255,255,255,0.92)",
+            borderRadius: 16,
+            backdropFilter: "blur(8px)"
+          }} />
           <div style={{
-            fontSize: 10,
-            color: T.terra,
-            fontWeight: 600,
-            marginTop: 12,
-            textAlign: "center"
-          }}>Shared materials: 850g yarn, 5.5mm hook</div>
+            position: "relative",
+            zIndex: 1
+          }}>
+            <div style={{
+              fontFamily: T.serif,
+              fontSize: 13,
+              fontWeight: 700,
+              color: T.ink,
+              marginBottom: 12
+            }}>Spring MKAL 2025 • 3/12 clues done</div>
+            {[
+              { name: "Clue 1: Foundation", progress: 100, done: true },
+              { name: "Clue 2: Center Design", progress: 75, done: false },
+              { name: "Clue 3: Border", progress: 40, done: false }
+            ].map((clue, i) => (
+              <div key={i} style={{ marginBottom: i < 2 ? 12 : 0 }}>
+                <div style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 4
+                }}>
+                  <div style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: T.ink
+                  }}>{clue.name}</div>
+                  <div style={{
+                    fontSize: 10,
+                    color: T.terra,
+                    fontWeight: 600
+                  }}>{clue.progress}%</div>
+                </div>
+                <div style={{
+                  height: 6,
+                  background: "#EDE4F7",
+                  borderRadius: 3,
+                  overflow: "hidden"
+                }}>
+                  <div style={{
+                    height: "100%",
+                    width: `${clue.progress}%`,
+                    background: clue.done ? T.sage : T.terra,
+                    transition: "width 0.3s"
+                  }} />
+                </div>
+              </div>
+            ))}
+            <div style={{
+              fontSize: 10,
+              color: T.terra,
+              fontWeight: 600,
+              marginTop: 12,
+              textAlign: "center"
+            }}>Shared materials: 850g yarn, 5.5mm hook</div>
+          </div>
         </div>
       )
     }
@@ -270,23 +283,33 @@ const DesktopShowcase = () => {
       position: "relative",
       overflow: "hidden"
     }}>
-      {/* Header */}
+      {/* Header with BIG BEV */}
       <div style={{
         position: "absolute",
         top: 40,
         left: 40,
         display: "flex",
         alignItems: "center",
-        gap: 12,
+        gap: 16,
         zIndex: 10
       }}>
-        <img src="/bev_neutral.png" alt="Bev" style={{ height: 44, width: "auto" }} />
+        <img src="/bev_neutral.png" alt="Bev" style={{ height: 100, width: "auto" }} />
         <div style={{
           fontFamily: T.serif,
-          fontSize: 26,
+          fontSize: 32,
           fontWeight: 700,
-          color: T.ink
-        }}>Wovely</div>
+          color: T.ink,
+          display: "flex",
+          flexDirection: "column"
+        }}>
+          <div>Wovely</div>
+          <div style={{
+            fontSize: 12,
+            fontWeight: 400,
+            color: T.terra,
+            marginTop: 4
+          }}>Your patterns. Your progress.</div>
+        </div>
       </div>
 
       {/* Story + Mockup */}
@@ -313,7 +336,7 @@ const DesktopShowcase = () => {
           {current.subtitle}
         </p>
 
-        {/* REAL MOCKUP - not emoji */}
+        {/* REAL MOCKUP */}
         <div style={{ marginBottom: 24, minHeight: 200 }}>
           {current.mockup}
         </div>
@@ -353,14 +376,14 @@ const DesktopShowcase = () => {
   );
 };
 
-/* ── Mobile: Real Feature Cards ── */
+/* ── Mobile: Real Feature Cards with VISUALS ── */
 const MobileShowcase = () => {
   return (
     <div style={{
       padding: "40px 20px",
       background: `linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`
     }}>
-      {/* Header */}
+      {/* Header with BIG BEV */}
       <div style={{
         display: "flex",
         alignItems: "center",
@@ -368,18 +391,28 @@ const MobileShowcase = () => {
         gap: 12,
         marginBottom: 32
       }}>
-        <img src="/bev_neutral.png" alt="Bev" style={{ height: 40, width: "auto" }} />
+        <img src="/bev_neutral.png" alt="Bev" style={{ height: 70, width: "auto" }} />
         <div style={{
           fontFamily: T.serif,
-          fontSize: 24,
+          fontSize: 22,
           fontWeight: 700,
-          color: T.ink
-        }}>Wovely</div>
+          color: T.ink,
+          display: "flex",
+          flexDirection: "column"
+        }}>
+          <div>Wovely</div>
+          <div style={{
+            fontSize: 11,
+            fontWeight: 400,
+            color: T.terra,
+            marginTop: 2
+          }}>Your patterns. Your progress.</div>
+        </div>
       </div>
 
       <h2 style={{
         fontFamily: T.serif,
-        fontSize: 24,
+        fontSize: 22,
         fontWeight: 700,
         color: T.ink,
         marginBottom: 24,
@@ -389,7 +422,7 @@ const MobileShowcase = () => {
         Stop losing patterns.<br />Start tracking progress.
       </h2>
 
-      {/* Feature cards with REAL mockups */}
+      {/* Feature cards with REAL VISUALS */}
       <div style={{
         display: "flex",
         flexDirection: "column",
@@ -400,22 +433,22 @@ const MobileShowcase = () => {
           {
             title: "Upload from anywhere",
             desc: "Phone, desktop, tablet. PDF, link, manual. We sync it all.",
-            preview: "Pattern • iPhone upload • Auto-synced"
+            img: "/mommy_fiora.png"
           },
           {
             title: "Track row by row",
             desc: "Never lose your place in a 100-page pattern. Visual progress.",
-            preview: "Rnd 42 of 68 • 62% complete • Next: (sc, inc) x 12"
+            detail: "Rnd 42 of 68 • 62% complete"
           },
           {
             title: "Organize MKALs",
             desc: "12-clue project? One collection. Shared materials. Unified progress.",
-            preview: "Spring MKAL • 3/12 clues done • 850g yarn needed"
+            img: "/wovely_landing_bg_v1.png"
           },
           {
             title: "Share your build",
             desc: "Show friends what you're making. Collaborate on group projects.",
-            preview: "Shared collection • 4 makers • 85% to finish together"
+            img: "/manatee_hero.png"
           }
         ].map((feature, i) => (
           <div key={i} style={{
@@ -423,35 +456,55 @@ const MobileShowcase = () => {
             backdropFilter: "blur(16px)",
             border: "1px solid rgba(155,126,200,0.2)",
             borderRadius: 12,
-            padding: 16
+            overflow: "hidden"
           }}>
-            <div style={{
-              fontFamily: T.serif,
-              fontSize: 16,
-              fontWeight: 700,
-              color: T.terra,
-              marginBottom: 8
-            }}>
-              {feature.title}
-            </div>
-            <div style={{
-              fontSize: 13,
-              color: T.ink2,
-              lineHeight: 1.5,
-              marginBottom: 10
-            }}>
-              {feature.desc}
-            </div>
-            <div style={{
-              fontSize: 11,
-              color: T.terra,
-              fontFamily: T.sans,
-              fontWeight: 600,
-              background: "rgba(155,126,200,0.08)",
-              padding: "8px 10px",
-              borderRadius: 6
-            }}>
-              {feature.preview}
+            {feature.img && (
+              <div style={{
+                height: 80,
+                background: `url('${feature.img}')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                position: "relative"
+              }}>
+                <div style={{
+                  position: "absolute",
+                  inset: 0,
+                  background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.3))"
+                }} />
+              </div>
+            )}
+            <div style={{ padding: 16 }}>
+              <div style={{
+                fontFamily: T.serif,
+                fontSize: 16,
+                fontWeight: 700,
+                color: T.terra,
+                marginBottom: 6
+              }}>
+                {feature.title}
+              </div>
+              <div style={{
+                fontSize: 13,
+                color: T.ink2,
+                lineHeight: 1.5,
+                marginBottom: 8
+              }}>
+                {feature.desc}
+              </div>
+              {feature.detail && (
+                <div style={{
+                  fontSize: 11,
+                  color: T.ink,
+                  fontFamily: T.sans,
+                  fontWeight: 600,
+                  background: "rgba(155,126,200,0.06)",
+                  padding: "6px 8px",
+                  borderRadius: 4,
+                  marginTop: 8
+                }}>
+                  ✓ {feature.detail}
+                </div>
+              )}
             </div>
           </div>
         ))}
