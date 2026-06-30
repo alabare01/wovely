@@ -180,12 +180,12 @@ const AnimatedProductPreview = () => {
               gridTemplateColumns: "1fr 1fr",
               gap: 16
             }}>
-              {/* Mock pattern cards */}
+              {/* Mock pattern cards with REAL product images */}
               {[
-                { title: "Baby Blanket", pct: 75, img: "linear-gradient(135deg, rgba(155,126,200,0.15), rgba(155,126,200,0.05))" },
-                { title: "Amigurumi Set", pct: 100, img: "linear-gradient(135deg, rgba(122,158,116,0.15), rgba(122,158,116,0.05))" },
-                { title: "Market Bag", pct: 45, img: "linear-gradient(135deg, rgba(139,111,71,0.15), rgba(139,111,71,0.05))" },
-                { title: "Scarf MKAL", pct: 20, img: "linear-gradient(135deg, rgba(185,134,11,0.15), rgba(185,134,11,0.05))" }
+                { title: "Amigurumi Set", pct: 100, img: "/mommy_fiora.png", cover: "cover" },
+                { title: "Manatee Friend", pct: 75, img: "/manatee_hero.png", cover: "contain" },
+                { title: "Baby Blanket", pct: 45, img: "/wovely_landing_bg_v1.png", cover: "cover" },
+                { title: "Progress Tracker", pct: 20, img: "/mommy_fiora.png", cover: "cover" }
               ].map((p, i) => (
                 <div key={i} style={{
                   background: "rgba(255,255,255,0.85)",
@@ -198,8 +198,11 @@ const AnimatedProductPreview = () => {
                   animation: `slideUp 600ms ease-out ${i * 100}ms both`
                 }}>
                   <div style={{
-                    height: 120,
-                    background: p.img,
+                    height: 140,
+                    background: `url('${p.img}')`,
+                    backgroundSize: p.cover,
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat",
                     display: "flex",
                     alignItems: "flex-end",
                     padding: 12,
