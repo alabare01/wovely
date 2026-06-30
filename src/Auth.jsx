@@ -2,131 +2,328 @@ import { useState, useEffect, useRef } from "react";
 import { T, useBreakpoint } from "./theme.jsx";
 import { supabaseAuth } from "./supabase.js";
 
-/* ── Animated Product Preview Component ── */
+/* ── Animated Product Preview Component (Real Features) ── */
 const AnimatedProductPreview = () => {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setStep((s) => (s + 1) % 4);
-    }, 4000);
+      setStep((s) => (s + 1) % 3);
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
-
-  const steps = [
-    {
-      title: "Import from anywhere",
-      desc: "PDF, link, or manual entry. We handle it.",
-      visual: "📥",
-      color: "#8B6F47"
-    },
-    {
-      title: "Organize into collections",
-      desc: "MKALs, seasonal projects, big builds. All in one place.",
-      visual: "📂",
-      color: "#7A9E74"
-    },
-    {
-      title: "Track every row, stitch by stitch",
-      desc: "See progress across all your projects. Never lose your place.",
-      visual: "✓",
-      color: "#9B7EC8"
-    },
-    {
-      title: "Get smarter with Bev",
-      desc: "AI-powered feedback on patterns. Spot issues before they cost you.",
-      visual: "🤖",
-      color: "#B8860B"
-    }
-  ];
-
-  const current = steps[step];
 
   return (
     <div style={{
       flex: 1,
-      padding: "40px 36px",
+      padding: "60px 40px",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
       alignItems: "center",
-      textAlign: "center",
       minHeight: "100vh",
-      background: `linear-gradient(135deg, rgba(250,248,245,1) 0%, rgba(245,242,238,0.8) 100%)`,
+      background: `linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`,
       position: "relative",
       overflow: "hidden"
     }}>
-      {/* Bev logo top */}
+      {/* Wovely header */}
       <div style={{
         position: "absolute",
         top: 40,
-        left: 36,
+        left: 40,
         display: "flex",
         alignItems: "center",
-        gap: 10
+        gap: 12,
+        zIndex: 10
       }}>
-        <img src="/bev_neutral.png" alt="Bev" style={{ height: 48, width: "auto" }} />
+        <img src="/bev_neutral.png" alt="Bev" style={{ height: 44, width: "auto" }} />
         <div style={{
           fontFamily: T.serif,
-          fontSize: 28,
+          fontSize: 26,
           fontWeight: 700,
           color: T.ink
         }}>Wovely</div>
       </div>
 
-      {/* Animated content */}
-      <div style={{
-        maxWidth: 400,
-        margin: "0 auto"
-      }}>
-        <div style={{
-          fontSize: 72,
-          marginBottom: 24,
-          opacity: 0.85,
-          transition: "all 600ms ease-out"
-        }}>
-          {current.visual}
-        </div>
+      {/* Feature carousel */}
+      <div style={{ maxWidth: 480, margin: "0 auto" }}>
+        {step === 0 && (
+          <div style={{ animation: "fadeIn 600ms ease-out", opacity: 1 }}>
+            <h2 style={{
+              fontFamily: T.serif,
+              fontSize: 28,
+              fontWeight: 700,
+              color: T.ink,
+              marginBottom: 28,
+              textAlign: "center"
+            }}>
+              Save & Track Every Pattern
+            </h2>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 16
+            }}>
+              {/* Mock pattern cards */}
+              {[
+                { title: "Baby Blanket", pct: 75, img: "linear-gradient(135deg, rgba(155,126,200,0.15), rgba(155,126,200,0.05))" },
+                { title: "Amigurumi Set", pct: 100, img: "linear-gradient(135deg, rgba(122,158,116,0.15), rgba(122,158,116,0.05))" },
+                { title: "Market Bag", pct: 45, img: "linear-gradient(135deg, rgba(139,111,71,0.15), rgba(139,111,71,0.05))" },
+                { title: "Scarf MKAL", pct: 20, img: "linear-gradient(135deg, rgba(185,134,11,0.15), rgba(185,134,11,0.05))" }
+              ].map((p, i) => (
+                <div key={i} style={{
+                  background: "rgba(255,255,255,0.85)",
+                  backdropFilter: "blur(16px)",
+                  border: "1px solid rgba(155,126,200,0.2)",
+                  borderRadius: 16,
+                  overflow: "hidden",
+                  cursor: "pointer",
+                  transition: "transform 0.2s, box-shadow 0.2s",
+                  animation: `slideUp 600ms ease-out ${i * 100}ms both`
+                }}>
+                  <div style={{
+                    height: 120,
+                    background: p.img,
+                    display: "flex",
+                    alignItems: "flex-end",
+                    padding: 12,
+                    position: "relative"
+                  }}>
+                    {p.pct === 100 && (
+                      <span style={{
+                        position: "absolute",
+                        top: 8,
+                        right: 8,
+                        background: T.sage,
+                        color: "#fff",
+                        fontSize: 10,
+                        fontWeight: 700,
+                        padding: "3px 8px",
+                        borderRadius: 99
+                      }}>DONE</span>
+                    )}
+                    {p.pct > 0 && p.pct < 100 && (
+                      <div style={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: 3,
+                        background: "#EDE4F7",
+                        overflow: "hidden"
+                      }}>
+                        <div style={{
+                          height: "100%",
+                          width: `${p.pct}%`,
+                          background: T.terra,
+                          transition: "width 0.3s"
+                        }} />
+                      </div>
+                    )}
+                  </div>
+                  <div style={{
+                    padding: "12px 14px",
+                    textAlign: "center"
+                  }}>
+                    <div style={{
+                      fontFamily: T.serif,
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: T.ink,
+                      marginBottom: 4
+                    }}>{p.title}</div>
+                    <div style={{
+                      fontSize: 12,
+                      color: T.terra,
+                      fontWeight: 600
+                    }}>{p.pct}% complete</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-        <h2 style={{
-          fontFamily: T.serif,
-          fontSize: 32,
-          fontWeight: 700,
-          color: current.color,
-          marginBottom: 12,
-          transition: "color 600ms ease-out",
-          lineHeight: 1.2
-        }}>
-          {current.title}
-        </h2>
+        {step === 1 && (
+          <div style={{ animation: "fadeIn 600ms ease-out", opacity: 1 }}>
+            <h2 style={{
+              fontFamily: T.serif,
+              fontSize: 28,
+              fontWeight: 700,
+              color: T.ink,
+              marginBottom: 28,
+              textAlign: "center"
+            }}>
+              Bev Analyzes Your Patterns
+            </h2>
+            {/* BevCheck gauge mockup */}
+            <div style={{
+              background: "rgba(255,255,255,0.87)",
+              backdropFilter: "blur(18px)",
+              border: "1px solid rgba(255,255,255,0.75)",
+              borderRadius: 24,
+              padding: "28px 24px",
+              textAlign: "center",
+              animation: "slideUp 600ms ease-out"
+            }}>
+              <span style={{
+                display: "inline-block",
+                fontFamily: T.sans,
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: "0.16em",
+                textTransform: "uppercase",
+                color: T.terra,
+                padding: "3px 10px",
+                borderRadius: 99,
+                background: "rgba(155,126,200,0.12)",
+                marginBottom: 12
+              }}>BevCheck</span>
 
-        <p style={{
-          fontFamily: T.sans,
-          fontSize: 16,
-          color: T.ink2,
-          lineHeight: 1.6,
-          transition: "color 600ms ease-out"
-        }}>
-          {current.desc}
-        </p>
+              <div style={{
+                fontSize: 20,
+                fontFamily: T.serif,
+                fontWeight: 700,
+                color: "#2D3A7C",
+                marginBottom: 20
+              }}>Pattern Quality</div>
+
+              {/* Gauge SVG */}
+              <svg viewBox="0 0 240 140" style={{ width: "100%", maxWidth: 240, margin: "0 auto 20px" }}>
+                <defs>
+                  <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#CEA0A4" />
+                    <stop offset="50%" stopColor="#E2D985" />
+                    <stop offset="100%" stopColor="#A4C2C3" />
+                  </linearGradient>
+                </defs>
+                {/* Arc */}
+                <path d="M 20 120 A 100 100 0 0 1 220 120" fill="none" stroke="#EDE4F7" strokeWidth="12" strokeLinecap="round" />
+                <path d="M 20 120 A 100 100 0 0 1 220 120" fill="none" stroke="url(#gaugeGrad)" strokeWidth="12" strokeLinecap="round" opacity="0.85" />
+                {/* Needle */}
+                <g>
+                  <line x1="120" y1="120" x2="160" y2="75" stroke={T.terra} strokeWidth="2.5" strokeLinecap="round" />
+                  <circle cx="120" cy="120" r="6" fill={T.terra} />
+                </g>
+              </svg>
+
+              <div style={{
+                fontFamily: T.serif,
+                fontSize: 36,
+                fontWeight: 700,
+                color: "#2D3A7C",
+                marginBottom: 12,
+                lineHeight: 1
+              }}>85%</div>
+
+              <div style={{
+                fontFamily: T.serif,
+                fontSize: 16,
+                fontWeight: 600,
+                color: "#2D3A7C",
+                marginBottom: 14
+              }}>Looks Good</div>
+
+              <div style={{
+                fontSize: 12,
+                color: T.ink2,
+                lineHeight: 1.5
+              }}>Pattern structure is clear. One minor stitch count to verify in round 12.</div>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div style={{ animation: "fadeIn 600ms ease-out", opacity: 1 }}>
+            <h2 style={{
+              fontFamily: T.serif,
+              fontSize: 28,
+              fontWeight: 700,
+              color: T.ink,
+              marginBottom: 28,
+              textAlign: "center"
+            }}>
+              Organize Multi-Part Projects
+            </h2>
+            <div style={{
+              background: "rgba(255,255,255,0.85)",
+              backdropFilter: "blur(16px)",
+              border: "1px solid rgba(155,126,200,0.2)",
+              borderRadius: 20,
+              padding: "20px 18px",
+              animation: "slideUp 600ms ease-out"
+            }}>
+              <div style={{
+                fontFamily: T.serif,
+                fontSize: 16,
+                fontWeight: 700,
+                color: T.ink,
+                marginBottom: 16
+              }}>Spring MKAL 2025</div>
+
+              {[
+                { name: "Clue 1: Base", progress: 100, done: true },
+                { name: "Clue 2: Stripes", progress: 60, done: false },
+                { name: "Clue 3: Border", progress: 0, done: false }
+              ].map((clue, i) => (
+                <div key={i} style={{
+                  marginBottom: i < 2 ? 14 : 0
+                }}>
+                  <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 6
+                  }}>
+                    <span style={{
+                      fontSize: 13,
+                      fontFamily: T.sans,
+                      color: T.ink,
+                      fontWeight: 600
+                    }}>{clue.name}</span>
+                    <span style={{
+                      fontSize: 12,
+                      color: T.terra,
+                      fontWeight: 600
+                    }}>{clue.progress}%</span>
+                  </div>
+                  <div style={{
+                    height: 6,
+                    background: "#EDE4F7",
+                    borderRadius: 3,
+                    overflow: "hidden"
+                  }}>
+                    <div style={{
+                      height: "100%",
+                      width: `${clue.progress}%`,
+                      background: clue.done ? T.sage : T.terra,
+                      transition: "width 0.4s ease-out",
+                      borderRadius: 3
+                    }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Progress dots */}
       <div style={{
         position: "absolute",
-        bottom: 40,
+        bottom: 50,
         display: "flex",
-        gap: 8,
+        gap: 12,
         justifyContent: "center"
       }}>
-        {steps.map((_, i) => (
+        {[0, 1, 2].map((i) => (
           <div
             key={i}
             style={{
-              width: i === step ? 24 : 8,
+              width: i === step ? 28 : 8,
               height: 8,
               borderRadius: 4,
-              background: i === step ? current.color : T.border,
+              background: i === step ? T.terra : "#EDE4F7",
               transition: "all 300ms ease",
               cursor: "pointer"
             }}
@@ -135,30 +332,28 @@ const AnimatedProductPreview = () => {
         ))}
       </div>
 
-      {/* Real maker photo (bottom) */}
-      <div style={{
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 200,
-        background: `linear-gradient(to top, rgba(123, 158, 116, 0.08), transparent)`,
-        pointerEvents: "none"
-      }} />
+      <style>{`
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 };
 
 /* ── Auth Form Component ── */
 const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
-  const [mode, setMode] = useState("form"); // "form" (signup) | "signin" | "magic"
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
-  const [magicSent, setMagicSent] = useState(false);
-  const [isSignIn, setIsSignIn] = useState(false); // Toggle for sign-in vs signup
+  const [isSignIn, setIsSignIn] = useState(false);
 
   const handleSignup = async () => {
     setAuthError(null);
@@ -185,23 +380,9 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
     setLoading(false);
   };
 
-  const handleMagicLink = async () => {
-    setAuthError(null);
-    if (!email.trim() || !email.includes("@")) { setAuthError("Please enter a valid email."); return; }
-    setLoading(true);
-    try {
-      const { error } = await supabaseAuth.signInWithOtp(email.trim());
-      if (error) { setAuthError(error.msg || error.message || "Could not send magic link."); setLoading(false); return; }
-      setMagicSent(true);
-    } catch { setAuthError("Network error — please try again."); }
-    setLoading(false);
-  };
-
   const onKey = e => {
     if (e.key === "Enter" && !loading) {
-      if (mode === "magic") handleMagicLink();
-      else if (isSignIn) handleSignin();
-      else handleSignup();
+      isSignIn ? handleSignin() : handleSignup();
     }
   };
 
@@ -272,11 +453,11 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
           fontFamily: T.serif,
           fontSize: 28,
           fontWeight: 700,
-          color: T.ochre,
+          color: T.terra,
           marginBottom: 8,
           lineHeight: 1.2
         }}>
-          {isSignIn ? "Welcome back" : "Start free, organize everything"}
+          {isSignIn ? "Welcome back" : "Your patterns, organized"}
         </h1>
         <p style={{
           fontFamily: T.sans,
@@ -285,8 +466,8 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
           lineHeight: 1.6
         }}>
           {isSignIn
-            ? "Your Wovely and all your projects are waiting."
-            : "Free tier: 5 patterns. Craft: unlimited patterns, collections, and pattern tracking."}
+            ? "Pick up right where you left off."
+            : "Free: 5 patterns. Craft: Unlimited tracking, Collections, and BevCheck pattern analysis."}
         </p>
       </div>
 
@@ -299,7 +480,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
               width: "100%",
               padding: "12px 16px",
               marginBottom: 16,
-              background: T.sage,
+              background: T.terra,
               color: "#FFFFFF",
               border: "none",
               borderRadius: 10,
@@ -307,10 +488,11 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
               fontWeight: 600,
               fontFamily: T.sans,
               cursor: "pointer",
-              transition: "all 200ms"
+              transition: "all 200ms",
+              boxShadow: "0 2px 8px rgba(155,126,200,0.2)"
             }}
-            onMouseEnter={(e) => e.target.style.opacity = "0.9"}
-            onMouseLeave={(e) => e.target.style.opacity = "1"}
+            onMouseEnter={(e) => e.target.style.boxShadow = "0 4px 12px rgba(155,126,200,0.3)"}
+            onMouseLeave={(e) => e.target.style.boxShadow = "0 2px 8px rgba(155,126,200,0.2)"}
           >
             Try free for 5 patterns
           </button>
@@ -321,129 +503,14 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             margin: "16px 0 20px"
           }}>
             <div style={{ flex: 1, height: 1, background: T.border }} />
-            <div style={{ fontSize: 12, color: T.ink2, whiteSpace: "nowrap" }}>or</div>
+            <div style={{ fontSize: 12, color: T.ink2, whiteSpace: "nowrap" }}>or create an account</div>
             <div style={{ flex: 1, height: 1, background: T.border }} />
           </div>
         </>
       )}
 
-      {/* Magic link sent state */}
-      {mode === "magic" && magicSent ? (
-        <div style={{
-          background: T.surface,
-          borderRadius: 12,
-          padding: "20px 16px",
-          textAlign: "center",
-          marginBottom: 16
-        }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>✉️</div>
-          <div style={{
-            fontFamily: T.serif,
-            fontSize: 18,
-            fontWeight: 700,
-            color: T.ink,
-            marginBottom: 8
-          }}>Check your inbox</div>
-          <div style={{
-            fontSize: 13,
-            color: T.ink2,
-            lineHeight: 1.6,
-            marginBottom: 16
-          }}>
-            We sent a magic link to <strong>{email}</strong>. Click it to sign in.
-          </div>
-          <button
-            onClick={() => { setMode(isSignIn ? "signin" : "form"); setMagicSent(false); setAuthError(null); }}
-            style={{
-              background: "none",
-              border: "none",
-              color: T.terra,
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: "pointer",
-              fontFamily: T.sans
-            }}
-          >
-            ← Back
-          </button>
-        </div>
-      ) : mode === "magic" ? (
-        /* Magic link form */
-        <div onKeyDown={onKey}>
-          <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            type="email"
-            style={{
-              width: "100%",
-              padding: "11px 14px",
-              marginBottom: 12,
-              background: T.surface,
-              border: `1px solid ${T.border}`,
-              borderRadius: 8,
-              fontSize: 14,
-              color: T.ink,
-              fontFamily: T.sans,
-              outline: "none",
-              transition: "border-color 200ms"
-            }}
-            onFocus={(e) => e.target.style.borderColor = T.ochre}
-            onBlur={(e) => e.target.style.borderColor = T.border}
-          />
-          {authError && (
-            <div style={{
-              background: T.surface,
-              color: T.ochre,
-              padding: "8px 12px",
-              borderRadius: 8,
-              fontSize: 12,
-              marginBottom: 12,
-              fontFamily: T.sans
-            }}>
-              {authError}
-            </div>
-          )}
-          <button
-            onClick={handleMagicLink}
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "12px 16px",
-              marginBottom: 12,
-              background: T.ochre,
-              color: "#FFFFFF",
-              border: "none",
-              borderRadius: 8,
-              fontSize: 15,
-              fontWeight: 600,
-              fontFamily: T.sans,
-              cursor: "pointer",
-              opacity: loading ? 0.6 : 1,
-              transition: "all 200ms"
-            }}
-          >
-            {loading ? "Sending..." : "Send magic link →"}
-          </button>
-          <button
-            onClick={() => { setMode(isSignIn ? "signin" : "form"); setAuthError(null); }}
-            style={{
-              width: "100%",
-              background: "none",
-              border: "none",
-              color: T.ink2,
-              fontSize: 13,
-              cursor: "pointer",
-              fontFamily: T.sans,
-              fontWeight: 500
-            }}
-          >
-            ← Back to email & password
-          </button>
-        </div>
-      ) : (
-        /* Email + password form */
-        <div onKeyDown={onKey}>
+      {/* Email + password form */}
+      <div onKeyDown={onKey}>
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -462,7 +529,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
               outline: "none",
               transition: "border-color 200ms"
             }}
-            onFocus={(e) => e.target.style.borderColor = T.ochre}
+            onFocus={(e) => e.target.style.borderColor = T.terra}
             onBlur={(e) => e.target.style.borderColor = T.border}
           />
           <input
@@ -483,7 +550,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
               outline: "none",
               transition: "border-color 200ms"
             }}
-            onFocus={(e) => e.target.style.borderColor = T.ochre}
+            onFocus={(e) => e.target.style.borderColor = T.terra}
             onBlur={(e) => e.target.style.borderColor = T.border}
           />
           {!isSignIn && (
@@ -505,7 +572,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
                 outline: "none",
                 transition: "border-color 200ms"
               }}
-              onFocus={(e) => e.target.style.borderColor = T.ochre}
+              onFocus={(e) => e.target.style.borderColor = T.terra}
               onBlur={(e) => e.target.style.borderColor = T.border}
             />
           )}
@@ -524,94 +591,71 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             </div>
           )}
 
-          <button
-            onClick={isSignIn ? handleSignin : handleSignup}
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "13px 16px",
-              marginBottom: 12,
-              background: T.ochre,
-              color: "#FFFFFF",
-              border: "none",
-              borderRadius: 8,
-              fontSize: 15,
-              fontWeight: 600,
-              fontFamily: T.sans,
-              cursor: "pointer",
-              opacity: loading ? 0.6 : 1,
-              transition: "all 200ms",
-              boxShadow: "0 2px 6px rgba(184, 134, 11, 0.2)"
-            }}
-            onMouseEnter={(e) => !loading && (e.target.style.boxShadow = "0 4px 12px rgba(184, 134, 11, 0.3)")}
-            onMouseLeave={(e) => e.target.style.boxShadow = "0 2px 6px rgba(184, 134, 11, 0.2)"}
-          >
-            {loading ? "Please wait..." : (isSignIn ? "Sign in →" : "Start free today")}
-          </button>
+        <button
+          onClick={isSignIn ? handleSignin : handleSignup}
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "13px 16px",
+            marginBottom: 16,
+            background: T.terra,
+            color: "#FFFFFF",
+            border: "none",
+            borderRadius: 8,
+            fontSize: 15,
+            fontWeight: 600,
+            fontFamily: T.sans,
+            cursor: "pointer",
+            opacity: loading ? 0.6 : 1,
+            transition: "all 200ms",
+            boxShadow: "0 2px 8px rgba(155,126,200,0.2)"
+          }}
+          onMouseEnter={(e) => !loading && (e.target.style.boxShadow = "0 4px 12px rgba(155,126,200,0.3)")}
+          onMouseLeave={(e) => e.target.style.boxShadow = "0 2px 8px rgba(155,126,200,0.2)"}
+        >
+          {loading ? "Please wait..." : (isSignIn ? "Sign in" : "Create account")}
+        </button>
 
-          <button
-            onClick={() => { setMode("magic"); setAuthError(null); }}
-            style={{
-              width: "100%",
-              padding: "11px 14px",
-              marginBottom: 16,
-              background: "transparent",
-              border: `1px solid ${T.border}`,
-              borderRadius: 8,
-              fontSize: 13,
-              color: T.ink2,
-              cursor: "pointer",
-              fontFamily: T.sans,
-              fontWeight: 500,
-              transition: "all 200ms"
-            }}
-            onMouseEnter={(e) => { e.target.style.borderColor = T.ochre; e.target.style.color = T.ochre; }}
-            onMouseLeave={(e) => { e.target.style.borderColor = T.border; e.target.style.color = T.ink2; }}
-          >
-            ✉️ Magic link instead
-          </button>
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 12,
+          margin: "16px 0"
+        }}>
+          <div style={{ flex: 1, height: 1, background: T.border }} />
+          <div style={{ fontSize: 12, color: T.ink2, whiteSpace: "nowrap" }}>or</div>
+          <div style={{ flex: 1, height: 1, background: T.border }} />
+        </div>
 
-          <div style={{
+        <button
+          onClick={() => supabaseAuth.signInWithOAuth("google")}
+          style={{
+            width: "100%",
+            padding: "11px 14px",
+            background: "#FFFFFF",
+            border: `1px solid ${T.border}`,
+            borderRadius: 8,
+            fontSize: 14,
+            fontWeight: 500,
+            color: T.ink,
+            cursor: "pointer",
+            fontFamily: T.sans,
             display: "flex",
             alignItems: "center",
-            gap: 12,
-            margin: "16px 0"
-          }}>
-            <div style={{ flex: 1, height: 1, background: T.border }} />
-            <div style={{ fontSize: 12, color: T.ink2, whiteSpace: "nowrap" }}>or</div>
-            <div style={{ flex: 1, height: 1, background: T.border }} />
-          </div>
-
-          <button
-            onClick={() => supabaseAuth.signInWithOAuth("google")}
-            style={{
-              width: "100%",
-              padding: "11px 14px",
-              background: "#FFFFFF",
-              border: `1px solid ${T.border}`,
-              borderRadius: 8,
-              fontSize: 14,
-              fontWeight: 500,
-              color: T.ink,
-              cursor: "pointer",
-              fontFamily: T.sans,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              transition: "all 200ms"
-            }}
-            onMouseEnter={(e) => e.target.style.background = T.surface}
-            onMouseLeave={(e) => e.target.style.background = "#FFFFFF"}
-          >
-            <svg width="16" height="16" viewBox="0 0 48 48">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-            </svg>
-            Continue with Google
-          </button>
-        </div>
-      )}
+            justifyContent: "center",
+            gap: 8,
+            transition: "all 200ms"
+          }}
+          onMouseEnter={(e) => e.target.style.background = T.surface}
+          onMouseLeave={(e) => e.target.style.background = "#FFFFFF"}
+        >
+          <svg width="16" height="16" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          </svg>
+          Continue with Google
+        </button>
+      </div>
 
       {/* Footer social proof */}
       <div style={{
