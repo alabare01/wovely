@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 
 export const T = {
-  bg:"#FFFFFF", surface:"#F8F6FF", linen:"#F8F6FF", ink:"#2D2D4E", ink2:"#6B6B8A", ink3:"#6B6B8A",
-  border:"#EDE4F7", terra:"#9B7EC8", terraLt:"#EDE4F7", sage:"#5C9E7A", sageLt:"#D8EAD8", gold:"#C9853A",
-  navy:"#2D3A7C", modal:"#FFFFFF", card:"#FFFFFF",
-  serif:'"Playfair Display", Georgia, serif', sans:'"Inter", -apple-system, sans-serif',
-  shadow:"0 1px 4px rgba(0,0,0,0.06)",
-  shadowLg:"0 4px 16px rgba(155,126,200,0.12)",
-  disabled:"#B0AEC4",
-  success:"#5C9E7A", warning:"#C9853A", error:"#C05A5A",
+  bg:"#FAF8F5", surface:"#F5F2EE", linen:"#F5F2EE", ink:"#3D4621", ink2:"#7A7A6F", ink3:"#8A8A80",
+  border:"#E8E4DC", terra:"#9B7EC8", terraLt:"#EDE4F7", sage:"#7A9E74", sageLt:"#D8EAD8", gold:"#B8860B",
+  ochre:"#9B7E30", earth:"#8B6F47", navy:"#3D4621", modal:"#FFFFFF", card:"#FFFFFF",
+  serif:'"Libre Baskerville", Georgia, serif', sans:'"Raleway", -apple-system, sans-serif',
+  shadow:"0 1px 3px rgba(61,70,33,0.08)",
+  shadowLg:"0 4px 16px rgba(155,126,200,0.1)",
+  disabled:"#B8B8AD",
+  success:"#7A9E74", warning:"#B8860B", error:"#C05A5A",
 };
 
 export const useBreakpoint = () => {
