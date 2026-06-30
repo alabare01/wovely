@@ -304,7 +304,8 @@ const DesktopShowcase = () => {
       justifyContent: "center",
       alignItems: "center",
       minHeight: "100vh",
-      background: `linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`,
+      background: `url('/wovely_landing_bg_v1.png') center/cover no-repeat fixed, linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`,
+      backgroundBlendMode: "overlay",
       position: "relative",
       overflow: "hidden"
     }}>
@@ -473,8 +474,7 @@ const MobileShowcase = () => {
             title: "Spring MKAL 2025",
             author: "12-clue monthly CAL",
             type: "3 of 12 clues released",
-            desc: "One collection. Shared materials. Unified progress.",
-            img: "/wovely_landing_bg_v1.png"
+            desc: "One collection. Shared materials. Unified progress."
           },
           {
             title: "Finished projects",
@@ -497,9 +497,11 @@ const MobileShowcase = () => {
                 alt={feature.title}
                 style={{
                   width: "100%",
-                  height: 120,
-                  objectFit: "cover",
-                  display: "block"
+                  height: 140,
+                  objectFit: "contain",
+                  objectPosition: "center",
+                  display: "block",
+                  background: "#fafbfc"
                 }}
               />
             )}
