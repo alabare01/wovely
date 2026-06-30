@@ -1,0 +1,419 @@
+{
+  "stitches": [
+    {
+      "primary_name": "Diamond Lasa Motif",
+      "slug": "diamond-lasa-motif",
+      "also_known_as": [],
+      "description": null,
+      "instructions": "Ch 3 (counts as dc), 15 dc in ring, sl st to top of t-ch, do not turn, pull ring closed—16 dc.\nRnd 1 (RS): Ch 1, sc in top of t-ch, sc in next 3 dc, *ch 3, sc in next 4 dc; rep from * around, ch 1, hdc to 1st sc, do not turn—16 sc.\nRnd 2: Ch 5 (counts as dc, ch-2 sp), 2 dc around post of hdc, *ch 4, sk next sc, sc in next 2 sc, ch 4, sk next sc, 2 sc, ch 4, sk next sc in ch-1 sp, sl to 3rd ch of t-ch, do not turn—8 sc.\nRnd 3: Ch 5 (counts as dc, ch-2 sp), 2 dc in next ch-2 sp, *ch 3, 11 dc in ch-5 sp, ch 3, [2 dc, ch 2, 2 dc] in next ch-2 sp; rep from * twice, ch 3, 11 dc in ch-5 sp, ch 3, [2 dc, ch 2, 2 dc] in next ch-2 sp, sl st in 3rd ch of t-ch, do not turn—60 dc.\nRnd 4: Ch 5 (counts as dc, ch-2 sp), 2 dc in ch-2 sp, *ch 3, [hdc, ch 1] in last dc and ea dc across to last dc, hdc in last dc, ch 3, [2 dc, ch 1, 2 dc] in next ch-2 sp; rep from * around, ch 3, [hdc, ch 1] in last dc and ea dc across to last dc, hdc in last dc, ch 3, dc in last ch-2 sp, sl st to 3rd ch of t-ch, do not turn—44 hdc.\nRnd 5: Ch 6 (counts as dc, ch-2 sp), 2 dc in ch-2 sp, *ch 3, [hdc, ch 1] in last dc and ea dc across to last dc, hdc in last dc, ch 3, [2 dc, ch 2, 2 dc] in next ch-2 sp; rep from * twice, ch 3, [hdc, ch 1] in last dc and ea dc across to last dc, hdc in last dc, ch 3, sl st to 3rd ch of t-ch, do not turn—44 hdc.\nRnd 6: Ch 3 (counts as dc), dc in ch-2 sp, *ch 3, [hdc, ch 1] in next 5 ch-1 sps, sc in next ch-1 sp, ch 5, sc in ch-6 sp, ch 5, picot, 3 dc in ch-1 sp; rep from * around to last ch-1 sp, picot, ch 5, sc in next ch-6 sp, ch 5, picot, dc in last ch-1 sp, sl st to top of t-ch, fasten off.\nRnd 7: Ch 3 (counts as dc), dc in ch-2 sp, *ch 2, dc in ch-2 sp; rep from * around, sl st to 3rd ch of t-ch, do not turn—44 hdc.\nRnd 8: Ch 1, sc in ch-2 sp, *ch 4, [sc in next 2 ch-1 sps, ch 3, sc] in next 2 ch-1 sps, ch 4, sc in ch-2 sp; rep from * around, sl st to 1st sc, fasten off—40 sc.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["lace", "diamond shape", "open mesh", "square motif"],
+      "source_filename": "Screenshot 2026-04-24 165607.png"
+    },
+    {
+      "primary_name": "Kaihua Motif",
+      "slug": "kaihua-motif",
+      "also_known_as": [],
+      "description": "This simple little flower makes a great appliqué around the neckline of a girl's top.",
+      "instructions": "Ch 5, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 7 (counts as dc, ch-4 sp), [2 dc in ring, ch 4] 5 times, dc in ring, sl st in 3rd ch of t-ch, do not turn—12 dc.\nRnd 2: [Sl st, sc, hdc, 5 dc, hdc, sc, sl st] in ea ch-sp around, fasten off—30 dc.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["appliqué", "garments"],
+      "visual_cues": ["flower", "petals", "circular motif"],
+      "source_filename": "Screenshot 2026-04-24 165647.png"
+    },
+    {
+      "primary_name": "Daun Motif",
+      "slug": "daun-motif",
+      "also_known_as": [],
+      "description": "The small flower makes a great motif to fill in spaces between larger flower motifs.",
+      "instructions": "Ch 5, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, [sc, ch 7, sc] 4 times in ring, sl st to 1st sc, do not turn—8 sc.\nRnd 2: [Sc, 4 dc, ch 3, 4 dc, sc] in ea ch-sp around, sl st to 1st sc, fasten off—32 dc.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["filler motif"],
+      "visual_cues": ["flower", "four petals", "small motif"],
+      "source_filename": "Screenshot 2026-04-24 165717.png"
+    },
+    {
+      "primary_name": "Bloei Motif",
+      "slug": "bloei-motif",
+      "also_known_as": [],
+      "description": "Classically simple in design, this motif makes a great accessory (scarf or headband) when combining multiple motifs together.",
+      "instructions": "Ch 5, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 3 (counts as dc), 2 dc in ring, [ch 5, 3 dc] 4 times in ring, ch 5, sl st to top of t-ch, do not turn—15 dc.\nRnd 2: Ch 3 (counts as dc), [(dc, ch 1) 6 times, dc] in next 4 ch-5 sps, [(dc, ch 1) 6 times] in last ch-5 sp; sl st to top of t-ch, do not turn—35 dc.\nRnd 3: Ch 1, *[sc, ch 3] in next 5 ch-1 sps, sc in next ch-1 sp; rep from * around, sl st to 1st sc, fasten off—30 sc.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["scarf", "headband"],
+      "visual_cues": ["flower", "lace", "circular motif", "open petals"],
+      "source_filename": "Screenshot 2026-04-24 165741.png"
+    },
+    {
+      "primary_name": "Nashi Motif",
+      "slug": "nashi-motif",
+      "also_known_as": [],
+      "description": "When made in thread and stiffened, this motif can be a fun earring.",
+      "instructions": "Ch 8, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 16 sc in ring, sl st to 1st sc, do not turn.\nRnd 2: Ch 7 (counts as dc, ch-4 sp), *sk 1 sc, dc in next sc, ch 4; rep from * around, sl st to 3rd ch of t-ch, do not turn—8 dc.\nRnd 3: Ch 1, [sc, hdc, 2 dc, ch 3, 2 dc, hdc, sc] in ea ch-sp around, sl st to 1st sc, fasten off—32 dc.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["earrings"],
+      "visual_cues": ["flower", "petals", "circular motif", "lace"],
+      "source_filename": "Screenshot 2026-04-24 165846.png"
+    },
+    {
+      "primary_name": "Flor de Nieve Motif",
+      "slug": "flor-de-nieve-motif",
+      "also_known_as": [],
+      "description": "The voids made by the chain spaces create a visible cross that you can use as a design feature when you combine them all together.",
+      "instructions": "Trefoil: Ch 4, sl st in 4th ch, ch 6, sl st in 6th ch, ch 4, sl st in 4th ch.\nPicot: Ch 4, sl st in 4th ch.\nMake an adjustable ring.\nRnd 1 (RS): Ch 4 (counts as dc, ch 1), [3 dc, trefoil, 3 dc, ch 1] 3 times, 3 dc, trefoil, 2 dc] in ring, sl st to 3rd ch of t-ch, pull adjustable ring closed, do not turn.\nRnd 2: Ch 3 (counts as dc), dc in ch-1 sp, *picot, ch 5, sc in ch-6 sp, ch 5, picot, 3 dc in ch-1 sp; rep from * around to last ch-1 sp, picot, ch 5, sc in next ch-6 sp, ch 5, picot, dc in last ch-1 sp, sl st to top of t-ch, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["snowflake", "cross", "lace", "trefoil", "circular motif"],
+      "source_filename": "Screenshot 2026-04-24 165920.png"
+    },
+    {
+      "primary_name": "Tusculum Motif",
+      "slug": "tusculum-motif",
+      "also_known_as": [],
+      "description": "The back and forth of lace and solid rounds makes this flower great in a larger lace or solid project.",
+      "instructions": "Ch 10, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 3 (counts as dc), 23 dc in ring, sl st to top of t-ch, do not turn—24 dc.\nRnd 2: Ch 1, sc in top of t-ch, *ch 2, sk next dc, sc in next dc, ch 3, sk next dc, sc in next dc; rep from * around to last 3 dc, ch 2, sk next dc, sc in next dc, ch 1, hdc in 1st sc (counts as ch-3 sp), do not turn—12 ch-sps.\nRnd 3: Ch 4 (counts as dc, ch-1 sp), 3 dc around post of hdc, *sc in next ch-2 sp, [3 dc, ch 1, 3 dc] in next ch-3 sp; rep from * around, sc in last ch-2 sp, 2 dc in 1st ch-sp, sl st to 3rd ch of t-ch, do not turn—6 sc.\nRnd 4: Ch 1, *sc in ch-1 sp, ch 4, sk next dc, sc in next dc, ch 5, sk next [dc, sc, dc], sc in next dc, ch 4; rep from * around, sl st to 1st sc, fasten off—18 ch-sps.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["flower", "lace", "circular motif", "alternating solid and lace rounds"],
+      "source_filename": "Screenshot 2026-04-24 165942.png"
+    },
+    {
+      "primary_name": "Fuji Motif",
+      "slug": "fuji-motif",
+      "also_known_as": [],
+      "description": "The chain spaces on the last round make a perfect place to connect larger motifs together, while filling the fabric with adorable little flowers.",
+      "instructions": "Ch 4, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, [sc, ch 4, sc, ch 3] 4 times in ring, sl st to 1st sc, do not turn—8 ch-sps.\nRnd 2: Ch 1, *[sc, ch 5, hdc, ch 5, sc] in next ch-4 sp, [sc, ch 5, hdc, ch 5, sc] in next ch-3 sp; rep from * around, sl st to 1st sc, fasten off—12 ch-sps.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["flower", "small motif", "circular", "chain spaces"],
+      "source_filename": "Screenshot 2026-04-24 170008.png"
+    },
+    {
+      "primary_name": "Daisy Leaf Motif",
+      "slug": "daisy-leaf-motif",
+      "also_known_as": [],
+      "description": "This leafy motif can make a great base for a sculptural flower, or when combining motifs together, makes a great tablecloth fabric.",
+      "instructions": "Ch 7, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 2, 2 dc-cl in ring, ch 3, *3 dc-cl in ring, ch 5, 3 dc-cl in ring, ch 3; rep from * twice, 3 dc-cl in ring, ch 2, dc in top of 2 dc-cl, do not turn—seven 3 dc-cl.\nRnd 2: Ch 3, 2 tr-cl around post of prev rnd's dc, ch 4, 3 dc-cl around post of dc, ch 3, *sc in next ch-3 sp, ch 3, [3 dc-cl, ch 4, 3 tr-cl, ch 4, 3 dc-cl] in next ch-5 sp, ch 3; rep from * around, sc in last ch-3 sp, ch 3, 3 dc-cl in ch-2 sp, ch 4, sl st to top of 2 tr-cl, do not turn—eight 3 dc-cl.\nRnd 3: Ch 3 (counts as dc), *[dc, 3 hdc] in next ch-4 sp, 2 sc in next ch-3 sp, sl st to sc, 2 sc in next ch-3 sp, [3 hdc, dc] in next ch-4 sp, dc in 3 tr-cl; rep from * around, sl st to top of t-ch, do not turn—12 dc.\nRnd 4: [Sc, ch 3, sc, ch 5, sc, ch 3, sc] in top of t-ch, *ch 2, sc in next dc, [ch 2, sc in next hdc] 3 times, ch 2, sl st in next 2 sc, sk sl st, sl st in next 2 sc, [ch 2, sc in next hdc] 3 times, ch 2, sc in next dc, ch 2, [sc, ch 3, sc, ch 5, sc, ch 3, sc] in next dc; rep from * around, sl st to 1st sc, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": ["tablecloth"],
+      "visual_cues": ["leaf", "daisy", "square motif", "sculptural", "lace"],
+      "source_filename": "Screenshot 2026-04-24 170038.png"
+    },
+    {
+      "primary_name": "Windroos Motif",
+      "slug": "windroos-motif",
+      "also_known_as": [],
+      "description": "By slightly changing where you crochet the double crochet stitches on round 3, you can create a textured flower.",
+      "instructions": "Ch 6, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 12 sc in ring, sl st to 1st sc, do not turn.\nRnd 2: Ch 1, *sc in next sc, ch 3, sk next sc; rep from * around, sl st to 1st sc, do not turn—6 sc.\nRnd 3: Ch 1, [sc in next sc, ch 3 (push ch forward and work behind ch), ch 2] 5 times, sc in next sc, ch 2, 3 dc in next sc on rnd 1 behind ch-3 sp, hdc in 1st sc, do not turn—18 dc.\nRnd 4: Ch 1, sc around hdc post, *ch 3, sc in next ch-2 sp; rep from * around, ch 3, sl st to 1st sc, fasten off—12 ch-3 sps.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["flower", "textured", "circular motif", "raised petals"],
+      "source_filename": "Screenshot 2026-04-24 170115.png"
+    },
+    {
+      "primary_name": "Tea Rose Motif",
+      "slug": "tea-rose-motif",
+      "also_known_as": [],
+      "description": "The three-dimensional nature of this motif is stunning on its own as a broach or ring.",
+      "instructions": "Picot: Ch 3, sl st to 1st ch.\nCh 10, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 24 sc in ring, sl st to 1st sc, do not turn.\nRnd 2: Ch 1, *sc in next sc, ch 3, sk 2 sc; rep from * around, sl st to 1st sc, do not turn—8 ch-3 sps.\nRnd 3: [Sc, ch 2, 4 dc, ch 2, sc] in ea ch-3 sp around, sl st to 1st sc, do not turn—8 petals.\nRnd 4: Ch 1, *sc btw next 2 sc, ch 5; rep from * around, sl st to 1st sc, do not turn—8 ch-5 sps.\nRnd 5: [Sc, ch 2, 6 dc, ch 2, sc] in ea ch-5 sp around, sl st to 1st sc, do not turn—8 petals.\nRnd 6: Ch 1, *sc btw next 2 sc, ch 7; rep from * around, sl st to 1st sc, do not turn—8 ch-7 sps.\nRnd 7: [Sc, ch 2, 8 dc, ch 2, sc] in ea ch-7 sp around, sl st to 1st sc, do not turn—8 petals.\nRnd 8: Ch 1, *sc btw next 2 sc, ch 9; rep from * around, sl st to 1st sc, do not turn—8 ch-9 sps.\nRnd 9: [Sc, ch 2, (dc, picot) 5 times, dc, ch 2, sc] in ea ch-9 sp around, sl st to 1st sc, fasten off—8 petals.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": ["broach", "ring"],
+      "visual_cues": ["rose", "three-dimensional", "layered petals", "flower motif"],
+      "source_filename": "Screenshot 2026-04-24 170135.png"
+    },
+    {
+      "primary_name": "Tulipe Motif",
+      "slug": "tulipe-motif",
+      "also_known_as": [],
+      "description": "Contrasting colors highlight the sculptural nature of this motif.",
+      "instructions": "Ch 8, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 3 (counts as dc), 23 dc in ring, sl st to top of t-ch, do not turn—24 dc.\nRnd 2: Ch 1, sc in top of t-ch, *ch 3, sk 1 dc, dc in next dc; rep from * around to last 2 dc, ch 1, hdc in 1st sc (counts as ch-3 sp), do not turn—12 ch-3 sps.\nRnd 3: Ch 1, sc around post of hdc, *7 dc in next ch-3 sp, sc in next ch-3 sp; rep from * around to last ch-3 sp, 7 dc in last ch-3 sp, sl st to 1st sc, fasten off—6 petals.\nRnd 4: Join new color to next sc on rnd 2, sc in same sc, *ch 5, sc in next sc on rnd 2 (push rnd 3 forward and work behind rnd), ch 3, sc in next sc on rnd 2; rep from * around to last 2 sc, ch 5, sc in next sc on rnd 2, ch 1, hdc in 1st sc, do not turn—12 sc.\nRnd 5: Ch 1, sc around post of hdc, *[6 dc, ch 2, 6 dc] in next ch-5 sp, sc in next ch-3 sp; rep from * around to last ch-3 sp, [6 dc, ch 2, 6 dc] in last ch-5 sp, sl st to 1st sc, fasten off—6 petals.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["flower", "tulip", "layered petals", "sculptural", "contrasting colors"],
+      "source_filename": "Screenshot 2026-04-24 170259.png"
+    },
+    {
+      "primary_name": "Amaryllis Motif",
+      "slug": "amaryllis-motif",
+      "also_known_as": [],
+      "description": "These simple flowers make great decorations to add to kids' projects.",
+      "instructions": "Picot: Ch 4, sl st to 1st ch.\nCh 8, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 3 (counts as dc), 17 dc in ring, sl st to top of t-ch, do not turn, fasten off color—18 dc.\nRnd 2: Join new color, *ch 6, sl st in next dc, picot, 3 tr in next dc, ch 6, sl st in next dc; rep from * around, sl st to top of t-ch, fasten off—36 tr.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["kids' projects", "decoration"],
+      "visual_cues": ["flower", "petals", "picot edging", "circular motif"],
+      "source_filename": "Screenshot 2026-04-24 170320.png"
+    },
+    {
+      "primary_name": "Toets Motif",
+      "slug": "toets-motif",
+      "also_known_as": [],
+      "description": "You can combine these realistic flowers for a brilliant purse or ottoman.",
+      "instructions": "Popcorn (pop): 5 dc in st indicated, remove hk, insert hk into 1st dc, place free lp on hk and pull through dc.\nBeginning Popcorn (beg pop): 4 dc in st indicated, remove hk, insert hk into 1st dc, place free lp on hk and pull through dc.\nMake an adjustable ring.\nRnd 1 (RS): Ch 1, 6 sc in ring, pull ring closed, do not turn.\nRnd 2: Ch 3, beg pop in 1st sc, [ch 3, pop in next sc] 5 times, ch 3, sl st to beg pop, fasten off—6 pop.\nRnd 3: Join new color to beg pop, [sc, hdc, 3 dc, hdc, sc] in ea ch-3 sp around, sl st to 1st sc, do not turn—6 petals.\nRnd 4: Ch 1, sc in same st, ch 5, *sc btw next 2 sc, ch 5; rep from * around, sl st to 1st sc, fasten off—6 ch-5 sps.\nRnd 5: Join new color, [sc, hdc, 5 dc, hdc, sc] in ea ch-5 sp around, sl st to 1st sc, fasten off—6 petals.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["purse", "ottoman"],
+      "visual_cues": ["flower", "popcorn stitch", "layered petals", "realistic flower", "three-dimensional"],
+      "source_filename": "Screenshot 2026-04-24 170344.png"
+    },
+    {
+      "primary_name": "Protea Motif",
+      "slug": "protea-motif",
+      "also_known_as": [],
+      "description": "The simple chain spaces create a unique texture that mimics sunflowers.",
+      "instructions": "Ch 5, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, [sc, ch 5] 7 times in ring, sc in ring, ch 2, dc in 1st sc, do not turn—8 sc.\nRnd 2: Ch 1, sc around post of dc, *ch 5, sk next 2 ch-5 sps, ch 5; rep from * around to last ch-5 sp, ch 5, sl st to 1st sc, do not turn—16 ch-5 sps.\nRnd 3: Ch 7 (counts as dc, ch-4 sp), *sk next 2 ch-5 sps, *sk next 2 ch-5 sps, [hdc, ch 2] 5 times, sc in next sc, ch 5; rep from * around, [hdc, ch 2] 5 times, sc in next sc, sl st to 1st sc, do not turn—40 ch-4 sps.\nRnd 4: Ch 1, sc in t-ch, *ch 6, sk 5 ch-4 sps, sc in next sc (push ch-sps forward, sk behind them); rep from * around to last 5 sc, ch 6, sl st to 1st sc, do not turn—8 ch-6 sps.\nRnd 5: Ch 1, sc in t-ch, *ch 6, sk 5 ch-4 sps, sc in next sc (push ch-sps forward, sk behind them); rep from * around, sl st to 1st sc, do not turn—8 ch-7 sps.\nRnd 6: Ch 1, in t-ch, *[(ch, hdc) 4 ch-4 sps, sl st] in ch-6 sp around, sl st to 1st sc, do not turn—48 ch-sps.\nRnd 7: Join new color to beg sc, *ch 7, sl st sc in next sc; rep from * around to last 6 sc, ch 7, sl st to 1st sc, do not turn—8 ch-7 sps.\nRnd 8: [Sc, hdc, 2 dc, 5 tr, 2 dc, hdc, sc] in ea ch-7 sp around, sl st to 1st sc, fasten off—8 petals.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["sunflower", "large motif", "circular", "layered petals", "chain spaces"],
+      "source_filename": "Screenshot 2026-04-24 170520.png"
+    },
+    {
+      "primary_name": "Gallica Motif",
+      "slug": "gallica-motif",
+      "also_known_as": [],
+      "description": "The popcorns burst from this motif to make eye-catching flowers that you can use as fun dish scrubbies.",
+      "instructions": "Popcorn (pop): 5 dc in st indicated, remove hk, insert hk into 1st dc, place free lp on hk and pull through dc.\nBeginning Popcorn (beg pop): 4 dc in st indicated, remove hk, insert hk into 1st dc, place free lp on hk and pull through dc.\nMake an adjustable ring.\nRnd 1 (RS): Ch 1, 6 sc in ring, pull ring closed, do not turn.\nRnd 2: Ch 3, beg pop in 1st sc, [ch 3, pop in next sc] 5 times, ch 3, sl st to beg pop, do not turn—6 pop.\nRnd 3: Ch 3, beg pop in prev ch-sp, [(ch 3, pop) twice] in ea ch-3 sp around to last ch-sp, ch 3, pop in last ch-sp, ch 3, sl st in beg pop, do not turn—12 pop.\nRnd 4: Ch 3, beg pop in prev ch-sp, [(ch 3, pop) twice] in ea ch-3 sp around to last ch-sp, ch 3, pop in last ch-sp, ch 1, hdc in beg pop, do not turn—24 pop.\nRnd 5: Ch 3 (counts as dc), [dc, hdc, sc] around post of hdc, [sc, hdc, 3 dc, hdc, sc] in ea ch-3 sp around, [sc, hdc, dc] in 1st ch-1 sp, sl st to top of t-ch, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["dish scrubbies"],
+      "visual_cues": ["flower", "popcorn stitch", "circular motif", "textured", "raised"],
+      "source_filename": "Screenshot 2026-04-24 170542.png"
+    },
+    {
+      "primary_name": "Carnation",
+      "slug": "carnation",
+      "also_known_as": [],
+      "description": "Bursting with joy, this flower looks equally lovely in a large bouquet or as a simple cummerbund.",
+      "instructions": "Ch 32.\nRow 1 (RS): Sl st in 2nd ch from hk, [ch 4, sk 2 dc, ch, sc in next ch] 6 times, *ch 3, sk 1 ch, sc in next ch; rep from * to end, turn—12 ch-sps.\nRow 2: Ch 1, [sc, ch 2, 4 hdc, 2 sc] in ea ch-3 sp, [sc, ch 3, 6 dc, ch 3, sc] in ea ch-4 sp across, turn.\nRow 3: *Sl st in sc, sc in next sc, ch 6, sc in same sc, ch 4, sk btw 3rd and 4th dc, ch 3, sl st in same sc, ch 6, sl st in next sc; rep from * in over all large petals, *sl st in next sc, sc in next sc, ch 4, sk btw 2nd and 3rd hdc, ch 3, sl st in same sc, ch 4, sl st in next sc; rep from ** over all small petals, sl st to end with long tail.\nTwist the flower into a rose by wrapping the large petals around the smaller petals, and securing them in the center.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["bouquet", "cummerbund", "decoration"],
+      "visual_cues": ["carnation", "rose", "three-dimensional", "layered petals", "worked flat and twisted"],
+      "source_filename": "Screenshot 2026-04-24 170643.png"
+    },
+    {
+      "primary_name": "Chrysanthemum",
+      "slug": "chrysanthemum",
+      "also_known_as": [],
+      "description": "Mums are one of the most unique flowers. The mums in this pattern work best with stiff acrylic or single-pile wool to let the petals curl. If your petals do not curl enough, try dropping down a few hook sizes before changing your yarn choice.",
+      "instructions": "Make an adjustable ring.\nRnd 1 (RS): Ch 2 (counts as hdc), 11 hdc in ring, pull ring closed, sl st to t-ch, do not turn—12 hdc.\nRnd 2: *Ch 6, hdc in 3rd ch from hk and ea ch across (petal formed), sl st blp in next hdc; rep from * around, do not turn—12 large petals.\nRnd 3: Sl st flp to t-ch on rnd 1, *ch 4, sc in 2nd ch from hk and ea ch across (petal formed), sl st flp in next hdc on rnd 1; rep from * around, fasten off—12 small petals.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["chrysanthemum", "mum", "curling petals", "three-dimensional", "layered petals"],
+      "source_filename": "Screenshot 2026-04-24 170704.png"
+    },
+    {
+      "primary_name": "Spiral Motif",
+      "slug": "spiral-motif",
+      "also_known_as": [],
+      "description": "Crocheted one petal at a time, the motif spirals around itself into a Ferris wheel of a flower.",
+      "instructions": "Ch 8, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 16 sc in ring, sl st to 1st sc, do not turn.\nPetal 1: Ch 15, sl st in next sc, ch 3 (counts as dc), turn to work in ch-sp, 5 dc in ch-15 sp, ch 3 (counts as dc), sl st in 4th ch from rnd 1, sl st in next 5 ch, ch 3 (counts as dc), turn, 8 dc in ch-15 sp (around all sts), sl st to top of ch 3, do not turn—16 dc.\nPetal 2: Ch 9, sk next sc on rnd 1, sl st in next sc on rnd 1, ch 3 (counts as dc), turn to work in ch-sp, 5 dc in ch-9 sp, ch 3 (counts as dc), sl st in 4th ch from rnd 1, sl st in next 5 ch, ch 3 (counts as dc), turn, 8 dc in ch-9 sp, sl st to top of ch 3, do not turn—16 dc.\nPetals 3–8: Rep petal 2, sl st to petal 1, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["spiral", "pinwheel", "Ferris wheel", "flower", "circular motif"],
+      "source_filename": "Screenshot 2026-04-24 170737.png"
+    },
+    {
+      "primary_name": "Anjer Motif",
+      "slug": "anjer-motif",
+      "also_known_as": [],
+      "description": "When left unblocked, this flower curls into a pretty daisy.",
+      "instructions": "Ch 5, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, [sc in ring, ch 6] 6 times, sl st to 1st sc, do not turn—6 sc.\nRnd 2: [Sc, hdc, 5 dc, hdc, sc] in ea ch-6 sp around, do not turn—6 petals.\nRnd 3: *Sl st to next sc, sc in next hdc, ch 1, hdc in next dc, [ch 1, dc in next dc] 3 times, ch 1, hdc in next dc, ch 1, sc in next hdc, sl st in next sc; rep from * around, do not turn—6 petals.\nRnd 4: *Sl st to next sc, sc in next ch-1 sp, [sc, ch 3, sl st] in next 4 ch-1 sps, sc in next ch-1 sp, sl st to next sc; rep from * around, fasten off—24 ch-sps.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["daisy", "flower", "curling petals", "circular motif", "lace edging"],
+      "source_filename": "Screenshot 2026-04-24 170802.png"
+    },
+    {
+      "primary_name": "Nelke Motif",
+      "slug": "nelke-motif",
+      "also_known_as": [],
+      "description": "This can be both a flower motif and a tiny doily. Stretch out and stiffen for a snowflake, or crochet tightly with a thick yarn to let the yarn curl the petals.",
+      "instructions": "Picot: Ch 3, sl st to 1st ch.\nCh 4, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 2, 2 dc-cl in ring, [ch 3, picot, 3 dc-cl in ring] 4 times, ch 3, picot, sl st to dc-cl, do not turn—5 dc-cl.\nRnd 2: Sl st in ch-3 sp, ch 1, sc in same ch-3 sp, *ch 5, sc in next ch-5 sp; rep from * to last ch-5 sp, ch 2, dc in 1st sc, do not turn—5 ch-sps.\nRnd 3: Sl st around post of dc, ch 2, 2 dc-cl around post of dc, ch 2, sl st to next sc, *[ch 2, 2 dc-cl, ch 2, sl st, ch 2, 2 dc-cl, ch 2] in next ch-5 sp, sl st in next sc; rep from * around, ch 2, 2 dc-cl in 1st ch-2 sp, hdc in 1st sl st, do not turn—10 dc-cl.\nRnd 4: Ch 3, sl st to hdc, *sl st to next ch-2 sp, ch 3, [sl st, ch 3, sl st] in next dc-cl, ch 3, sl st to next ch-2 sp; rep from * around to last ch-2 sp, sl st to last ch-2 sp, ch 3, [sl st, ch 3, sl st] in next dc-cl, fasten off—30 ch-3 sps.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["doily", "snowflake"],
+      "visual_cues": ["flower", "snowflake", "lace", "circular motif", "picot edging"],
+      "source_filename": "Screenshot 2026-04-24 170834.png"
+    },
+    {
+      "primary_name": "Victoria Motif",
+      "slug": "victoria-motif",
+      "also_known_as": [],
+      "description": "Easy repeating rounds make this doily burst from your hook with lightning speed.",
+      "instructions": "Picot: Ch 3, sl st to 1st sc.\nCh 12, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 3 (counts as dc), 39 dc in ring, sl st to top of t-ch, do not turn—40 dc.\nRnd 2: Ch 3 (counts as dc), dc in next dc, *ch 3, dc in next 4 dc; rep from * around to last 2 dc, ch 3, dc in next 2 dc, sl st to top of t-ch, do not turn—10 ch-3 sps.\nRnd 3: Ch 3 (counts as dc), dc in next dc, *ch 4, dc in next 4 dc; rep from * around to last 2 dc, ch 4, dc in next 2 dc, sl st to top of t-ch, do not turn—10 ch-4 sps.\nRnd 4: Ch 3 (counts as dc), dc in next dc, *ch 5, dc in next 4 dc; rep from * around to last 2 dc, ch 5, dc in next 2 dc, sl st to top of t-ch, do not turn—10 ch-5 sps.\nRnd 5: Ch 3 (counts as dc), dc in next dc, *ch 7, dc in next 4 dc; rep from * around to last 2 dc, ch 7, dc in next 2 dc, sl st to top of t-ch, do not turn—10 ch-7 sps.\nRnd 6: Ch 1, sc in top of t-ch, *[2 dc, (picot, 3 dc) twice, picot, 2 dc] in next ch-7 sp, sk next dc, sc in next 2 dc; rep from * around, sl st to 1st sc, fasten off—30 picots.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["doily"],
+      "visual_cues": ["doily", "circular motif", "lace", "picot edging", "repeating rounds"],
+      "source_filename": "Screenshot 2026-04-24 170921.png"
+    },
+    {
+      "primary_name": "Letitia Motif",
+      "slug": "letitia-motif",
+      "also_known_as": [],
+      "description": "The tiny groups of chains on the final round of the doily make it ruffle ever so slightly for a feminine look.",
+      "instructions": "Ch 10, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 16 sc in ring, sl st to 1st sc, do not turn—16 sc.\nRnd 2: Ch 5 (counts as tr, ch-1 sp), *tr in next sc, ch 1; rep from * around, sl st in 4th ch of t-ch, do not turn—16 tr.\nRnd 3: Ch 1, *2 sc in ch-1 sp, ch 1, sk next tr; rep from * around to t-ch, sl st to 1st sc, do not turn—32 sc.\nRnd 4: Ch 3 (counts as dc), dc in next sc, ch 1, sk next ch-1 sp, *dc in next 2 sc, ch 1, sk next ch-1 sp; rep from * around, sl st to top of t-ch, do not turn—32 dc.\nRnd 5: Ch 7 (counts as dc, ch-4 sp), sk next ch-1 sp, dc in next ch-1 sp, ch 3, dc in skipped ch-1 sp (by inserting hk behind prev dc made), *ch 4, dc in next ch-1 sp, ch 3, dc in prev ch-1 sp (by inserting hk behind prev dc made); rep from * around, ch 4, dc in 1st ch-1 sp, ch 3, sl st in 3rd ch of t-ch, do not turn—32 ch-sps.\nRnd 6: Ch 1, *[(sc, ch 3) 3 times, sc] in next ch-4 sp, 2 sc in next ch-3 sp; rep from * around, sl st to 1st sc, fasten off—96 sc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["doily"],
+      "visual_cues": ["doily", "circular motif", "ruffled edge", "lace", "feminine"],
+      "source_filename": "Screenshot 2026-04-24 171003.png"
+    },
+    {
+      "primary_name": "Eudora Motif",
+      "slug": "eudora-motif",
+      "also_known_as": [],
+      "description": "If you have not tried crocheting into the post of a stitch to see the cool shapes it makes, this doily will give you all the practice you need to master the technique.",
+      "instructions": "Ch 10, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 24 sc in ring, sl st to 1st sc, do not turn—24 sc.\nRnd 2: Ch 6, *sk next sc, dtr in next sc, ch 4, dc in middle of dtr post; rep from * around, dc in 3rd ch of t-ch, ch 2, hdc in 6th ch of t-ch (counts as ch-sp), do not turn—12 ch-4 sps.\nRnd 3: Ch 1, 3 sc around post of hdc, *ch 3, 5 sc in next ch-4 sp; rep from * around, ch 3, 2 sc in ch-2 sp, sl st to 1st sc, do not turn—60 sc.\nRnd 4: Ch 6, *dtr in next ch-3 sp, ch 4, dc in middle of dtr post, sk 2 sc, dtr in next sc, ch 4, dc in middle of dtr post; rep from * around, dtr in next ch-3 sp, ch 4, dc in middle of dtr post, dc in 3rd ch of t-ch, ch 2, hdc in 6th ch of t-ch, do not turn—23 ch-4 sps.\nRnd 5: Ch 1, 3 sc around post of hdc, *[sc, 4 hdc, sc] in next ch-4 sp, [3 sc, ch 2, 3 sc] in next ch-4 sp; rep from * around, [sc, 4 hdc, sc] in last ch-4 sp, 3 sc in ch-2 sp, ch 2, sl st to 1st sc, fasten off—96 sc.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": ["doily"],
+      "visual_cues": ["doily", "circular motif", "post stitch", "lace", "textured"],
+      "source_filename": "Screenshot 2026-04-24 171029.png"
+    },
+    {
+      "primary_name": "Julia Motif",
+      "slug": "julia-motif",
+      "also_known_as": [],
+      "description": "Simple and classic, this motif can be used to fill in spaces between larger, more intricate ones.",
+      "instructions": "Ch 8, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 3 (counts as dc), 17 dc in ring, sl st to top of t-ch, do not turn—18 dc.\nRnd 2: Ch 4 (counts as dc, ch-1 sp), [dc, ch 1] in ea dc around, sl st to 3rd ch of t-ch, do not turn—18 dc.\nRnd 3: [Sc, ch 4, sc] in ea ch-1 sp around, sl st to 1st sc, fasten off—18 ch-4 sps.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["filler motif"],
+      "visual_cues": ["circular motif", "simple", "lace", "open center"],
+      "source_filename": "Screenshot 2026-04-24 171114.png"
+    },
+    {
+      "primary_name": "Zylphia Motif",
+      "slug": "zylphia-motif",
+      "also_known_as": [],
+      "description": "Ruffles and popcorn—what is not to love about this textured crazy motif? Use it alone in fun coasters or connected together in a shawl.",
+      "instructions": "Popcorn (pop): 5 dc in sp indicated and remove hk. Insert hk into top of 1st dc from front to back. Place free lp on hk and pull through 1st dc. Ch 1.\nCh 5, sl st to 1st ch to form ring.\nRnd 1 (RS): Ch 4 (counts as dc, ch-1 sp), [dc, ch 1] in ring 11 times, sl st to 3rd ch of t-ch, do not turn—12 dc.\nRnd 2: Ch 5 (counts as dc, ch-2 sp), [dc, ch 2] in ea dc around, sl st to 3rd ch of t-ch, do not turn—12 dc.\nRnd 3: Ch 1, sc in 3rd ch of t-ch, *ch 2, pop in next ch-2 sp, ch 2, sc to next dc; rep from * around to last dc, ch 2, pop in last ch-2 sp, ch 2, sl st to 1st sc, do not turn—12 pop.\nRnd 4: *Ch 7, sk pop, sl st to next sc; rep from * around to beg sl st, sl st in sl st, do not turn—12 ch-7 sps.\nRnd 5: Ch 1, [2 sc, 2 hdc, 6 dc, 2 hdc, 2 sc] in ea ch-7 sp around, sl st to 1st sc, fasten off—12 petals.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["coasters", "shawl"],
+      "visual_cues": ["ruffles", "popcorn stitch", "textured", "circular motif", "flower-like petals"],
+      "source_filename": "Screenshot 2026-04-24 171132.png"
+    },
+    {
+      "primary_name": "Lorena Motif",
+      "slug": "lorena-motif",
+      "also_known_as": [],
+      "description": "The delicate picots are highlighted in the final solid round of this motif.",
+      "instructions": "Picot: Ch 4, sl st to 1st ch.\nCh 4, sl st to 1st ch to form ring.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["flower", "circular motif", "picot edging", "lace", "open spaces"],
+      "source_filename": "Screenshot 2026-04-24 171206.png"
+    }
+  ],
+  "entries_skipped": [
+    {
+      "source_filename": "Screenshot 2026-04-24 165616.png",
+      "reason": "continuation of Diamond Lasa Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 165637.png",
+      "reason": "Section header page — Chapter 8: Flower, Snowflake, and Joining Motifs"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 165704.png",
+      "reason": "Generic tip page — color advice for flower motifs, no stitch entry"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 165804.png",
+      "reason": "continuation of Bloei Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 165930.png",
+      "reason": "continuation of Flor de Nieve Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 165955.png",
+      "reason": "continuation of Tusculum Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170052.png",
+      "reason": "continuation of Daisy Leaf Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170125.png",
+      "reason": "continuation of Windroos Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170146.png",
+      "reason": "continuation of Tea Rose Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170310.png",
+      "reason": "continuation of Tulipe Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170414.png",
+      "reason": "continuation of Toets Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170529.png",
+      "reason": "continuation of Protea Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170551.png",
+      "reason": "continuation of Gallica Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170713.png",
+      "reason": "continuation of Chrysanthemum"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170746.png",
+      "reason": "continuation of Spiral Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170818.png",
+      "reason": "continuation of Anjer Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170851.png",
+      "reason": "continuation of Nelke Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170921.png",
+      "reason": "Section sub-header — Circular Motifs — combined with Victoria Motif swatch (swatch only, no instructions yet)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170945.png",
+      "reason": "Generic tip page — Doily Ideas, no stitch entry"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 170958.png",
+      "reason": "continuation of Letitia Motif (partial swatch, name only)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171014.png",
+      "reason": "continuation of Letitia Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171056.png",
+      "reason": "continuation of Eudora Motif"
+    }
+  ],
+  "duplicates_skipped": []
+}

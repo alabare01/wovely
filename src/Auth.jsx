@@ -70,12 +70,24 @@ const ProductPreview = () => {
         <div style={{ fontFamily: "'Playfair Display',Georgia,serif", fontSize: 32, fontWeight: 700, color: "#2D3A7C" }}>Wovely</div>
       </div>
 
-      {/* Headline */}
-      <div style={{ fontFamily: T.serif, fontSize: 26, fontWeight: 700, color: "#2D2D4E", lineHeight: 1.2, marginBottom: 4 }}>
-        Save, build and track every pattern you love.
+      {/* ── TIER BADGES ── */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}>
+        <div style={{ background: "rgba(92,158,122,0.12)", border: "1px solid rgba(92,158,122,0.25)", borderRadius: 20, padding: "6px 14px", display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#5C9E7A", textTransform: "uppercase", letterSpacing: "0.5px" }}>Free</span>
+          <span style={{ fontSize: 11, color: "#5C9E7A" }}>5 patterns</span>
+        </div>
+        <div style={{ background: "rgba(201,133,58,0.12)", border: "1px solid rgba(201,133,58,0.25)", borderRadius: 20, padding: "6px 14px", display: "flex", alignItems: "center", gap: 6 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#C9853A", textTransform: "uppercase", letterSpacing: "0.5px" }}>Craft</span>
+          <span style={{ fontSize: 11, color: "#C9853A" }}>100 patterns • $6.99/mo</span>
+        </div>
       </div>
-      <div style={{ fontSize: 13, color: "#6B6B8A", lineHeight: 1.6, marginBottom: 20 }}>
-        Import any pattern, follow every row, and let Bev keep you on track.
+
+      {/* Headline */}
+      <div style={{ fontFamily: T.serif, fontSize: 28, fontWeight: 700, color: "#2D2D4E", lineHeight: 1.2, marginBottom: 8, textWrap: "balance" }}>
+        Crochet patterns, finally organized.
+      </div>
+      <div style={{ fontSize: 14, color: "#6B6B8A", lineHeight: 1.6, marginBottom: 24 }}>
+        Import from anywhere, track every row, organize your whole collection. Free tier or unlimited with Craft.
       </div>
 
       {/* ── HERO PATTERN CARD ── */}
@@ -246,14 +258,29 @@ const SignupForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", padding: "48px 40px", maxWidth: 400, margin: "0 auto", width: "100%", boxSizing: "border-box" }}>
       {/* Heading */}
-      <div style={{ marginBottom: 20 }}>
-        <div style={{ fontFamily: T.serif, fontSize: 21, fontWeight: 700, color: "#2D2D4E", marginBottom: 4 }}>
-          {mode === "signin" ? "Welcome back." : "Start crafting smarter today."}
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontFamily: T.serif, fontSize: 20, fontWeight: 700, color: "#2D2D4E", marginBottom: 8 }}>
+          {mode === "signin" ? "Welcome back." : "Pick your tier"}
         </div>
-        <div style={{ fontSize: 12.5, color: "#6B6B8A" }}>
-          {mode === "signin" ? "Your Wovely is waiting." : "Free to start. No credit card needed."}
+        <div style={{ fontSize: 13, color: "#6B6B8A", lineHeight: 1.5 }}>
+          {mode === "signin" ? "Your Wovely is waiting." : "Free (5 patterns) always free. Craft ($6.99/mo) for 100 patterns + BevCheck + Collections."}
         </div>
       </div>
+
+      {/* Tier Selection (only on signup) */}
+      {mode !== "signin" && (
+        <div style={{ display: "flex", gap: 12, marginBottom: 20 }}>
+          <button style={{ flex: 1, padding: "14px 16px", border: "2px solid #5C9E7A", borderRadius: 12, background: "#fff", cursor: "pointer", transition: "all 200ms", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
+            <div style={{ fontWeight: 700, color: "#5C9E7A", fontSize: 13 }}>Free</div>
+            <div style={{ fontSize: 11, color: "#6B6B8A" }}>5 patterns, always free</div>
+          </button>
+          <button style={{ flex: 1, padding: "14px 16px", border: "2px solid #9B7EC8", borderRadius: 12, background: "rgba(155,126,200,0.08)", cursor: "pointer", transition: "all 200ms", display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 4 }}>
+            <div style={{ fontWeight: 700, color: "#9B7EC8", fontSize: 13 }}>Craft</div>
+            <div style={{ fontSize: 11, color: "#6B6B8A" }}>100 patterns + more</div>
+            <div style={{ fontSize: 10, color: "#C9853A", fontWeight: 600, marginTop: 2 }}>7-day free trial</div>
+          </button>
+        </div>
+      )}
 
       {/* Try it free — no-signup entry to the app shell */}
       {onTryAnonymous && (
@@ -305,9 +332,20 @@ const SignupForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             )}
           </div>
           {authError && <div style={{ background: "#EDE4F7", borderRadius: 8, padding: "8px 12px", fontSize: 12, color: "#9B7EC8", marginBottom: 10 }}>{authError}</div>}
-          <button onClick={mode === "signin" ? handleSignin : handleSignup} disabled={loading} style={{ width: "100%", height: 43, background: "#9B7EC8", color: "#fff", border: "none", borderRadius: 10, fontSize: 14, fontWeight: 600, cursor: "pointer", opacity: loading ? 0.6 : 1 }}>
-            {loading ? "Please wait\u2026" : mode === "signin" ? "Sign in \u2192" : "Create my free account \u2192"}
+          <button onClick={mode === "signin" ? handleSignin : handleSignup} disabled={loading} style={{
+            width: "100%", height: 52, background: "#9B7EC8", color: "#fff", border: "none", borderRadius: 12,
+            fontSize: 16, fontWeight: 700, cursor: "pointer", opacity: loading ? 0.7 : 1,
+            transition: "all 200ms", boxShadow: "0 4px 12px rgba(155,126,200,0.3)",
+            animation: "pulse-button 2s ease-in-out infinite"
+          }}>
+            {loading ? "Please wait\u2026" : mode === "signin" ? "Sign in \u2192" : "Start free today"}
           </button>
+          <style>{`
+            @keyframes pulse-button {
+              0%, 100% { box-shadow: 0 4px 12px rgba(155,126,200,0.3); }
+              50% { box-shadow: 0 4px 24px rgba(155,126,200,0.5); }
+            }
+          `}</style>
 
           {/* Magic link toggle */}
           <button onClick={() => { setMode("magic"); setAuthError(null); }} style={{ width: "100%", height: 38, background: "transparent", border: "1px solid #EDE4F7", borderRadius: 10, fontSize: 12.5, color: "#6B6B8A", cursor: "pointer", marginTop: 10, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
@@ -344,7 +382,7 @@ const SignupForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             <span onClick={() => { setMode("signin"); setAuthError(null); }} style={{ color: "#9B7EC8", cursor: "pointer", fontWeight: 600 }}>Sign in &rarr;</span>
           </div>
         )}
-        <div style={{ fontSize: 11, color: "#9B9BAA", marginTop: 10 }}>Join makers already organizing their patterns with Wovely</div>
+        <div style={{ fontSize: 11, color: "#9B9BAA", marginTop: 10 }}>✓ Trusted by 500+ crocheters • No credit card required</div>
       </div>
     </div>
   );
@@ -380,9 +418,9 @@ const MobileCTA = ({ signupRef }) => {
         <div style={{ width: 36, height: 36, flexShrink: 0, borderRadius: "50%", background: "#F8F6FF", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
           <img src="/bev_neutral.png" alt="" style={{ width: 36, height: 36, objectFit: "contain" }} />
         </div>
-        <span style={{ fontFamily: "Inter,sans-serif", fontSize: 14, fontWeight: 600, color: "#2D2D4E" }}>Ready to start crafting?</span>
+        <span style={{ fontFamily: "Inter,sans-serif", fontSize: 14, fontWeight: 600, color: "#2D2D4E" }}>Start free. Craft tier available.</span>
       </div>
-      <button onClick={() => signupRef?.current?.scrollIntoView({ behavior: "smooth" })} style={{ background: "#9B7EC8", color: "#fff", fontSize: 13, fontWeight: 600, borderRadius: 20, padding: "8px 18px", border: "none", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0 }}>Sign up free ↓</button>
+      <button onClick={() => signupRef?.current?.scrollIntoView({ behavior: "smooth" })} style={{ background: "#9B7EC8", color: "#fff", fontSize: 14, fontWeight: 700, borderRadius: 8, padding: "10px 20px", border: "none", cursor: "pointer", whiteSpace: "nowrap", flexShrink: 0, boxShadow: "0 2px 8px rgba(155,126,200,0.3)" }}>Get started ↓</button>
     </div>
   );
 };

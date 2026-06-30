@@ -1,0 +1,340 @@
+{
+  "stitches": [
+    {
+      "primary_name": "Traditional Granny Square",
+      "slug": "traditional-granny-square",
+      "also_known_as": [],
+      "description": "This is the most classic of all the granny squares, and what some consider the definition of a granny square.\n\nCh 4, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 3 (counts as dc), 2 dc in ring, [ch 3, 3 dc in ring] 3 times, ch 3, hdc in top of t-ch, do not turn—12 dc.\nRnd 2: Ch 3 (counts as dc), 2 dc around post of hdc, *[ch 1, 3 dc, ch 3, 3 dc] in next ch-3 sp; rep from * around to last ch-3 sp, [ch 1, 3 dc, ch 3, 3 dc] in last ch-3 sp, ch 1, hdc in top of t-ch, do not turn—24 dc.\nRnd 3: Ch 3 (counts as dc), 2 dc around post of hdc, *[ch 1, 3 dc in ch-1 sp] twice, [ch 1, 3 dc, ch 3, 3 dc] in ch-3 sp; rep from * around to last ch-3 sp, [ch 1, 3 dc in ch-1 sp] twice, ch 1, 3 dc in last ch-3 sp, ch 1, hdc in top of t-ch, do not turn—36 dc.\nRnd 4: Ch 3 (counts as dc), 2 dc around post of hdc, *[ch 1, 3 dc in ch-1 sp] twice, ch 1, [3 dc in ch-1 sp] twice, [ch 1, 3 dc, ch 3, 3 dc] in ch-3 sp; rep from * around to last ch-3 sp, [ch 1, 3 dc in ch-1 sp] twice, ch 1, 3 dc in last ch-3 sp, ch 1, hdc in top of t-ch, do not turn—48 dc. Fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["afghans", "blankets"],
+      "visual_cues": ["square motif", "chain spaces", "dc clusters", "open center"],
+      "source_filename": "Screenshot 2026-04-24 062003.png"
+    },
+    {
+      "primary_name": "Double Crochet Granny Square",
+      "slug": "double-crochet-granny-square",
+      "also_known_as": [],
+      "description": "The simple construction of this square highlights the chain spaces more than the solid fabric.\n\nCh 4, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 3 (counts as dc), dc in ring, [ch 3, 3 dc in ring] 3 times, ch 3, dc in ring, sl st to top of t-ch, do not turn—12 dc.\nRnd 2: Ch 3 (counts as dc), dc in dc, *[2 dc, ch 3, 2 dc] in ch-3 sp, dc in next 3 dc; rep from * around to last ch-3 sp, [2 dc, ch 3, 2 dc] in last ch-3 sp, dc in last dc, sl st to top of t-ch, do not turn—28 dc.\nRnd 3: Ch 3 (counts as dc), dc in next 3 dc, *[2 dc, ch 3, 2 dc] in ch-3 sp, dc in next 7 dc; rep from * around to last ch-3 sp, [2 dc, ch 3, 2 dc] in last ch-3 sp, dc in last 3 dc, sl st to top of t-ch, do not turn—44 dc.\nRnd 4: Ch 3 (counts as dc), dc in next 5 dc, *[2 dc, ch 3, 2 dc] in ch-3 sp, dc in next 11 dc; rep from * around to last ch-3 sp, [2 dc, ch 3, 2 dc] in last ch-3 sp, dc in last 5 dc, sl st to top of t-ch, fasten off—60 dc.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["square motif", "chain spaces", "solid fabric", "open corners"],
+      "source_filename": "Screenshot 2026-04-24 062051.png"
+    },
+    {
+      "primary_name": "Brick Granny Square",
+      "slug": "brick-granny-square",
+      "also_known_as": [],
+      "description": "You can make this simple granny come alive by changing color on every other round to highlight the small stitches on the wrong-side rounds.\n\nCh 4, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 3 (counts as dc), 2 dc in ring, [ch 3, 3 dc in ring] 3 times, ch 3, sl st to top of t-ch, turn, fasten off—12 dc.\nRnd 2: Join new color, ch 1, *[sc, ch 3, sc] in ch-3 sp, ch 3; rep from * around, sl st to 1st sc, turn, fasten off—8 sc.\nRnd 3: Join new color, ch 3 (counts as dc), 2 dc in ch-3 sp, *[3 dc, ch 3, 3 dc] in next ch-3 sp, 3 dc in next ch-3 sp; rep from * around to last ch-3 sp, [3 dc, ch 3, 3 dc] in last ch-3 sp, sl st to top of t-ch, fasten off, turn—36 dc.\nRnd 4: Join new color, ch 1, sc btw t-ch and dc, *ch 3, [sc, ch 3, sc] in next ch-3 sp, [ch 3, sk 3 dc, sc btw prev and next dc] twice; rep from * around, sl st to 1st sc, fasten off, turn—16 sc.\nRnd 5: Join new color, ch 3 (counts as dc), 2 dc in ch-3 sp, *3 dc in next ch-3 sp, [3 dc, ch 3, 3 dc] in next ch-3 sp, 3 dc in last 2 ch-3 sps; rep from * around to last ch-3 sp, 3 dc in last ch-3 sp, sl st to top of t-ch, fasten off, turn—60 dc.\nRnd 6: Join new color, ch 1, sc btw t-ch and dc, *ch 3, sk 3 dc, sc btw prev and next dc, ch 3, [sc, ch 3, sc] in next ch-3 sp, [ch 3, sk 3 dc, sc btw prev and next dc] 3 times; rep from * around, sl st to 1st sc, fasten off, turn—24 sc.\nRnd 7: Join new color, ch 3 (counts as dc), 2 dc in ch-3 sp, *3 dc in next 2 ch-3 sps, [3 dc, ch 3, 3 dc] in next ch-3 sp, 3 dc in next 3 ch-3 sps; rep from * around to last ch-3 sp, 3 dc in last ch-3 sp, sl st to top of t-ch, fasten off, turn—84 dc.\nRnd 8: Join new color, ch 1, sc btw t-ch and dc, *[ch 3, sk 3 dc, sc btw prev and next dc] twice, ch 3, [sc, ch 3, sc] in next ch-3 sp, [ch 3, sk 3 dc, sc btw prev and next dc] 4 times; rep from * around, sl st to 1st sc, fasten off, turn—32 sc.\nRnd 9: Join new color, ch 1, *3 sc in next 4 ch-3 sps, 5 sc in next ch-3 sp, 3 dc in next 3 ch-3 sps; rep from * around, sl st to 1st sc, fasten off—104 sc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["square motif", "color-changing rounds", "brick texture", "raised stitches"],
+      "source_filename": "Screenshot 2026-04-24 062242.png"
+    },
+    {
+      "primary_name": "Open Cross Granny Square",
+      "slug": "open-cross-granny-square",
+      "also_known_as": [],
+      "description": "The voids created by the chain spaces create a visible cross that you can use as a design feature when you combine it all together.\n\nCh 7, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 3 (counts as dc), 15 dc in ring, sl st to top of t-ch, do not turn.\nRnd 2: Ch 5 (counts as dc, ch-2 sp), sk ch-sp, *dc in next dc, ch 2, sk 1 dc; rep from * 3 times total, dc in next 3 dc, ch 2, sk 1 dc, 3rd ch of t-ch, ch 2, do not turn—16 dc.\nRnd 3: Ch 5 (counts as dc, ch-2 sp), sk ch-sp, *dc in next 3 dc, ch 2, sk 1 dc, 3rd ch of t-ch, ch 2, do not turn—32 dc.\nRnd 4: Ch 5 (counts as dc, ch-2 sp), sk ch-sp, *dc in next 3 dc, ch 2, 3rd ch of t-ch, ch 2, do not turn—48 dc.\nRnd 5: Ch 5 (counts as dc, ch-2 sp), sk ch-sp, *dc in next 5 dc, 5 dc in next dc, dc in next 5 dc, ch 2, sk 1 dc, 3rd ch of t-ch, ch 2, do not turn—68 dc.\nRnd 6: Ch 5 (counts as dc, ch-2 sp), *dc in next 7 dc, ch 2, dc in next 7 dc, ch 2, sl st to top of t-ch, do not turn—80 dc.\nRnd 7: Ch 3 (counts as dc), 2 dc in next ch-sp, *dc in next 9 dc, 5 dc in next ch-sp, dc in next 9 dc, 2 dc in next ch-sp, ch-sp, dc in dc, 2 dc in next ch-sp; rep from * 3 times total, dc in next 9 dc, 5 dc in next ch-sp, dc in next 9 dc, 2 dc in next ch-sp, sl st to top of t-ch, fasten off—112 dc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["square motif", "cross design", "chain space voids", "open work"],
+      "source_filename": "Screenshot 2026-04-24 062314.png"
+    },
+    {
+      "primary_name": "Window Granny Square",
+      "slug": "window-granny-square",
+      "also_known_as": [],
+      "description": "The middle round of chain spaces combines with the voids on the corners to create quite an architectural motif.\n\nMake an adjustable ring.",
+      "instructions": "Rnd 1 (RS): Ch 3 (counts as dc), 15 dc in ring, sl st to top of t-ch, do not turn.\nRnd 2: Ch 2 (counts as hdc), *hdc in next dc, [2 dc, ch 2, 2 dc] in next dc, hdc in next 2 dc; rep from * around, sl st to top of t-ch, do not turn—16 dc.\nRnd 3: Ch 4 (counts as dc, ch-1 sp), *sk hdc, dc in next dc, ch 1, [2 dc, ch 2, 2 dc] in next ch-2 sp, ch 1, sk dc, dc in next dc, ch 1, dc in next hdc; rep from * around, sl st to 3rd ch of t-ch, do not turn—28 dc.\nRnd 4: Ch 3 (counts as dc), *[dc in ch-1 sp, dc in next dc] twice, dc in next dc, [2 dc, ch 2, 2 dc] in next ch-2 sp, dc in next 2 dc, [dc in ch-1 sp, dc in next dc] twice; rep from * around, sl st to top of t-ch, do not turn—60 dc.\nRnd 5: Ch 3 (counts as dc), *dc in ea dc across to ch-sp, [2 dc, ch 2, 2 dc] in ch-2 sp; rep from * around, dc in ea dc across to t-ch, sl st to top of t-ch, fasten off—76 dc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["square motif", "chain space windows", "architectural", "open corners"],
+      "source_filename": "Screenshot 2026-04-24 062350.png"
+    },
+    {
+      "primary_name": "Crossed Clusters Granny Square",
+      "slug": "crossed-clusters-granny-square",
+      "also_known_as": [],
+      "description": "This classic afghan granny square makes a great impact with the simple clusters in the corners.\n\nCh 6, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 2, 2 dc-cl in ring, *ch 4, 3 dc-cl in ring, ch 2, 3 dc-cl; rep from * 3 times total, ch 4, 3 dc-cl in ring, ch 2, sl st to 2 dc-cl, do not turn—8 dc-cl.\nRnd 2: Ch 5 (counts as dc, ch-2 sp), *[3 dc-cl, ch 2, 3 dc-cl] in ch-4 sp, ch 2, 3 dc in next ch-2 sp, ch 2; rep from * 3 times total, [3 dc-cl, ch 2, 3 dc-cl] in ch-4 sp, ch 2, 2 dc in last ch-2 sp, sl st to 3rd ch of t-ch, do not turn—12 dc.\nRnd 3: Ch 3 (counts as dc), *2 dc in next ch-2 sp, ch 2, [3 dc-cl, ch 2, 3 dc-cl] in next ch-2 sp, ch 2, 2 dc in next ch-2 sp, dc in next 3 dc; rep from * around, sl st to top of t-ch, do not turn—28 dc.\nRnd 4: Ch 3 (counts as dc), *dc in next 2 dc, 2 dc in next ch-2 sp, ch 2, [3 dc-cl, ch 2, 3 dc-cl] in next ch-2 sp, ch 2, 2 dc in next ch-2 sp, dc in next 5 dc; rep from * around, sl st to top of t-ch, do not turn—44 dc.\nRnd 5: Ch 3 (counts as dc), *dc in ea dc to ch-sp, 2 dc in next ch-2 sp, [3 dc, ch 2, 3 dc] in next ch-2 sp, 2 dc in next ch-2 sp; rep from * around, dc in ea dc to t-ch, sl st to top of t-ch, do not turn—84 dc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["afghans"],
+      "visual_cues": ["square motif", "cluster corners", "chain spaces", "open center"],
+      "source_filename": "Screenshot 2026-04-24 062418.png"
+    },
+    {
+      "primary_name": "Gerber Daisy Granny Square",
+      "slug": "gerber-daisy-granny-square",
+      "also_known_as": [],
+      "description": "The beauty of the three-dimensional daisy in the center of the classic granny square is as lovely in two colors as in one solid square.\n\nCh 4, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 1, 8 sc in ring, sl st to 1st sc, do not turn.\nRnd 2: Ch 3 (counts as dc), 4 dc in same dc (petal made); rep from * ea sc around, ch 4, turn, do not join—8 petals.\nRnd 3: Ch 3 (counts as dc), 2 dc around post of hdc, *[ch 1, 3 dc in ch-4 sp] twice, ch 1, [3 dc, ch 2, 3 dc] in next ch-4 sp; rep from * around to last ch-4 sp, [ch 1, 3 dc in ch-4 sp] twice, ch 1, 3 dc in last ch-4 sp, ch 1, hdc in top of 2 dc-cl, do not turn—24 dc.\nRnd 4: Ch 3 (counts as dc), 2 dc around post of hdc, *[ch 1, 3 dc in ch-1 sp] 3 times, ch 1, [3 dc, ch 2, 3 dc] in next ch-2 sp; rep from * around to last ch-2 sp, [ch 1, 3 dc in ch-1 sp] 3 times, ch 1, 3 dc in last ch-2 sp, hdc in top in top of t-ch, do not turn—48 dc.\nRnd 5: Ch 3 (counts as dc), 2 dc around post of hdc, *[ch 1, 3 dc in ch-1 sp] 3 times, ch 1, [ch 1, 3 dc in ch-1 sp] 3 times, ch 1, [3 dc, ch 2, 3 dc] in next ch-2 sp, [ch 1, 3 dc in ch-1 sp] 3 times; rep from * around to last ch-2 sp, [ch 1, 3 dc in ch-1 sp] 3 times, ch 1, 3 dc in last ch-2 sp, hdc in top of t-ch, do not turn—60 dc.\nRnd 6: Ch 3 (counts as dc), 2 dc around post of hdc, *[ch 1, 3 dc in ch-1 sp] 4 times, ch 1, [3 dc, ch 2, 3 dc] in next ch-2 sp, [ch 1, 3 dc in ch-1 sp] 4 times; rep from * around to last ch-2 sp, [ch 1, 3 dc in ch-1 sp] 4 times, ch 1, 3 dc in last ch-2 sp, hdc in top in top of t-ch, fasten off—72 dc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["square motif", "three-dimensional daisy center", "raised petals", "open chain spaces"],
+      "source_filename": "Screenshot 2026-04-24 062604.png"
+    },
+    {
+      "primary_name": "Posy in the Granny",
+      "slug": "posy-in-the-granny",
+      "also_known_as": [],
+      "description": "The flower in the center is almost three-dimensional and is even more highlighted by a color change on the flower.\n\nCh 7, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 1, *[sc, ch 3, 3 dc, sk 3, sc] in ring, ch 5; rep from * twice, sc in ring, ch 3, 3 dc in ring, ch 3, sc in ring, ch 2, dc to 1st sc, do not turn, fasten off—12 dc.\nRnd 2: Join new color, ch 3 (counts as dc), 2 dc around post of dc, *ch 2, [3 dc, ch 3, 3 dc] in next ch-5 sp; rep from * around, ch 2, 3 dc in ch-2 sp, ch 1, hdc to top of t-ch, do not turn—24 dc.\nRnd 3: Ch 3 (counts as dc), 2 dc around post of hdc, *ch 2, dc in next ch-2 sp, ch 2, [3 dc, ch 3, 3 dc] in next ch-3 sp; rep from * around, ch 2, dc in ch-2 sp, ch 2, 3 dc in ch-1 sp, ch 3, sl st to top of t-ch, do not turn—28 dc.\nRnd 4: Ch 1, sc in ch-3 sp, *ch 4, sc in next ch-2 sp, ch 4, sc in next dc, ch 4, sc in next ch-2 sp, ch 4, [sc, ch 4, sc] in next ch-3 sp; rep from * around, ch 4, sc in next ch-2 sp, ch 4, sc in next dc, ch 4, sc in next ch-2 sp, ch 4, sc in next ch-3 sp, ch 4, sl st to 1st sc, fasten off—20 sc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["square motif", "three-dimensional flower center", "color change", "open chain spaces"],
+      "source_filename": "Screenshot 2026-04-24 062627.png"
+    },
+    {
+      "primary_name": "Gladiolus Granny Square",
+      "slug": "gladiolus-granny-square",
+      "also_known_as": [],
+      "description": "This simple square is transformed into a delicate motif by adding picots on the last round.\n\nPicot: Ch 3, sl st to 1st ch.\n\nCh 5, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 3 (counts as dc), [dc, ch 3, 2 dc] in ring, ch 1 *[2 dc, ch 3, 2 dc] in ring, ch 1; rep from * 3 times total, sl st to top of t-ch, do not turn—16 dc.\nRnd 2: Sl st to next dc, sl st to ch-3 sp, ch 3 (counts as dc), 6 dc in ch-3 sp, [sc, ch 3, sc] in ch-1 sp, *7 dc in ch-3 sp, [sc, ch 3, sc] in ch-1 sp; rep from * around, sl st to top of t-ch, do not turn—28 dc.\nRnd 3: Ch 3 (counts as dc), dc in next dc, picot, dc in next dc, [dc, picot, dc] in next dc, dc in next dc, picot, dc in next 2 dc, [sc, picot, sc] in ch-3 sp, *dc in next 2 dc, picot, dc in next dc, [dc, picot, dc] in next dc, dc in next dc, picot, dc in next 2 dc, [sc, picot, sc] in ch-3 sp; rep from * around, sl st to top of t-ch, fasten off—32 dc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["square motif", "picot edging", "delicate", "open chain spaces"],
+      "source_filename": "Screenshot 2026-04-24 062721.png"
+    },
+    {
+      "primary_name": "Beatrice Granny Square",
+      "slug": "beatrice-granny-square",
+      "also_known_as": [],
+      "description": "The diamond pattern shines in this classic square by changing colors for the clusters.\n\nFour Double Crochet Cluster (4 dc-cl): [Yo, insert hk into st indicated and pull up lp, yo, pull through 2 lps on hk] twice; rep from ( ) twice, yo, pull through all lps on hk.\n\nBegin Double Crochet Cluster (beg dc-cl): *Yo, insert hk into st indicated and pull up lp, yo, pull through 2 lps on hk; rep from * twice in next st, yo, pull through all lps on hk.\n\nCh 5, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 3 (counts as dc), 15 dc in ring, sl st to top of t-ch, do not turn.\nRnd 2: Ch 2, 2 dc-cl in top of t-ch, *2 dc in next 2 dc, 3 dc-cl in next dc, ch 5, 3 dc-cl in next dc; rep from * around, sl st to 2 dc-cl, do not turn—8 dc-cl.\nRnd 3: Sl st in next dc, ch 2, 2 dc-cl in same dc, dc in next 2 dc, 3 dc-cl in next dc, *change color, ch 2, 5 dc in next ch-5 sp, ch 2, change color, 3 dc-cl in next dc, dc in next 2 dc, 3 dc-cl in next dc; rep from * around to last ch-5 sp, change color, ch 2, 5 dc in last ch-5 sp, ch 2, sl st to 2 dc-cl, do not turn—28 dc.\nRnd 4: Change color, sl st to next dc, ch 2, 2 dc-cl in same dc, dc in next dc, 3 dc-cl in next dc, *change color, ch 2, dc in next ch-2 sp, dc in next dc, 2 dc in next dc, dc in next dc, dc in next dc, dc in next ch-2 sp, ch 2, change color, 3 dc-cl in next 2 dc; rep from * 3 times total, change color, ch 2, dc in next ch-2 sp, dc in next dc, dc in next 3 dc, 2 dc in next dc, dc in next ch-2 sp, ch 2, sl st to 2 dc-cl, do not turn—44 dc.\nRnd 5: Ch 2, beg dc-cl over next 2 sts, *change color, ch 2, dc in next ch-2 sp, dc in next 4 dc, 2 dc in next dc, dc in next dc, dc in next 4 dc, dc in next ch-2 sp, ch 2, change color, 4 dc-cl over next 2 sts; rep from * 3 times total, change color, ch 2, dc in next ch-2 sp, dc in next 4 dc, 2 dc in next 4 dc, dc in next ch-2 sp, ch 2, sl st to beg dc-cl, do not turn—68 dc.\nRnd 6: Change color, ch 3 (counts as dc), *2 dc in next ch-2 sp, dc in next 7 dc, ch 3, sk 1 dc, change color, 3 dc-cl in next dc, sk 1 dc, change color, ch 3, dc in ea dc across to ch-2 sp, 2 dc in next ch-2 sp, dc in next dc; rep from * around, sl to top of t-ch, do not turn—76 dc.\nRnd 7: Ch 3 (counts as dc), *dc in ea dc to ch-sp, ch 2, change color, 3 dc-cl in ch-3 sp, ch 2, 3 dc-cl in next ch-3 sp, change color, ch 2; rep from * around, dc in ea dc to t-ch, sl st to top of t-ch, do not turn—76 dc.\nRnd 8: Ch 3 (counts as dc), *dc in ea dc to ch-sp, 2 dc in ch-2 sp, dc in dc-cl, 2 dc in ch-2 sp, 3 dc in next dc-cl, 2 dc in ch-2 sp; rep from * around, dc in ea dc to t-ch, sl st to top of t-ch, fasten off—128 dc.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["square motif", "diamond pattern", "color-changing clusters", "raised texture"],
+      "source_filename": "Screenshot 2026-04-24 062838.png"
+    },
+    {
+      "primary_name": "Rose Granny Square",
+      "slug": "rose-granny-square",
+      "also_known_as": [],
+      "description": "The clusters pop out in this classic square to create a unique fabric that you can use in fun projects from totes to blankets.\n\nCh 5, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 2 (counts as hdc), 15 hdc in ring, sl st to top of t-ch, do not turn.\nRnd 2: Ch 3 (counts as dc), *dc in next hdc, 5 dc in next hdc, dc in next 2 hdc; rep from * around, sl st to top of t-ch, do not turn—56 dc.\nRnd 3: Ch 1, sc in top of t-ch, *change color, 4 dc-cl in next dc, change color, sc in next 3 dc, change color, 4 dc-cl in next dc, change color, sc in next dc; rep from * around, sl st to 1st sc, do not turn—12 dc-cl.\nRnd 4: Ch 1, sc in 1st sc, *sc in next dc, change color, 4 dc-cl in next dc, change color, sc in next 3 dc, change color, 4 dc-cl in next dc, change color, sc in next 2 dc; rep from * around, sl st to 1st sc, do not turn—56 dc.\nRnd 5: Ch 1, sc in top of t-ch, *sc in next dc, [change color, 4 dc-cl in next dc, change color, sc in next 2 dc] twice; rep from * around, sl st to 1st sc, do not turn—20 dc-cl.\nRnd 6: Ch 3 (counts as dc), *dc in next 7 sts, 5 dc in next dc, dc in next 8 sts; rep from * around, sl st to top of t-ch, do not turn—80 dc.\nRnd 7: Ch 1, sc in top of t-ch, *sc in next 2 dc, [change color, 4 dc-cl in next dc, change color, sc in next 3 dc] twice; rep from * around, sl st to 1st sc, do not turn—20 dc-cl.\nRnd 8: Ch 3 (counts as dc), *dc in next 10 sts, 5 dc in next dc, dc in next 11 sts; rep from * around, sl st to top of t-ch, fasten off—104 dc.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": ["totes", "blankets"],
+      "visual_cues": ["square motif", "raised clusters", "color-changing", "three-dimensional texture"],
+      "source_filename": "Screenshot 2026-04-24 062903.png"
+    },
+    {
+      "primary_name": "Traditional Hexagon Granny",
+      "slug": "traditional-hexagon-granny",
+      "also_known_as": [],
+      "description": "Well known for its construction and simplicity, this traditional hexagon has graced many cherished afghans.\n\nCh 6, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 3, [3 dc, ch 3] 5 times in ring, ch 1, hdc in top of 2 dc-cl, do not turn—6 dc-cl.\nRnd 2: Ch 2, 2 dc around post of hdc, [(ch 3, 3 dc) twice] in ea ch-3 sp around, ch 3, dc in last ch-1 sp, ch 1, hdc in top of 2 dc-cl, do not turn—12 dc.\nRnd 3: Ch 2, 2 dc around post of hdc, *[3 dc, ch 3, 3 dc] in next ch-3 sp, 3 dc in next ch-3 sp; rep from * around to last ch-3 sp, [3 dc, ch 3, 3 dc] in last ch-3 sp, ch 1, hdc in top of 2 dc-cl, do not turn—18 dc.\nRnd 4: Ch 3 (counts as dc), dc around post of hdc, *3 dc in next ch-3 sp, [3 dc, ch 2, 3 dc] in next ch-3 sp, 3 dc in next 3 ch-3 sp; rep from * around to last 2 ch-3 sps, 3 dc in next ch-3 sp, 3 dc in last ch-3 sp, ch 1, sl st to top of t-ch, do not turn—72 dc.\nRnd 5: Ch 1, sc in top of t-ch, *sc in ea dc to ch-2 sp, 2 sc in ch-2 sp; rep from * around, sc in ea dc to end, sl st to 1st sc, fasten off—84 sc.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["afghans"],
+      "visual_cues": ["hexagon motif", "dc clusters", "chain space corners", "open center"],
+      "source_filename": "Screenshot 2026-04-24 062940.png"
+    },
+    {
+      "primary_name": "Budding Hexagon",
+      "slug": "budding-hexagon",
+      "also_known_as": [],
+      "description": "Turning the classic granny blossom square into a hexagon is not only pleasing to the eye but seems classic and fresh all at the same time.\n\nMake an adjustable ring.",
+      "instructions": "Rnd 1 (RS): Ch 1, 12 sc in ring, sl st to 1st sc, pull ring closed, do not turn—12 sc.\nRnd 2: Ch 2, 2 dc-cl in 1st sc, *ch 5, 3 dc-cl in next sc, ch 2, 3 dc-cl in next sc; rep from * around to last sc, ch 5, 3 dc-cl in last sc, hdc in top of 2 dc-cl, do not turn—12 dc-cl.\nRnd 3: Ch 3 (counts as dc), dc around post of hdc, ch 1, *[3 dc-cl, ch 3, 3 dc-cl] in next ch-5 sp, ch 1, 3 dc in ch-3 sp, ch 1; rep from * around to last ch-5 sp, [3 dc-cl, ch 3, 3 dc-cl] in last ch-5 sp, ch 1, dc around post of hdc, sl st to top of t-ch, do not turn—18 dc.\nRnd 4: Ch 3 (counts as dc), *dc in each dc and ch-1 sp across, ch 1, [3 dc-cl, ch 3, 3 dc-cl] in next ch-3 sp, ch 1; rep from * around, dc in last ch-1 sp, dc in last dc, sl st to top of t-ch, do not turn—30 dc.\nRnd 5: Ch 3 (counts as dc), *dc in each dc and ch-1 sp across, ch 1, [3 dc-cl, ch 3, 3 dc-cl] in next ch-3 sp, ch 1; rep from * around, dc in last ch-1 sp, dc in last 2 dc, sl st to top of t-ch, do not turn—42 dc.\nRnd 6: Ch 1, *sc in each dc and ch-1 sp across, [2 sc, ch 3, 2 sc] in next ch-3 sp; rep from * around, sc in last ch-1 sp, sc in last 3 dc, sl st to 1st sc, fasten off—78 sc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["hexagon motif", "cluster corners", "open chain spaces", "blossom center"],
+      "source_filename": "Screenshot 2026-04-24 063010.png"
+    },
+    {
+      "primary_name": "Ridged Hexagon",
+      "slug": "ridged-hexagon",
+      "also_known_as": [],
+      "description": "This stitch pattern is eye-catching not only for its raised rounds (perfect for kitchen scrubbies) but also for its color changing rounds.\n\nV-Stitch (v-st): [Dc, ch 1, dc] in same sp.\n\nCh 6, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 3 (counts as dc), v-st 5 times in ring, dc in ring, ch 1, sl st to top of t-ch, fasten off, do not turn—12 dc.\nRnd 2: Join new color to ch-1 sp with sl st, ch 3 (counts as dc), BPdc around t-ch, BPdc around next dc, *v-st in next ch-1 sp, BPdc around ea dc across to ch-1 sp; rep from * around to 1st ch-1 sp, dc in 1st ch-1 sp, ch 1, sl st to top of t-ch, fasten off, do not turn—24 dc.\nRnd 3: Join new color to ch-1 sp with sl st, ch 3 (counts as dc), BPdc around t-ch, BPdc around ea dc to ch-1 sp, *v-st in next ch-1 sp, BPdc around ea dc across to ch-1 sp; rep from * around to 1st ch-1 sp, dc in 1st ch-1 sp, ch 1, sl st to top of t-ch, fasten off color, do not turn—36 dc.\nRep rnd 3 to desired size. Each additional rnd adds 12 dc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["kitchen scrubbies"],
+      "visual_cues": ["hexagon motif", "raised rounds", "back post stitches", "color-changing"],
+      "source_filename": "Screenshot 2026-04-24 065431.png"
+    },
+    {
+      "primary_name": "Spiral Hexagon",
+      "slug": "spiral-hexagon",
+      "also_known_as": [],
+      "description": "The simple repeating rounds that are not joined make the hexagon appear as if it is growing magically and twisting around itself.\n\nCh 5, sl st to 1st ch to form a ring.",
+      "instructions": "Rnd 1 (RS): Ch 1, [sc, ch 5] 5 times in ring, sc in ring, ch 2, dc in 1st sc, do not turn—6 sc.\nRnd 2: *Ch 4, sc in next ch-5 sp; rep from * around to last ch-5 sp, ch 4, sc around post of dc, do not join, do not turn—6 sc.\nRnd 3: *Ch 4, 2 sc in ch-4 sp, sc in next sc; rep from * around, do not turn, do not join—18 sc.\nRnd 4: *Ch 4, 2 sc in ch-4 sp, sc in ea sc to last sc before ch-4 sp, sk last sc; rep from * around, do not turn, do not join—24 sc.\nRep rnd 4 to desired size. Each additional rnd adds 6 sc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["hexagon motif", "spiral", "no-join rounds", "open chain spaces"],
+      "source_filename": "Screenshot 2026-04-24 065511.png"
+    },
+    {
+      "primary_name": "Peony Hexagon",
+      "slug": "peony-hexagon",
+      "also_known_as": [],
+      "description": "You can punch up this simple motif with clusters of color separated by trebles, mimicking petals in a flower.\n\nMake an adjustable lp.",
+      "instructions": "Rnd 1 (RS): Ch 1, 12 sc in ring, sl st to 1st sc, pull lp closed, do not turn.\nRnd 2: Ch 1, sc in 1st sc, *ch 3, sk 1 sc, sc in next sc; rep from * around, omitting last sc, sl st to 1st sc, do not turn—6 ch-sps.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["hexagon motif", "petal clusters", "color contrast", "flower center"],
+      "source_filename": "Screenshot 2026-04-24 065533.png"
+    }
+  ],
+  "entries_skipped": [
+    {
+      "source_filename": "Screenshot 2026-04-24 061604.png",
+      "reason": "continuation of Bolbec (last row instructions and tip only, no stitch header)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 061646.png",
+      "reason": "continuation of Bolbec (rows 2–7 and last row)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 061837.png",
+      "reason": "continuation of Bolbec (last row and tip, no stitch header)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 061850.png",
+      "reason": "section header page — Chapter 7: Square and Hexagonal Granny Squares, no stitch detail"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062038.png",
+      "reason": "continuation of Traditional Granny Square (rounds 1–4 and tip)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062100.png",
+      "reason": "continuation of Double Crochet Granny Square (rounds 2–4)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062251.png",
+      "reason": "continuation of Brick Granny Square (rounds 1–9)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062328.png",
+      "reason": "continuation of Open Cross Granny Square (rounds 1–7)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062340.png",
+      "reason": "blank/unreadable — only a partial logo mark visible, no stitch content"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062357.png",
+      "reason": "continuation of Window Granny Square (rounds 1–5)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062428.png",
+      "reason": "continuation of Crossed Clusters Granny Square (rounds 1–5)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062614.png",
+      "reason": "continuation of Gerber Daisy Granny Square (rounds 1–6)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062708.png",
+      "reason": "continuation of Posy in the Granny (rounds 1–4)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062756.png",
+      "reason": "continuation of Gladiolus Granny Square (rounds 2–3)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062846.png",
+      "reason": "continuation of Beatrice Granny Square (rounds 1–8)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062928.png",
+      "reason": "continuation of Rose Granny Square (rounds 1–8)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 062948.png",
+      "reason": "continuation of Traditional Hexagon Granny (rounds 1–5 and tip)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 065239.png",
+      "reason": "continuation of Traditional Hexagon Granny (duplicate section header + rounds)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 065251.png",
+      "reason": "continuation of Traditional Hexagon Granny (duplicate rounds)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 065358.png",
+      "reason": "continuation of Budding Hexagon (rounds 1–6)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 065450.png",
+      "reason": "continuation of Ridged Hexagon (rounds 1–3)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 065519.png",
+      "reason": "continuation of Spiral Hexagon (rounds 2–4)"
+    }
+  ],
+  "duplicates_skipped": [
+    {
+      "primary_name": "Bolbec",
+      "source_filename": "Screenshot 2026-04-24 061638.png"
+    },
+    {
+      "primary_name": "Bolbec",
+      "source_filename": "Screenshot 2026-04-24 061737.png"
+    },
+    {
+      "primary_name": "Bolbec",
+      "source_filename": "Screenshot 2026-04-24 061744.png"
+    },
+    {
+      "primary_name": "Terryn",
+      "source_filename": "Screenshot 2026-04-24 061701.png"
+    },
+    {
+      "primary_name": "Terryn",
+      "source_filename": "Screenshot 2026-04-24 061829.png"
+    },
+    {
+      "primary_name": "Window Granny Square",
+      "source_filename": "Screenshot 2026-04-24 062527.png"
+    },
+    {
+      "primary_name": "Window Granny Square",
+      "source_filename": "Screenshot 2026-04-24 062535.png"
+    },
+    {
+      "primary_name": "Beatrice Granny Square",
+      "source_filename": "Screenshot 2026-04-24 063333.png"
+    },
+    {
+      "primary_name": "Beatrice Granny Square",
+      "source_filename": "Screenshot 2026-04-24 063343.png"
+    },
+    {
+      "primary_name": "Traditional Hexagon Granny",
+      "source_filename": "Screenshot 2026-04-24 065239.png"
+    },
+    {
+      "primary_name": "Budding Hexagon",
+      "source_filename": "Screenshot 2026-04-24 065342.png"
+    },
+    {
+      "primary_name": "Budding Hexagon",
+      "source_filename": "Screenshot 2026-04-24 065409.png"
+    },
+    {
+      "primary_name": "Budding Hexagon",
+      "source_filename": "Screenshot 2026-04-24 065419.png"
+    }
+  ]
+}

@@ -1,0 +1,451 @@
+{
+  "stitches": [
+    {
+      "primary_name": "Cameroon",
+      "slug": "cameroon",
+      "also_known_as": [],
+      "description": "This pattern crosses itself to create a three-dimensional lattice look, making it great for kids' toys so they can cuddle and hold it by the crosses.\n\nCh a multiple of 8 sts plus 1.",
+      "instructions": "Row 1 (WS): Sc in 2nd ch from hk and ea ch across, change color, turn.\nRow 2: Ch 1, sc in 1st sc, *ch 1, sk 1 sc, sc in next 2 sc, ch 1, sk 1 sc, sc in next 4 sc; rep from * across to last 2 sc, sc in last 2 sc, turn.\nRow 3: Ch 3 (counts as dc), dc in each sc and ch across, change color, turn.\nRow 4: Ch 1, sc in 1st 2 sc, *sk 3 sc 3 rows below, dtr in next sc 3 rows below (under 2nd ch-sp in front of fabric), sc in next 2 dc, dtr in 1st sk sc 3 rows below (under 1st ch-sp in front of prev dtr), sc in next 4 dc; rep from * across to last 2 dc, sc in last 2 dc, turn.\nRow 5: Ch 1, sc in ea st across, change color, turn.\nRow 6: Ch 1, sc in 1st 6 sc, *ch 1, sk 1 sc, sc in next 2 sc, ch 1, sk 1 sc, sc in next 4 sc; rep from * across to last 2 sc, sc in last 2 sc, turn.\nRow 7: Rep row 3.\nRow 8: Ch 1, sc in 1st 4 dc, *sc in next 2 dc, sk 3 sc 3 rows below, dtr in next sc 3 rows below (under 2nd ch-sp in front of fabric), sc in next 2 dc, dtr in 1st sk sc 3 rows below (under 1st ch-sp in front of prev dtr), sc in next 2 dc; rep from * across to last 4 sts, sc in last 4 sts, turn.\nRow 9: Ch 1, sc in ea st across, change color, turn.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["kids' toys"],
+      "visual_cues": ["three-dimensional lattice", "crossing stitches", "raised crosses"],
+      "source_filename": "Screenshot 2026-04-24 054650.png"
+    },
+    {
+      "primary_name": "Malawi",
+      "slug": "malawi",
+      "also_known_as": [],
+      "description": "Repeating dropped stitches over and over creates a woven fabric that looks quite impressive and makes great warm hats.\n\nCh a multiple of 4 sts.",
+      "instructions": "Row 1 (RS): Sc in 2nd ch from hk, sc in next 2 ch, *ch 1, sk 1 ch, sc in next 3 sc; rep from * to end, turn.\nRow 2: Ch 3 (counts as dc), dc in ea st across, change color, turn.\nRow 3: Ch 1, sc in 1st sc, dtr in st below next ch-1 sp 3 rows below (in front of prev sts), sc in next dc, *ch 1, sk next dc, sc in next dc, dtr2tog in st below prev ch-1 sp and next ch-1 sp 3 rows below, sc in next dc; rep from * across to last 4 sts, ch 1, sk next dc, sc in next dc, dtr in prev st below prev ch-1 sp 3 rows below, sc in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["hats"],
+      "visual_cues": ["woven fabric", "dropped stitches", "chevron-like ridges"],
+      "source_filename": "Screenshot 2026-04-24 054723.png"
+    },
+    {
+      "primary_name": "Congo",
+      "slug": "congo",
+      "also_known_as": [],
+      "description": "The bright pattern of this fabric looks great from either side and is almost three-dimensional in nature.\n\nCh a multiple of 7 sts plus 2.",
+      "instructions": "Row 1 (RS): Sc in 2nd ch from hk, *sc in next sc, ch 7, sk 4 ch, sc in next 2 sc; rep from * across, change color, turn.\nRow 2: Ch 1, sc in 1st sc, *sc in next sc, hdc in next 4 ch on foundation (sk ch-sps), sc in next 2 sc; rep from * across, turn.\nRow 3: Ch 1, sc in ea sc and hdc across (sk ch-sps), change color, turn.\nRow 4: Ch 3 (counts as dc), *dc in next dc, ch 3, sk 3, ch 3 in ch-7 sp, ch 3, sk 4 sc, dc in next 2 sc; rep from * across, turn.\nRow 5: Ch 1, sc in 1st dc, *sc in next dc, ch 7, sk ch-sps, sc in next 2 dc; rep from * across, change color, turn.\nRow 6: Ch 1, sc in 1st sc, *sc in next sc, tr in next 4 sc 3 rows below (in front of ch-sps), sc in next 2 sc; rep from * across, turn.\nRep rows 3–6 to desired length. End with a row 4, change color.\nLast row: Ch 1, sc in 1st sc, *sc in next sc, dc in next 4 sc 2 rows below (in front of ch-sps), sc in next 2 sc; rep from * across, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["three-dimensional", "reversible fabric", "bright pattern", "arched chains"],
+      "source_filename": "Screenshot 2026-04-24 054743.png"
+    },
+    {
+      "primary_name": "Kenitra",
+      "slug": "kenitra",
+      "also_known_as": [],
+      "description": "This classic shell pattern is given new life with dashes of color in the fabric to transform it into something new.\n\nCh a multiple of 4 sts plus 3.",
+      "instructions": "Row 1 (RS): 3 dc in 4th ch from hk, sk 2 ch, sc in next ch, *ch 2, 3 dc in next ch, sk 2 ch, sc in next ch; rep from * across, do not turn, drop color.\nRow 2: Join new color to start of prev row at t-ch, sc in top of t-ch, *sc in next 3 dc, sc in next sc, ch 3; rep from * across, change color, turn.\nRow 3: Ch 3 (counts as dc), 3 dc in 1st ch, [sc, ch 2, 3 dc] in ea ch-3 sp across, sc in last sc, do not turn, drop color.\nRow 4: Join next color to top of t-ch, sc in t-ch, sc in next 3 dc, *sc in sc, ch 3, sc in next 3 dc; rep from * across, sc in last sc, change color, turn.\nRep rows 3 and 4 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["shell pattern", "color dashes", "alternating shells and chains"],
+      "source_filename": "Screenshot 2026-04-24 054806.png"
+    },
+    {
+      "primary_name": "Azilal",
+      "slug": "azilal",
+      "also_known_as": [],
+      "description": "This two-color repeat brings to mind ancestral patterns that get more defined as the contrast in color increases.\n\nV-Stitch (v-st): [Dc, ch 1, dc] in st indicated.\n\nCh a multiple of 6 sts plus 4.",
+      "instructions": "Row 1 (RS): Dc in 4th ch from hk, *sk 1 ch, dc in next 3 ch, sk 1 ch, v-st in next ch; rep from * across to last ch, dc in last ch, change color, turn.\nRow 2: Join new color to top of t-ch on prev row, ch 3, dc in next dc, *sk 1 dc, dc btw next 2 dc, ch 1, dc btw next 2 dc, dtr in same ch as v-st on foundation, dc in ch-1 sp, dtr in same dc as last dtr; rep from * across to last 5 dc, sk 1 dc, dc btw next 2 sts, ch 1, dc btw next 2 sts, dc in last 2 dc, change color, turn.\nRow 3: Ch 3 (counts as dc), dc in 1st dc, *dtr in dc below ch-1 sp 2 rows below, dc in ch-1 sp, dtr in same dc below ch-1 sp, sk 1 st, dc btw next 2 sts, ch 1, dc btw next 2 sts; rep from * across to last ch-1 sp, dtr in dc below ch-1 sp 2 rows below, dc in ch-1 sp, dtr in same dc below ch-1 sp, 2 dc in top of t-ch, do not turn.\nRow 4: Join color to top of t-ch, ch 3 (counts as dc), dc in next dc, *sk 1 st, dc btw next 2 sts, ch 1, dc btw next 2 sts, dtr in dc below ch-1 sp 2 rows below, dc in ch-1 sp, dtr in same dc below ch-1 sp; rep from * across to 5 sts, sk 1 st, dc btw next 2 sts, ch 1, dc btw next 2 sts, dc in last 2 dc, change color, turn.\nRep rows 3 and 4 to desired length. End with a row 3.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["ancestral patterns", "V-stitches", "two-color repeat", "geometric"],
+      "source_filename": "Screenshot 2026-04-24 054837.png"
+    },
+    {
+      "primary_name": "Zagora",
+      "slug": "zagora",
+      "also_known_as": [],
+      "description": "The filet lace in this stitch pattern offsets the bulkiness of the double crochet shells. By using an odd number of colors, you will always have the color you need at the end of each row.\n\nShell (sh): [2 dc, ch 1, 2 dc] in ch-sp indicated.\n\nStitch pattern is a multiple of 10 sts plus 3.",
+      "instructions": "Row 1 (WS): Dc in 6th ch from hk, ch 5, sk 5 ch, dc in next ch, ch 1, sk 1 ch, *dc in next ch, ch 1, sk 1 ch, dc in next ch, ch 5, sk 5 ch, dc in next ch, ch 1, sk 1 ch; rep from * across, dc in last ch, change color, turn.\nRow 2: Ch 1, sc in 1st dc, *sc in ch-1 sp, sc in next dc, sk 2 ch on foundation row, sh in next ch on foundation (in front of ch-5 sp), sc in next dc, sc in next ch-1 sp, sc in next dc; rep from * across to t-ch, sc in 4th and 5th ch of t-ch, change color, turn.\nRow 3: Ch 4 (counts as dc, ch 1), sk 2 sc, dc in next sc, *ch 5, sk sh, [dc in next sc, ch 1, sk next sc] twice, dc in next sc; rep from * across; to last sh, ch 5, sk sh, dc in next sc, ch 1, sk next sc, dc in last sc, change color, turn.\nRow 4: Ch 1, sc in 1st dc, * sc in ch-1 sp, sc in next dc, sh in next ch-1 sp on sh below (in front of ch-5 sp), sc in next dc, sc in next ch-1 sp, sc in next dc; rep from * across to t-ch, sc in 3rd and 4th ch of t-ch, change color, turn.\nRep rows 3 and 4 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["filet lace", "double crochet shells", "multi-color", "offset shells"],
+      "source_filename": "Screenshot 2026-04-24 054900.png"
+    },
+    {
+      "primary_name": "Tarfaya",
+      "slug": "tarfaya",
+      "also_known_as": [],
+      "description": "When you use one color for all the double crochet rows and another for the rest, the resulting fabric looks like the second color is bursting out of the first in little curls.\n\nCh a multiple of 4 sts plus 2.",
+      "instructions": "Row 1 (RS): Dc in 4th ch from hk and ea ch across, change color, turn.\nRow 2: Ch 1, sc in ea dc across to t-ch, sc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), sk 1st 2 sc, dc in next sc, dc in 1st sk sc, ch 3, turn, sl st to 1st dc, turn, 5 sc in ch-3 sp, *[sk next sc, dc in next sc, dc in sk sc] twice, ch 3, turn, sl st in 2nd prev dc, turn, 5 sc in ch-3 sp; rep from * across to last sc, dc in last sc, change color, turn.\nRow 4: Ch 3 (counts as dc), 2 dc btw ea set of crossed dc across (working in front of the sc), dc in top of t-ch, turn.\nRow 5: Ch 3 (counts as dc), dc in ea dc across, change color, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["curls", "bursting color", "crossed double crochets", "two-color"],
+      "source_filename": "Screenshot 2026-04-24 054922.png"
+    },
+    {
+      "primary_name": "Oujda",
+      "slug": "oujda",
+      "also_known_as": [],
+      "description": "This pattern's biggest challenge is in keeping the colors straight. The stitches are simple—either a shell or a single crochet and chains. After a main color row, you always turn, and after the contrasting color row, you never turn.\n\nShell (sh): [(Dc, ch 1) 3 times, dc] in st indicated.\n\nCh a multiple of 8 sts plus 2.",
+      "instructions": "Row 1 (RS): Sc in 2nd ch from hk, *sk 3 ch, sh in next ch, sk 3 ch, sc in next ch; rep from * across, turn.\nRow 2: Join new color to 1st ch-1 sp with sl st, *[sc, ch 5, sc] in ch-1 sp, ch 5, sk next ch-sp, [sc, ch 5, sc] in next ch-1 sp, ch 1, sk next ch-1 sp, sh in next ch-1 sp, ch 1, sk next ch-1 sp; rep from * across, dc in last sc, do not turn.\nRow 3: Ch 5 with prev color, *sk 1 ch-1 sp on sh 2 rows below, sh in next ch-1 sp on sh below, ch 1, [sc, ch 5, sc] in next ch-1 sp on next sh, ch 5, sk next ch-1 sp, [sc, ch 5, sc] in next ch-1 sp, ch 1; rep from * across, turn.\nRow 4: Rep row 3 with next color, do not turn.\nRow 5: Ch 4 with prev color, *[sc, ch 5, sc] in next ch-1 sp on next sh, ch 5, sk next ch-1 sp, [sc, ch 5, sc] in next ch-1 sp, ch 1, sk 1 ch-1 sp on sh 2 rows below, sh in next ch-1 sp on sh below, ch 1; rep from * across, tr in 4th ch of t-ch 2 rows below, turn.\nRow 6: Rep row 5 with next color, do not turn.\nRep rows 3–6 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["shell pattern", "chain loops", "multi-color", "airy fabric"],
+      "source_filename": "Screenshot 2026-04-24 054945.png"
+    },
+    {
+      "primary_name": "Rutherglen",
+      "slug": "rutherglen",
+      "also_known_as": [],
+      "description": "This simple plaid pattern comes from changing colors on alternating rows and embroidering on the vertical lines. It may be time consuming, but the results are worth it.\n\nCh a multiple of 7 sts plus 1.",
+      "instructions": "Row 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in ea sc across, turn.\nRep row 2 to desired length, changing colors on rows 2, 3, 5; then 9, 10, 12; and 16, 17, 19 and so on.\nJoin yarn to edge at foundation ch, sl st up fabric with 1 sl st in ea row going up the fabric by holding the working yarn to the back of the fabric and inserting your hk into the fabric from the front. Sl st up next st over, then sk 1 sc, sl st up next sc, sk 3 sc, and sl st up next; rep sl st embroidery across fabric.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["plaid pattern", "vertical embroidery lines", "color stripes", "slip stitch embroidery"],
+      "source_filename": "Screenshot 2026-04-24 055009.png"
+    },
+    {
+      "primary_name": "Bearsden",
+      "slug": "bearsden",
+      "also_known_as": [],
+      "description": "Using extended single crochet in this pattern lengthens the plaid design and makes a fabric that is thin enough for garments.\n\nExtended Single Crochet (esc): Insert hk into next st and pull up a lp, yo and pull through 1 lp on hk, yo and pull through last 2 lps on hk.\n\nCh a multiple of 4 sts plus 3.",
+      "instructions": "Row 1 (RS): Esc in 3rd ch from hk and ea ch across, turn.\nRow 2: Ch 2 (counts as esc), esc in ea st across, change color, turn.\nRow 3: Ch 1, sc in ea st across, change color, turn.\nRows 4 and 5: Ch 2 (counts as esc), esc in ea st across, turn.\nRow 6: Change color, ch 1, sc in ea st across, change color, turn.\nRow 7: Ch 2 (counts as esc), esc in ea st across, change color, turn.\nRows 8–13: Ch 2 (counts as esc), esc in ea st across, turn.\nRep rows 2–13 to desired length.\nJoin yarn to edge at foundation ch, sl st up fabric with 1 sl st in ea row going up the fabric by holding the working yarn to the back of the fabric and inserting your hk into the fabric from the front. Change color, sk 3 sts, sl st up next st, change color, sl st up next st, sk 7 sts, and sl st up next; rep sl st embroidery across fabric.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["garments"],
+      "visual_cues": ["plaid design", "vertical embroidery lines", "extended single crochet", "thin fabric"],
+      "source_filename": "Screenshot 2026-04-24 055034.png"
+    },
+    {
+      "primary_name": "Glasgow",
+      "slug": "glasgow",
+      "also_known_as": [],
+      "description": "This pattern takes a new twist on an old technique with a mod, print-inspired fabric.\n\nCh a multiple of 10 sts plus 4.",
+      "instructions": "Row 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in ea st across, change color, turn.\nRows 3 and 4: Rep row 2, do not change color after row 4.\nRow 5: Ch 3 (counts as dc), dc in ea st across, turn.\nRep rows 2–5 to desired length.\nJoin color to 4th st on row 5, sl st btw the next 5 sts, turn 90 degrees, sl st btw the next 4 rows, turn 90 degrees, sl st btw the next 5 sts, turn 90 degrees, sl st btw the rows to join (making a rectangle). Using chart as a guide, sl st crochet rectangles 4 sts away or 4 rows up.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["mod print", "embroidered rectangles", "slip stitch embroidery", "geometric"],
+      "source_filename": "Screenshot 2026-04-24 055103.png"
+    },
+    {
+      "primary_name": "Larkhall",
+      "slug": "larkhall",
+      "also_known_as": [],
+      "description": "Using chain spaces as guidelines can make for a great slip stitch embroidery pattern. Here the spaces make a cable-like fabric.\n\nCh a multiple of 8 sts plus 1.",
+      "instructions": "Row 1 (RS): Sc in 2nd ch, sc in next ch, *ch 1, sk 1 ch, sc in next 2 ch, ch 1, sk 1 ch, sc in next 4 ch; rep from * across to last 6 ch, ch 1, sk 1 ch, sc in next 2 ch, ch 1, sk 1 ch, sc in last 2 ch, turn.\nRows 2 and 3: Ch 1, sc in 1st 2 sc, *[ch 1, sk ch-1 sp, sc in next 4 sc] twice; rep from * across to last 2 sc, sc in last 2 sc, turn.\nRow 4: Ch 1, sc in 1st 2 sc, *sc in next ch-1 sp, ch 2, sk 2 sc, sc in next ch-1 sp, sc in next 4 sc; rep from * across to last 2 sc, sc in last 2 sc, turn.\nRow 5: Ch 1, sc in 1st 3 sc, *ch 2, sk ch-sp, sc in next 6 sc; rep from * across to last 3 sc, sc in last 3 sc, turn.\nRow 6: Ch 1, sc in 1st 2 sc, *ch 1, sk 1 sc, 2 sc in next ch-2 sp, ch 1, sk 1 sc, sc in next 4 sc; rep from * across to last 2 sc, sc in last 2 sc, turn.\nRows 7–9: Rep row 2.\nRep rows 2–9 to desired length.\nJoin new color to foundation row, sl st up fabric rows in each ch-sp by inserting the hk from the front of the fabric and pulling up a lp from the back.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["cable-like", "chain spaces", "slip stitch embroidery", "vertical columns"],
+      "source_filename": "Screenshot 2026-04-24 055208.png"
+    },
+    {
+      "primary_name": "Alloa",
+      "slug": "alloa",
+      "also_known_as": [],
+      "description": "This use of slip stitch embroidery combines with standard chains for a loop-d-loop edging.\n\nStitch pattern is a multiple of 8 sts.\n\nCrochet an edging of at least 6 rows of sc.",
+      "instructions": "Join new color to edge with sl st, ch 7, turn work 180 degrees, sl st to same spot, *using chart as a guide, sl st from right to left: 1 st over and 1 row down, 1 row down below last sl st, [1 st over and 1 row down] twice, 1 st up, 1 st over and 1 row up, ch 7, turn work 180 degrees around, sl st to same spot; rep from * across.\nFor a stronger edge, work another row of sl st in ea sl st and chain around.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["edging"],
+      "visual_cues": ["loop-d-loop edging", "slip stitch embroidery", "chain loops"],
+      "source_filename": "Screenshot 2026-04-24 055235.png"
+    },
+    {
+      "primary_name": "Snowflake",
+      "slug": "snowflake",
+      "also_known_as": [],
+      "description": "Who says ski sweaters are for knitters only? This charted pattern looks great as a band of color in any crocheted ski sweater.\n\nStitch pattern is a multiple of 15 sts.\n\nCrochet 15 rows of single crochet following the chart for color changes.",
+      "instructions": null,
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["sweaters"],
+      "visual_cues": ["snowflake motif", "charted color pattern", "tapestry/stranded colorwork"],
+      "source_filename": "Screenshot 2026-04-24 055245.png"
+    },
+    {
+      "primary_name": "Jumping Beans",
+      "slug": "jumping-beans",
+      "also_known_as": [],
+      "description": "Adding polka dots to any kid or baby project just makes it even cuter. Watch that all the odd rows are right sides and the evens are wrong. The way crochet stitches sit will naturally give you the dot.\n\nStitch pattern is a multiple of 7 sts.\n\nCrochet a multiple of 10 rows of single crochet, following the chart for color changes.",
+      "instructions": null,
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": ["kids' projects", "baby projects"],
+      "visual_cues": ["polka dots", "charted color pattern", "scattered dot motifs"],
+      "source_filename": "Screenshot 2026-04-24 055316.png"
+    },
+    {
+      "primary_name": "Diamond Jacquard",
+      "slug": "diamond-jacquard",
+      "also_known_as": [],
+      "description": "Using taller stitches in charts gives an extended look to the pattern, as in our example here with half doubles.\n\nStitch pattern is a multiple of 8 sts.\n\nCrochet a multiple of 8 rows of half double crochet, following the chart for color changes.",
+      "instructions": null,
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["diamond motifs", "jacquard colorwork", "half double crochet", "extended geometric pattern"],
+      "source_filename": "Screenshot 2026-04-24 055339.png"
+    },
+    {
+      "primary_name": "Bright Daisy",
+      "slug": "bright-daisy",
+      "also_known_as": [],
+      "description": "When you change the color of the bobbles from the background color, the stitches appear to burst from the fabric.\n\nCh a multiple of 12 sts plus 10.",
+      "instructions": "Row 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in ea sc across, turn.\nRow 3: Ch 1, sc in 1st 9 sc, *[change color, 4 hdc-cl in next sc, change color, sc in next sc] twice sc in next 8 sc; rep from * across to last 6 sts, [change color, 4 hdc-cl in next sc, change color, sc in next sc] 3 times, sc in last 3 sc, turn.\nRow 4: Ch 1, sc in ea sc and hdc-cl across, turn.\nRow 5: Ch 1, sc in 1st 2 sc, *[change color, 4 hdc-cl in next sc, change color, sc in next sc] 3 times, sc in next 6 sc; rep from * across to last 7 sts, [change color, 4 hdc-cl in next sc, change color, sc in next sc] 3 times, sc in last sc, turn.\nRows 6–10: Rep row 4; rep row 3; rep row 4; rep row 2 twice.\nRow 11: Ch 1, sc in 1st 9 sc, *[change color, 4 hdc-cl in next sc, change color, sc in next sc] twice, sc in next 8 sc; rep from * across to last sc, sc in last sc, turn.\nRow 12: Rep row 4.\nRow 13: Ch 1, sc in 1st 8 sc, *[change color, 4 hdc-cl in next sc, change color, sc in next sc] 3 times, sc in next 6 sc; rep from * across to last sc, sc in last sc, turn.\nRows 14–17: Rep row 4; rep row 11; rep row 4; rep row 2.\nRep rows 2–17 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["daisy motifs", "bobbles", "color-contrast flowers", "scattered floral"],
+      "source_filename": "Screenshot 2026-04-24 055518.png"
+    },
+    {
+      "primary_name": "Carnation Wallpaper",
+      "slug": "carnation-wallpaper",
+      "also_known_as": [],
+      "description": "Combining bobbles and charted flowers brings this pattern to life, making it pretty enough to frame.\n\nStitch pattern is a multiple of 27 sts.\n\nWorking in rows of single crochet, follow the chart for color changes to rows 7, 11, 21, 25, and so on.",
+      "instructions": "Rows 7, 11, 21, 25, and so on: Substitute 4 hdc-cl bobbles in 8th and 11th sc from edge of carnation in new color, continue to follow chart for color changes in single crochet.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["carnation flower motif", "bobbles", "charted colorwork", "wallpaper pattern"],
+      "source_filename": "Screenshot 2026-04-24 055828.png"
+    },
+    {
+      "primary_name": "Tunisian Simple Stitch",
+      "slug": "tunisian-simple-stitch",
+      "also_known_as": ["Tss"],
+      "description": "Referred to as Tss for short, this stitch is the basis for all Tunisian stitch patterns. Used alone, it makes a great fabric to embellish with embroidery or cross stitches in the vertical bar.\n\nTunisian Simple Stitch (Tss): Insert hk, from right to left, into front vert bar of next st and pull up a lp.\n\nCh any number of sts.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: (Lp on hk counts as 1st st.) Tss across row. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRep row 2 to desired length.\nLast row: *Tss in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["vertical bars", "dense fabric", "knit-like appearance", "smooth surface"],
+      "source_filename": "Screenshot 2026-04-24 055907.png"
+    },
+    {
+      "primary_name": "Tunisian Purl Stitch",
+      "slug": "tunisian-purl-stitch",
+      "also_known_as": ["Tps"],
+      "description": "By simply moving the yarn to the front of the project before inserting your hook, you create an entirely different fabric. This stitch, which mimics purling in knitting, is usually referred to as Tps.\n\nTunisian Purl Stitch (Tps): Move yarn to front of work, insert hk, from right to left, into front vert bar of next st, yo, pull up a lp.\n\nCh any number of sts.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: (Lp on hk counts as 1st st.) Tps in each st across row. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRep row 2 to desired length.\nLast row: *Tps in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["purl texture", "horizontal ridges", "knitting-like surface", "bumpy texture"],
+      "source_filename": "Screenshot 2026-04-24 055934.png"
+    },
+    {
+      "primary_name": "Tunisian Knit Stitch",
+      "slug": "tunisian-knit-stitch",
+      "also_known_as": ["Tks"],
+      "description": "This stitch mimics stockinette stitch in knitting almost perfectly, except that Tunisian fabric is thicker than knitting. It makes for great, sturdy bags. The stitch is often referred to as Tks.\n\nTunisian Knit Stitch (Tks): Insert hk, from front to back, btw front and back vert bars and under all horiz bars of next st, yo, pull up a lp.\n\nCh any number of sts.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: (Lp on hk counts as 1st st.) Tks across row. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRep row 2 to desired length.\nLast row: *Tks in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["bags"],
+      "visual_cues": ["stockinette-like surface", "V-shape columns", "dense fabric", "knit appearance"],
+      "source_filename": "Screenshot 2026-04-24 055954.png"
+    },
+    {
+      "primary_name": "Tunisian Extended Stitch",
+      "slug": "tunisian-extended-stitch",
+      "also_known_as": [],
+      "description": "By adding a simple chain stitch at the end of each standard Tunisian simple stitch, you get a lovely thin fabric perfect for any stylish garment.\n\nCh any number of sts.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 3rd ch from hk, ch 1, *pull up lp in next ch, ch 1; rep from * across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: Ch 1, *Tss in next st, ch 1; rep from * across row. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRep row 2 to desired length.\nLast row: *Tss in next st, ch 1 and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["garments"],
+      "visual_cues": ["thin fabric", "open texture", "chain between bars", "lightweight"],
+      "source_filename": "Screenshot 2026-04-24 060010.png"
+    },
+    {
+      "primary_name": "Tire Tread Stitch",
+      "slug": "tire-tread-stitch",
+      "also_known_as": [],
+      "description": "By simply changing the yarn position on each stitch in the row, you produce a gentle, geometric texture.\n\nWork off lps as normal: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nCh an odd number of sts.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Work off lps as normal.\nRow 2 Fwd: (Lp on hk counts as 1 st.) *Tps in next st, Tss in next st; rep from * across to end. Rtn: Work off lps as normal.\nRow 3 Fwd: (Lp on hk counts as 1 st.) *Tss in next st, Tps in next st; rep from * across to last 2 sts, Tss in last 2 sts. Rtn: Work off lps as normal.\nRep rows 2 and 3 to desired length.\nLast row: *Tps in next st and pull through lp on hk, Tss in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["geometric texture", "alternating stitch pattern", "subtle ridges"],
+      "source_filename": "Screenshot 2026-04-24 060023.png"
+    },
+    {
+      "primary_name": "Griddle Stitch",
+      "slug": "griddle-stitch",
+      "also_known_as": [],
+      "description": "Tunisian double crochet stitches add a touch of texture to this simple pattern and produce a soft, bobbly fabric.\n\nTunisian Double Crochet (Tdc): Yo, insert hk into vert bar of next st, yo and pull lp through st, yo and pull through 2 lps, leaving last lp on hk.\n\nCh an even number of sts.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: (Lp on hk counts as 1st st.) *Tdc in next st, Tps in next st; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\nRow 3 Fwd: (Lp on hk counts as 1st st.) *Tps in next st, Tdc in next st; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\nRep rows 2 and 3 to desired length.\nLast row: *Tdc in next st and pull through lp on hk, Tps in next st and pull through lp on hk; rep from * across to last st, Tss in last st and pull through lp on hk. Fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["soft bobbly fabric", "Tunisian double crochet", "textured surface"],
+      "source_filename": "Screenshot 2026-04-24 060037.png"
+    },
+    {
+      "primary_name": "Twisted Simple Stitch",
+      "slug": "twisted-simple-stitch",
+      "also_known_as": ["Twtss"],
+      "description": "The columns of twisted stitches make a great simple fabric that works for projects from scarves to vests. Because you are inserting the hook from left to right, the opposite direction from Tss, the twisted stitch will slant, or twist, the vertical bar to the right. When combined with Tss, the two bars almost look like they are grouped together. This stitch is commonly referred to as Twtss.\n\nTwisted Simple Stitch (Twtss): Insert hk from left to right into front vert bar of next st and pull up a lp.\n\nCh an odd number of sts.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: (Lp on hk counts as 1 st.) *Twtss in next st, Tss in next st; rep from * across to end. Rtn: Work off lps as normal.\nRep row 2 to desired length.\nLast row: *Twtss in next st and pull through lp on hk, Tss in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["scarves", "vests"],
+      "visual_cues": ["twisted vertical bars", "right-slanting columns", "grouped bar appearance"],
+      "source_filename": "Screenshot 2026-04-24 060056.png"
+    },
+    {
+      "primary_name": "Ribbed Simple Stitch",
+      "slug": "ribbed-simple-stitch",
+      "also_known_as": [],
+      "description": "The beauty of simple stitches is highlighted in this pattern.\n\nCh a multiple of 5 sts plus 4.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: (Lp on hk counts as 1 st.) *Tks in next 2 sts, Tss in next st, Tps in next st, Tss in next st; rep from * across to last 3 sts, Tks in next 2 sts, Tss in last st. Rtn: Work off lps as normal.\nRep row 2 to desired length.\nLast row: *Tks in next st and pull through lp on hk, Tks in next st and pull through lp on hk, Tss in next st and pull through lp on hk, Tps in next st and pull through lp on hk, Tss in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["ribbed texture", "vertical columns", "mixed Tunisian stitches"],
+      "source_filename": "Screenshot 2026-04-24 060106.png"
+    },
+    {
+      "primary_name": "Dropped Simple Stitch",
+      "slug": "dropped-simple-stitch",
+      "also_known_as": [],
+      "description": "This simple lace stitch pattern can be challenging if you don't watch the number of stitches on each forward row. Be careful not to add stitches to the beginning or end of the row.\n\nCh any number of sts.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: (Lp on hk counts as 1st st throughout.) Insert hk between 2nd and 3rd sts (around horiz bars) and pull up a lp, *insert hk btw next 2 sts and pull up a lp; rep from * across to last st, Tss in last st. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 3 Fwd: (Lp on hk counts as 1st st throughout.) Insert hk between 1st and 2nd sts and pull up a lp, *insert hk btw next 2 sts and pull up a lp; rep from * across to last 2 sts, sk 2nd to last st, Tss in last st. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRep rows 2 and 3 to desired length.\nLast row: *Insert hk btw next 2 sts, pull up a lp and through lp on hk; rep from * across to last st, Tss in last st and pull through lp on hk; fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["lace texture", "dropped stitch effect", "open fabric", "horizontal bars"],
+      "source_filename": "Screenshot 2026-04-24 060116.png"
+    },
+    {
+      "primary_name": "Crossed Simple Stitch",
+      "slug": "crossed-simple-stitch",
+      "also_known_as": [],
+      "description": "This pretty crisscross stitch pattern looks fantastic as a background to afghan projects.\n\nCh an even number of sts.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: (Lp on hk counts as 1st st.) *Sk next st, Tss in next st, Tss in skipped st and pull up a lp; rep from * across to last st, Tss in last st. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 3 Fwd: (Lp on hk counts as 1st st.) Tss in next st, *sk next st, Tss in next st, Tss in skipped st and pull up a lp; rep from * across to last 2 sts, Tss in last 2 sts. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRep rows 2 and 3 to desired length.\nLast row: *Sk next st, Tss in next st and pull through lp on hk, Tss in skipped st, and pull through lp on hk; rep from * across to last st, Tss in last st and pull through lp on hk, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": ["afghans"],
+      "visual_cues": ["crisscross pattern", "crossed vertical bars", "X-shape texture"],
+      "source_filename": "Screenshot 2026-04-24 060127.png"
+    },
+    {
+      "primary_name": "Basketweave Stitch",
+      "slug": "basketweave-stitch",
+      "also_known_as": [],
+      "description": "This basketweave stitch greatly mimics knitting with the blocks of changing stitches.\n\nCh a multiple of 10 sts plus 2.",
+      "instructions": "Row 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\nRow 2 Fwd: (Lp on hk counts as 1 st.) *Tss in next 5 sts, Tps in next 5 sts; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\nRows 3 and 4: Rep row 2 twice.\nRow 5 Fwd: (Lp on hk counts as 1 st.) *Tps in next 5 sts, Tss in next 5 sts; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\nRows 6–8: Rep row 5 three times.\nRow 9 Fwd: (Lp on hk counts as 1 st.) *Tss in next 5 sts, Tps in next 5 sts; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\nRows 10–12: Rep row 9 three times.\nRep rows 5–12 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["basketweave texture", "blocks of texture", "knitting-like appearance", "alternating raised and recessed squares"],
+      "source_filename": "Screenshot 2026-04-24 060139.png"
+    }
+  ],
+  "entries_skipped": [
+    {
+      "source_filename": "Screenshot 2026-04-24 054700.png",
+      "reason": "continuation of Cameroon"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054752.png",
+      "reason": "continuation of Congo"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054822.png",
+      "reason": "continuation of Kenitra"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054847.png",
+      "reason": "continuation of Azilal"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054909.png",
+      "reason": "continuation of Zagora"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054931.png",
+      "reason": "continuation of Tarfaya"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054954.png",
+      "reason": "continuation of Oujda"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055009.png",
+      "reason": "section header page — Embroidery Stitch Patterns (no stitch detail on its own; Rutherglen begins here and is extracted)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055021.png",
+      "reason": "continuation of Rutherglen (plus Tip box — not a stitch)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055044.png",
+      "reason": "continuation of Bearsden"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055103.png",
+      "reason": "continuation of Glasgow (chart-only page, no description text yet)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055139.png",
+      "reason": "continuation of Glasgow"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055155.png",
+      "reason": "continuation of Glasgow"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055219.png",
+      "reason": "continuation of Larkhall"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055245.png",
+      "reason": "section header page — Charted Color Stitch Patterns (Snowflake begins here and is extracted)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055326.png",
+      "reason": "Tip box only — Tapestry vs. Stranded Tips (not a stitch entry)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055348.png",
+      "reason": "continuation of Diamond Jacquard"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055528.png",
+      "reason": "continuation of Bright Daisy"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055838.png",
+      "reason": "continuation of Carnation Wallpaper"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055847.png",
+      "reason": "section header page — Chapter 6: Tunisian Stitch Patterns (no stitch detail)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055915.png",
+      "reason": "Tip box only — Tunisian hook sizing tip (not a stitch entry)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 055927.png",
+      "reason": "continuation of Tunisian Purl Stitch (browser UI overlay, partial view; clean version extracted from 055934)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060045.png",
+      "reason": "continuation of Griddle Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060153.png",
+      "reason": "continuation of Basketweave Stitch"
+    }
+  ],
+  "duplicates_skipped": []
+}

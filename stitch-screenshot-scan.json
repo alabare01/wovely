@@ -1,0 +1,4524 @@
+﻿[
+    {
+        "filename":  "Screenshot 2026-04-23 193515.png",
+        "detected_stitch_name":  "Slip Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter heading \u0027Slip Stitch Patterns\u0027 above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 193557.png",
+        "detected_stitch_name":  "Front Loop Slip Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 193631.png",
+        "detected_stitch_name":  "Back Loop Slip Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 193752.png",
+        "detected_stitch_name":  "Back Loop Slip Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "duplicate/second shot of same entry"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 193818.png",
+        "detected_stitch_name":  "Purl Slip Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 193841.png",
+        "detected_stitch_name":  "Single Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter heading above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 193942.png",
+        "detected_stitch_name":  "Foundation Single Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194018.png",
+        "detected_stitch_name":  "Single Crochet Ribbing",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194032.png",
+        "detected_stitch_name":  "Alternating Single Crochet Spike",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194148.png",
+        "detected_stitch_name":  "Tweed",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194203.png",
+        "detected_stitch_name":  "Angled",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194228.png",
+        "detected_stitch_name":  "Rocking",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194241.png",
+        "detected_stitch_name":  "Extended Single Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194256.png",
+        "detected_stitch_name":  "Extended Mesh",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194309.png",
+        "detected_stitch_name":  "Half Double Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter heading above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194335.png",
+        "detected_stitch_name":  "Waffle Rib",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194351.png",
+        "detected_stitch_name":  "Middle Bar Half Double Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194412.png",
+        "detected_stitch_name":  "Forked Half Double Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194429.png",
+        "detected_stitch_name":  "Double Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter heading above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194441.png",
+        "detected_stitch_name":  "Foundation Double Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194503.png",
+        "detected_stitch_name":  "Herringbone Double Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194724.png",
+        "detected_stitch_name":  "Double Crochet Group",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194751.png",
+        "detected_stitch_name":  "Diamond Tweed",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194808.png",
+        "detected_stitch_name":  "Wrapped Double Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 194907.png",
+        "detected_stitch_name":  "Wrapped Double Crochet",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "tail end only"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195019.png",
+        "detected_stitch_name":  "Treble Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter heading above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195031.png",
+        "detected_stitch_name":  "Linked Treble Crochet",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195042.png",
+        "detected_stitch_name":  "Linked Treble Crochet",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "tip box continuation"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195121.png",
+        "detected_stitch_name":  "Brick",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter heading \u0027Combined Stitch Patterns\u0027 above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195156.png",
+        "detected_stitch_name":  "Block",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195230.png",
+        "detected_stitch_name":  "Block",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "second shot of same entry"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195243.png",
+        "detected_stitch_name":  "Aligned",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195250.png",
+        "detected_stitch_name":  "Aligned",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "second shot of same entry"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195351.png",
+        "detected_stitch_name":  "Jacquard",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195433.png",
+        "detected_stitch_name":  "Jacquard",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "tail end only"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195525.png",
+        "detected_stitch_name":  "Chicken Foot",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195540.png",
+        "detected_stitch_name":  "Chicken Foot",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "tail end only"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195636.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter divider page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195641.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter divider page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195658.png",
+        "detected_stitch_name":  "Crunchy Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section \u0027Simple Texture Stitch Patterns\u0027 above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195712.png",
+        "detected_stitch_name":  "Crunchy Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "tip box continuation"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195726.png",
+        "detected_stitch_name":  "Kuranchi Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195743.png",
+        "detected_stitch_name":  "Kroller Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195805.png",
+        "detected_stitch_name":  "Bloque Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195822.png",
+        "detected_stitch_name":  "Kabeli Corded Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195852.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "low",
+        "notes":  "decorative letter A only"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195859.png",
+        "detected_stitch_name":  "Arruga Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195913.png",
+        "detected_stitch_name":  "Arruga Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "tail end only"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 195931.png",
+        "detected_stitch_name":  "Woven Shell Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 200341.png",
+        "detected_stitch_name":  "Woven Shell Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "tail end only"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 200407.png",
+        "detected_stitch_name":  "Romeo Cluster Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 200422.png",
+        "detected_stitch_name":  "Romeo Cluster Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 200444.png",
+        "detected_stitch_name":  "Kyla Shell Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 200455.png",
+        "detected_stitch_name":  "Kyla Shell Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 200507.png",
+        "detected_stitch_name":  "Marguerite Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 200521.png",
+        "detected_stitch_name":  "Bobblet Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter \u0027Bobble Texture Stitch Patterns\u0027"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 200538.png",
+        "detected_stitch_name":  "Bobblet Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 201532.png",
+        "detected_stitch_name":  "Diagonal Bob Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 201544.png",
+        "detected_stitch_name":  "Diagonal Bob Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 201556.png",
+        "detected_stitch_name":  "Filet Bobbles Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 201603.png",
+        "detected_stitch_name":  "Filet Bobbles Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "duplicate scan"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 201611.png",
+        "detected_stitch_name":  "Filet Bobbles Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 201622.png",
+        "detected_stitch_name":  "Diamante Bobble Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "heading cropped to Diama"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 201628.png",
+        "detected_stitch_name":  "Diamante Bobble Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 201636.png",
+        "detected_stitch_name":  "Diamante Bobble Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 201648.png",
+        "detected_stitch_name":  "Popcorn Line Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202345.png",
+        "detected_stitch_name":  "Balloon Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202356.png",
+        "detected_stitch_name":  "Judith Bobble Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202448.png",
+        "detected_stitch_name":  "Judith Bobble Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202533.png",
+        "detected_stitch_name":  "Popping Cable Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202541.png",
+        "detected_stitch_name":  "Popping Cable Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202549.png",
+        "detected_stitch_name":  "Popping Circle Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202615.png",
+        "detected_stitch_name":  "Popping Circle Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "duplicate scan"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202643.png",
+        "detected_stitch_name":  "Popping Circle Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202913.png",
+        "detected_stitch_name":  "Popping Flower Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202924.png",
+        "detected_stitch_name":  "Popping Flower Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202937.png",
+        "detected_stitch_name":  "Single Rib",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter \u0027Cable Stitch Patterns\u0027"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202946.png",
+        "detected_stitch_name":  "Single Rib",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 202957.png",
+        "detected_stitch_name":  "Basketweave Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203014.png",
+        "detected_stitch_name":  "Basketweave Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203026.png",
+        "detected_stitch_name":  "Woven Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203044.png",
+        "detected_stitch_name":  "Cable Towers",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203051.png",
+        "detected_stitch_name":  "Cable Towers",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203103.png",
+        "detected_stitch_name":  "Petal Link Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203113.png",
+        "detected_stitch_name":  "Petal Link Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203125.png",
+        "detected_stitch_name":  "Greene Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203134.png",
+        "detected_stitch_name":  "Greene Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203139.png",
+        "detected_stitch_name":  "Greene Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203329.png",
+        "detected_stitch_name":  "Ginger Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203340.png",
+        "detected_stitch_name":  "Ginger Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203355.png",
+        "detected_stitch_name":  "Ripple Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203456.png",
+        "detected_stitch_name":  "Ripple Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203527.png",
+        "detected_stitch_name":  "Pine Tree Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203539.png",
+        "detected_stitch_name":  "Pine Tree Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203551.png",
+        "detected_stitch_name":  "Pine Tree Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203609.png",
+        "detected_stitch_name":  "Cable Lattice Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203630.png",
+        "detected_stitch_name":  "Cable Lattice Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203703.png",
+        "detected_stitch_name":  "Diamond Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203733.png",
+        "detected_stitch_name":  "Diamond Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203742.png",
+        "detected_stitch_name":  "Diamond Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203754.png",
+        "detected_stitch_name":  "Stella Cable",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203807.png",
+        "detected_stitch_name":  "Stella Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203813.png",
+        "detected_stitch_name":  "Stella Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203822.png",
+        "detected_stitch_name":  "Stella Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203842.png",
+        "detected_stitch_name":  "Arabel Cable",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203852.png",
+        "detected_stitch_name":  "Arabel Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203903.png",
+        "detected_stitch_name":  "Olivia Cable",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203911.png",
+        "detected_stitch_name":  "Olivia Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203916.png",
+        "detected_stitch_name":  "Olivia Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203924.png",
+        "detected_stitch_name":  "Olivia Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203934.png",
+        "detected_stitch_name":  "Severin Cable",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203943.png",
+        "detected_stitch_name":  "Severin Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203948.png",
+        "detected_stitch_name":  "Severin Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 203956.png",
+        "detected_stitch_name":  "Severin Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204033.png",
+        "detected_stitch_name":  "Marcus Cable",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204044.png",
+        "detected_stitch_name":  "Marcus Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204055.png",
+        "detected_stitch_name":  "Marcus Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204117.png",
+        "detected_stitch_name":  "Masterpiece Cable",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204145.png",
+        "detected_stitch_name":  "Masterpiece Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204154.png",
+        "detected_stitch_name":  "Masterpiece Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204200.png",
+        "detected_stitch_name":  "Masterpiece Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204222.png",
+        "detected_stitch_name":  "Brennen Cable",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204235.png",
+        "detected_stitch_name":  "Brennen Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204243.png",
+        "detected_stitch_name":  "Brennen Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204255.png",
+        "detected_stitch_name":  "Brennen Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204304.png",
+        "detected_stitch_name":  "Brennen Cable",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204321.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Lace Stitch Patterns chapter title page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204337.png",
+        "detected_stitch_name":  "Picot Trellis",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "under Chain Space Stitch Patterns section"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204406.png",
+        "detected_stitch_name":  "Picot Trellis",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204416.png",
+        "detected_stitch_name":  "Trefoil Link",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204505.png",
+        "detected_stitch_name":  "Trefoil Link",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "appears to be a duplicate/overlap of previous"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204515.png",
+        "detected_stitch_name":  "Trefoil Lattice",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204524.png",
+        "detected_stitch_name":  "Trefoil Lattice",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204538.png",
+        "detected_stitch_name":  "Zen Lattice",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204550.png",
+        "detected_stitch_name":  "Zen Lattice",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204657.png",
+        "detected_stitch_name":  "Zen Shell",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204708.png",
+        "detected_stitch_name":  "Zen Shell",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204735.png",
+        "detected_stitch_name":  "Diamond Lattice",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204744.png",
+        "detected_stitch_name":  "Diamond Lattice",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204807.png",
+        "detected_stitch_name":  "Posy Arcade",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204902.png",
+        "detected_stitch_name":  "Posy Arcade",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 204919.png",
+        "detected_stitch_name":  "Iced Shell",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "under Shell Stitch Patterns section"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205012.png",
+        "detected_stitch_name":  "Fairy Shell",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205048.png",
+        "detected_stitch_name":  "Pistachio Shell",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205057.png",
+        "detected_stitch_name":  "Pistachio Shell",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205109.png",
+        "detected_stitch_name":  "Arcade",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205224.png",
+        "detected_stitch_name":  "Arcade",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205237.png",
+        "detected_stitch_name":  "Clunky Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205546.png",
+        "detected_stitch_name":  "Delmarva",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205601.png",
+        "detected_stitch_name":  "Delmarva",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205613.png",
+        "detected_stitch_name":  "Iris Shell",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205621.png",
+        "detected_stitch_name":  "Iris Shell",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205636.png",
+        "detected_stitch_name":  "Colonnade",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205650.png",
+        "detected_stitch_name":  "Colonnade",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205703.png",
+        "detected_stitch_name":  "Diamond Shell",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205713.png",
+        "detected_stitch_name":  "Diamond Shell",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205728.png",
+        "detected_stitch_name":  "Jumping Shells",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205740.png",
+        "detected_stitch_name":  "Jumping Shells",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205754.png",
+        "detected_stitch_name":  "Emma Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205804.png",
+        "detected_stitch_name":  "Emma Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205819.png",
+        "detected_stitch_name":  "Wallpaper Cluster",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Chapter header Cluster Stitch Patterns above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205828.png",
+        "detected_stitch_name":  "Wallpaper Cluster",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205837.png",
+        "detected_stitch_name":  "Pebble Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205909.png",
+        "detected_stitch_name":  "Climbing Vine",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 205946.png",
+        "detected_stitch_name":  "Stone Trellis",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210018.png",
+        "detected_stitch_name":  "Paragon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210117.png",
+        "detected_stitch_name":  "Paragon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210708.png",
+        "detected_stitch_name":  "Leaf Bloom",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210717.png",
+        "detected_stitch_name":  "Leaf Bloom",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210727.png",
+        "detected_stitch_name":  "Clover Lattice",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210736.png",
+        "detected_stitch_name":  "Clover Lattice",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210747.png",
+        "detected_stitch_name":  "Harriet Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210758.png",
+        "detected_stitch_name":  "Harriet Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210810.png",
+        "detected_stitch_name":  "Flower Diamond",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210853.png",
+        "detected_stitch_name":  "Flower Diamond",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210929.png",
+        "detected_stitch_name":  "Simple Chevron",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Chapter header Wave Stitch Patterns above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210938.png",
+        "detected_stitch_name":  "Simple Chevron",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "end of entry plus Tip box"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 210951.png",
+        "detected_stitch_name":  "Peephole Chevron",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211003.png",
+        "detected_stitch_name":  "Simple Wave",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211018.png",
+        "detected_stitch_name":  "Corolla Wave",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211039.png",
+        "detected_stitch_name":  "Corolla Wave",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211050.png",
+        "detected_stitch_name":  "Atlantic Wave",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211100.png",
+        "detected_stitch_name":  "Atlantic Wave",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211112.png",
+        "detected_stitch_name":  "Pacific Wave",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211124.png",
+        "detected_stitch_name":  "Spider",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Chapter header Pineapple Stitch Patterns above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211140.png",
+        "detected_stitch_name":  "Spider",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211148.png",
+        "detected_stitch_name":  "Spider",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211159.png",
+        "detected_stitch_name":  "Berry Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211206.png",
+        "detected_stitch_name":  "Berry Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211223.png",
+        "detected_stitch_name":  "Berry Lace",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "near-duplicate, second screenshot of same stitch"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211232.png",
+        "detected_stitch_name":  "Berry Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211249.png",
+        "detected_stitch_name":  "Blackberry Jam",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211301.png",
+        "detected_stitch_name":  "Blackberry Jam",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211316.png",
+        "detected_stitch_name":  "Strawberry Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211326.png",
+        "detected_stitch_name":  "Strawberry Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211348.png",
+        "detected_stitch_name":  "Strawberry Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211400.png",
+        "detected_stitch_name":  "Columbia Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211542.png",
+        "detected_stitch_name":  "Columbia Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211547.png",
+        "detected_stitch_name":  "Columbia Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211556.png",
+        "detected_stitch_name":  "Columbia Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211606.png",
+        "detected_stitch_name":  "Pineapple",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211752.png",
+        "detected_stitch_name":  "Pineapple",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211806.png",
+        "detected_stitch_name":  "Pineapple",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211828.png",
+        "detected_stitch_name":  "Pineapple",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211836.png",
+        "detected_stitch_name":  "Pineapple",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211847.png",
+        "detected_stitch_name":  "Kiwi Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211902.png",
+        "detected_stitch_name":  "Kiwi Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211909.png",
+        "detected_stitch_name":  "Kiwi Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211919.png",
+        "detected_stitch_name":  "Kiwi Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211930.png",
+        "detected_stitch_name":  "Kiwi Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 211945.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Unique Lace Stitch Patterns chapter title page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212014.png",
+        "detected_stitch_name":  "Dermot Filet Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212021.png",
+        "detected_stitch_name":  "Dermot Filet Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212030.png",
+        "detected_stitch_name":  "Keelan Filet Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212040.png",
+        "detected_stitch_name":  "Keelan Filet Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212048.png",
+        "detected_stitch_name":  "Keelan Filet Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212101.png",
+        "detected_stitch_name":  "Rebecca Filet Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212110.png",
+        "detected_stitch_name":  "Rebecca Filet Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212124.png",
+        "detected_stitch_name":  "Granya Filet Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212133.png",
+        "detected_stitch_name":  "Granya Filet Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212150.png",
+        "detected_stitch_name":  "Mairenn Filet Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212158.png",
+        "detected_stitch_name":  "Mairenn Filet Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212211.png",
+        "detected_stitch_name":  "Ella",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section Short Row Stitch Patterns"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212226.png",
+        "detected_stitch_name":  "Ella",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212234.png",
+        "detected_stitch_name":  "Ella",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212301.png",
+        "detected_stitch_name":  "Akalena",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212309.png",
+        "detected_stitch_name":  "Akalena",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212317.png",
+        "detected_stitch_name":  "Akalena",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212332.png",
+        "detected_stitch_name":  "Tatianna",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212340.png",
+        "detected_stitch_name":  "Tatianna",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212346.png",
+        "detected_stitch_name":  "Tatianna",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212358.png",
+        "detected_stitch_name":  "Raya Clover",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212405.png",
+        "detected_stitch_name":  "Raya Clover",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212420.png",
+        "detected_stitch_name":  "Raya Clover",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "bold heading visible again, possible duplicate/re-scan"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212430.png",
+        "detected_stitch_name":  "Raya Clover",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212440.png",
+        "detected_stitch_name":  "Stivlana",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212448.png",
+        "detected_stitch_name":  "Stivlana",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212455.png",
+        "detected_stitch_name":  "Stivlana",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "appears duplicate of previous"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212511.png",
+        "detected_stitch_name":  "Drika",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section Brussels Stitch Patterns"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212518.png",
+        "detected_stitch_name":  "Drika",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212523.png",
+        "detected_stitch_name":  "Drika",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212533.png",
+        "detected_stitch_name":  "Drika",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212547.png",
+        "detected_stitch_name":  "Annaleise",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212555.png",
+        "detected_stitch_name":  "Annaleise",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212603.png",
+        "detected_stitch_name":  "Annaleise",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212617.png",
+        "detected_stitch_name":  "Lotte",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212626.png",
+        "detected_stitch_name":  "Lotte",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212641.png",
+        "detected_stitch_name":  "Lotte",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "appears duplicate of previous"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212703.png",
+        "detected_stitch_name":  "Jacintha",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212713.png",
+        "detected_stitch_name":  "Jacintha",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212725.png",
+        "detected_stitch_name":  "Fleur Brussels Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212756.png",
+        "detected_stitch_name":  "Fleur Brussels Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "sub-sections Fleur Motif and Brussels Edging are part of same entry"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212813.png",
+        "detected_stitch_name":  "Solomon\u0027s Knot Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "under Loop Stitch Patterns section"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212822.png",
+        "detected_stitch_name":  "Solomon\u0027s Knot Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 212834.png",
+        "detected_stitch_name":  "Bathsheba Knot Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213001.png",
+        "detected_stitch_name":  "Bathsheba Knot Stitch",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "overlapping/duplicate scan"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213006.png",
+        "detected_stitch_name":  "Bathsheba Knot Stitch",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "overlapping/duplicate scan"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213016.png",
+        "detected_stitch_name":  "Bathsheba Knot Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213033.png",
+        "detected_stitch_name":  "Abishag Cluster Knot",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213042.png",
+        "detected_stitch_name":  "Abishag Cluster Knot",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213102.png",
+        "detected_stitch_name":  "Abishag Cluster Knot",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213122.png",
+        "detected_stitch_name":  "Classic Broomstick Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213132.png",
+        "detected_stitch_name":  "Classic Broomstick Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213143.png",
+        "detected_stitch_name":  "Broomstick Lace Flower",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213155.png",
+        "detected_stitch_name":  "Broomstick Lace Flower",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213211.png",
+        "detected_stitch_name":  "Madena Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "under Partial Motif Stitch Patterns section"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213225.png",
+        "detected_stitch_name":  "Madena Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213233.png",
+        "detected_stitch_name":  "Madena Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213245.png",
+        "detected_stitch_name":  "Anesha Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213250.png",
+        "detected_stitch_name":  "Anesha Lace",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "re-scrolled view/duplicate"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213255.png",
+        "detected_stitch_name":  "Anesha Lace",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "re-scrolled view/duplicate"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213306.png",
+        "detected_stitch_name":  "Anesha Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213312.png",
+        "detected_stitch_name":  "Anesha Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213328.png",
+        "detected_stitch_name":  "Zaria Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213336.png",
+        "detected_stitch_name":  "Zaria Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213348.png",
+        "detected_stitch_name":  "Innya Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213357.png",
+        "detected_stitch_name":  "Innya Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213537.png",
+        "detected_stitch_name":  "Zaria Lace",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "re-scrolled view/duplicate"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213548.png",
+        "detected_stitch_name":  "Zaria Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213649.png",
+        "detected_stitch_name":  "Innya Lace",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "re-scrolled view/duplicate"
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213657.png",
+        "detected_stitch_name":  "Innya Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-23 213704.png",
+        "detected_stitch_name":  "Innya Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054151.png",
+        "detected_stitch_name":  "Nadja Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054200.png",
+        "detected_stitch_name":  "Nadja Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054215.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Colorwork Stitch Patterns chapter title page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054235.png",
+        "detected_stitch_name":  "Popsicle Spike",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "under Mosaic Stitch Patterns section"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054251.png",
+        "detected_stitch_name":  "Popsicle Spike",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054305.png",
+        "detected_stitch_name":  "Ridge Diagonal",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054327.png",
+        "detected_stitch_name":  "Ridge Diagonal",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054332.png",
+        "detected_stitch_name":  "Ridge Diagonal",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054436.png",
+        "detected_stitch_name":  "Dotted Frieze",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054452.png",
+        "detected_stitch_name":  "Dotted Frieze",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054512.png",
+        "detected_stitch_name":  "Wave Tote",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054523.png",
+        "detected_stitch_name":  "Wave Tote",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054536.png",
+        "detected_stitch_name":  "Gentle Wave",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054545.png",
+        "detected_stitch_name":  "Gentle Wave",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054559.png",
+        "detected_stitch_name":  "Twilight",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054608.png",
+        "detected_stitch_name":  "Twilight",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054626.png",
+        "detected_stitch_name":  "Gambia",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054636.png",
+        "detected_stitch_name":  "Gambia",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054650.png",
+        "detected_stitch_name":  "Cameroon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054700.png",
+        "detected_stitch_name":  "Cameroon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054723.png",
+        "detected_stitch_name":  "Malawi",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054743.png",
+        "detected_stitch_name":  "Congo",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054752.png",
+        "detected_stitch_name":  "Congo",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054806.png",
+        "detected_stitch_name":  "Kenitra",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054822.png",
+        "detected_stitch_name":  "Kenitra",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054837.png",
+        "detected_stitch_name":  "Azilal",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054847.png",
+        "detected_stitch_name":  "Azilal",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054900.png",
+        "detected_stitch_name":  "Zagora",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054909.png",
+        "detected_stitch_name":  "Zagora",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054922.png",
+        "detected_stitch_name":  "Tarfaya",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054931.png",
+        "detected_stitch_name":  "Tarfaya",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054945.png",
+        "detected_stitch_name":  "Oujda",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 054954.png",
+        "detected_stitch_name":  "Oujda",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055009.png",
+        "detected_stitch_name":  "Rutherglen",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter Embroidery Stitch Patterns above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055021.png",
+        "detected_stitch_name":  "Rutherglen",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055034.png",
+        "detected_stitch_name":  "Bearsden",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055044.png",
+        "detected_stitch_name":  "Bearsden",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055103.png",
+        "detected_stitch_name":  "Glasgow",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055139.png",
+        "detected_stitch_name":  "Glasgow",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055155.png",
+        "detected_stitch_name":  "Glasgow",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055208.png",
+        "detected_stitch_name":  "Larkhall",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055219.png",
+        "detected_stitch_name":  "Larkhall",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055235.png",
+        "detected_stitch_name":  "Alloa",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055245.png",
+        "detected_stitch_name":  "Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter Charted Color Stitch Patterns above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055316.png",
+        "detected_stitch_name":  "Jumping Beans",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055326.png",
+        "detected_stitch_name":  "Jumping Beans",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055339.png",
+        "detected_stitch_name":  "Diamond Jacquard",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055348.png",
+        "detected_stitch_name":  "Diamond Jacquard",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055518.png",
+        "detected_stitch_name":  "Bright Daisy",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055528.png",
+        "detected_stitch_name":  "Bright Daisy",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055828.png",
+        "detected_stitch_name":  "Carnation Wallpaper",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055838.png",
+        "detected_stitch_name":  "Carnation Wallpaper",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055847.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Chapter 6 Tunisian Stitch Patterns title page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055907.png",
+        "detected_stitch_name":  "Tunisian Simple Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section Simple Stitch Patterns above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055915.png",
+        "detected_stitch_name":  "Tunisian Simple Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055927.png",
+        "detected_stitch_name":  "Tunisian Purl Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055934.png",
+        "detected_stitch_name":  "Tunisian Purl Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "duplicate scan"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 055954.png",
+        "detected_stitch_name":  "Tunisian Knit Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060010.png",
+        "detected_stitch_name":  "Tunisian Extended Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060023.png",
+        "detected_stitch_name":  "Tire Tread Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060037.png",
+        "detected_stitch_name":  "Griddle Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060045.png",
+        "detected_stitch_name":  "Griddle Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060056.png",
+        "detected_stitch_name":  "Twisted Simple Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060106.png",
+        "detected_stitch_name":  "Ribbed Simple Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060116.png",
+        "detected_stitch_name":  "Dropped Simple Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060127.png",
+        "detected_stitch_name":  "Crossed Simple Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060139.png",
+        "detected_stitch_name":  "Basketweave Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section Textured Stitch Patterns above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060153.png",
+        "detected_stitch_name":  "Basketweave Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060212.png",
+        "detected_stitch_name":  "Ocean",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060226.png",
+        "detected_stitch_name":  "Ocean",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060234.png",
+        "detected_stitch_name":  "Ocean",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060303.png",
+        "detected_stitch_name":  "Neom",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060313.png",
+        "detected_stitch_name":  "Neom",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060325.png",
+        "detected_stitch_name":  "Knotted Cross Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060337.png",
+        "detected_stitch_name":  "Cordon Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060345.png",
+        "detected_stitch_name":  "Cordon Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060403.png",
+        "detected_stitch_name":  "Single Rib Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060415.png",
+        "detected_stitch_name":  "Starburst Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060424.png",
+        "detected_stitch_name":  "Starburst Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060430.png",
+        "detected_stitch_name":  "Starburst Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060440.png",
+        "detected_stitch_name":  "Borla Ripple Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060449.png",
+        "detected_stitch_name":  "Borla Ripple Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060500.png",
+        "detected_stitch_name":  "Diamond Knit Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060511.png",
+        "detected_stitch_name":  "Diamond Knit Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060522.png",
+        "detected_stitch_name":  "Cable Column Stitch",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060531.png",
+        "detected_stitch_name":  "Cable Column Stitch",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060546.png",
+        "detected_stitch_name":  "Esme Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section Lace Stitch Patterns"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060553.png",
+        "detected_stitch_name":  "Esme Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060602.png",
+        "detected_stitch_name":  "Julianna Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060610.png",
+        "detected_stitch_name":  "Julianna Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060620.png",
+        "detected_stitch_name":  "Julianna Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060655.png",
+        "detected_stitch_name":  "Julianna Lace",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "duplicate of earlier scan"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060705.png",
+        "detected_stitch_name":  "Julianna Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "duplicate"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060713.png",
+        "detected_stitch_name":  "Julianna Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "duplicate"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060735.png",
+        "detected_stitch_name":  "Mildred Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060800.png",
+        "detected_stitch_name":  "Cedany Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060813.png",
+        "detected_stitch_name":  "Cedany Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060829.png",
+        "detected_stitch_name":  "Adelaide Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060835.png",
+        "detected_stitch_name":  "Adelaide Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Tip box"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060911.png",
+        "detected_stitch_name":  "Cedany Lace",
+        "is_continuation":  true,
+        "confidence":  "medium",
+        "notes":  "possible duplicate"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060936.png",
+        "detected_stitch_name":  "Adelaide Lace",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "duplicate scan"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060947.png",
+        "detected_stitch_name":  "Adelaide Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Tip box duplicate"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 060959.png",
+        "detected_stitch_name":  "Emeline Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061008.png",
+        "detected_stitch_name":  "Emeline Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061029.png",
+        "detected_stitch_name":  "Catrain Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061056.png",
+        "detected_stitch_name":  "Alianor Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061107.png",
+        "detected_stitch_name":  "Alianor Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061120.png",
+        "detected_stitch_name":  "Peronell Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061128.png",
+        "detected_stitch_name":  "Peronell Lace",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061139.png",
+        "detected_stitch_name":  "Cleves Lace",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061150.png",
+        "detected_stitch_name":  "Fendrel",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section Color Stitch Patterns"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061207.png",
+        "detected_stitch_name":  "Fendrel",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061220.png",
+        "detected_stitch_name":  "Cartwright",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061228.png",
+        "detected_stitch_name":  "Cartwright",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061256.png",
+        "detected_stitch_name":  "Wykeham",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061535.png",
+        "detected_stitch_name":  "Bolbec",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061545.png",
+        "detected_stitch_name":  "Bolbec",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061555.png",
+        "detected_stitch_name":  "Terryn",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061604.png",
+        "detected_stitch_name":  "Bolbec",
+        "is_continuation":  true,
+        "confidence":  "medium",
+        "notes":  "No bold heading; starts with \u0027Last row:\u0027 plus a Tip box. Parent stitch appears to be Bolbec based on surrounding context."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061638.png",
+        "detected_stitch_name":  "Bolbec",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061646.png",
+        "detected_stitch_name":  "Bolbec",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Rows 2-7 visible, no bold heading at top."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061701.png",
+        "detected_stitch_name":  "Terryn",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061737.png",
+        "detected_stitch_name":  "Bolbec",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Duplicate scan of Bolbec heading page."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061744.png",
+        "detected_stitch_name":  "Bolbec",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Rows 2-7 continuation; duplicate of 061646."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061829.png",
+        "detected_stitch_name":  "Terryn",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Duplicate scan of Terryn heading page."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061837.png",
+        "detected_stitch_name":  "Terryn",
+        "is_continuation":  true,
+        "confidence":  "medium",
+        "notes":  "No bold heading; starts with \u0027Last row:\u0027 plus Tip box. Likely Terryn continuation based on sequence after 061829."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 061850.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Chapter 7 divider page: \u0027Square and Hexagonal Granny Squares\u0027. No stitch name."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062003.png",
+        "detected_stitch_name":  "Traditional Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Section \u0027Classic Granny Squares\u0027 above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062038.png",
+        "detected_stitch_name":  "Traditional Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062051.png",
+        "detected_stitch_name":  "Double Crochet Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062100.png",
+        "detected_stitch_name":  "Double Crochet Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062242.png",
+        "detected_stitch_name":  "Brick Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062251.png",
+        "detected_stitch_name":  "Brick Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062314.png",
+        "detected_stitch_name":  "Open Cross Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062328.png",
+        "detected_stitch_name":  "Open Cross Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062340.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  true,
+        "confidence":  "low",
+        "notes":  "Nearly blank/dark image with only a small red partial character visible."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062350.png",
+        "detected_stitch_name":  "Window Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062357.png",
+        "detected_stitch_name":  "Window Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062418.png",
+        "detected_stitch_name":  "Crossed Clusters Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062428.png",
+        "detected_stitch_name":  "Crossed Clusters Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062527.png",
+        "detected_stitch_name":  "Window Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Duplicate scan."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062535.png",
+        "detected_stitch_name":  "Window Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Duplicate."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062604.png",
+        "detected_stitch_name":  "Gerber Daisy Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062614.png",
+        "detected_stitch_name":  "Gerber Daisy Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062627.png",
+        "detected_stitch_name":  "Posy in the Granny",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062708.png",
+        "detected_stitch_name":  "Posy in the Granny",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062721.png",
+        "detected_stitch_name":  "Gladiolus Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062756.png",
+        "detected_stitch_name":  "Gladiolus Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062838.png",
+        "detected_stitch_name":  "Beatrice Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062846.png",
+        "detected_stitch_name":  "Beatrice Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062903.png",
+        "detected_stitch_name":  "Rose Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062928.png",
+        "detected_stitch_name":  "Rose Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062940.png",
+        "detected_stitch_name":  "Traditional Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Hexagon version under \u0027Hexagon Motifs\u0027 section"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 062948.png",
+        "detected_stitch_name":  "Traditional Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Hexagon version continuation"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 063010.png",
+        "detected_stitch_name":  "Budding Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 063333.png",
+        "detected_stitch_name":  "Beatrice Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Duplicate scan."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 063343.png",
+        "detected_stitch_name":  "Beatrice Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Duplicate."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065239.png",
+        "detected_stitch_name":  "Traditional Granny Square",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Hexagon version duplicate scan."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065251.png",
+        "detected_stitch_name":  "Traditional Granny Square",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Hexagon version duplicate."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065342.png",
+        "detected_stitch_name":  "Budding Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Duplicate."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065358.png",
+        "detected_stitch_name":  "Budding Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065409.png",
+        "detected_stitch_name":  "Budding Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Duplicate."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065419.png",
+        "detected_stitch_name":  "Budding Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Duplicate."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065431.png",
+        "detected_stitch_name":  "Ridged Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065450.png",
+        "detected_stitch_name":  "Ridged Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065511.png",
+        "detected_stitch_name":  "Spiral Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065519.png",
+        "detected_stitch_name":  "Spiral Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065533.png",
+        "detected_stitch_name":  "Peony Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065542.png",
+        "detected_stitch_name":  "Crystal Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065604.png",
+        "detected_stitch_name":  "Crystal Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065612.png",
+        "detected_stitch_name":  "Crystal Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065648.png",
+        "detected_stitch_name":  "Gardenia Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065705.png",
+        "detected_stitch_name":  "Gardenia Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065727.png",
+        "detected_stitch_name":  "Dahlia Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065735.png",
+        "detected_stitch_name":  "Dahlia Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065746.png",
+        "detected_stitch_name":  "Kensington Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 065803.png",
+        "detected_stitch_name":  "Kensington Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164433.png",
+        "detected_stitch_name":  "Kensington Hexagon",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "duplicate title page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164442.png",
+        "detected_stitch_name":  "Kensington Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "duplicate body"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164453.png",
+        "detected_stitch_name":  "Beachwood Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164504.png",
+        "detected_stitch_name":  "Beachwood Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164516.png",
+        "detected_stitch_name":  "Winterburn Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164523.png",
+        "detected_stitch_name":  "Winterburn Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164538.png",
+        "detected_stitch_name":  "Brynwood Hexagon",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164602.png",
+        "detected_stitch_name":  "Brynwood Hexagon",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164614.png",
+        "detected_stitch_name":  "Crystal Lace Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section Lacy Motifs"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164623.png",
+        "detected_stitch_name":  "Crystal Lace Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164637.png",
+        "detected_stitch_name":  "RaeAnne Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164655.png",
+        "detected_stitch_name":  "RaeAnne Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164714.png",
+        "detected_stitch_name":  "RaeAnne Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "duplicate"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164725.png",
+        "detected_stitch_name":  "Moorish Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164733.png",
+        "detected_stitch_name":  "Moorish Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164746.png",
+        "detected_stitch_name":  "Zany Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164914.png",
+        "detected_stitch_name":  "Zany Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164932.png",
+        "detected_stitch_name":  "Hatsukoi Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 164945.png",
+        "detected_stitch_name":  "Hatsukoi Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165010.png",
+        "detected_stitch_name":  "Blomma Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165018.png",
+        "detected_stitch_name":  "Blomma Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165037.png",
+        "detected_stitch_name":  "Calendula Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165045.png",
+        "detected_stitch_name":  "Calendula Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165124.png",
+        "detected_stitch_name":  "Glass Lace Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165131.png",
+        "detected_stitch_name":  "Glass Lace Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165150.png",
+        "detected_stitch_name":  "Rouz Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165158.png",
+        "detected_stitch_name":  "Rouz Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165208.png",
+        "detected_stitch_name":  "Carnation Lace Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165216.png",
+        "detected_stitch_name":  "Carnation Lace Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165253.png",
+        "detected_stitch_name":  "Vikna Lace Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165302.png",
+        "detected_stitch_name":  "Vikna Lace Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165316.png",
+        "detected_stitch_name":  "Maltese Lace Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165324.png",
+        "detected_stitch_name":  "Maltese Lace Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165336.png",
+        "detected_stitch_name":  "Kukka Lace Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165413.png",
+        "detected_stitch_name":  "Kukka Lace Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165449.png",
+        "detected_stitch_name":  "Sweetheart Lace Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165457.png",
+        "detected_stitch_name":  "Sweetheart Lace Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165516.png",
+        "detected_stitch_name":  "Gothic Lace Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165524.png",
+        "detected_stitch_name":  "Gothic Lace Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165535.png",
+        "detected_stitch_name":  "Sachem Blossom Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165548.png",
+        "detected_stitch_name":  "Sachem Blossom Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165607.png",
+        "detected_stitch_name":  "Diamond Lasa Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165616.png",
+        "detected_stitch_name":  "Diamond Lasa Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165637.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Flower, Snowflake, and Joining Motifs chapter title page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165647.png",
+        "detected_stitch_name":  "Kaihua Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165704.png",
+        "detected_stitch_name":  "Kaihua Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165717.png",
+        "detected_stitch_name":  "Daun Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165741.png",
+        "detected_stitch_name":  "Bloei Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165804.png",
+        "detected_stitch_name":  "Bloei Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165846.png",
+        "detected_stitch_name":  "Nashi Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165920.png",
+        "detected_stitch_name":  "Flor de Nieve Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165930.png",
+        "detected_stitch_name":  "Flor de Nieve Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165942.png",
+        "detected_stitch_name":  "Tusculum Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 165955.png",
+        "detected_stitch_name":  "Tusculum Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170008.png",
+        "detected_stitch_name":  "Fuji Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170038.png",
+        "detected_stitch_name":  "Daisy Leaf Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170052.png",
+        "detected_stitch_name":  "Daisy Leaf Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170115.png",
+        "detected_stitch_name":  "Windroos Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170125.png",
+        "detected_stitch_name":  "Windroos Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170135.png",
+        "detected_stitch_name":  "Tea Rose Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170146.png",
+        "detected_stitch_name":  "Tea Rose Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170259.png",
+        "detected_stitch_name":  "Tulipe Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170310.png",
+        "detected_stitch_name":  "Tulipe Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170320.png",
+        "detected_stitch_name":  "Amaryllis Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170344.png",
+        "detected_stitch_name":  "Toets Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170414.png",
+        "detected_stitch_name":  "Toets Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170520.png",
+        "detected_stitch_name":  "Protea Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170529.png",
+        "detected_stitch_name":  "Protea Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170542.png",
+        "detected_stitch_name":  "Gallica Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170551.png",
+        "detected_stitch_name":  "Gallica Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170643.png",
+        "detected_stitch_name":  "Carnation",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170704.png",
+        "detected_stitch_name":  "Chrysanthemum",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170713.png",
+        "detected_stitch_name":  "Chrysanthemum",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170737.png",
+        "detected_stitch_name":  "Spiral Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170746.png",
+        "detected_stitch_name":  "Spiral Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170802.png",
+        "detected_stitch_name":  "Anjer Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170818.png",
+        "detected_stitch_name":  "Anjer Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170834.png",
+        "detected_stitch_name":  "Nelke Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170851.png",
+        "detected_stitch_name":  "Nelke Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170921.png",
+        "detected_stitch_name":  "Victoria Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section Circular Motifs"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170936.png",
+        "detected_stitch_name":  "Victoria Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170945.png",
+        "detected_stitch_name":  "Victoria Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "tip box"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 170958.png",
+        "detected_stitch_name":  "Letitia Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171003.png",
+        "detected_stitch_name":  "Letitia Motif",
+        "is_continuation":  false,
+        "confidence":  "medium",
+        "notes":  "heading repeats with photo/diagram"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171014.png",
+        "detected_stitch_name":  "Letitia Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171029.png",
+        "detected_stitch_name":  "Eudora Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171056.png",
+        "detected_stitch_name":  "Eudora Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171114.png",
+        "detected_stitch_name":  "Julia Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171132.png",
+        "detected_stitch_name":  "Zylphia Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171145.png",
+        "detected_stitch_name":  "Zylphia Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171206.png",
+        "detected_stitch_name":  "Lorena Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171214.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "Continuation; shows Rnd 1-4 with petals reference. Context likely a flower motif (prior page)."
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171228.png",
+        "detected_stitch_name":  "Constance Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171238.png",
+        "detected_stitch_name":  "Constance Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171306.png",
+        "detected_stitch_name":  "Orpha Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171315.png",
+        "detected_stitch_name":  "Orpha Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171334.png",
+        "detected_stitch_name":  "Hasu Flower Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171349.png",
+        "detected_stitch_name":  "Hasu Flower Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171416.png",
+        "detected_stitch_name":  "Riverbed Flower Motif",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171440.png",
+        "detected_stitch_name":  "Riverbed Flower Motif",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171454.png",
+        "detected_stitch_name":  "Zimni Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Chapter heading \u0027Snowflake Motifs\u0027 above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171503.png",
+        "detected_stitch_name":  "Zimni Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171518.png",
+        "detected_stitch_name":  "Daisy Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171530.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  true,
+        "confidence":  "low",
+        "notes":  "completely black/blank page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171537.png",
+        "detected_stitch_name":  "Daisy Snowflake",
+        "is_continuation":  true,
+        "confidence":  "medium",
+        "notes":  "likely continuation of Daisy Snowflake"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171629.png",
+        "detected_stitch_name":  "Uriah Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171640.png",
+        "detected_stitch_name":  "Uriah Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171727.png",
+        "detected_stitch_name":  "Ambrose Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171740.png",
+        "detected_stitch_name":  "Ambrose Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171752.png",
+        "detected_stitch_name":  "Leander Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171816.png",
+        "detected_stitch_name":  "Leander Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171926.png",
+        "detected_stitch_name":  "Mudan Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171936.png",
+        "detected_stitch_name":  "Mudan Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 171954.png",
+        "detected_stitch_name":  "Lujoso Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172005.png",
+        "detected_stitch_name":  "Lujoso Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172024.png",
+        "detected_stitch_name":  "Bernard Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172041.png",
+        "detected_stitch_name":  "Bernard Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172112.png",
+        "detected_stitch_name":  "Magairlin Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172200.png",
+        "detected_stitch_name":  "Magairlin Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172221.png",
+        "detected_stitch_name":  "Surrey Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172241.png",
+        "detected_stitch_name":  "Surrey Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172257.png",
+        "detected_stitch_name":  "Clinton Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172318.png",
+        "detected_stitch_name":  "Clinton Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172333.png",
+        "detected_stitch_name":  "Wilfred Snowflake",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172347.png",
+        "detected_stitch_name":  "Wilfred Snowflake",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172436.png",
+        "detected_stitch_name":  "Slip Stitch Seam",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter Joining Motifs above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172504.png",
+        "detected_stitch_name":  "Reverse Single Crochet Seam",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172543.png",
+        "detected_stitch_name":  "Double Crochet Track Seam",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172620.png",
+        "detected_stitch_name":  "Chain Space Seam",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172756.png",
+        "detected_stitch_name":  "Slip Stitch Motifs Together",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172813.png",
+        "detected_stitch_name":  "Slip Stitch Motifs Together",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172841.png",
+        "detected_stitch_name":  "Small Motif Join",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172853.png",
+        "detected_stitch_name":  "Small Motif Join",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172906.png",
+        "detected_stitch_name":  "Cluster Chain Seam",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 172954.png",
+        "detected_stitch_name":  "V-Stitch Seam",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 173723.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Chapter 9 Edgings title page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 173747.png",
+        "detected_stitch_name":  "Reverse Single Crochet Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "section Simple Edgings above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 173810.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  true,
+        "confidence":  "low",
+        "notes":  "completely black/blank page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 173817.png",
+        "detected_stitch_name":  "Double Arch Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 173854.png",
+        "detected_stitch_name":  "Double Arch Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "near-duplicate of previous"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 174055.png",
+        "detected_stitch_name":  "Picot Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 174141.png",
+        "detected_stitch_name":  "Spike Cluster Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 174200.png",
+        "detected_stitch_name":  "Chain Lace Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 174227.png",
+        "detected_stitch_name":  "Picot Curls Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 174420.png",
+        "detected_stitch_name":  "Net Cluster Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 174436.png",
+        "detected_stitch_name":  "Net Cluster Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 174524.png",
+        "detected_stitch_name":  "Cluster Picot Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 174537.png",
+        "detected_stitch_name":  "Cluster Picot Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175710.png",
+        "detected_stitch_name":  "Mission Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter Shell Edgings above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175721.png",
+        "detected_stitch_name":  "Mission Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175737.png",
+        "detected_stitch_name":  "Mystic Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175830.png",
+        "detected_stitch_name":  "Mystic Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175840.png",
+        "detected_stitch_name":  "Belle Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175851.png",
+        "detected_stitch_name":  "Belle Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175904.png",
+        "detected_stitch_name":  "Kika Shell Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175913.png",
+        "detected_stitch_name":  "Kika Shell Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175930.png",
+        "detected_stitch_name":  "Maria Shell Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175939.png",
+        "detected_stitch_name":  "Maria Shell Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 175952.png",
+        "detected_stitch_name":  "Sorbet Shell Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180006.png",
+        "detected_stitch_name":  "Sorbet Shell Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180016.png",
+        "detected_stitch_name":  "Gemma Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180024.png",
+        "detected_stitch_name":  "Large Outside Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "second stitch on page: Small Inside Edging; also tail of Gemma Edging at top"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180038.png",
+        "detected_stitch_name":  "Clover Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180102.png",
+        "detected_stitch_name":  "Clover Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180116.png",
+        "detected_stitch_name":  "Mari Cluster Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "chapter Special Edgings above"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180125.png",
+        "detected_stitch_name":  "Mari Cluster Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180135.png",
+        "detected_stitch_name":  "Aragon Crossed Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180144.png",
+        "detected_stitch_name":  "Aragon Crossed Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180219.png",
+        "detected_stitch_name":  "Chrysler Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180234.png",
+        "detected_stitch_name":  "Chrysler Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180348.png",
+        "detected_stitch_name":  "Lucky Clover Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180412.png",
+        "detected_stitch_name":  "St. Basil Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180424.png",
+        "detected_stitch_name":  "St. Basil Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180547.png",
+        "detected_stitch_name":  "Anderlecht Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 180853.png",
+        "detected_stitch_name":  "Flapper Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181048.png",
+        "detected_stitch_name":  "Flapper Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181157.png",
+        "detected_stitch_name":  "Ruffle Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181207.png",
+        "detected_stitch_name":  "Ruffle Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181227.png",
+        "detected_stitch_name":  "Bubble Edging",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181239.png",
+        "detected_stitch_name":  "Bubble Edging",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  ""
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181302.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Glossary/Abbreviations page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181321.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Stitch symbol legend page"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181336.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Crochet Techniques reference"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181350.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Crochet Stitches glossary"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181400.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  true,
+        "confidence":  "high",
+        "notes":  "continuation of Crochet Stitches glossary"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 181414.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "Tunisian Crochet Stitches reference"
+    },
+    {
+        "filename":  "Screenshot 2026-04-24 184657.png",
+        "detected_stitch_name":  "",
+        "is_continuation":  false,
+        "confidence":  "high",
+        "notes":  "unrelated screenshot, not a stitch library page"
+    }
+]

@@ -1,0 +1,532 @@
+{
+  "stitches": [
+    {
+      "primary_name": "Slip Stitch",
+      "slug": "slip-stitch",
+      "also_known_as": [],
+      "description": "The smallest of all the stitches, this dense fabric makes great kitchen scrubbies with cotton yarn.",
+      "instructions": "Ch any number of sts.\nRow 1 (RS): Sl st in 1st ch from hk and ea ch across, turn.\nRow 2: Sl st in ea sl st across, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["kitchen scrubbies"],
+      "visual_cues": ["dense fabric"],
+      "source_filename": "Screenshot 2026-04-23 193515.png"
+    },
+    {
+      "primary_name": "Front Loop Slip Stitch",
+      "slug": "front-loop-slip-stitch",
+      "also_known_as": [],
+      "description": "This simple pattern makes a thin fabric that is great for hats.",
+      "instructions": "Ch any number of sts.\nRow 1 (RS): Sl st in 1st ch from hk and ea ch across, turn.\nRow 2: Sl st flp in ea sl st across, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["hats"],
+      "visual_cues": ["thin fabric"],
+      "source_filename": "Screenshot 2026-04-23 193557.png"
+    },
+    {
+      "primary_name": "Back Loop Slip Stitch",
+      "slug": "back-loop-slip-stitch",
+      "also_known_as": [],
+      "description": "Looking for a ribbing that very closely matches knitting? This pattern is for you.",
+      "instructions": "Ch any number of sts.\nRow 1 (RS): Sl st in 1st ch from hk and ea ch across, turn.\nRow 2: Sl st blp in ea sl st across, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["ribbing"],
+      "source_filename": "Screenshot 2026-04-23 193631.png"
+    },
+    {
+      "primary_name": "Purl Slip Stitch",
+      "slug": "purl-slip-stitch",
+      "also_known_as": [],
+      "description": "This pattern can easily pass for purl stitches in knitting.",
+      "instructions": "Ch any number of sts.\nRow 1 (RS): Sl st in 1st ch from hk and ea ch across, turn.\nRow 2: Sl st blp in ea sl st across, turn.\nRow 3: Sl st flp in ea sl st across, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["purl texture", "knit-like appearance"],
+      "source_filename": "Screenshot 2026-04-23 193818.png"
+    },
+    {
+      "primary_name": "Single Crochet",
+      "slug": "single-crochet",
+      "also_known_as": [],
+      "description": "The fattest of all the stitches, single crochet comes in handy for any project, from sweaters to toys.",
+      "instructions": "Ch any number of sts.\nRow 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in ea sc across, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["sweaters", "toys"],
+      "visual_cues": ["dense fabric"],
+      "source_filename": "Screenshot 2026-04-23 193841.png"
+    },
+    {
+      "primary_name": "Foundation Single Crochet",
+      "slug": "foundation-single-crochet",
+      "also_known_as": [],
+      "description": "This is a great way to start projects if your crochet chains are always too tight. It creates the chain and first row of single crochet at the same time.",
+      "instructions": "Ch 2, insert hk in 2nd ch from hk, pull up lp, yo, draw through 1 lp (the \"ch\"), [yo, draw through 2 lps (the \"sc\"). *Insert hk under 2 lps of the \"ch\" st at of last st and pull up lp, yo, and draw through 1 lp, [yo and draw through 2 lps] twice; rep from * for length of foundation.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["chainless foundation"],
+      "source_filename": "Screenshot 2026-04-23 193942.png"
+    },
+    {
+      "primary_name": "Single Crochet Ribbing",
+      "slug": "single-crochet-ribbing",
+      "also_known_as": [],
+      "description": "This ribbing is faster to crochet than slip stitch ribbing, with the same amount of elasticity.",
+      "instructions": "Ch any number of sts.\nRow 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc blp in ea sc across, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["sweater cuffs", "collars", "edging"],
+      "visual_cues": ["ribbing", "elasticity"],
+      "source_filename": "Screenshot 2026-04-23 194018.png"
+    },
+    {
+      "primary_name": "Alternating Single Crochet Spike",
+      "slug": "alternating-single-crochet-spike",
+      "also_known_as": [],
+      "description": "This fabric makes very warm vests for men and kids.",
+      "instructions": "Single Crochet Spike (sc spike): Insert hk into st 1 row below, pull up lp, yo, and pull through all lps on hk.\nCh an even number of sts.\nRow 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in 1st sc, *sc spike over next sc into ch below, sc in next sc; rep from * across, turn.\nRow 3: Ch 1, sc in 1st 2 sc, *sc spike over next sc, sc in next sc; rep from * across to last sc, sc in last sc, turn.\nRow 4: Ch 1, sc in 1st sc, *sc spike over next sc, sc in next sc; rep from * across, turn.\nRep rows 3 and 4 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["vests"],
+      "visual_cues": ["spike stitches", "warm fabric"],
+      "source_filename": "Screenshot 2026-04-23 194032.png"
+    },
+    {
+      "primary_name": "Tweed",
+      "slug": "tweed",
+      "also_known_as": [],
+      "description": "This simple stitch pattern can transform itself into tweed when you crochet each row in a different color.",
+      "instructions": "Ch an even number of sts.\nRow 1 (RS): Sc in 2nd ch from hk, *ch 1, sk next ch, sc in next ch; rep from * across, turn.\nRow 2: Ch 1, sc in 1st sc, sc in next ch-1 sp, *ch 1, sk next sc, sc in next ch-1 sp; rep from * across to last sc, sc in last sc, turn.\nRow 3: Ch 1, sc in 1st sc, *ch 1, sk next sc, sc in next ch-1 sp; rep from * across to last 2 sts, ch 1, sk next sc, sc in last sc, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["tweed effect", "colorwork"],
+      "source_filename": "Screenshot 2026-04-23 194148.png"
+    },
+    {
+      "primary_name": "Angled",
+      "slug": "angled",
+      "also_known_as": [],
+      "description": "This lightweight pattern is perfect for cardigans and skirts that need to move.",
+      "instructions": "Ch a multiple of 3 sts.\nRow 1 (RS): Sc in 2nd ch from hk, ch 3, sc in next ch, sk next ch, *sc in next ch, ch 3, sc in next ch, sk next ch; rep from * across, turn.\nRow 2: Ch 1, (sc, ch 3, sc) in ea ch-3 sp across, turn.\nRep row 2 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": ["cardigans", "skirts"],
+      "visual_cues": ["lightweight", "open fabric", "angled texture"],
+      "source_filename": "Screenshot 2026-04-23 194203.png"
+    },
+    {
+      "primary_name": "Rocking",
+      "slug": "rocking",
+      "also_known_as": [],
+      "description": "A mix of lace and texture makes this simple pattern great for baby blankets.",
+      "instructions": "Ch an even number of sts.\nRow 1 (RS): Sc2tog over 2nd and 3rd ch from hk, *ch 1, sc3tog over prev ch and next 2 ch; rep from * across to last 2 ch, ch 1, sc2tog over prev ch and last ch, turn.\nRow 2: Ch 1, sc3tog over prev ch-1 sp and next sc and ch-1 sp; rep from * across to last ch-1 sp, ch 1, sc2tog over prev ch-1 sp and last sc, turn.\nRep row 2 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["baby blankets"],
+      "visual_cues": ["lace", "texture"],
+      "source_filename": "Screenshot 2026-04-23 194228.png"
+    },
+    {
+      "primary_name": "Extended Single Crochet",
+      "slug": "extended-single-crochet",
+      "also_known_as": ["esc"],
+      "description": "This very thin fabric works well for all types of projects, from socks to gloves.",
+      "instructions": "Extended single crochet (esc): Insert hk into next st, yo and pull up a lp, yo, draw through 1 lp on hk, yo, and draw through rem 2 lps on hk.\nCh any number of sts.\nRow 1 (RS): Esc in 3rd ch from hk (sk ch counts as esc) and ea ch across, turn.\nRow 2: Ch 2 (counts as esc), esc in ea esc across to t-ch, esc in top of t-ch, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["socks", "gloves"],
+      "visual_cues": ["thin fabric"],
+      "source_filename": "Screenshot 2026-04-23 194241.png"
+    },
+    {
+      "primary_name": "Extended Mesh",
+      "slug": "extended-mesh",
+      "also_known_as": [],
+      "description": "Extended stitch sits slightly angled, and when combined with classic mesh, it makes a drapey fabric that is great for lots of projects.",
+      "instructions": "Ch an odd number of sts.\nRow 1 (RS): Esc in 5th ch from hk (counts as esc, ch-1 sp), *ch 1, sk 1 ch, esc in next ch; rep from * across, turn.\nRow 2: Ch 3 (counts as esc, ch-1 sp), *sk next ch-1 sp, esc in next esc, ch 1; rep from * across to t-ch, esc in top of t-ch, turn.\nRep row 2 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["angled", "drapey fabric", "mesh", "open fabric"],
+      "source_filename": "Screenshot 2026-04-23 194256.png"
+    },
+    {
+      "primary_name": "Half Double Crochet",
+      "slug": "half-double-crochet",
+      "also_known_as": [],
+      "description": "Being short and thick, half double crochet stitches can be the black sheep of the crochet family, but they are unique in the way they wrap yarn overs around the post. They form the basis for a number of amazing stitch patterns.",
+      "instructions": "Ch any number of sts.\nRow 1 (RS): Hdc in 3rd ch from hk (sk ch counts as hdc), hdc in ea ch across, turn.\nRow 2: Ch 2 (counts as hdc), hdc in ea hdc across, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["short and thick", "yarn over around post"],
+      "source_filename": "Screenshot 2026-04-23 194309.png"
+    },
+    {
+      "primary_name": "Waffle Rib",
+      "slug": "waffle-rib",
+      "also_known_as": [],
+      "description": "A very textured stitch pattern makes for a great fabric for warm, snuggly sweaters.",
+      "instructions": "Ch an even number of sts.\nRow 1 (RS): Hdc in 3rd ch from hk (sk ch counts as hdc), hdc in ea ch across, turn.\nRow 2: Ch 2 (counts as hdc), *hdc blp in next hdc, hdc flp in next hdc; rep from * across to last 2 sts, hdc blp in next hdc, hdc in top of t-ch, turn.\nRep row 2 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": ["sweaters"],
+      "visual_cues": ["raised texture", "waffle texture", "ribbing"],
+      "source_filename": "Screenshot 2026-04-23 194335.png"
+    },
+    {
+      "primary_name": "Middle Bar Half Double Crochet",
+      "slug": "middle-bar-half-double-crochet",
+      "also_known_as": [],
+      "description": "Crocheting in the middle bar makes a great fabric with a defined horizontal line.",
+      "instructions": "Middle Bar: Insert hk into middle of wrong side of the hdc st that is formed by the yo in the hdc st. The middle bar is below the top 2 lps.\nCh any number of sts.\nRow 1 (RS): Hdc in 3rd ch from hk (sk ch counts as hdc), hdc in ea ch across, turn.\nRow 2: Ch 2 (counts as hdc), hdc in middle bar of ea hdc across to t-ch, hdc in top of t-ch, turn.\nRow 3: Ch 2 (counts as hdc), hdc in ea hdc across to last t-ch, hdc in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["horizontal ridges", "defined horizontal line"],
+      "source_filename": "Screenshot 2026-04-23 194351.png"
+    },
+    {
+      "primary_name": "Forked Half Double Crochet",
+      "slug": "forked-half-double-crochet",
+      "also_known_as": ["fk hdc"],
+      "description": "Crocheting in the middle bar makes a great fabric with a defined horizontal line.",
+      "instructions": "Forked Half Double Crochet (fk hdc): Yo hk, insert hk into next st indicated, pull up lp, yo hk, insert hk into next st indicated, pull up lp, yo hk, pull through 3 lps on hk, yo hk, pull through last 3 lps on hk.\nCh any number of sts.\nRow 1 (RS): Fk hdc in 3rd and 4th ch from hk (sk ch counts as dc), fk hdc in prev and next ch across to last ch, dc in last ch, turn.\nRow 2: Ch 3 (counts as dc), fk hdc in 3rd ch and next hdc, fk hdc in prev and next hdc across to t-ch, dc in top of t-ch, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["horizontal lines", "forked texture"],
+      "source_filename": "Screenshot 2026-04-23 194412.png"
+    },
+    {
+      "primary_name": "Double Crochet",
+      "slug": "double-crochet",
+      "also_known_as": [],
+      "description": "The double crochet is the most useful stitch in a crocheter's toolbox. It can make thin fabric and when combined with other stitches can form an infinite number of patterns.",
+      "instructions": "Ch any number of sts.\nRow 1 (RS): Dc in 4th ch from hk (sk ch counts as dc), dc in ea ch across, turn.\nRow 2: Ch 3 (counts as dc), dc in ea dc across to t-ch, dc in top of t-ch, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["thin fabric"],
+      "source_filename": "Screenshot 2026-04-23 194429.png"
+    },
+    {
+      "primary_name": "Foundation Double Crochet",
+      "slug": "foundation-double-crochet",
+      "also_known_as": [],
+      "description": "Foundation double crochet is perfect to use when your project needs an elastic foundation.",
+      "instructions": "Ch 4 sts.\nYo, insert hk into 4th ch from hk, pull up lp, yo, draw through 1 lp (the \"ch\"), [yo, draw through 2 lps] twice (the \"dc\").\nYo, insert hk under 2 lps of the \"ch\" portion of last st and pull up lp, yo, and draw through 1 lp, [yo and draw through 2 lps] twice.\nRep for desired length.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["chainless foundation", "elastic foundation"],
+      "source_filename": "Screenshot 2026-04-23 194441.png"
+    },
+    {
+      "primary_name": "Herringbone Double Crochet",
+      "slug": "herringbone-double-crochet",
+      "also_known_as": ["herr dc"],
+      "description": "This is a fun stitch that puts a new twist on a classic just by slightly changing how you pull off the loops.",
+      "instructions": "Herringbone Double Crochet (herr dc): Yo hk, insert hk into next st indicated, yo, pull through st and 1st lp on hk, yo, pull through 1 lp on hk, yo, pull through last 2 lps on hk.\nCh any number of sts.\nRow 1: Herr dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 3 (counts as herr dc), herr dc in ea dc across, turn.\nRep row 2 for desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["herringbone pattern", "diagonal lines"],
+      "source_filename": "Screenshot 2026-04-23 194503.png"
+    },
+    {
+      "primary_name": "Double Crochet Group",
+      "slug": "double-crochet-group",
+      "also_known_as": [],
+      "description": "By grouping double crochet stitches, you end up with an interesting vertical stitch pattern that looks more than just simple.",
+      "instructions": "Ch an odd number of sts.\nRow 1 (RS): Dc in 5th ch from hk (sk ch counts as dc), dc in same ch, *sk 1 ch, 2 dc in next ch; rep from * across to last 2 ch, sk 1 ch, dc in last ch, turn.\nRow 2: Ch 3 (counts as dc), 2 dc btw next 2 dc group across, dc in top of t-ch, turn.\nRep row 2 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["vertical texture", "grouped stitches"],
+      "source_filename": "Screenshot 2026-04-23 194724.png"
+    },
+    {
+      "primary_name": "Diamond Tweed",
+      "slug": "diamond-tweed",
+      "also_known_as": [],
+      "description": "This tweed stitch pattern forms tiny little diamonds all over the fabric for a lacy effect.",
+      "instructions": "Ch an odd number of sts.\nRow 1 (RS): Dc in 4th ch from hk (sk ch counts as dc2tog), ch 1, *dc2tog in prev ch and ch 2 away (skipping 1 ch), ch 1; rep from * across to last ch, dc2tog in prev and last ch, turn.\nRow 2: Ch 3 (counts as dc), *dc2tog in prev and next dc2tog (sk ch-sp), ch 1; rep from * across to t-ch, dc2tog in prev dc2tog and top of t-ch, dc in top of t-ch, turn.\nRow 3: Ch 2, dc in 1st dc2tog, *ch 1, dc2tog in prev and next dc2tog (sk ch-sp); rep from * across to t-ch, ch 1, dc2tog in prev dc2tog and top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["tiny diamonds", "lacy effect", "tweed"],
+      "source_filename": "Screenshot 2026-04-23 194751.png"
+    },
+    {
+      "primary_name": "Wrapped Double Crochet",
+      "slug": "wrapped-double-crochet",
+      "also_known_as": [],
+      "description": "Wrapped stitches spice up an otherwise boring stitch pattern by changing the direction of the stitch from vertical to horizontal. Use them anytime you want to add a little pop of texture.",
+      "instructions": "Wrapped Double Crochet Two Together (wdc2tog): *Yo, insert hk from front of fabric around posts of prev 2 dc, yo, pull up lp, yo, pull through 2 lps on hk; rep from * once around same 2 dc, yo, pull through rem lps on hk.\nV-Stitch (v-st): [Dc, ch 1, dc] in st indicated.\nCh a multiple of 6 sts plus 3.\nRow 1 (RS): Dc in 4th ch from hk (counts as dc), *sk next ch, v-st in next ch, sk next ch, dc in next 3 ch; rep from * across to last 5 ch, sk next ch, v-st in next ch, sk next ch, dc in last 2 ch, turn.\nRow 2: Ch 3 (counts as dc), dc in next dc, *v-st in next ch-1 sp, dc next 2 dc, wdc2tog around prev 2 dc, v-st in next ch-1 sp; rep from * across to last 2 dc, dc in next dc, dc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), dc in next dc, v-st in next ch-1 sp, *dc in next 3 dc, v-st in next ch-1 sp; rep from * across to last 2 dc, dc in next dc, dc in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["horizontal texture", "V-shape", "wrapped stitches", "pop of texture"],
+      "source_filename": "Screenshot 2026-04-23 194808.png"
+    },
+    {
+      "primary_name": "Treble Crochet",
+      "slug": "treble-crochet",
+      "also_known_as": [],
+      "description": "The treble crochet and taller stitches (like double treble and triple treble) make a lacy fabric just by the natural height of their stitch.",
+      "instructions": "Ch any number of sts.\nRow 1 (RS): Tr in 5th ch from hk (sk ch counts as tr), tr in ea ch across, turn.\nRow 2: Ch 4 (counts as tr), tr in ea st across, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["lacy fabric", "tall stitch", "open fabric"],
+      "source_filename": "Screenshot 2026-04-23 195019.png"
+    },
+    {
+      "primary_name": "Linked Treble Crochet",
+      "slug": "linked-treble-crochet",
+      "also_known_as": ["ltr"],
+      "description": "This unique stitch makes a fantastic solid fabric without adding weight to your project. The horizontal lines also make a great chart to embroider on later.",
+      "instructions": "Linked Treble Crochet (ltr): Description is below.\nSetup Stitch: Ch 4, insert hk into 2nd ch from hk, yo, pull up lp, insert hk into 3rd ch from hk, yo, pull up lp (4 lps on hk), yo, draw through 2 lps on hk, yo, draw through next 2 lps (1st st made).\nNext Stitches: Insert hk into upper horiz bar of prev st from top to bottom (the 1st bar is found below the sts' top 2 lps), yo, pull up lp, insert hk into lower horiz bar, yo, pull up lp, insert hk into next st, yo, pull up lp (4 lps on hk), yo, draw through next 2 lps, yo, draw through next 2 lps, yo, draw through last 2 lps.\nCh any number of sts.\nRow 1 (RS): Complete 1st ltr in 2nd, 3rd, and 5th ch from hk, ltr in ea ch across, turn.\nRow 2: Ch 4 (does not count as a tr), ltr in 2nd ch, 3rd ch, and next st, ltr in ea st across, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["solid fabric", "horizontal lines", "embroidery base"],
+      "source_filename": "Screenshot 2026-04-23 195031.png"
+    },
+    {
+      "primary_name": "Brick",
+      "slug": "brick",
+      "also_known_as": [],
+      "description": "This stitch pattern is another unique combination of uncomplicated texture without weight. It makes a great fabric for coats or afghans.",
+      "instructions": "Ch a multiple of 4 sts plus 2.\nRow 1 (WS): Sc in 2nd ch from hk, *ch 3, sk 3 ch, sc in next ch; rep from * across to end, turn.\nRow 2: Ch 3 (counts as dc), 3 dc in ea ch-3 sp across, dc in last sc, turn.\nRow 3: Ch 1, sc in 1st dc, ch 3, sk 3 dc, *sc btw prev and next dc, ch 3, sk 3 dc; rep from * across to t-ch, sc in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["coats", "afghans"],
+      "visual_cues": ["brick pattern", "texture without weight"],
+      "source_filename": "Screenshot 2026-04-23 195121.png"
+    },
+    {
+      "primary_name": "Block",
+      "slug": "block",
+      "also_known_as": [],
+      "description": "Similar to the brick stitch pattern, this one steps up the texture a notch with post stitches.",
+      "instructions": "Ch a multiple of 3 sts plus 2.\nRow 1 (WS): Sc in 2nd ch from hk, *ch 2, sk 2 ch, sc in next ch; rep from * across, turn.\nRow 2: Ch 3 (counts as dc), *2 dc in next ch-2 sp, FPdc around next sc; rep from * across to last ch-2 sp, 2 dc in last ch-2 sp, dc in last sc, turn.\nRow 3: Ch 1, sc in 1st dc, *ch 2, sk 2 dc, sc in next dc; rep from * across to last FPdc, ch 2, sk 2 dc, sc in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["post stitches", "raised texture", "block pattern"],
+      "source_filename": "Screenshot 2026-04-23 195156.png"
+    },
+    {
+      "primary_name": "Aligned",
+      "slug": "aligned",
+      "also_known_as": [],
+      "description": "This unassuming stitch pattern makes a lovely fabric for garments with its mixture of double and single crochet stitches.",
+      "instructions": "Ch an odd number of sts.\nRow 1 (RS): 2 dc in 5th ch from hk (sk ch counts as dc), *sk 1 ch, 2 dc (dc group made) in next ch; rep from * across to last 2 ch, sk 1 ch, dc in last ch, turn.\nRow 2: Ch 1, sc in 1st dc, *ch 1, sc in sp btw next 2 dc (center of dc group); rep from * across to t-ch, ch 1, sc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), 2 dc in ea sc across to last sc, dc in last sc, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["garments"],
+      "visual_cues": ["mixed stitches", "dc groups"],
+      "source_filename": "Screenshot 2026-04-23 195243.png"
+    },
+    {
+      "primary_name": "Jacquard",
+      "slug": "jacquard",
+      "also_known_as": [],
+      "description": "When alternating colors in this stitch pattern, you get a great jacquard-like tweed. Because the stitch pattern is a combination of double and single crochet, it is light enough even for garments.",
+      "instructions": "Ch an odd number of sts.\nRow 1 (RS): Dc in 4th ch from hk, *ch 1, dc2tog in same ch and 2 ch away (sk 1 ch); rep from * across to last 2 ch, ch 1, dc2tog in last 2 ch, turn.\nRow 2: Ch 1, sc in dc2tog, *sc in ch-1 sp, ch 1, sk dc2tog; rep from * across to last ch-1 sp, sc in last ch-1 sp, sc in last dc2tog, turn.\nRow 3: Ch 3 (counts as dc), dc2tog in 1st sc and ch-1 sp, *ch 1, dc2tog in same ch-1 sp and next ch-1 sp; rep from * across to last ch-1 sp, ch 1, dc2tog in last ch-1 sp and last sc, dc in last sc, turn.\nRow 4: Ch 1, sc in dc, *ch 1, sk dc2tog, sc in ch-1 sp; rep from * across to last ch-1 sp, sc in last ch-sp, ch 1, sk dc2tog, sc in top of t-ch, turn.\nRow 5: Ch 2, dc in ch-1 sp, *ch 1, dc2tog in same ch-1 sp and next ch-1 sp; rep from * across to last ch-1 sp, ch 1, dc2tog in last ch-1 sp and last sc, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["garments"],
+      "visual_cues": ["jacquard-like tweed", "colorwork", "mixed stitches"],
+      "source_filename": "Screenshot 2026-04-23 195351.png"
+    },
+    {
+      "primary_name": "Chicken Foot",
+      "slug": "chicken-foot",
+      "also_known_as": [],
+      "description": "Half double crochet takes a starring role in this stitch pattern by leaving little, diagonal star-like lines in the fabric.",
+      "instructions": "Ch an even number of sts.\nRow 1 (WS): Sc in 2nd ch from hk, *ch 1, sk 1 ch, sc in next ch; rep from * across, turn.\nRow 2: Ch 3 (counts as hdc, ch 1), *hdc2tog in next ch-1 sp and sc, ch 1; rep from * across to last ch-1 sp and sc, hdc2tog in last ch-1 sp and sc, turn.\nRow 3: Ch 1, sc in hdc2tog, sc in ch-1 sp, *ch 1, sk next hdc2tog, sc in next ch-1 sp; rep from * across to t-ch, sc in 2nd ch on t-ch, turn.\nRow 4: Ch 2 (counts as hdc), hdc2tog in 1st 2 sc, ch 1, *hdc2tog in next ch-1 sp and sc, ch 1; rep from * across to last ch-1 sp, hdc2tog in last ch-1 sp and next sc, hdc in last sc, turn.\nRow 5: Ch 1, sc in hdc, *ch 1, sk next hdc2tog, sc in next ch-1 sp; rep from * across to t-ch, ch 1, sk hdc2tog, sc in top of t-ch, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["diagonal star-like lines", "chicken foot pattern"],
+      "source_filename": "Screenshot 2026-04-23 195525.png"
+    },
+    {
+      "primary_name": "Crunchy Stitch",
+      "slug": "crunchy-stitch",
+      "also_known_as": [],
+      "description": "This fabric makes very bold, diagonal lines, which can be great for highlighting parts of your project where you want a strong fabric.",
+      "instructions": "Ch an even number of sts.\nRow 1 (RS): Sl st in 2nd ch from hk, *hdc in next ch, sl st in next ch; rep from * across, turn.\nRow 2: Ch 2, *sl st in next hdc, hdc in next sl st; rep from * across, turn.\nRow 3: *Sl st in hdc, hdc in next sl st; rep from * across to t-ch, sl st in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["bold diagonal lines", "strong fabric"],
+      "source_filename": "Screenshot 2026-04-23 195658.png"
+    },
+    {
+      "primary_name": "Kuranchi Stitch",
+      "slug": "kuranchi-stitch",
+      "also_known_as": [],
+      "description": "This simple variation of the crunchy stitch highlights the popping double crochet lines while still making a fabric gentle enough for sweaters.",
+      "instructions": "Ch an odd number of sts.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Sl st in 1st dc, *dc in next dc, sl st in next dc; rep from * across, ending sl st in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), dc in ea st across, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": ["sweaters"],
+      "visual_cues": ["popping double crochet lines", "gentle texture"],
+      "source_filename": "Screenshot 2026-04-23 195726.png"
+    },
+    {
+      "primary_name": "Kroller Stitch",
+      "slug": "kroller-stitch",
+      "also_known_as": [],
+      "description": "This stitch pattern is my hands-down favorite for baby projects in that it makes a gentle texture that babies love to pet.",
+      "instructions": "Ch a multiple of 3 sts plus 1.\nRow 1 (RS): [Sc, hdc, dc] in 4th ch from hk, *sk 2 ch, [sc, hdc, dc] in next ch; rep from * across to last ch, hdc in last ch, turn.\nRow 2: Ch 2 (counts as hdc), [sc, hdc, dc] in next dc and ea dc across, hdc in top of t-ch, turn.\nRep row 2 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": ["baby projects"],
+      "visual_cues": ["gentle texture", "soft fabric"],
+      "source_filename": "Screenshot 2026-04-23 195743.png"
+    },
+    {
+      "primary_name": "Bloque Stitch",
+      "slug": "bloque-stitch",
+      "also_known_as": [],
+      "description": "The dropped double crochet puffs out, creating a thick, yet soft, woven-like fabric.",
+      "instructions": "Ch a multiple of 4 sts plus 2.\nRow 1 (RS): Dc in 4th ch from hk (sk sts count as dc), dc in next ch, *ch 2, sk 2 ch, dc in next 2 ch; rep from * across to last ch, dc in last ch, turn.\nRow 2: Ch 2 (counts as hdc, ch 2), *sk next 2 dc, dc in next 2 ch on foundation ch (working over ch-2 sp), ch 2; rep from * across, hdc in t-ch, turn.\nRow 3: Ch 2 (counts as hdc), *dc in next 2 dc 2 rows below (working over ch-2 sp), ch 2, sk next 2 dc; rep from * across, dc in next 2 dc 2 rows below, hdc in t-ch, turn.\nRow 4: Ch 4 (counts as hdc, ch 2), *sk next 2 dc, dc in next 2 dc 2 rows below (working over ch-2 sp), ch 2; rep from * across, hdc in t-ch, turn.\nRep rows 3 and 4 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["woven-like fabric", "thick fabric", "dropped double crochet"],
+      "source_filename": "Screenshot 2026-04-23 195805.png"
+    },
+    {
+      "primary_name": "Kabeli Corded Stitch",
+      "slug": "kabeli-corded-stitch",
+      "also_known_as": [],
+      "description": "Reverse single crochet stitches create a bold line in this pattern, which can be great for cleaning pads or for showing off tiny waistlines.",
+      "instructions": "Reverse Single Crochet (rev sc): Insert hk back into prev st (to the right in the clockwise direction), yo, pull up lp twisting hk around to face upwards, yo, pull through sts on hk.\nCh any number of sts.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, do not turn.\nRow 2: Working from left to right, ch 1, rev sc in flp of ea dc across, sl st to top of t-ch, do not turn.\nRow 3: Ch 3, dc blp in ea dc 2 rows below (working in rem lp behind rev sc), do not turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["cleaning pads"],
+      "visual_cues": ["bold horizontal lines", "corded texture", "reverse single crochet"],
+      "source_filename": "Screenshot 2026-04-23 195822.png"
+    },
+    {
+      "primary_name": "Arruga Stitch",
+      "slug": "arruga-stitch",
+      "also_known_as": [],
+      "description": "Post stitches in this pattern pop out the double crochet in a rhythm that mimics a woven fabric.",
+      "instructions": "Ch an even number of sts.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in 1st dc, *BPsc in next sc, FPsc in next sc; rep from * across, sc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), dc in ea sc across, turn.\nRow 4: Ch 1, sc in 1st dc, *FPsc in next sc, BPsc in next sc; rep from * across, sc in top of t-ch, turn.\nRow 5: Ch 3 (counts as dc), dc in ea sc across, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["woven fabric appearance", "post stitches", "raised texture"],
+      "source_filename": "Screenshot 2026-04-23 195859.png"
+    },
+    {
+      "primary_name": "Woven Shell Stitch",
+      "slug": "woven-shell-stitch",
+      "also_known_as": [],
+      "description": "By crossing the double crochet groups in the shell, you make a thatched roof look. Using thin or silky yarn makes a drapable fabric.",
+      "instructions": "Shell (sh): Sk 5 dc, 3 dc in next dc, ch 3, 3 dc in 2nd skipped dc (in front of dc just made).\nCh a multiple of 6 sts plus 3.\nRow 1 (RS): 3 dc in 7th ch from hk, ch 3, 3 dc in 5th skipped ch (in front dc just made), *sk 1 ch, dc in next ch, sk 3 ch, 3 dc in next ch, ch 3, 3 dc in 2nd skipped ch (in front of dc just made); rep from * to last 2 ch, sk 1 ch, dc in last ch, turn.\nRow 2: Ch 3 (counts as dc), 3 dc in 1st dc, *sc in next ch-3 sp, sh over next 6 dc; rep from * across to last ch-3 sp, sc in last ch-3 sp, 4 dc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), *sh over next 6 dc, sc in next ch-3 sp; rep from * across to t-ch, dc in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["thatched roof look", "shell pattern", "crossed dc groups", "drapable fabric"],
+      "source_filename": "Screenshot 2026-04-23 195931.png"
+    }
+  ],
+  "entries_skipped": [
+    {
+      "source_filename": "Screenshot 2026-04-23 193515.png",
+      "reason": "Section header page: 'Slip Stitch Patterns' — stitch entry (Slip Stitch) also extracted from same image"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 193841.png",
+      "reason": "Section header page: 'Single Crochet Patterns' — stitch entry (Single Crochet) also extracted from same image"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 194309.png",
+      "reason": "Section header page: 'Half Double Crochet Patterns' — stitch entry (Half Double Crochet) also extracted from same image"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 194429.png",
+      "reason": "Section header page: 'Double Crochet Patterns' — stitch entry (Double Crochet) also extracted from same image"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 194907.png",
+      "reason": "continuation of Wrapped Double Crochet"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195019.png",
+      "reason": "Section header page: 'Treble Crochet Patterns' — stitch entry (Treble Crochet) also extracted from same image"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195042.png",
+      "reason": "continuation of Linked Treble Crochet (Tip text only, no new stitch)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195121.png",
+      "reason": "Section header page: 'Combined Stitch Patterns' — stitch entry (Brick) also extracted from same image"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195433.png",
+      "reason": "continuation of Jacquard"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195540.png",
+      "reason": "continuation of Chicken Foot"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195636.png",
+      "reason": "Section header page: Chapter 2 / Textured Stitch Patterns — no stitch detail"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195641.png",
+      "reason": "Section header page: Chapter 2 / Textured Stitch Patterns — no stitch detail"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195658.png",
+      "reason": "Section header: 'Simple Texture Stitch Patterns' — stitch entry (Crunchy Stitch) also extracted from same image"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195712.png",
+      "reason": "continuation of Crunchy Stitch (Tip / Fiber Counts text only)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195852.png",
+      "reason": "Decorative chapter letter 'A' only — no stitch content"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 195913.png",
+      "reason": "continuation of Arruga Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 200341.png",
+      "reason": "continuation of Woven Shell Stitch"
+    }
+  ],
+  "duplicates_skipped": [
+    {
+      "primary_name": "Back Loop Slip Stitch",
+      "source_filename": "Screenshot 2026-04-23 193752.png"
+    },
+    {
+      "primary_name": "Block",
+      "source_filename": "Screenshot 2026-04-23 195230.png"
+    },
+    {
+      "primary_name": "Aligned",
+      "source_filename": "Screenshot 2026-04-23 195250.png"
+    }
+  ]
+}

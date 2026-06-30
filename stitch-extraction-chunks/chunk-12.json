@@ -1,0 +1,424 @@
+{
+  "stitches": [
+    {
+      "primary_name": "Constance Motif",
+      "slug": "constance-motif",
+      "also_known_as": [],
+      "description": "Depending on your blocking technique, this motif can look very smooth and circular or spiky and ridged.",
+      "instructions": "Ch 10, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 5 (counts as dc, ch-2 sp), [dc, ch 2] 6 times in ring, dc in ring, hdc to 3rd ch of t-ch, do not turn—8 dc.\nRnd 2: Ch 3 (counts as dc), *[ch 1, picot] twice, ch 1, dc in next ch-2 sp; rep from * around to last ch-2 sp, [ch 1, picot] twice, ch 1, sl st to 3rd ch of t-ch, fasten off—8 ch-sps.\nRnd 3: Join yarn to ch-sp btw picots with sl st, sc in same sp, *ch 7, sc to next ch-sp btw picot; rep from * around, ending ch 7, sl st to 1st sc, do not turn—8 sc.\nRnd 4: [Sc, hdc, 9 dc, hdc, sc] in ea ch-7 sp around, sl st to 1st sc, fasten off—8 petals.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["circular", "petals", "picot edging", "spiky or smooth depending on blocking"],
+      "source_filename": "Screenshot 2026-04-24 171228.png"
+    },
+    {
+      "primary_name": "Orpha Motif",
+      "slug": "orpha-motif",
+      "also_known_as": [],
+      "description": "Bursting with chain-space petals, this motif makes for stunning jewelry when combined with simple beads.",
+      "instructions": "Ch 5, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 4 (counts as dc, ch-1 sp), [dc, ch 1] in ring 11 times, ch 1, sl st to 3rd ch of t-ch, do not turn—12 dc.\nRnd 2: Ch 1, [sc, ch 2, sc] in ea ch-1 sp around, sl st to 1st sc, do not turn—24 sc.\nRnd 3: Ch 9 (counts as dc, ch-6 sp), sk sc and ch-2 sp, *dc btw next 2 sc, ch 6, sk ch-2 sp; rep from * around to last 3 sc, dc btw next 2 sc, ch 6, sl st to 3rd ch of t-ch, do not turn—12 dc.\nRnd 4: Ch 1, [3 sc, ch 3, sc, ch 4, sc, ch 3, 3 sc] in ea ch-6 sp around, sl st to 1st sc, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["jewelry"],
+      "visual_cues": ["chain-space petals", "lacy", "circular"],
+      "source_filename": "Screenshot 2026-04-24 171306.png"
+    },
+    {
+      "primary_name": "Hasu Flower Motif",
+      "slug": "hasu-flower-motif",
+      "also_known_as": [],
+      "description": "This unassuming motif can make the most incredible fabric when you combine it multiple times in a sweater.",
+      "instructions": "Picot: Ch 3, sl st to 1st ch.\nCh 6, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 4 (counts as dc, ch-1), [3 dc, ch 1] into ring 7 times, 2 dc in ring, sl st to 3rd ch of t-ch, do not turn—24 dc.\nRnd 2: Ch 2, [dc, ch 2, 2 dc-cl] in ch-1 sp, ch 5, *[2 dc-cl, ch 2, 2 dc-cl] in next ch-1 sp, ch 5; rep from * around to last ch-1 sp, [2 dc-cl, ch 2, 2 dc-cl] in last ch-1 sp, ch 2, dc to top of dc, do not turn—15 dc-cl.\nRnd 3: Ch 3 (counts as dc), [2 dc, picot, 2 dc] around post of dc, *sc in next ch-2 sp, [2 dc, picot, 3 dc, ch 5, 3 dc, picot, 2 dc] in next ch-5 sp; rep from * around 6 more times, sc in next ch-2 sp, [2 dc, picot, 3 dc] in last ch-2 sp, ch 5, sl st to top of t-ch, fasten off—80 dc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["sweaters", "fabric"],
+      "visual_cues": ["flower", "picot edging", "circular", "lacy"],
+      "source_filename": "Screenshot 2026-04-24 171334.png"
+    },
+    {
+      "primary_name": "Riverbed Flower Motif",
+      "slug": "riverbed-flower-motif",
+      "also_known_as": [],
+      "description": "Earthy in look, this motif works equally well in vests and tunics as it does in coasters and jewelry.",
+      "instructions": "Double Crochet Three Together (dc3tog): *Yo, insert hk into st indicated, yo, draw up lp, yo, draw through 2 lps on hk; rep from * twice in next st, yo, draw through last lps on hk.\nDouble Crochet Four Together (dc4tog): *Yo, insert hk into st indicated, yo, draw up lp, yo, draw through 2 lps on hk; rep from * once in same st; rep from * twice in next st, yo, draw through last lps on hk.\nCh 4, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 8 sc in ring, sl st to sc, do not turn.\nRnd 2: Ch 2, dc3tog working 1st leg in 1st sc and next two legs in next sc, ch 4, [dc4tog in prev sc and next sc, ch 4] 7 times, sl st to top of dc3tog, do not turn—8 ch-sps.\nRnd 3: Ch 1, *[3 sc, ch 4, 3 sc] in next ch-4 sp; rep from * around, sl st to 1st sc, do not turn—8 ch-sps.\nRnd 4: Ch 1, sc between 1st and last sc from last rnd, ch 3, sc in next ch-4 sp, ch 3, *sk 2 sc, sc between next 2 sc, ch 3, sc in next ch-4 sp, ch 3; rep from * around, sl st to 1st sc, do not turn.\nRnd 5: Ch 1, *4 sc in next ch-3 sp, ch 3, 4 sc in next ch-3 sp; rep from * around, sl st to 1st sc, do not turn.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": ["vests", "tunics", "coasters", "jewelry"],
+      "visual_cues": ["flower", "earthy", "circular", "petal clusters"],
+      "source_filename": "Screenshot 2026-04-24 171416.png"
+    },
+    {
+      "primary_name": "Zimni Snowflake",
+      "slug": "zimni-snowflake",
+      "also_known_as": [],
+      "description": "If you are looking for a snowflake to mimic actual ones, this is for you. All the trefoils in the snowflake fan out to create a stunning motif.",
+      "instructions": "Ch 9, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 4 (counts as tr), 4 tr in ring, [ch 4, 5 tr in ring] 5 times, ch 4, sl st in top of t-ch, do not turn—30 tr.\nRnd 2: Sl st in next 4 tr, *[sl st, ch 2, hdc, (ch 5, sl st to 1st ch) 3 times, sl st to prev hdc, hdc, ch 7, sl st in 3rd ch from hk, [ch 5, sl st to 1st ch] twice, sc in next 2 ch, hdc, [ch 5, sl st to 1st ch] 3 times, sl st to prev hdc, hdc, ch 2, sl st] in next ch-sp, sl st in next 5 tr; rep from * around, fasten off—6 petals.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": ["ornaments", "jewelry", "necklace"],
+      "visual_cues": ["snowflake", "trefoils", "six-pointed", "lacy"],
+      "source_filename": "Screenshot 2026-04-24 171454.png"
+    },
+    {
+      "primary_name": "Daisy Snowflake",
+      "slug": "daisy-snowflake",
+      "also_known_as": [],
+      "description": "This flowery snowflake looks equally cute whether blocked and stiffened or unblocked and curly; try it each way to find your favorite look.",
+      "instructions": "Single Crochet Spike Stitch (spike st): Insert hk in next st 2 rnds below, yo, draw up a lp to height of current rnd, yo, pull through both lps on hk.\nPicot: Ch 3, sl st to prev sc.\nCh 10, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 24 sc into ring, sl st to 1st sc, do not turn.\nRnd 2: Ch 1, *sc in next 2 sc, [sc, ch 7, sc] in next sc, sc in next sc; rep from * around, sl st to 1st sc, do not turn—30 sc.\nRnd 3: Ch 1, sc in 1st sc, *[2 hdc, 13 dc, 2 hdc] in next ch-7 sp, sk 2 sc, sc in next sc; rep from * around to last ch-7 sp, sl st to 1st sc, do not turn, fasten off color—6 petals.\nRnd 4: Join new color, ch 1, *spike st in next sc on rnd 1, ch 3, sk 2 hdc and 2 dc, sc in next dc, picot, ch 3, sk 3 dc, sc in next dc, picot, ch 3, sk 3 dc, sc in next dc, picot, ch 3, sk 2 dc and 2 hdc; rep from * around, sl st to 1st spike st, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": ["ornaments", "jewelry"],
+      "visual_cues": ["snowflake", "flower", "petals", "picot edging", "two-color"],
+      "source_filename": "Screenshot 2026-04-24 171518.png"
+    },
+    {
+      "primary_name": "Uriah Snowflake",
+      "slug": "uriah-snowflake",
+      "also_known_as": [],
+      "description": "Like a star that fell from heaven, this snowflake shines with the beauty of clusters and arches.",
+      "instructions": "Ch 7, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, [sc, ch 4] into ring 11 times, sc in ring, ch 2, hdc to 1st sc, do not turn—12 sc.\nRnd 2: Ch 2, 2 dc-cl around post of hdc, *ch 3, 3 dc-cl in next ch-4 sp; rep from * around, ch 3, sl st to 2 dc-cl, do not turn—12 ch-sps.\nRnd 3: Ch 1, [3 sc, ch 3, 3 sc] in ea ch-3 sp around, sl st to 1st sc, do not turn—12 ch-sps.\nRnd 4: Sl st in next 2 sc, sl st in ch-3 sp, ch 2, [2 dc-cl, ch 7, 3 dc-cl] in same ch 3-sp, *[3 dc-cl, ch 6, 3 dc-cl] in next ch-3 sp, [3 dc-cl, ch 7, 3 dc-cl] in next ch-3 sp; rep from * around, [3 dc-cl, ch 6, 3 dc-cl] in last ch-3 sp, sl st to 2 dc-cl, do not turn—24 dc-cl.\nRnd 5: *[6 sc, ch 3, 6 sc] in next ch-7 sp, 11 sc in next ch-6 sp; rep from * around, sl st to 1st sc, fasten off—138 sc.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["snowflake", "clusters", "arches", "star-shaped"],
+      "source_filename": "Screenshot 2026-04-24 171629.png"
+    },
+    {
+      "primary_name": "Ambrose Snowflake",
+      "slug": "ambrose-snowflake",
+      "also_known_as": [],
+      "description": "Delicate and lacy, this snowflake combines easily with itself to make a beautiful fabric that almost looks like lattice.",
+      "instructions": "X-Stitch (X-st): Yo 3 times, insert hk in next dc, yo and draw up lp, [yo, pull through 2 lps on hk] twice, sk 2 dc, yo, insert hk in next dc, yo and draw up lp, [yo, pull through 2 lps on hk] twice (dc made), [yo and pull through 2 lps] twice, ch 3, dc in top of dc just made.\nCh 6, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 3 (counts as dc), dc in ring, ch 3, [2 dc, ch 3] into ring 5 times, sl st to top of t-ch, do not turn.\nRnd 2: Ch 3, dc in t-ch, 2 dc in next dc, ch 4, sl st to 2nd ch, ch 1, *2 dc in next 2 dc, ch 4, sl st to 2nd ch, ch 1; rep from * around, sl st to top of t-ch, do not turn—24 dc.\nRnd 3: Ch 3, sk 2 dc, dc in next dc, ch 6, dc in prev dc, ch 6, sl st to 4th ch, ch 3, *sk ch-6 sp, X-st over next 4 dc, ch 6, sl st to 4th ch, ch 3; rep from * around to 3rd ch of 1st ch-6 sp, do not turn.\nRnd 4: Ch 2, [2 dc-cl, ch 3, 3 dc-cl, ch 5, 3 dc-cl, ch 3, 3 dc-cl] in ch-3 sp, ch 6, sl st to 4th ch, ch 3, *sk ch-6 sp, [3 dc-cl, ch 3, 3 dc-cl, ch 5, 3 dc-cl, ch 3, 3 dc-cl] in next ch-3 sp of X-st, ch 6, sl st to 4th ch, ch 3; rep from * around to 2 dc-cl, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["snowflake", "lacy", "lattice", "delicate", "X-stitch"],
+      "source_filename": "Screenshot 2026-04-24 171727.png"
+    },
+    {
+      "primary_name": "Leander Snowflake",
+      "slug": "leander-snowflake",
+      "also_known_as": [],
+      "description": "Part flower, part snowflake—this motif can stand in as either in your next crochet project.",
+      "instructions": "Trefoil: Ch 7, sl st in 7th ch, ch 9, sl st in 9th ch, ch 7, sl st in 7th ch.\nSmall Picot (sm picot): Ch 3, sl st in 3rd ch.\nLarge Picot (lg picot): Ch 5, sl st in 5th ch.\nCh 11, sl st to 1st ch to form ring.\nRnd 1 (RS): Ch 3 (counts as dc), 23 dc in ring, sl st to top of t-ch, do not turn—24 dc.\nRnd 2: *[Sl st, ch 1, sm picot, ch 1, lg picot, 2 tr, trefoil, 2 tr, lg picot, ch 1, sm picot, ch 1, sl st] in next st, sl st to next 3 dc; rep from * around, fasten off—6 petals.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["snowflake", "flower", "trefoil", "picot", "six-pointed"],
+      "source_filename": "Screenshot 2026-04-24 171752.png"
+    },
+    {
+      "primary_name": "Mudan Snowflake",
+      "slug": "mudan-snowflake",
+      "also_known_as": [],
+      "description": "The numerous chain spaces on the last round of this snowflake give you multiple chances to connect it with other motifs or places to thread it onto an earring hook.",
+      "instructions": "Shell (sh): [Sc, hdc, 2 dc, ch 2, 2 dc, hdc, sc] in st indicated.\nCh 6, sl st to 1st ch to form ring.\nRnd 1 (RS): Ch 1, 12 sc in ring, sl st to 1st sc, do not turn—12 sc.\nRnd 2: Ch 7 (counts as dc and ch 4), sk next sc, [dc in next sc, ch 4, sk 1 sc] 4 times, sk 1 sc, dc in next sc, ch 1, dc in 3rd ch of beg ch-7, do not turn—6 ch-sps.\nRnd 3: Ch 5 (counts as dc and ch 2), [2 dc, hdc, sc] around post of dc, [sh in next 4-ch sp] 5 times, [sc, hdc, dc] in the next ch-1 sp, join with a sl st to 3rd ch of beg ch-5, do not turn—6 sh.\nRnd 4: Ch 4 (counts as tr), 4 tr in 1st ch-2 sp, [9 tr in next ch-2 sp] 5 times, 4 tr in 1st ch-2 sp, join with a sl st to 4th ch of beg ch-4, do not turn—54 tr.\nRnd 5: Ch 8 (counts as dc, ch-5 sp), 2 dc in top of t-ch, *ch 2, sk 2 tr, sc in next tr, ch 2, sk 1 tr, [dc, ch 3, dc] in sp btw 9 tr of prev rnd, ch 2, sk 1 tr, sc in next tr, ch 2, sk 2 tr, [2 dc, ch 5, 2 dc] in next tr; rep from * 4 times more, ch 2, sk 2 tr, sc in next tr, ch 2, sk 1 tr, [dc, ch 3, dc] in sp btw 9 tr of prev rnd, ch 2, sk 1 tr, sc in next tr, ch 2, dc in top of t-ch, sl st to 3rd ch of beg ch-8, fasten off—36 ch-sps.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": ["earrings", "jewelry"],
+      "visual_cues": ["snowflake", "shell", "chain spaces", "lacy", "circular"],
+      "source_filename": "Screenshot 2026-04-24 171926.png"
+    },
+    {
+      "primary_name": "Lujoso Snowflake",
+      "slug": "lujoso-snowflake",
+      "also_known_as": [],
+      "description": "This star-like snowflake will seem far out after crocheting the first two rounds. You will have to stick with the directions to watch it transform into the beautiful motif it truly is.",
+      "instructions": "Trefoil: [Ch 7, sl st to 7th ch, ch 11, sl st to 11th ch, ch 7, sl st to 7th ch] in st indicated.\nCh 9, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 18 sc in ring, sl st to 1st sc, do not turn—18 sc.\nRnd 2: Ch 6, sl st to same sc, *sl st to next sc, ch 6, [2 dc, ch 3, sl st] in 3rd ch, sc in next 2 ch, sl st in prev sc, [sl st, ch 3, dc] in next sc, [dc, ch 3, sl st] in next sc; rep from * around to last 2 sc, sl st to next sc, ch 6, [2 dc, ch 3, sl st] in 3rd ch, sc in next 2 ch, sl st in prev sc, [sl st, ch 3, dc] in last sc, sl st to 3rd ch of t-ch—6 petals.\nRnd 3: *Ch 6, [sl st, trefoil, sl st] btw next 2 dc, ch 6, sl st btw next 2 dc; rep from * around, fasten off—6 trefoils.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["snowflake", "star", "trefoil", "lacy", "six-pointed"],
+      "source_filename": "Screenshot 2026-04-24 171954.png"
+    },
+    {
+      "primary_name": "Bernard Snowflake",
+      "slug": "bernard-snowflake",
+      "also_known_as": [],
+      "description": "The lacy chain spaces of this snowflake's center set up the final round for the dramatic set of double crochet. Be sure to block to get the snowflake to lay flat.",
+      "instructions": "Picot: Ch 4, sl st to prev sc.\nCh 6, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 2, 2 dc-cl in ring, [ch 4, 3 dc-cl] in ring 5 times, ch 2, hdc in top of 2 dc-cl, do not turn—6 dc-cl.\nRnd 2: Ch 1, sc around post of hdc, *ch 5, sc in dc-cl, ch 5, sc in ch-4 sp; rep from * around to last ch-4 sp, ch 5, sc in dc-cl, ch 2, dc in 1st sc (counts as ch-sp), do not turn—12 ch-sps.\nRnd 3: Ch 1, sc around post of dc, *ch 7, sc in next ch-5 sp; rep from * around to last ch-5 sp, ch 3, tr in 1st sc, do not turn—12 ch-sps.\nRnd 4: Ch 3 (counts as dc), 6 dc around post of dc, *sc in next ch-7 sp, picot, 13 dc in next ch-7 sp; rep from * around to last ch-7 sp, sc in last ch-7 sp, picot, 6 dc in ch-3 sp, sl st to top of t-ch, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["snowflake", "lacy", "chain spaces", "double crochet fans", "picot"],
+      "source_filename": "Screenshot 2026-04-24 172024.png"
+    },
+    {
+      "primary_name": "Magairlin Snowflake",
+      "slug": "magairlin-snowflake",
+      "also_known_as": [],
+      "description": "Moroccan inspired, this snowflake highlights trefoils on two rounds to draw the eye to their beauty.",
+      "instructions": "Trefoil: [Ch 3, sl st to 1st ch] 3 times.\nCh 10, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 4 (counts as tr), 23 tr in ring, sl st to top of t-ch, do not turn—24 tr.\nRnd 2: Ch 1, sc in top of t-ch, *ch 4, sk 2 tr, sc in next tr; rep from * around, sl st to 1st sc, do not turn—8 ch-sps.\nRnd 3: [Sc, hdc, 2 dc, trefoil, sl st to prev dc, 2 dc, hdc, sc] in ea ch-4 sp around, sl st to 1st sc, do not turn—8 petals.\nRnd 4: Ch 1, sc in sl st, *ch 6, sk 1 ch-3 sp, sc in next ch-3 sp, ch 6, sc btw next 2 sc; rep from * around, sl st to 1st sc, do not turn—16 ch-sps.\nRnd 5: Ch 1, *7 sc in next ch-6 sp, trefoil, sl st to prev sc, 7 sc in next ch-6 sp; rep from * around, sl st to 1st sc, fasten off—8 trefoils.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["snowflake", "trefoil", "Moroccan-inspired", "lacy", "circular"],
+      "source_filename": "Screenshot 2026-04-24 172112.png"
+    },
+    {
+      "primary_name": "Surrey Snowflake",
+      "slug": "surrey-snowflake",
+      "also_known_as": [],
+      "description": "The crossed double crochets in the snowflake add just a touch of texture to this classical design.",
+      "instructions": "Crossed Double Crochet (crossed dc): Sk next 2 sc, dc in next sc, ch 3, dc in prev 3rd sc (sk same 2 sc backward).\nCh 7, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 12 sc in ring, sl st to 1st sc, do not turn.\nRnd 2: Ch 5 (counts as dc, ch-2 sp), *dc in next sc, ch 2; rep from * around, sl st to 3rd ch of t-ch, do not turn—12 dc.\nRnd 3: Ch 1, sc on top of t-ch, *2 sc in ch-2 sp, sc in next dc; rep from * around, sl st to 1st sc, do not turn—36 sc.\nRnd 4: Ch 6 (counts as dc, ch-3 sp), dc in prev 3rd sc (sk prev 2 sc), [ch 2, crossed dc] 11 times, ch 2, sl st to 3rd ch of t-ch, do not turn—12 crossed dc.\nRnd 5: Ch 1, *[2 sc, ch 2, 2 sc] in ch-3 sp, 2 sc in next ch-2 sp, [sc, (ch 3, hdc) 3 times, ch 3, sc] in next ch-3 sp, 2 sc in next ch-2 sp; rep from * around, sl st to 1st sc, fasten off—18 hdc.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["snowflake", "crossed double crochet", "classical", "textured", "lacy"],
+      "source_filename": "Screenshot 2026-04-24 172221.png"
+    },
+    {
+      "primary_name": "Clinton Snowflake",
+      "slug": "clinton-snowflake",
+      "also_known_as": [],
+      "description": "This chunky snowflake is made more delicate with the tiny picots on the last rounds. The picots also make a great location to join other motifs to this one.",
+      "instructions": "Ch 7, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 2, 2 dc-cl in ring, [ch 3, 3 dc-cl] in ring 7 times, ch 1, hdc in top of 2 dc-cl, do not turn—8 dc-cl.\nRnd 2: Ch 2 (counts as hdc), 2 hdc around post of hdc, *ch 5, 4 hdc in next ch-3 sp; rep from * around, ch 5, hdc in ch-1 sp, sl st to top of t-ch, do not turn—32 hdc.\nRnd 3: Sl st in next hdc, *[3 hdc, ch 3, sl st in prev hdc, 2 hdc, ch 3, 3 hdc, ch 3, sl st in prev hdc, 2 hdc] in next ch-5 sp, sl st btw next 2nd and 3rd hdc; rep from * around, sl st to 1st sl st, fasten off—80 hdc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["snowflake", "chunky", "picot", "cluster", "joining points"],
+      "source_filename": "Screenshot 2026-04-24 172257.png"
+    },
+    {
+      "primary_name": "Wilfred Snowflake",
+      "slug": "wilfred-snowflake",
+      "also_known_as": [],
+      "description": "The star shape to this simple snowflake makes it a standout in any project from shawl to scarf.",
+      "instructions": "Ch 7, sl st to 1st ch to form a ring.\nRnd 1 (RS): Ch 1, 12 sc into ring, sl st to 1st sc, do not turn.\nRnd 2: Ch 2, 2 dc-cl in 1st sc, ch 3, *3 dc-cl in next sc, ch 5, 3 dc-cl in next sc, ch 3; rep from * around to last sc, 3 dc-cl in last sc, ch 2, dc in top of 2 dc-cl, do not turn—12 dc-cl.\nRnd 3: Ch 3 (counts as dc), 4 dc around post of dc, *sc in next ch-3 sp, [5 dc, ch 3, 5 dc] in next ch-5 sp; rep from * around to last ch-3 sp, sc in last ch-3 sp, 5 dc in ch-2 sp, ch 3, sl st to top of t-ch, fasten off—60 dc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["shawls", "scarves"],
+      "visual_cues": ["snowflake", "star-shaped", "simple", "six-pointed"],
+      "source_filename": "Screenshot 2026-04-24 172333.png"
+    },
+    {
+      "primary_name": "Slip Stitch Seam",
+      "slug": "slip-stitch-seam",
+      "also_known_as": [],
+      "description": "This simple seam creates a little pucker that you can use as a design feature, or turn it upside down and make it invisible.\n\nPin motifs together with wrong sides together for a ridge seam, or right sides together for a hidden seam.\n\nJoin the yarn to the edge, slip stitch across each stitch in both motifs (inserting the hook through both motifs at the same time), and fasten off.",
+      "instructions": null,
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["joining motifs", "seaming"],
+      "visual_cues": ["ridge seam", "pucker", "joining line"],
+      "source_filename": "Screenshot 2026-04-24 172436.png"
+    },
+    {
+      "primary_name": "Reverse Single Crochet Seam",
+      "slug": "reverse-single-crochet-seam",
+      "also_known_as": [],
+      "description": "This seam uses the ridge to add a gentle wave between each motif.\n\nReverse Single Crochet (rev sc): Insert hk back into prev st (to the right in the clockwise direction), yo, pull up lp twisting hk around to face upwards, yo, pull through sts on hk.\n\nPin the motifs together with wrong sides together.\n\nJoin the yarn to the left edge, and reverse single crochet across each stitch in both motifs at the same time (inserting the hook through the back loop of the motif closest to you and the front loop of the motif farthest from you); working across to the right edge, fasten off.",
+      "instructions": null,
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["joining motifs", "seaming"],
+      "visual_cues": ["ridge", "gentle wave", "joining line"],
+      "source_filename": "Screenshot 2026-04-24 172504.png"
+    },
+    {
+      "primary_name": "Double Crochet Track Seam",
+      "slug": "double-crochet-track-seam",
+      "also_known_as": [],
+      "description": "This incredibly simple seam looks more complex, which makes the beauty of it sing. This motif looks great on motifs with solid final rounds or ones with a regular spacing of tall stitches, like granny squares.\n\nHold the motifs together with wrong sides facing.\n\nJoin the yarn to the edge of the motif closest to you. Ch 3 (counts as dc), dc in next st of motif closest to you, *sk 2 sts in motif farthest from you, dc in next 2 sts of far motif, sk 2 sts in near motif, dc in next 2 sts of near motif; rep from * across, fasten off.",
+      "instructions": null,
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["joining motifs", "granny squares", "seaming"],
+      "visual_cues": ["track pattern", "contrasting seam", "zigzag joining"],
+      "source_filename": "Screenshot 2026-04-24 172543.png"
+    },
+    {
+      "primary_name": "Chain Space Seam",
+      "slug": "chain-space-seam",
+      "also_known_as": [],
+      "description": "This is one of the most common ways to join two lacy motifs. The chain spaces become invisible in the larger fabric.\n\nAlign the edges of the motifs side-by-side, and join the yarn to the motif on the right.\n\nCh 1, sc in same sp as join, *ch 3, sc in next ch-sp on motif on left, ch 3, sc in next ch-sp on motif on right; rep from * across, fasten off.",
+      "instructions": null,
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["joining lacy motifs", "seaming"],
+      "visual_cues": ["chain spaces", "invisible join", "lacy seam"],
+      "source_filename": "Screenshot 2026-04-24 172620.png"
+    },
+    {
+      "primary_name": "Slip Stitch Motifs Together",
+      "slug": "slip-stitch-motifs-together",
+      "also_known_as": [],
+      "description": "Less of a seam and more of a way just to join two motifs, you can crochet motifs together as you go, by replacing a chain with a slip stitch and literally crocheting one motif onto another.\n\nCrochet the next motif to the last round.\n\nFollow the directions for the last round of the motif. When you get to a chain space, remove the middle chain and replace it with a slip stitch to the same space on an adjoining motif. In the example shown, you would chain 2, slip stitch to the adjoining motif, chain 2, and then continue crocheting the working motif.",
+      "instructions": null,
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["joining motifs", "as-you-go joining"],
+      "visual_cues": ["joined motifs", "continuous fabric", "no visible seam"],
+      "source_filename": "Screenshot 2026-04-24 172756.png"
+    },
+    {
+      "primary_name": "Small Motif Join",
+      "slug": "small-motif-join",
+      "also_known_as": [],
+      "description": "When motifs are connected and have a void, you can use small motifs to fill in the space and make the resulting fabric sturdier.\n\nThis can work with any motif. Just replace a chain for a slip stitch join as in the previous joining.\n\nIn the example shown, ch 7, sl st to 1st ch to make a ring. Ch 2, 2 dc-cl in ring, *ch 1, sl st to adjoining motif's picot, ch 1, 3 dc-cl in ring, ch 1, sl st to adjoining motif's next picot, ch 1, 3 dc-cl in ring; rep from * for each additional motif around, sl st to 2 dc-cl, fasten off.",
+      "instructions": null,
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["joining motifs", "filling voids", "fabric construction"],
+      "visual_cues": ["fill motif", "small center motif", "void filling"],
+      "source_filename": "Screenshot 2026-04-24 172841.png"
+    },
+    {
+      "primary_name": "Cluster Chain Seam",
+      "slug": "cluster-chain-seam",
+      "also_known_as": [],
+      "description": "This fancy seam adds a little vine of clusters between motifs. It looks quite impressive on both solid and lacy motifs.\n\nAlign the edges of the motifs side-by-side, and join the yarn to the edge of the motif on the right.\n\nCh 1, sc in same sp as join, *ch 3, 2 dc-cl in 1st ch, sc in next ch-sp (or sk 3 sts and sc in next st) on motif on left, ch 3, 2 dc-cl in 1st ch, sc in next ch-sp (or sk 3 sts and sc in next st) on motif on right; rep from * across, fasten off.",
+      "instructions": null,
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["joining motifs", "seaming", "decorative seam"],
+      "visual_cues": ["cluster vine", "decorative seam", "joining line"],
+      "source_filename": "Screenshot 2026-04-24 172906.png"
+    },
+    {
+      "primary_name": "V-Stitch Seam",
+      "slug": "v-stitch-seam",
+      "also_known_as": [],
+      "description": "This technique to join two motifs is very commonly used in Belgium lace crochet. Here it adds a bit of lace to solid motifs to transform them into a completely different fabric.\n\nV-Stitch (v-st): [2 dc, ch 1, 2 dc] in same st or sp.\n\nAlign the edges of the motifs side-by-side, and join the yarn to the motif on the left; chain 7.\n\nRow 1 (RS): Sl st to corner of motif on right, sk 3 ch, v-st in next ch, ch 1, sl st to motif on left (about the same height as row 1), turn.\nRow 2: Ch 1, v-st in ch-1 sp on v-st, ch 1, sk 3 sts on right motif, sl st to next st of motif on right, turn.\nRow 3: Ch 1, v-st in ch-1 sp on v-st, ch 1, sl st to motif on the left, turn.\nRep rows 2 and 3 up the motifs to the end, fasten off.",
+      "instructions": null,
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["joining motifs", "Belgium lace crochet", "seaming"],
+      "visual_cues": ["V-stitch column", "lacy seam", "decorative joining"],
+      "source_filename": "Screenshot 2026-04-24 172954.png"
+    },
+    {
+      "primary_name": "Reverse Single Crochet Edging",
+      "slug": "reverse-single-crochet-edging",
+      "also_known_as": [],
+      "description": "This is the simplest of all edgings, but is quite effective for finishing off a project.\n\nReverse Single Crochet (rev sc): Insert hk back into prev st (to the right in the clockwise direction), yo, pull up lp twisting hk around to face upward, yo, pull through sts on hk.\n\nThis stitch pattern is a multiple of any number of stitches. Join the yarn to the edge with a sl st, and ch 1.",
+      "instructions": "Rnd 1 (RS): *Sc across edge, 3 sc in corner; rep from * around, sl st to 1st sc, do not turn.\nRnd 2: Ch 1, rev sc in ea sc around, sl st to 1st sc, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["edging", "finishing", "blankets", "shawls"],
+      "visual_cues": ["reverse single crochet", "simple edging", "clean finish"],
+      "source_filename": "Screenshot 2026-04-24 173747.png"
+    },
+    {
+      "primary_name": "Double Arch Edging",
+      "slug": "double-arch-edging",
+      "also_known_as": [],
+      "description": "When you change the colors and slightly shift the last round, the edging almost looks corded or braided.\n\nThe stitch pattern is a multiple of 3 plus 1 on the sides. Join the yarn to the edge with a sl st, and ch 1.",
+      "instructions": "Rnd 1 (RS): *Sc across edge in a multiple of 3 plus 1, 3 sc in corner; rep from * around, sl st to 1st sc, do not turn.\nRnd 2: Ch 1, sc in 1st sc, *ch 5, sk 2 sc, sc in next sc; rep from * to corner, ch 5, turn project 90 degrees, sc in next sc, cont around sl st to 1st sc, fasten off color, turn.\nRnd 3: Join new color to rnd 1 with sl st next to a skipped sc on row 2. Rep rnd 2 directions around, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["edging", "finishing"],
+      "visual_cues": ["double arch", "corded appearance", "braided look", "two-color"],
+      "source_filename": "Screenshot 2026-04-24 173817.png"
+    },
+    {
+      "primary_name": "Picot Edging",
+      "slug": "picot-edging",
+      "also_known_as": [],
+      "description": "This edging comes in handy when you need something simple and delicate.\n\nPicot: Ch 3, sl st in 1st ch.\n\nThe stitch pattern is a multiple of 3 on the sides. Join the yarn to the edge with a sl st, and ch 1.",
+      "instructions": "Rnd 1 (RS): *Sc across edge in a multiple of 3, 3 sc in corner; rep from * around, sl st to 1st sc, do not turn.\nRnd 2: Ch 1, *[sc in next 2 sc, picot, sc in next sc] across to corner, [sc, picot, sc, picot, sc] in corner sc; rep from * around, sl st to 1st sc, fasten off.",
+      "dimension": "construction_method",
+      "difficulty": "beginner",
+      "common_uses": ["edging", "finishing", "delicate projects"],
+      "visual_cues": ["picot", "delicate", "simple edging"],
+      "source_filename": "Screenshot 2026-04-24 174055.png"
+    }
+  ],
+  "entries_skipped": [
+    {
+      "source_filename": "Screenshot 2026-04-24 171214.png",
+      "reason": "continuation of Constance Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171238.png",
+      "reason": "continuation of Constance Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171315.png",
+      "reason": "continuation of Orpha Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171349.png",
+      "reason": "continuation of Hasu Flower Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171440.png",
+      "reason": "continuation of Riverbed Flower Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171503.png",
+      "reason": "continuation of Zimni Snowflake (instructions + Tip)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171530.png",
+      "reason": "blank page"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171537.png",
+      "reason": "continuation of Daisy Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171640.png",
+      "reason": "continuation of Uriah Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171740.png",
+      "reason": "continuation of Ambrose Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171816.png",
+      "reason": "continuation of Leander Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 171936.png",
+      "reason": "continuation of Mudan Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 172005.png",
+      "reason": "continuation of Lujoso Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 172041.png",
+      "reason": "continuation of Bernard Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 172200.png",
+      "reason": "continuation of Magairlin Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 172241.png",
+      "reason": "continuation of Surrey Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 172318.png",
+      "reason": "continuation of Clinton Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 172347.png",
+      "reason": "continuation of Wilfred Snowflake"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 172813.png",
+      "reason": "continuation of Slip Stitch Motifs Together (Tip text)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 172853.png",
+      "reason": "continuation of Small Motif Join"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 173723.png",
+      "reason": "section header page — Chapter 9 Edgings, no stitch detail"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 173810.png",
+      "reason": "blank page"
+    }
+  ],
+  "duplicates_skipped": [
+    {
+      "primary_name": "Double Arch Edging",
+      "source_filename": "Screenshot 2026-04-24 173854.png"
+    }
+  ]
+}

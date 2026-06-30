@@ -1,0 +1,396 @@
+{
+  "stitches": [
+    {
+      "primary_name": "Ocean",
+      "slug": "ocean",
+      "also_known_as": [],
+      "description": "The alternating shells in the overall pattern look like waves in the ocean.",
+      "instructions": "Ch a multiple of 3 sts plus 1.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 2 lps on hk (half sh made), *ch 2, yo, pull through 4 lps on hk (ch 3, sh made); rep from * across to last 3 lps on hk, ch 2, yo, pull through last 3 lps on hk (half sh made).\n\nRow 2 Fwd: Ch 1, sk half sh, *pull up lp in next ch, pull up lp in ch btw shells on foundation ch, sk next ch, pull up lp in next ch, sk next sh; rep from * across to end, pull up lp in top of half sh. Rtn: Yo, pull through 1 lp on hk, ch 1, *yo, pull through 4 lps on hk, ch 2; rep from * across to last 5 lps on hk, yo, pull through 4 lps on hk, ch 1, pull through last 2 lps on hk.\n\nRow 3 Fwd: Ch 1, sk 1st vert bar, pull up lp in next ch, *sk next sh, pull up lp in next ch, pull up lp on top of sh 1 row below, sk next ch, pull up lp in next ch; rep from * across to end, sk next sh, pull up lp in next ch, sk next sh, pull up lp in next ch; rep from * across to end, sk next sh, pull up lp in next ch, pull up lp in top of sh, ch 2; rep from * across to last 3 lps on hk, ch 2, yo, pull through last 3 lps on hk.\n\nRow 4 Fwd: Ch 1, sk half sh, *pull up lp in next ch, pull up lp on top of sh 1 row below, sk next ch, pull up lp in next ch, sk next sh; rep from * across to end, pull up lp in top of half sh. Rtn: Yo, pull through 1 lp on hk, ch 1, *yo, pull through 4 lps on hk, ch 2; rep from * across to last 5 lps on hk, yo, pull through 4 lps on hk, ch 1, pull through last 2 lps on hk.\n\nRep rows 3 and 4 to desired length.\n\nLast row: *Insert hk into vert bar of next st, and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["alternating shells", "wave pattern"],
+      "source_filename": "Screenshot 2026-04-24 060226.png"
+    },
+    {
+      "primary_name": "Neom",
+      "slug": "neom",
+      "also_known_as": [],
+      "description": "The crossed stitches in this pattern create a diagonal feel to the fabric.",
+      "instructions": "Ch a multiple of 4 sts plus 2.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: (Lp on hk counts as 1st st.) *Tps in next 2 sts, sk next st, Tss in next st, Tss in skipped st; rep from * across to last st, Tss in last st. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 3 Fwd: (Lp on hk counts as 1st st.) Tps in next st, *sk next st, Tss in next st, Tss in skipped st, Tps in next 2 sts; rep from * across to last 4 sts, sk next st, Tss in next st, Tss in skipped st, Tps in next st, Tss in last st. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 4 Fwd: (Lp on hk counts as 1st st.) *Sk next st, Tss in next st, Tss in skipped st, Tps in next 2 sts; rep from * across to last st, Tss in last st. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 5 Fwd: (Lp on hk counts as 1st st.) Tps in next 3 sts, *sk next st, Tss in next st, Tss in skipped st, Tps in next 2 sts; rep from * across to last 2 sts, Tps in next st, Tss in last st. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRep rows 2–5 to desired length.\n\nLast row: *Tps in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["crossed stitches", "diagonal feel"],
+      "source_filename": "Screenshot 2026-04-24 060303.png"
+    },
+    {
+      "primary_name": "Knotted Cross Stitch",
+      "slug": "knotted-cross-stitch",
+      "also_known_as": [],
+      "description": "The purl stitches in this pattern give a knotted look to the fabric, which can be soft enough for pillows and afghans.",
+      "instructions": "Ch an even number of sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and each ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: (Lp on hk counts as 1st st.) *Move yarn to front, insert hk into next 2 sts and pull up a lp, move yarn to front, insert hk into top horiz bar of 2nd st; rep from * across to last st, Tss in last st. Rtn: Work lps off as normal.\n\nRow 3 Fwd: Tss in ea st across. Rtn: Work lps off as normal.\n\nRep rows 2 and 3 to desired length.\n\nLast row: *Tps in next st and pull through lp on hk; rep from * across, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": ["pillows", "afghans"],
+      "visual_cues": ["knotted look", "purl stitches"],
+      "source_filename": "Screenshot 2026-04-24 060325.png"
+    },
+    {
+      "primary_name": "Cordon Stitch",
+      "slug": "cordon-stitch",
+      "also_known_as": [],
+      "description": "This textured stitch pattern with long double crochet stitches makes for great accessories such as scarves and mittens.",
+      "instructions": "Tunisian Double Crochet (Tdc): Yo, insert hk, from right to left, into front vert bar of next st, yo and pull lp through st, yo and pull through 2 lps, leaving last lp on hk.\n\nCh a multiple of 3 sts plus 2.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Tss in ea st across. Rtn: Work off lps as normal.\n\nRow 3 Fwd: (Lp on hk counts as 1 st.) *Tss in next st, Tdc in next st 2 rows below, Tss in next st; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRow 4 Fwd: (Lp on hk counts as 1 st.) *Tss in next 2 sts, Tdc in next st 2 rows below; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRow 5 Fwd: (Lp on hk counts as 1 st.) *Tdc in next st 2 rows below, Tss in next 2 sts; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRep rows 3–5 to desired length.\n\nLast row: *Tss in next st and pull through lp on hk; rep from * across, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": ["scarves", "mittens", "accessories"],
+      "visual_cues": ["long double crochet stitches", "textured"],
+      "source_filename": "Screenshot 2026-04-24 060337.png"
+    },
+    {
+      "primary_name": "Single Rib Stitch",
+      "slug": "single-rib-stitch",
+      "also_known_as": [],
+      "description": "This cabled fabric is thicker than ribbing and makes for great hats and cowls.",
+      "instructions": "Tunisian Extended Double Crochet (Tedc): Yo, insert hk, from right to left, into front vert bar of st indicated, pull up a lp, yo and pull through 1 lp on hk, yo and pull through 2 lps, leaving last lp on hk.\n\nCh an odd number of sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Tss across. Rtn: Work off lps as normal.\n\nRow 3 Fwd: (Lp on hk counts as 1st st.) *Tedc in bottom of next st 2 rows below, Tss in next st; rep from * across. Rtn: Work off lps as normal.\n\nRep rows 2 and 3 to desired length.\n\nLast row: *Tss next st, and pull through lp on hk; rep from * across, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": ["hats", "cowls"],
+      "visual_cues": ["cabled fabric", "ribbing-like", "thick fabric"],
+      "source_filename": "Screenshot 2026-04-24 060403.png"
+    },
+    {
+      "primary_name": "Starburst Stitch",
+      "slug": "starburst-stitch",
+      "also_known_as": [],
+      "description": "Double crochet clusters dominate this stitch pattern, which makes for great afghans.",
+      "instructions": "Tunisian Double Crochet (Tdc): Yo, insert hk, from right to left, into front vert bar of indicated st, yo and pull lp through st, yo and pull through 2 lps.\n\nStarburst: Tdc in st 2 sts to the right and 2 rows below, Tdc in st 1 st to the right and 3 rows below, Tdc in st 4 rows below, Tdc in st 1 st to the left and 3 rows below, Tdc in st 2 sts to the left and 2 rows below, yo and pull through 5 lps on hk.\n\nCh a multiple of 10 sts plus 2.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRows 2–4 Fwd: Tss in ea st across. Rtn: Work off lps as normal.\n\nRow 5 Fwd: (Lp on hk counts as 1 st.) *Tss in next 7 sts, starburst, sk st behind starburst, Tss in next 2 sts; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRows 6–8 Fwd: Tss in ea st across. Rtn: Work off lps as normal.\n\nRow 9 Fwd: (Lp on hk counts as 1 st.) *Tss in next 2 sts, starburst, sk st behind starburst, Tss in next 7 sts; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRep rows 2–9 to desired length.\n\nLast row: *Tss in next st, and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["afghans"],
+      "visual_cues": ["double crochet clusters", "starburst motif"],
+      "source_filename": "Screenshot 2026-04-24 060415.png"
+    },
+    {
+      "primary_name": "Borla Ripple Stitch",
+      "slug": "borla-ripple-stitch",
+      "also_known_as": [],
+      "description": "Alternating the cable stitches makes the fabric ripple in a wonderfully textured pattern.",
+      "instructions": "Tunisian Treble Crochet (Ttc): Yo twice, insert hk, from right to left, into front vert bar of next st, yo and pull lp through st, [yo and pull through 2 lps] twice, leaving last lp on hk.\n\nCh an odd number of sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Tss in ea st across. Rtn: Work off lps as normal.\n\nRow 3 Fwd: (Lp on hk counts as 1 st.) *Ttc in next st 2 rows below, Tss in next st; rep from * across. Rtn: Work off lps as normal.\n\nRow 4 Fwd: Tss in ea st across. Rtn: Work off lps as normal.\n\nRow 5 Fwd: (Lp on hk counts as 1 st.) Tss in next st, *Ttc in next st 2 rows below, Tss in next st; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRep rows 2–5 to desired length.\n\nLast row: Tss in next st and pull through lp on hk, rep to end, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["ripple", "textured", "cable stitches", "alternating pattern"],
+      "source_filename": "Screenshot 2026-04-24 060440.png"
+    },
+    {
+      "primary_name": "Diamond Knit Stitch",
+      "slug": "diamond-knit-stitch",
+      "also_known_as": [],
+      "description": "The double crochet clusters make diamond bobbles in the knitted fabric that look great in simple rectangular projects.",
+      "instructions": "Three Double Crochet Cluster (3 dc-cl): Yo, insert hk btw vert bar of next st, yo and pull lp through st, yo and pull through 2 lps; rep from * twice more in same st, yo and pull through 3 lps on hk.\n\nCh a multiple of 5 plus 7.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: (Lp on hk counts as 1st st throughout.) *Tks in next 2 sts, 3 dc-cl in next st, Tks in next 7 sts; rep from * across to last 6 sts, Tks in next 2 sts, 3 dc-cl in next st, Tks in next 2 sts, Tss in last st. Rtn: Work lps off as normal.\n\nRow 3 Fwd: (Lp on hk counts as 1st throughout.) *3 dc-cl in next st, Tks in next 3 sts, 3 dc-cl in next st, Tks in next 3 sts, 3 dc-cl in next st, Tss in last st. Rtn: Work lps off as normal.\n\nRow 4: Rep row 2.\n\nRow 5 Fwd: Tks in ea st across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRow 6 Fwd: (Lp on hk counts as 1st st.) *Tks in next 7 sts, 3 dc-cl in next st, Tks in next 2 sts; rep from * across to last 6 sts, Tks in next 5 sts, Tss in last st. Rtn: Work off lps as normal.\n\nRow 7 Fwd: (Lp on hk counts as 1st st.) *Tks in next 5 sts, 3 dc-cl in next st; rep from * across to last 6 sts, Tks in next 5 sts, Tss in last st. Rtn: Work off lps as normal.\n\nRow 8: Rep Row 6.\n\nRow 9 Fwd: Tks in ea st across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRep rows 2–9 to desired length.\n\nLast row: *Tks in next st and pull through lp on hk; rep from * across to last st, Tss in last st and pull through lp on hk; fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["rectangular projects"],
+      "visual_cues": ["diamond bobbles", "knitted fabric look", "double crochet clusters"],
+      "source_filename": "Screenshot 2026-04-24 060500.png"
+    },
+    {
+      "primary_name": "Cable Column Stitch",
+      "slug": "cable-column-stitch",
+      "also_known_as": [],
+      "description": "The cable in this stitch pattern almost pops off the fabric to draw interest to it. The pattern makes a great edge on lacier projects.",
+      "instructions": "Tunisian Treble Crochet (Ttc): Yo twice, insert hk, from right to left, into front vert bar of next st, yo and pull lp through st, [yo and pull through 2 lps] twice, leaving last lp on hk.\nTunisian Triple Treble Crochet (Tttc): Yo 4 times, insert hk, from right to left, into front vert bar of next st, yo and pull lp through st, [yo and pull through 2 lps] 4 times, leaving last lp on hk.\n\nCh a multiple of 8 sts plus 3.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Tss in ea st across. Rtn: Work off lps as normal.\n\nRow 3 Fwd: (Lp on hk counts as 1st st.) Tss in next st, *Tss in next st, Ttc in next st 2 rows below, Tss in next 2 sts; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRow 4: Tss in ea st across. Rtn: Work off lps as normal.\n\nRow 5 Fwd: (Lp on hk counts as 1st st.) *Tss in next st, *Tss in next st, Tttc around post of next Ttc 2 rows below, Tttc around post of skipped Ttc 2 rows below, Tss in next 2 sts; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRow 6 Fwd: Tss in ea st across. Rtn: Work off lps as normal.\n\nRow 7 Fwd: (Lp on hk counts as 1st st.) *Tss in next st, Tss in next 3 sts, Ttc around post of next Tttc 2 rows below, Tss in next 2 sts; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRep rows 4–7 to desired length.\n\nLast row: *Tss in next st and pull through lp on hk; rep from * across, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "advanced",
+      "common_uses": ["edging"],
+      "visual_cues": ["cable pops off fabric", "column cable", "raised texture"],
+      "source_filename": "Screenshot 2026-04-24 060522.png"
+    },
+    {
+      "primary_name": "Esme Lace",
+      "slug": "esme-lace",
+      "also_known_as": [],
+      "description": "Shells and chain spaces make a lovely lace fabric in the overall simple lines of the Tunisian simple stitch.",
+      "instructions": "Ch a multiple of 5 sts plus 2.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk, ch 1, yo, pull through 4 lps on hk (gathers the next 3 sts, making a sh), ch 1, yo, pull through 2 lps on hk; rep from * to last st, pull through 2 lps on hk.\n\nRow 2 Fwd: (Lp on hk counts as 1 st.) Tss in next st, *insert hk in next ch-sp, pull up a lp, insert hk in top of sh, pull up lp, insert hk in next ch-sp and pull up a lp, Tss in each of next 2 sts; rep from * across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk, ch 1, yo, pull through 4 lps on hk (gathers the next 3 sts, making a sh), ch 1; rep from * to last st, pull through 2 lps on hk.\n\nRep row 2 to desired length.\n\nLast row: *Insert hk into vert bar of next st, yo and pull up a lp and through lp on hk, insert hk in next ch-sp, yo and pull up a lp and through lp on hk, insert hk in top bar on top of sh, yo and pull up a lp and through lp on hk, insert hk in next ch-sp, yo and pull up a lp and through lp on hk, insert hk into vert bar of next st, yo and pull up a lp and through lp on hk; rep from * to last st, Tss and pull through lp on hk, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["shells", "chain spaces", "lace fabric"],
+      "source_filename": "Screenshot 2026-04-24 060546.png"
+    },
+    {
+      "primary_name": "Julianna Lace",
+      "slug": "julianna-lace",
+      "also_known_as": [],
+      "description": "The diagonal lines of chain spaces make an enchanting fabric that is great for wraps.",
+      "instructions": "Ch a multiple of 10 sts plus 7.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: (Lp on hk counts as 1st st.) *Insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice, Tss in next 5 sts; rep from * across to last 6 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice, Tss in last st. Rtn: Work off lps as normal.\n\nRow 3 Fwd: (Lp on hk counts as 1st st.) *Tss in next st, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice, Tss in next 4 sts; rep from * across to last 6 sts, Tss in next st, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice. Rtn: Work off lps as normal.\n\nRow 4 Fwd: (Lp on hk counts as 1st st.) *Tss in next 2 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice, Tss in next 3 sts; rep from * across to last 6 sts, Tss in next 2 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, yo, insert hk into next 2 sts together and pull up a lp, Tss in last st. Rtn: Work off lps as normal.\n\nRow 5 Fwd: (Lp on hk counts as 1st st.) *Tss in next 3 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice, Tss in next 2 sts; rep from * across to last 6 sts, Tss in next 3 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, yo, insert hk into next 2 sts together and pull up a lp. Rtn: Work off lps as normal.\n\nRow 6 Fwd: (Lp on hk counts as 1st st.) *Tss in next 4 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice, Tss in next st; rep from * across to last 6 sts, Tss in next 4 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, Tss in last st. Rtn: Work off lps as normal.\n\nRow 7 Fwd: (Lp on hk counts as 1st st.) *Tss in next 5 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice; rep from * across to last 6 sts, Tss in next 6 sts. Rtn: Work off lps as normal.\n\nRow 8 Fwd: (Lp on hk counts as 1st st.) Tss in next st, *Tss in next 5 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice; rep from * across to last 5 sts, Tss in next 5 sts. Rtn: Work off lps as normal.\n\nRow 9 Fwd: (Lp on hk counts as 1st st.) Ch 1, insert hk into next 2 sts and pull up a lp, *Tss in next 5 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice; rep from * across to last 4 sts, Tss in next 4 sts. Rtn: Work off lps as normal.\n\nRow 10 Fwd: (Lp on hk counts as 1st st.) Insert hk btw next 2 sts (around top bars) and pull up a lp, yo, insert hk into next 2 sts together and pull up a lp, *Tss in next 5 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice; rep from * across to last 3 sts, Tss in next 3 sts. Rtn: Work off lps as normal.\n\nRow 11 Fwd: (Lp on hk counts as 1st st.) [Yo, insert hk into next 2 sts together and pull up a lp] twice, *Tss in next 5 sts, insert hk btw next 2 sts (around top bars) and pull up a lp, [yo, insert hk into next 2 sts together and pull up a lp] twice; rep from * across to last 2 sts, Tss in next 2 sts. Rtn: Work off lps as normal.\n\nRep rows 2–11 to desired length.\n\nLast row: *Tss in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["wraps"],
+      "visual_cues": ["diagonal lines", "chain spaces", "lace fabric"],
+      "source_filename": "Screenshot 2026-04-24 060602.png"
+    },
+    {
+      "primary_name": "Mildred Lace",
+      "slug": "mildred-lace",
+      "also_known_as": [],
+      "description": "The tall stitches in the lace make for a long, flowing fabric.",
+      "instructions": "Ch an even number of sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Ch 2 (counts as 1st st.) *Tks in next st, ch 2, sk next st; rep from * across. Rtn: Yo, pull through 1 lp on hk, *ch 1, yo, pull through 2 lps on hk; rep from * to last 2 sts, [yo, pull through 2 lps on hk] twice.\n\nRep row 2 to desired length.\n\nLast row: *Tks in next st and pull through lp on hk, insert hk in next ch-sp (around top 2 bars), yo and pull up a lp and through lp on hk; rep from * to last st. Tks in last st and pull through lp on hk, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["tall stitches", "flowing fabric", "lace", "chain spaces"],
+      "source_filename": "Screenshot 2026-04-24 060735.png"
+    },
+    {
+      "primary_name": "Cedany Lace",
+      "slug": "cedany-lace",
+      "also_known_as": [],
+      "description": "When you gather two stitches together, the resulting fabric mimics a diamond lattice.",
+      "instructions": "Tunisian Double Crochet (Tdc): Yo, insert hk, from right to left, into front vert bar of next st, yo and pull lp through st, yo and pull through 2 lps, leaving last lp on hk.\n\nCh a multiple of 4 sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk, ch 1, *pull up lp in next ch, ch 1; rep from * across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Ch 1 (counts as 1st st), *sk next 2 sts, yo, insert hk into front vert bar of next 2 sts at once and pull up a lp, yo, pull through 2 lps on hk, yo twice, insert hk into vert bar of 2 skipped sts at once and pull up a lp, yo, pull through 2 lps on hk, yo; rep from * across to last 3 sts, Tdc in last 3 sts. Rtn: Work off lps as normal.\n\nRow 3 Fwd: Ch 1 (counts as 1st st), Tdc in next 2 sts, *sk next 2 sts, yo, insert hk into vert bar of next 2 sts at once and pull up a lp, yo, pull through 2 lps on hk, yo twice, insert hk into vert bar of 2 skipped sts and pull up a lp, yo, [pull through 2 lps on hk] twice, yo; rep from * across to last st, Tdc in last st. Rtn: Work off lps as normal.\n\nRep rows 2 and 3 to desired length.\n\nLast row: Ch 1, *sk next 2 sts, yo, insert hk into vert bar of next 2 sts at once and pull up a lp, [yo, pull through 2 lps on hk] twice, ch 1, insert hk into vert bar of last 2 skipped sts and pull up a lp, [yo, pull through 2 lps on hk] twice; rep from * across, Tdc in next st and pull through lp on hk to end, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["diamond lattice", "gathered stitches", "lace"],
+      "source_filename": "Screenshot 2026-04-24 060800.png"
+    },
+    {
+      "primary_name": "Adelaide Lace",
+      "slug": "adelaide-lace",
+      "also_known_as": [],
+      "description": "The crossed stitches add both texture and lace to this pretty fabric.",
+      "instructions": "Tunisian Double Crochet (Tdc): Yo, insert hk into vert bar of next st, yo and pull lp through st, yo and pull through 2 lps, leaving last lp on hk.\n\nCh an odd number of sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Ch 1 (counts as 1st sc), *sk 1 st, Tdc in next st, Tdc in skipped st; rep from * across to last 2 sts, Tdc in next st, Tss in next st, ch 1. Rtn: Work off lps as normal.\n\nRow 3 Fwd: Ch 1 (counts as 1st sc), Tdc in next st, *sk 1 st, Tdc in next st, Tdc in skipped st; rep from * across to last st, Tss in next st, ch 1. Rtn: Work off lps as normal.\n\nRep rows 2 and 3 to desired length.\n\nLast row: *Tss in next st and pull through lp on hk; rep from * across, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["crossed stitches", "lace", "texture"],
+      "source_filename": "Screenshot 2026-04-24 060829.png"
+    },
+    {
+      "primary_name": "Emeline Lace",
+      "slug": "emeline-lace",
+      "also_known_as": [],
+      "description": "This lace is thicker than most lace fabric with its alternating shells and spaces; it makes for great garments.",
+      "instructions": "Tunisian Simple Stitch (Tss): Insert hk, from right to left, into front vert bar of next st and pull up a lp.\n\nCh a multiple of 6 sts plus 5.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Tss in ea st across. Rtn: Yo, pull through 1 lp on hk, *ch 1, yo, pull through 4 lps on hk (sh made), ch 1, [yo, pull through 2 lps on hk] 3 times; rep from * to end.\n\nRow 3 Fwd: (Lp on hk counts as 1st st.) *Insert hk into top horiz bar of sh and pull up a lp, yo, insert hk into same horiz bar and pull up a lp, Tss in next 3 sts; rep from * across, Tss in last st. Rtn: Yo, pull through 1 lp on hk, *[yo, pull through 2 lps on hk] 3 times, ch 1, yo, pull through 4 lps on hk (sh made), ch 1; rep from * to end.\n\nRow 4 Fwd: (Lp on hk counts as 1st st.) *Tss in next 3 sts, Insert hk into top horiz bar of sh and pull up a lp, yo, insert hk into same horiz bar and pull up a lp; rep from * across, Tss in last 4 sts. Rtn: Yo, pull through 1 lp on hk, *ch 1, yo, pull through 4 lps on hk (sh made), ch 1, [yo, pull through 2 lps on hk] 3 times; rep from * to end.\n\nRep rows 3 and 4 to desired length.\n\nLast row: *Tss in next st and pull through lp on hk; rep from * across, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["garments"],
+      "visual_cues": ["alternating shells", "spaces", "thick lace"],
+      "source_filename": "Screenshot 2026-04-24 060959.png"
+    },
+    {
+      "primary_name": "Catrain Lace",
+      "slug": "catrain-lace",
+      "also_known_as": [],
+      "description": "The columns of shells create a very linear pattern, which makes great scarves.",
+      "instructions": "Ch a multiple of 5 sts plus 2.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, ch 1, *yo, pull through 6 lps on hk (sh made), ch 3; rep from * to last 6 sts, yo, pull through 6 lps on hk, ch 1, yo, pull through last 2 lps on hk.\n\nRow 2 Fwd: (Lp on hk counts as 1st st.) *[Insert hk into top horiz bar of next st and pull up a lp] twice, insert hk into horiz bar on top of next sh and pull up a lp, [insert hk into top horiz bar of next st and pull up a lp] twice; rep from * across to last st, Tss in last st. Rtn: Yo, pull through 1 lp on hk, ch 1, *yo, pull through 6 lps on hk (sh made), ch 3; rep from * to last 6 sts, yo, pull through 6 lps on hk, ch 1, yo, pull through last 2 lps on hk.\n\nRep row 2 to desired length.\n\nLast row: *[Insert hk into top horiz bar of next st, pull up a lp and through lp on hk] twice, insert hk into horiz bar on top of next sh, pull up a lp and through lp on hk, [insert hk into top horiz bar of next st, pull up a lp and through lp on hk] twice; rep from * to last st, Tss in last st and pull through lp on hk, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["scarves"],
+      "visual_cues": ["columns of shells", "linear pattern", "lace"],
+      "source_filename": "Screenshot 2026-04-24 061029.png"
+    },
+    {
+      "primary_name": "Alianor Lace",
+      "slug": "alianor-lace",
+      "also_known_as": [],
+      "description": "Rows of clusters separated by rows of vertical lines give a very structured lace pattern that works nicely for wraps.",
+      "instructions": "Two Extended Double Crochet Cluster (2 edc-cl): *Yo, insert hk into vert bar of next st, yo and pull up a lp, yo and pull through 2 lps on hk; rep from * once in same st, yo and pull through 2 lps, ch 1.\n\nCh an odd number of sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Ch 2 (counts as 1st st), *2 edc-cl in next st, sk next st; rep from * across to last st, Tss in last st, ch 2. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk, ch 1; rep from * last 2 sts, [yo, pull through 2 lps on hk] twice.\n\nRow 3 Fwd: (Lp on hk counts as 1 st.) *Tss in next st, insert hk into top horiz bar of next st and pull up a lp; rep from * across to last 2 sts, Tss in last 2 sts. Rtn: Work off lps as normal.\n\nRep rows 2 and 3 to desired length.\n\nLast row: *Tss in next st and pull through lp on hk; rep * to end, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["wraps"],
+      "visual_cues": ["clusters", "vertical lines", "structured lace"],
+      "source_filename": "Screenshot 2026-04-24 061056.png"
+    },
+    {
+      "primary_name": "Peronell Lace",
+      "slug": "peronell-lace",
+      "also_known_as": [],
+      "description": "When you change the position of the yarn, the strands create a lattice look with clusters under the bars.",
+      "instructions": "Two Double Crochet Cluster (2 dc-cl): *Yo, insert hk into vert bar of next st, yo and pull up a lp, yo and pull through 2 lps; rep from * once more in same st, yo and pull through 2 lps on hk.\n\nCh a multiple of 4 sts plus 3.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: Ch 1 (counts as 1st st), *2 dc-cl in next st, sk next st, Tps in next st, sk next st; rep from * across to last 2 sts, 2 dc-cl in next st, Tss in last st, ch 1. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk, ch 1; rep from * to last 2 sts, [yo, pull through 2 lps on hk] twice.\n\nRow 3 Fwd: Ch 1 (counts as 1st st), *Tps in next st, sk next st, 2 dc-cl in next st, sk next st; rep from * across to last 2 sts, Tps in next st, Tss in last st, ch 1. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk, ch 1; rep from * to last 2 sts, [yo, pull through 2 lps on hk] twice.\n\nRep rows 2 and 3 to desired length.\n\nLast row: *Tss in next st and pull through lp on hk, insert hk in next ch-s, pull up a lp and through lp on hk; rep from * across, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["lattice look", "clusters under bars", "yarn position change"],
+      "source_filename": "Screenshot 2026-04-24 061120.png"
+    },
+    {
+      "primary_name": "Cleves Lace",
+      "slug": "cleves-lace",
+      "also_known_as": [],
+      "description": "This simple lace pattern is strong enough for beautiful, flowing skirts and tops.",
+      "instructions": "Ch an even number of sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: (Lp on hk counts as 1st st on hk.) *Tss in next 2 sts at once, yo and pull up a lp, yo; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRow 3 Fwd: (Lp on hk counts as 1st st.) *Tss in next st, insert hk around horiz bars of next st, yo and pull up a lp; rep from * across to last st, Tss in last st. Rtn: Work off lps as normal.\n\nRep rows 2 and 3 to desired length.\n\nLast row: * Tss in next st and pull up a lp and through lp on hk; rep from * across, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["skirts", "tops", "garments"],
+      "visual_cues": ["simple lace", "flowing fabric"],
+      "source_filename": "Screenshot 2026-04-24 061139.png"
+    },
+    {
+      "primary_name": "Fendrel",
+      "slug": "fendrel",
+      "also_known_as": [],
+      "description": "The dropped-stitch look makes a great zigzag fabric that can work great for kids' or adults' projects. The stitch pattern does tend to lean, so blocking is necessary.",
+      "instructions": "Ch an odd number of sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 2 lps on hk, *ch 1, yo, pull through 3 lps on hk (dec made); rep from * to last st (last 2 lps on hk), ch 1 with new color, yo and pull through last 2 lps on hk.\n\nRow 2 Fwd: Ch 1 (counts as 1st st), *insert hk around next ch-sp and pull up a lp, ch 2, Tss in next st; rep from * across. Rtn: Yo, pull through 2 lps on hk, ch 1, *yo, pull through 3 lps on hk (dec made), ch 1; rep from * to last st (last 2 lps on hk), change color, yo and pull through last 2 lps on hk.\n\nRep row 2 to desired length.\n\nLast row: *Insert hk around next ch-sp, yo and pull up a lp and through lp on hk, Tss in next st and pull through lp on hk; rep from * across, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["kids' projects", "adults' projects"],
+      "visual_cues": ["dropped-stitch look", "zigzag fabric", "color work"],
+      "source_filename": "Screenshot 2026-04-24 061150.png"
+    },
+    {
+      "primary_name": "Cartwright",
+      "slug": "cartwright",
+      "also_known_as": [],
+      "description": "Staggering of mitered corners gives an appealing pattern to the slightly textured fabric.",
+      "instructions": "Tunisian Double Crochet (Tdc): Yo, insert hk into vert bar of next st 2 rows below, yo and pull lp through st, yo and pull through 2 lps, leaving last lp on hk.\n\nCh a multiple of 4 sts plus 1.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end, change color before last st (last 2 lps).\n\nRow 2 Fwd: (Lp on hk counts as 1st st.) *Tss in next 3 sts, sk next st; rep from * across to last 4 sts, Tss in next 2 sts, sk next st, Tss in next st. Rtn: Yo, pull through 1 lp on hk, *ch 1, [yo, pull through 2 lps on hk] 3 times, change color, yo, pull through 2 lps on hk.\n\nRow 3 Fwd: (Lp on hk counts as 1st st.) *Tss in next st, sk next st, Tdc in next st, Tss in next st; rep from * across to last 4 sts, Tss in next 2 sts, sk next st, Tss in next st. Rtn: Yo, pull through 1 lp on hk, yo, pull through 2 lps on hk, *ch 1, [yo, pull through 2 lps on hk] 3 times; rep from * to last 2 sts (3 lps on hk), ch 1, yo, pull through 2 lps on hk, change color, yo, pull through last 2 lps on hk.\n\nRow 4 Fwd: (Lp on hk counts as 1st st.) *Tss in next st, sk next st, Tss in next st; rep from * across to last 2 sts (3 lps on hk), Tss in next st, Tdc in next st, Tss in next st; rep from * across to last 4 sts, Tss in next 3 sts, Tss in last st. Rtn: Yo, pull through 1 lp on hk, yo, pull through 2 lps on hk, *[yo, pull through 2 lps on hk] 3 times, ch 1; rep from * to last 4 sts (5 lps on hk), [yo, pull through 2 lps on hk] 3 times, change color, yo, pull through last 2 lps on hk.\n\nRow 5 Fwd: (Lp on hk counts as 1st st.) *Sk next st, Tdc in next st, Tss in next 2 sts; rep from * across to last 2 sts (3 lps on hk), ch 1, yo, pull through 2 lps on hk, change color, yo, pull through last 2 lps on hk.\n\nRow 6 Fwd: (Lp on hk counts as 1st st.) *Tdc in next st, Tss in next 2 sts, sk next st; rep from * across to last 4 sts (last 5 lps on hk), [yo, pull through 2 lps on hk] 3 times, change color, yo, pull through last 2 lps on hk.\n\nRep rows 3–6 to desired length.\n\nLast row: *[Tss in next st and pull lp through lp on hk] 3 times, Tdc in next at and pull lp through lp on hk; rep from * to end, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["mitered corners", "staggered pattern", "slightly textured", "color work"],
+      "source_filename": "Screenshot 2026-04-24 061220.png"
+    },
+    {
+      "primary_name": "Wykeham",
+      "slug": "wykeham",
+      "also_known_as": [],
+      "description": "This woven-looking fabric makes great projects that need a sturdy fabric with a tweedish look.",
+      "instructions": "Ch an odd number of sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end, change color in last st (last 2 lps).\n\nRow 2 Fwd: (Lp on hk counts as 1st st.) *Move yarn to front, insert hk into vert bar of next st (do not pull up a lp), Tss in next st; rep from * across. Rtn: Work off lps as normal, change color in last st.\n\nRow 3 Fwd: (Lp on hk counts as 1st st.) *Tss in next st, move yarn to front, insert hk into vert bar of next st (do not pull up a lp); rep from * across to last 2 sts, Tss in last 2 sts. Rtn: Work off lps as normal, change color in last st.\n\nRep rows 2 and 3 to desired length.\n\nLast row: *Tss in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["woven look", "sturdy fabric", "tweedish", "color work"],
+      "source_filename": "Screenshot 2026-04-24 061256.png"
+    },
+    {
+      "primary_name": "Bolbec",
+      "slug": "bolbec",
+      "also_known_as": [],
+      "description": "This slipped-stitch pattern brings the color from below up to the current row to add little parallel lines throughout the fabric. The slipped stitches may tend to scrunch the fabric, so plan to use larger hook sizes.",
+      "instructions": "Twisted Simple Stitch (Twtss): Move yarn to front, insert hk from left to right into front vert bar of next st and pull up a lp (opp direction from Tss and twists bar).\n\nCh a multiple of 4 sts.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Change color, yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end.\n\nRow 2 Fwd: (Lp on hk counts as 1st st.) *Insert hk into vert bar of next 2 sts (do not pull up a lp), Twtss in next 2 sts (do not pull up a lp); Tss in last 3 sts. Rtn: Change color, work off lps as normal.\n\nRow 3 Fwd: Tss in ea st across. Rtn: Work off lps as normal.\n\nRow 4 Fwd: (Lp on hk counts as 1st st.) *Twtss in next st, Tps in next st, insert hk into vert bar of next 2 sts (do not pull up a lp); rep from * across to last 3 sts, Twtss in next st, Tps in next st, Tss in last st. Rtn: Change color, work off lps as normal.\n\nRow 5 Fwd: (Lp on hk counts as 1st st.) *Twtss in next st, Tps in next st, insert hk into vert bar of next 2 sts (do not pull up a lp); rep from * across to last 3 sts, Twtss in next st, Tss in next 3 sts. Rtn: Change color, work off lps as normal.\n\nRow 6 Fwd: (Lp on hk counts as 1st st.) *Insert hk into vert bar of next 2 sts (do not pull up a lp), Tss in next 2 sts; rep from * across to last 3 sts, insert hk into vert bar of next 2 sts (do not pull up a lp), Tss in last st. Rtn: Work off lps as normal.\n\nRow 7: Rep Row 4.\n\nRep rows 2–7 to desired length, ending on a Row 6.\n\nLast row: *Tss in next st and pull through lp on hk; rep from * to end, fasten off.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["parallel lines", "slipped stitches", "color work", "woven look"],
+      "source_filename": "Screenshot 2026-04-24 061535.png"
+    },
+    {
+      "primary_name": "Terryn",
+      "slug": "terryn",
+      "also_known_as": [],
+      "description": "When you change colors in each direction and slowly gather stitches, a beautiful wave fabric emerges.",
+      "instructions": "Ch a multiple of 6 sts plus 1.\n\nRow 1 (RS) Fwd: Pull up lp in 2nd ch from hk and ea ch across. Rtn: Change color, yo, pull through 1 lp on hk, *yo, pull through 2 lps on hk; rep from * to end, change color at last st.\n\nRow 2 Fwd: (Lp on hk counts as 1st st.) Yo, *Tps in next st, move yarn to front, insert hk in vert bar of next 3 sts at once, yo and pull up a lp, Tps in next st, yo, Tps in next st, yo; rep from * across to last 6 sts, Tps in next st, move yarn to front, insert hk in vert bar of next 3 sts at once, yo and pull up a lp, Tps in next st, yo, sk next st, Tps in last st. Rtn: Change color, work off lps as normal, change color at last st.\n\nRow 3 Fwd: (Lp on hk counts as 1st st.) Yo, *Tss in back vert bar of next st, insert hk in back vert bar of next 3 sts at once, yo and pull up a lp, Tss in back vert bar of next st, yo, Tss in back vert bar of next st, yo; rep from * across to last 6 sts, Tss in back vert bar of next st, insert hk in back vert bar of next 3 sts at once, yo and pull up a lp, Tss in back vert bar of next st, yo, Tss in back vert bar of last st. Rtn: Change color, work off lps as normal, change color at last st.\n\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["wave fabric", "color work", "gathered stitches"],
+      "source_filename": "Screenshot 2026-04-24 061555.png"
+    }
+  ],
+  "entries_skipped": [
+    {
+      "source_filename": "Screenshot 2026-04-24 060212.png",
+      "reason": "continuation of a prior stitch (last row instruction text only, no stitch name)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060234.png",
+      "reason": "continuation of Ocean"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060313.png",
+      "reason": "continuation of Neom"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060345.png",
+      "reason": "continuation of Cordon Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060424.png",
+      "reason": "continuation of Starburst Stitch (partial cut-off instruction text)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060430.png",
+      "reason": "continuation of Starburst Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060449.png",
+      "reason": "continuation of Borla Ripple Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060511.png",
+      "reason": "continuation of Diamond Knit Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060531.png",
+      "reason": "continuation of Cable Column Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060553.png",
+      "reason": "continuation of Esme Lace (last row only)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060610.png",
+      "reason": "continuation of Julianna Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060620.png",
+      "reason": "continuation of Julianna Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060713.png",
+      "reason": "continuation of Julianna Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060813.png",
+      "reason": "continuation of Cedany Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060835.png",
+      "reason": "generic Tip box only, no stitch detail"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060911.png",
+      "reason": "continuation of Cedany Lace (repeated last row text)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 060947.png",
+      "reason": "generic Tip box only, no stitch detail"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 061008.png",
+      "reason": "continuation of Emeline Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 061107.png",
+      "reason": "continuation of Alianor Lace (last row only)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 061128.png",
+      "reason": "continuation of Peronell Lace (last row only)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 061207.png",
+      "reason": "continuation of Fendrel (last row only)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 061228.png",
+      "reason": "continuation of Cartwright"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 061545.png",
+      "reason": "continuation of Bolbec"
+    }
+  ],
+  "duplicates_skipped": [
+    {
+      "primary_name": "Julianna Lace",
+      "source_filename": "Screenshot 2026-04-24 060655.png"
+    },
+    {
+      "primary_name": "Adelaide Lace",
+      "source_filename": "Screenshot 2026-04-24 060936.png"
+    }
+  ]
+}

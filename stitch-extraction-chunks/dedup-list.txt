@@ -1,0 +1,285 @@
+﻿slip-stitch|Slip Stitch
+front-loop-slip-stitch|Front Loop Slip Stitch
+back-loop-slip-stitch|Back Loop Slip Stitch
+purl-slip-stitch|Purl Slip Stitch
+single-crochet|Single Crochet
+foundation-single-crochet|Foundation Single Crochet
+single-crochet-ribbing|Single Crochet Ribbing
+alternating-single-crochet-spike|Alternating Single Crochet Spike
+tweed|Tweed
+angled|Angled
+rocking|Rocking
+extended-single-crochet|Extended Single Crochet
+extended-mesh|Extended Mesh
+half-double-crochet|Half Double Crochet
+waffle-rib|Waffle Rib
+middle-bar-half-double-crochet|Middle Bar Half Double Crochet
+forked-half-double-crochet|Forked Half Double Crochet
+double-crochet|Double Crochet
+foundation-double-crochet|Foundation Double Crochet
+herringbone-double-crochet|Herringbone Double Crochet
+double-crochet-group|Double Crochet Group
+diamond-tweed|Diamond Tweed
+wrapped-double-crochet|Wrapped Double Crochet
+treble-crochet|Treble Crochet
+linked-treble-crochet|Linked Treble Crochet
+brick|Brick
+block|Block
+aligned|Aligned
+jacquard|Jacquard
+chicken-foot|Chicken Foot
+crunchy-stitch|Crunchy Stitch
+kuranchi-stitch|Kuranchi Stitch
+kroller-stitch|Kroller Stitch
+bloque-stitch|Bloque Stitch
+kabeli-corded-stitch|Kabeli Corded Stitch
+arruga-stitch|Arruga Stitch
+woven-shell-stitch|Woven Shell Stitch
+romeo-cluster-stitch|Romeo Cluster Stitch
+kyla-shell-stitch|Kyla Shell Stitch
+marguerite-stitch|Marguerite Stitch
+bobblet-stitch|Bobblet Stitch
+diagonal-bob-stitch|Diagonal Bob Stitch
+filet-bobbles-stitch|Filet Bobbles Stitch
+diamante-bobble-stitch|Diamante Bobble Stitch
+popcorn-line-stitch|Popcorn Line Stitch
+balloon-stitch|Balloon Stitch
+judith-bobble-stitch|Judith Bobble Stitch
+popping-cable-stitch|Popping Cable Stitch
+popping-circle-stitch|Popping Circle Stitch
+popping-flower-stitch|Popping Flower Stitch
+single-rib|Single Rib
+basketweave-stitch|Basketweave Stitch
+woven-stitch|Woven Stitch
+cable-towers|Cable Towers
+petal-link-stitch|Petal Link Stitch
+greene-lace|Greene Lace
+ginger-stitch|Ginger Stitch
+ripple-lace|Ripple Lace
+pine-tree-stitch|Pine Tree Stitch
+cable-lattice-stitch|Cable Lattice Stitch
+diamond-stitch|Diamond Stitch
+stella-cable|Stella Cable
+arabel-cable|Arabel Cable
+olivia-cable|Olivia Cable
+severin-cable|Severin Cable
+marcus-cable|Marcus Cable
+masterpiece-cable|Masterpiece Cable
+brennen-cable|Brennen Cable
+picot-trellis|Picot Trellis
+trefoil-link|Trefoil Link
+trefoil-lattice|Trefoil Lattice
+zen-lattice|Zen Lattice
+zen-shell|Zen Shell
+diamond-lattice|Diamond Lattice
+posy-arcade|Posy Arcade
+iced-shell|Iced Shell
+fairy-shell|Fairy Shell
+pistachio-shell|Pistachio Shell
+arcade|Arcade
+clunky-lace|Clunky Lace
+delmarva|Delmarva
+iris-shell|Iris Shell
+colonnade|Colonnade
+diamond-shell|Diamond Shell
+jumping-shells|Jumping Shells
+emma-lace|Emma Lace
+wallpaper-cluster|Wallpaper Cluster
+pebble-lace|Pebble Lace
+climbing-vine|Climbing Vine
+stone-trellis|Stone Trellis
+paragon|Paragon
+leaf-bloom|Leaf Bloom
+clover-lattice|Clover Lattice
+harriet-lace|Harriet Lace
+flower-diamond|Flower Diamond
+simple-chevron|Simple Chevron
+peephole-chevron|Peephole Chevron
+simple-wave|Simple Wave
+corolla-wave|Corolla Wave
+atlantic-wave|Atlantic Wave
+pacific-wave|Pacific Wave
+spider|Spider
+berry-lace|Berry Lace
+blackberry-jam|Blackberry Jam
+strawberry-lace|Strawberry Lace
+columbia-lace|Columbia Lace
+pineapple|Pineapple
+kiwi-lace|Kiwi Lace
+dermot-filet-stitch|Dermot Filet Stitch
+keelan-filet-stitch|Keelan Filet Stitch
+rebecca-filet-stitch|Rebecca Filet Stitch
+granya-filet-stitch|Granya Filet Stitch
+mairenn-filet-stitch|Mairenn Filet Stitch
+ella|Ella
+akalena|Akalena
+tatianna|Tatianna
+raya-clover|Raya Clover
+stivlana|Stivlana
+drika|Drika
+annaleise|Annaleise
+lotte|Lotte
+jacintha|Jacintha
+fleur-brussels-motif|Fleur Brussels Motif
+solomons-knot-stitch|Solomon's Knot Stitch
+bathsheba-knot-stitch|Bathsheba Knot Stitch
+abishag-cluster-knot|Abishag Cluster Knot
+classic-broomstick-lace|Classic Broomstick Lace
+broomstick-lace-flower|Broomstick Lace Flower
+madena-lace|Madena Lace
+anesha-lace|Anesha Lace
+zaria-lace|Zaria Lace
+innya-lace|Innya Lace
+nadja-lace|Nadja Lace
+popsicle-spike|Popsicle Spike
+ridge-diagonal|Ridge Diagonal
+dotted-frieze|Dotted Frieze
+wave-tote|Wave Tote
+gentle-wave|Gentle Wave
+twilight|Twilight
+gambia|Gambia
+cameroon|Cameroon
+malawi|Malawi
+congo|Congo
+kenitra|Kenitra
+azilal|Azilal
+zagora|Zagora
+tarfaya|Tarfaya
+oujda|Oujda
+rutherglen|Rutherglen
+bearsden|Bearsden
+glasgow|Glasgow
+larkhall|Larkhall
+alloa|Alloa
+snowflake|Snowflake
+jumping-beans|Jumping Beans
+diamond-jacquard|Diamond Jacquard
+bright-daisy|Bright Daisy
+carnation-wallpaper|Carnation Wallpaper
+tunisian-simple-stitch|Tunisian Simple Stitch
+tunisian-purl-stitch|Tunisian Purl Stitch
+tunisian-knit-stitch|Tunisian Knit Stitch
+tunisian-extended-stitch|Tunisian Extended Stitch
+tire-tread-stitch|Tire Tread Stitch
+griddle-stitch|Griddle Stitch
+twisted-simple-stitch|Twisted Simple Stitch
+ribbed-simple-stitch|Ribbed Simple Stitch
+dropped-simple-stitch|Dropped Simple Stitch
+crossed-simple-stitch|Crossed Simple Stitch
+ocean|Ocean
+neom|Neom
+knotted-cross-stitch|Knotted Cross Stitch
+cordon-stitch|Cordon Stitch
+single-rib-stitch|Single Rib Stitch
+starburst-stitch|Starburst Stitch
+borla-ripple-stitch|Borla Ripple Stitch
+diamond-knit-stitch|Diamond Knit Stitch
+cable-column-stitch|Cable Column Stitch
+esme-lace|Esme Lace
+julianna-lace|Julianna Lace
+mildred-lace|Mildred Lace
+cedany-lace|Cedany Lace
+adelaide-lace|Adelaide Lace
+emeline-lace|Emeline Lace
+catrain-lace|Catrain Lace
+alianor-lace|Alianor Lace
+peronell-lace|Peronell Lace
+cleves-lace|Cleves Lace
+fendrel|Fendrel
+cartwright|Cartwright
+wykeham|Wykeham
+bolbec|Bolbec
+terryn|Terryn
+traditional-granny-square|Traditional Granny Square
+double-crochet-granny-square|Double Crochet Granny Square
+brick-granny-square|Brick Granny Square
+open-cross-granny-square|Open Cross Granny Square
+window-granny-square|Window Granny Square
+crossed-clusters-granny-square|Crossed Clusters Granny Square
+gerber-daisy-granny-square|Gerber Daisy Granny Square
+posy-in-the-granny|Posy in the Granny
+gladiolus-granny-square|Gladiolus Granny Square
+beatrice-granny-square|Beatrice Granny Square
+rose-granny-square|Rose Granny Square
+traditional-hexagon-granny|Traditional Hexagon Granny
+budding-hexagon|Budding Hexagon
+ridged-hexagon|Ridged Hexagon
+spiral-hexagon|Spiral Hexagon
+peony-hexagon|Peony Hexagon
+crystal-hexagon|Crystal Hexagon
+gardenia-hexagon|Gardenia Hexagon
+dahlia-hexagon|Dahlia Hexagon
+kensington-hexagon|Kensington Hexagon
+beachwood-hexagon|Beachwood Hexagon
+winterburn-hexagon|Winterburn Hexagon
+brynwood-hexagon|Brynwood Hexagon
+crystal-lace-motif|Crystal Lace Motif
+raeanne-motif|RaeAnne Motif
+moorish-motif|Moorish Motif
+zany-motif|Zany Motif
+hatsukoi-motif|Hatsukoi Motif
+blomma-motif|Blomma Motif
+calendula-motif|Calendula Motif
+glass-lace-motif|Glass Lace Motif
+rouz-motif|Rouz Motif
+carnation-lace-motif|Carnation Lace Motif
+vikna-lace-motif|Vikna Lace Motif
+maltese-lace-motif|Maltese Lace Motif
+kukka-lace-motif|Kukka Lace Motif
+sweetheart-lace-motif|Sweetheart Lace Motif
+gothic-lace-motif|Gothic Lace Motif
+sachem-blossom-motif|Sachem Blossom Motif
+diamond-lasa-motif|Diamond Lasa Motif
+kaihua-motif|Kaihua Motif
+daun-motif|Daun Motif
+bloei-motif|Bloei Motif
+nashi-motif|Nashi Motif
+flor-de-nieve-motif|Flor de Nieve Motif
+tusculum-motif|Tusculum Motif
+fuji-motif|Fuji Motif
+daisy-leaf-motif|Daisy Leaf Motif
+windroos-motif|Windroos Motif
+tea-rose-motif|Tea Rose Motif
+tulipe-motif|Tulipe Motif
+amaryllis-motif|Amaryllis Motif
+toets-motif|Toets Motif
+protea-motif|Protea Motif
+gallica-motif|Gallica Motif
+carnation|Carnation
+chrysanthemum|Chrysanthemum
+spiral-motif|Spiral Motif
+anjer-motif|Anjer Motif
+nelke-motif|Nelke Motif
+victoria-motif|Victoria Motif
+letitia-motif|Letitia Motif
+eudora-motif|Eudora Motif
+julia-motif|Julia Motif
+zylphia-motif|Zylphia Motif
+lorena-motif|Lorena Motif
+constance-motif|Constance Motif
+orpha-motif|Orpha Motif
+hasu-flower-motif|Hasu Flower Motif
+riverbed-flower-motif|Riverbed Flower Motif
+zimni-snowflake|Zimni Snowflake
+daisy-snowflake|Daisy Snowflake
+uriah-snowflake|Uriah Snowflake
+ambrose-snowflake|Ambrose Snowflake
+leander-snowflake|Leander Snowflake
+mudan-snowflake|Mudan Snowflake
+lujoso-snowflake|Lujoso Snowflake
+bernard-snowflake|Bernard Snowflake
+magairlin-snowflake|Magairlin Snowflake
+surrey-snowflake|Surrey Snowflake
+clinton-snowflake|Clinton Snowflake
+wilfred-snowflake|Wilfred Snowflake
+slip-stitch-seam|Slip Stitch Seam
+reverse-single-crochet-seam|Reverse Single Crochet Seam
+double-crochet-track-seam|Double Crochet Track Seam
+chain-space-seam|Chain Space Seam
+slip-stitch-motifs-together|Slip Stitch Motifs Together
+small-motif-join|Small Motif Join
+cluster-chain-seam|Cluster Chain Seam
+v-stitch-seam|V-Stitch Seam
+reverse-single-crochet-edging|Reverse Single Crochet Edging
+double-arch-edging|Double Arch Edging
+picot-edging|Picot Edging

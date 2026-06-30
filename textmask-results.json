@@ -1,0 +1,609 @@
+[
+  {
+    "slug": "single-crochet",
+    "expected": "Single Crochet",
+    "category": "simple",
+    "cropDims": {
+      "left": 109,
+      "top": 157,
+      "width": 744,
+      "height": 508,
+      "fallback": false,
+      "srcW": 1679,
+      "srcH": 1244
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753533/sov-textmask-test/single-crochet.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "d6948835-b46b-45d8-bb4e-1132601f404d",
+        "slug": "single-crochet",
+        "primary_name": "Single Crochet",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "dense fabric"
+        ],
+        "construction_note": null,
+        "instructions": "Ch any number of sts.\nRow 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in ea sc across, turn.\nRep row 2 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 193841.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745199/stitch-library/single-crochet.png",
+        "created_at": "2026-05-02T18:19:14.032123+00:00",
+        "updated_at": "2026-05-02T18:19:14.032123+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "The fattest of all the stitches, single crochet comes in handy for any project, from sweaters to toys.",
+        "dimensions": "stitch_technique",
+        "difficulty": "beginner",
+        "common_uses": [
+          "sweaters",
+          "toys"
+        ]
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": false
+    }
+  },
+  {
+    "slug": "double-crochet",
+    "expected": "Double Crochet",
+    "category": "simple",
+    "cropDims": {
+      "left": 99,
+      "top": 170,
+      "width": 744,
+      "height": 508,
+      "fallback": false,
+      "srcW": 1482,
+      "srcH": 1314
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753533/sov-textmask-test/double-crochet.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "ecc66f7e-b247-4372-bc59-2b7b1a9e9610",
+        "slug": "double-crochet",
+        "primary_name": "Double Crochet",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "thin fabric"
+        ],
+        "construction_note": null,
+        "instructions": "Ch any number of sts.\nRow 1 (RS): Dc in 4th ch from hk (sk ch counts as dc), dc in ea ch across, turn.\nRow 2: Ch 3 (counts as dc), dc in ea dc across to t-ch, dc in top of t-ch, turn.\nRep row 2 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 194429.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745146/stitch-library/double-crochet.png",
+        "created_at": "2026-05-02T18:19:14.032123+00:00",
+        "updated_at": "2026-05-02T18:19:14.032123+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "The double crochet is the most useful stitch in a crocheter's toolbox. It can make thin fabric and when combined with other stitches can form an infinite number of patterns.",
+        "dimensions": "stitch_technique",
+        "difficulty": "beginner",
+        "common_uses": null
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": false
+    }
+  },
+  {
+    "slug": "basketweave-stitch",
+    "expected": "Basketweave Stitch",
+    "category": "textured",
+    "cropDims": {
+      "left": 88,
+      "top": 62,
+      "width": 744,
+      "height": 509,
+      "fallback": false,
+      "srcW": 1513,
+      "srcH": 1658
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753534/sov-textmask-test/basketweave-stitch.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "aa694d55-18d6-4a66-ba1e-f7c7200efea3",
+        "slug": "basketweave-stitch",
+        "primary_name": "Basketweave Stitch",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "basketweave texture",
+          "woven appearance",
+          "post stitch blocks"
+        ],
+        "construction_note": null,
+        "instructions": "Ch a multiple of 8 sts plus 4.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 3 (counts as dc), *FPdc in next 4 dc, BPdc in next 4 dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), *BPdc in next 4 dc, FPdc in next 4 dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRows 4 and 5: Rep rows 2 and 3 once.\nRow 6: Ch 3 (counts as dc), *BPdc in next 4 dc, FPdc in next 4 dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRow 7: Ch 3 (counts as dc), *FPdc in next 4 dc, BPdc in next 4 dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRows 8 and 9: Rep rows 6 and 7 once.\nRep rows 2â€“9 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 202957.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745114/stitch-library/basketweave-stitch.png",
+        "created_at": "2026-05-02T18:19:14.684383+00:00",
+        "updated_at": "2026-05-02T18:19:14.684383+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "This classic stitch works great for home projects from blankets to pillows.",
+        "dimensions": "pattern_arrangement",
+        "difficulty": "beginner",
+        "common_uses": [
+          "blankets",
+          "pillows"
+        ]
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": false
+    }
+  },
+  {
+    "slug": "waffle-rib",
+    "expected": "Waffle Rib",
+    "category": "textured",
+    "cropDims": {
+      "left": 99,
+      "top": 64,
+      "width": 744,
+      "height": 509,
+      "fallback": false,
+      "srcW": 1463,
+      "srcH": 1155
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753534/sov-textmask-test/waffle-rib.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "2a848559-8503-4b19-8236-9380b497e3ab",
+        "slug": "waffle-rib",
+        "primary_name": "Waffle Rib",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "raised texture",
+          "waffle texture",
+          "ribbing"
+        ],
+        "construction_note": null,
+        "instructions": "Ch an even number of sts.\nRow 1 (RS): Hdc in 3rd ch from hk (sk ch counts as hdc), hdc in ea ch across, turn.\nRow 2: Ch 2 (counts as hdc), *hdc blp in next hdc, hdc flp in next hdc; rep from * across to last 2 sts, hdc blp in next hdc, hdc in top of t-ch, turn.\nRep row 2 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 194335.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745215/stitch-library/waffle-rib.png",
+        "created_at": "2026-05-02T18:19:14.032123+00:00",
+        "updated_at": "2026-05-02T18:19:14.032123+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "A very textured stitch pattern makes for a great fabric for warm, snuggly sweaters.",
+        "dimensions": "pattern_arrangement",
+        "difficulty": "beginner",
+        "common_uses": [
+          "sweaters"
+        ]
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": true,
+      "stitch": {
+        "id": "80199a3e-d52c-431a-b53b-950b43042297",
+        "slug": "tweed",
+        "primary_name": "Tweed",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "tweed effect",
+          "colorwork"
+        ],
+        "construction_note": null,
+        "instructions": "Ch an even number of sts.\nRow 1 (RS): Sc in 2nd ch from hk, *ch 1, sk next ch, sc in next ch; rep from * across, turn.\nRow 2: Ch 1, sc in 1st sc, sc in next ch-1 sp, *ch 1, sk next sc, sc in next ch-1 sp; rep from * across to last sc, sc in last sc, turn.\nRow 3: Ch 1, sc in 1st sc, *ch 1, sk next sc, sc in next ch-1 sp; rep from * across to last 2 sts, ch 1, sk next sc, sc in last sc, turn.\nRep rows 2 and 3 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 194148.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745214/stitch-library/tweed.png",
+        "created_at": "2026-05-02T18:19:14.032123+00:00",
+        "updated_at": "2026-05-02T18:19:14.032123+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "This simple stitch pattern can transform itself into tweed when you crochet each row in a different color.",
+        "dimensions": "pattern_arrangement",
+        "difficulty": "beginner",
+        "common_uses": null
+      },
+      "confidence": "medium"
+    }
+  },
+  {
+    "slug": "spider",
+    "expected": "Spider",
+    "category": "lacy",
+    "cropDims": {
+      "left": 119,
+      "top": 175,
+      "width": 744,
+      "height": 687,
+      "fallback": false,
+      "srcW": 966,
+      "srcH": 898
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753536/sov-textmask-test/spider.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "7576cd9a-56d9-44f3-8a98-48ab8822e52d",
+        "slug": "spider",
+        "primary_name": "Spider",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "spider web",
+          "diamond shapes",
+          "chain spaces",
+          "intricate lace",
+          "openwork"
+        ],
+        "construction_note": null,
+        "instructions": "Ch a multiple of 14 sts plus 5.\nRow 1 (RS): Dc in 4th ch from hk (sk ch counts as dc), dc in next ch, *ch 3, sk next 3 ch, sc in next 5 ch, ch 3, sk next 3 ch, dc in next 3 ch; rep from * across, turn.\nRow 2: Ch 4 (counts as dc, ch-1 sp), *sk 3 dc, 3 dc in ch-3 sp, ch 3, sk next sc, sc in next 3 sc, ch 3, sk next sc, sc in ch-3 sp, ch 1; rep from * across, dc in 3rd ch of t-ch, turn.\nRow 3: Ch 3 (counts as dc), dc in ch-1 sp, *ch 3, sk next 3 dc, 3 dc in ch-3 sp, ch 3, sk next sc, sc in next sc, ch 3, sk next sc, 3 dc in ch-3 sp; rep from * across, dc in 3rd ch of t-ch, turn.\nRow 4: Ch 1, sc in 1st 2 dc, *sc in next ch-3 sp, ch 3, sk 3 dc, 3 dc in next ch-3 sp, ch 1, 3 dc in next ch-3 sp, ch 3, sk 3 dc, sc in next ch-3 sp, sc in dc; rep from * across, sc in top of t-ch, turn.\nRow 5: Ch 1, sc in 1st 3 sc, *sc in next ch-3 sp, ch 3, sk 3 dc, 3 dc in ch-1 sp, ch 3, sk 3 dc, sc in next ch-3 sp, sc in next 3 sc; rep from * across, turn.\nRow 6: Ch 1, sc in 1st 3 sc, *ch 3, sk 1 sc, 3 dc in next ch-3 sp, ch 1, 3 dc in next ch-3 sp, ch 3, sk 1 sc, sc in next 3 sc; rep from * across, turn.\nRow 7: Ch 3 (counts as dc), dc in next sc, *ch 3, sk 1 sc, 3 dc in next ch-3 sp, ch 3, sk 3 dc, dc in ch-1 sp, ch 3, sk 3 dc, 3 dc in next ch-3 sp, ch 3, sk 1 sc, dc in next sc; rep from * across, dc in last sc, turn.\nRow 8: Ch 4 (counts as dc, ch-1 sp), *3 dc in next ch-3 sp, ch 3, sk 3 dc, sc in next ch-3 sp, sc in 3 dc, sc in next ch-3 sp, ch 3, sk 3 dc, 3 dc in next ch-3 sp, ch 1; rep from * across, dc in top of t-ch, turn.\nRow 9: Ch 3 (counts as dc), 2 dc in ch-1 sp, *ch 3, sk 3 dc, sc in next ch-3 sp, sc in next 3 sc, sc in next ch-3 sp, ch 3, sk 3 dc, 3 dc in ch-1 sp; rep from * across, turn.\nRep rows 2â€“9 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 211124.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745204/stitch-library/spider.png",
+        "created_at": "2026-05-02T18:19:14.955957+00:00",
+        "updated_at": "2026-05-02T18:19:14.955957+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "The chain spaces all converging onto the diamond between the groups of double crochet look like a spider web when crocheted. This intricate pattern is great for small garments, like shrugs or wraps.",
+        "dimensions": "pattern_arrangement",
+        "difficulty": "advanced",
+        "common_uses": [
+          "shrugs",
+          "wraps",
+          "garments"
+        ]
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": false
+    }
+  },
+  {
+    "slug": "pineapple",
+    "expected": "Pineapple",
+    "category": "lacy",
+    "cropDims": {
+      "left": 105,
+      "top": 62,
+      "width": 744,
+      "height": 1495,
+      "fallback": false,
+      "srcW": 987,
+      "srcH": 1609
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753536/sov-textmask-test/pineapple.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "08452c42-8a67-4381-b8eb-ea4dc68ddd0d",
+        "slug": "pineapple",
+        "primary_name": "Pineapple",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "pineapple motif",
+          "lace openwork",
+          "fan shapes",
+          "treble crochet clusters"
+        ],
+        "construction_note": null,
+        "instructions": "Shell (sh): [2 dc, ch 2, 2 dc] in st indicated.\n\nCh a multiple of 31 sts plus 2.\n\nRow 1 (RS): Sc in 2nd ch from hk, *[ch 3, sk 1 ch, sc in next ch] 3 times, ch 3, sk 5 ch, sh in next ch, ch 1, sk 5 ch in next ch, ch 3, sk 5 ch, [sc in next ch, ch 3, sk 1 ch] 3 times; rep from * across to last dc, ch 1, tr in last dc, turn.\nRow 2: Ch 4 (counts as dc, ch-1 sp), 3 dc in ch-1 sp, *ch 3, sc in next ch-5 sp, sh in next ch-6 sp, sc in next ch-5 sp, ch 3, [3 dc, ch 3, 3 dc] in next ch-3 sp; rep from * across to last ch-3 sp, ch 3, sc in next ch-5 sp, sh in next ch-6 sp, sc in next ch-5 sp, ch 3, [3 dc, ch 1, dc] in last ch-5 sp, turn.\nRow 3: Ch 6 (counts as dc, ch-3 sp), 3 dc in ch-1 sp, *ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 5 times, sk next ch-3 sp, sk next ch-1 sp, [sc in next ch-1 sp, ch 3] 5 times, sk next ch-1 sp, sk next ch-3 sp, [3 dc, ch 1, dc] in last ch-4 sp, turn.\nRow 4: Ch 4 (counts as dc, ch-1 sp), 3 dc in ch-1 sp, *ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 4 times, sk next ch-3 sp, [3 dc, ch 3, 3 dc] in next ch-3 sp; rep from * across to last sc, ch 1, dc in last sc, turn.\nRow 5: Ch 1, sc in dc, *ch 3, sc in ch-3 sp, ch 3, sh in next ch-2 sp, ch 1, sk 1 ch-2 sp, 9 tr in next ch-2 sp, sk 1 ch-2 sp, sh in next ch-2 sp, sk 1 ch-3 sp [ch 3, sc in next ch-3 sp] twice; rep from * across to t-ch, sc in t-ch, turn.\nRow 6: Ch 4, *sc in next ch-3 sp, ch 3, sh in next ch-2 sp, ch 2, [sc in next ch 3] in next 8 tr, sc in next tr, ch 2, sh in next ch-2 sp, sk 1 ch-3 sp, ch 3, 3; rep from * across to last sc, ch 1, dc in last sc, turn.\nRow 7: Ch 1, sc in dc, *ch 3, sh in next ch-2 sp, ch 3, [sc in next ch-3 sp, ch 3] 8 times, sk 1 ch-2 sp, ch 3, sh in next ch-sp; rep from * across, turn.\nRow 8: Ch 5, *sh in next ch-2 sp, ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 7 times, sk next ch-3 sp, sh in next ch-2 sp, ch 1; rep from * across (do not ch 1), dtr in last sc, turn.\nRow 9: Ch 3 (counts as dc), 2 dc in dtr, *sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, [sc in next ch-3 sp, ch 3] 6 times, sk next ch-3 sp, sh in next ch-2 sp, sh in next ch-1 sp; rep from * across to t-ch, 3 dc in top of t-ch, turn.\nRow 10: Ch 3 (counts as dc), 2 dc in 1st dc, ch 1, *sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, [sc in next ch-3 sp, ch 3] 5 times, [sh in next ch-2 sp, ch 1] twice; rep from * across to t-ch (do not sh or ch 1), 3 dc in top of t-ch, turn.\nRow 11: Ch 3 (counts as dc), 2 dc in 1st dc, ch 2, *sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, [sc in next ch-3 sp, ch 3] 4 times, [sh in next ch-2 sp, ch 2] twice; rep from * across to t-ch (do not sh or ch 2), 3 dc in top of t-ch, turn.\nRow 12: Ch 4 (counts as tr), 4 tr in 1st dc, *ch 1, sk 1 ch-2 sp, sh in next ch-2 sp, ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 3 times, sh in next ch-2 sp, ch 1, sk 1 ch-2 sp, 9 tr in next ch-2 sp; rep from * across to t-ch, ch 1, sk 1 ch-2 sp, sh in next ch-2 sp, ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 3 times, sh in next ch-2 sp, ch 1, sk 1 ch-2 sp, 5 tr in top of t-ch, turn.\nRow 13: Ch 1, sc in 1st tr, *[ch 3, sc] in next 4 tr, ch 2, sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, [sc in next ch-3 sp, ch 3] twice, sh in next ch-2 sp, ch 2, [sc, ch 3] in next 4 tr, sc in next st; rep from * across, turn.\nRow 14: Ch 4, *[sc in next ch-3 sp, ch 3] 4 times, sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, sc in next ch-3 sp, ch 3, sh in next ch-2 sp, ch 3, [sc in next ch-3 sp, ch 3] 4 times; rep from * across to last sc (do not ch 3), ch 1, dc in last sc, turn.\nRow 15: Ch 1, sc in dc, *[ch 3, sc in next ch-3 sp] 3 times, ch 3, sh in next ch-2 sp, ch 1, sh in next ch-2 sp, sk 1 ch-3 sp, [ch 3, sc in next ch-3 sp] 4 times; rep from * across to t-ch, sc in t-ch, turn.\n\nRep rows 2â€“15 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 211752.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745189/stitch-library/pineapple.png",
+        "created_at": "2026-05-02T18:19:14.955957+00:00",
+        "updated_at": "2026-05-02T18:19:14.955957+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "This classic pineapple stitch pattern makes beautiful lace when crocheted in thread, from bedspreads to wedding shawls.",
+        "dimensions": "pattern_arrangement",
+        "difficulty": "advanced",
+        "common_uses": [
+          "bedspreads",
+          "wedding shawls",
+          "lace"
+        ]
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": true,
+      "stitch": {
+        "id": "08452c42-8a67-4381-b8eb-ea4dc68ddd0d",
+        "slug": "pineapple",
+        "primary_name": "Pineapple",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "pineapple motif",
+          "lace openwork",
+          "fan shapes",
+          "treble crochet clusters"
+        ],
+        "construction_note": null,
+        "instructions": "Shell (sh): [2 dc, ch 2, 2 dc] in st indicated.\n\nCh a multiple of 31 sts plus 2.\n\nRow 1 (RS): Sc in 2nd ch from hk, *[ch 3, sk 1 ch, sc in next ch] 3 times, ch 3, sk 5 ch, sh in next ch, ch 1, sk 5 ch in next ch, ch 3, sk 5 ch, [sc in next ch, ch 3, sk 1 ch] 3 times; rep from * across to last dc, ch 1, tr in last dc, turn.\nRow 2: Ch 4 (counts as dc, ch-1 sp), 3 dc in ch-1 sp, *ch 3, sc in next ch-5 sp, sh in next ch-6 sp, sc in next ch-5 sp, ch 3, [3 dc, ch 3, 3 dc] in next ch-3 sp; rep from * across to last ch-3 sp, ch 3, sc in next ch-5 sp, sh in next ch-6 sp, sc in next ch-5 sp, ch 3, [3 dc, ch 1, dc] in last ch-5 sp, turn.\nRow 3: Ch 6 (counts as dc, ch-3 sp), 3 dc in ch-1 sp, *ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 5 times, sk next ch-3 sp, sk next ch-1 sp, [sc in next ch-1 sp, ch 3] 5 times, sk next ch-1 sp, sk next ch-3 sp, [3 dc, ch 1, dc] in last ch-4 sp, turn.\nRow 4: Ch 4 (counts as dc, ch-1 sp), 3 dc in ch-1 sp, *ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 4 times, sk next ch-3 sp, [3 dc, ch 3, 3 dc] in next ch-3 sp; rep from * across to last sc, ch 1, dc in last sc, turn.\nRow 5: Ch 1, sc in dc, *ch 3, sc in ch-3 sp, ch 3, sh in next ch-2 sp, ch 1, sk 1 ch-2 sp, 9 tr in next ch-2 sp, sk 1 ch-2 sp, sh in next ch-2 sp, sk 1 ch-3 sp [ch 3, sc in next ch-3 sp] twice; rep from * across to t-ch, sc in t-ch, turn.\nRow 6: Ch 4, *sc in next ch-3 sp, ch 3, sh in next ch-2 sp, ch 2, [sc in next ch 3] in next 8 tr, sc in next tr, ch 2, sh in next ch-2 sp, sk 1 ch-3 sp, ch 3, 3; rep from * across to last sc, ch 1, dc in last sc, turn.\nRow 7: Ch 1, sc in dc, *ch 3, sh in next ch-2 sp, ch 3, [sc in next ch-3 sp, ch 3] 8 times, sk 1 ch-2 sp, ch 3, sh in next ch-sp; rep from * across, turn.\nRow 8: Ch 5, *sh in next ch-2 sp, ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 7 times, sk next ch-3 sp, sh in next ch-2 sp, ch 1; rep from * across (do not ch 1), dtr in last sc, turn.\nRow 9: Ch 3 (counts as dc), 2 dc in dtr, *sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, [sc in next ch-3 sp, ch 3] 6 times, sk next ch-3 sp, sh in next ch-2 sp, sh in next ch-1 sp; rep from * across to t-ch, 3 dc in top of t-ch, turn.\nRow 10: Ch 3 (counts as dc), 2 dc in 1st dc, ch 1, *sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, [sc in next ch-3 sp, ch 3] 5 times, [sh in next ch-2 sp, ch 1] twice; rep from * across to t-ch (do not sh or ch 1), 3 dc in top of t-ch, turn.\nRow 11: Ch 3 (counts as dc), 2 dc in 1st dc, ch 2, *sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, [sc in next ch-3 sp, ch 3] 4 times, [sh in next ch-2 sp, ch 2] twice; rep from * across to t-ch (do not sh or ch 2), 3 dc in top of t-ch, turn.\nRow 12: Ch 4 (counts as tr), 4 tr in 1st dc, *ch 1, sk 1 ch-2 sp, sh in next ch-2 sp, ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 3 times, sh in next ch-2 sp, ch 1, sk 1 ch-2 sp, 9 tr in next ch-2 sp; rep from * across to t-ch, ch 1, sk 1 ch-2 sp, sh in next ch-2 sp, ch 3, sk next ch-3 sp, [sc in next ch-3 sp, ch 3] 3 times, sh in next ch-2 sp, ch 1, sk 1 ch-2 sp, 5 tr in top of t-ch, turn.\nRow 13: Ch 1, sc in 1st tr, *[ch 3, sc] in next 4 tr, ch 2, sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, [sc in next ch-3 sp, ch 3] twice, sh in next ch-2 sp, ch 2, [sc, ch 3] in next 4 tr, sc in next st; rep from * across, turn.\nRow 14: Ch 4, *[sc in next ch-3 sp, ch 3] 4 times, sh in next ch-2 sp, ch 3, sk 1 ch-3 sp, sc in next ch-3 sp, ch 3, sh in next ch-2 sp, ch 3, [sc in next ch-3 sp, ch 3] 4 times; rep from * across to last sc (do not ch 3), ch 1, dc in last sc, turn.\nRow 15: Ch 1, sc in dc, *[ch 3, sc in next ch-3 sp] 3 times, ch 3, sh in next ch-2 sp, ch 1, sh in next ch-2 sp, sk 1 ch-3 sp, [ch 3, sc in next ch-3 sp] 4 times; rep from * across to t-ch, sc in t-ch, turn.\n\nRep rows 2â€“15 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 211752.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745189/stitch-library/pineapple.png",
+        "created_at": "2026-05-02T18:19:14.955957+00:00",
+        "updated_at": "2026-05-02T18:19:14.955957+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "This classic pineapple stitch pattern makes beautiful lace when crocheted in thread, from bedspreads to wedding shawls.",
+        "dimensions": "pattern_arrangement",
+        "difficulty": "advanced",
+        "common_uses": [
+          "bedspreads",
+          "wedding shawls",
+          "lace"
+        ]
+      },
+      "confidence": "high"
+    }
+  },
+  {
+    "slug": "tweed",
+    "expected": "Tweed",
+    "category": "patterned",
+    "cropDims": {
+      "left": 102,
+      "top": 67,
+      "width": 744,
+      "height": 509,
+      "fallback": false,
+      "srcW": 1543,
+      "srcH": 1430
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753537/sov-textmask-test/tweed.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "80199a3e-d52c-431a-b53b-950b43042297",
+        "slug": "tweed",
+        "primary_name": "Tweed",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "tweed effect",
+          "colorwork"
+        ],
+        "construction_note": null,
+        "instructions": "Ch an even number of sts.\nRow 1 (RS): Sc in 2nd ch from hk, *ch 1, sk next ch, sc in next ch; rep from * across, turn.\nRow 2: Ch 1, sc in 1st sc, sc in next ch-1 sp, *ch 1, sk next sc, sc in next ch-1 sp; rep from * across to last sc, sc in last sc, turn.\nRow 3: Ch 1, sc in 1st sc, *ch 1, sk next sc, sc in next ch-1 sp; rep from * across to last 2 sts, ch 1, sk next sc, sc in last sc, turn.\nRep rows 2 and 3 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 194148.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745214/stitch-library/tweed.png",
+        "created_at": "2026-05-02T18:19:14.032123+00:00",
+        "updated_at": "2026-05-02T18:19:14.032123+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "This simple stitch pattern can transform itself into tweed when you crochet each row in a different color.",
+        "dimensions": "pattern_arrangement",
+        "difficulty": "beginner",
+        "common_uses": null
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": false
+    }
+  },
+  {
+    "slug": "diamond-tweed",
+    "expected": "Diamond Tweed",
+    "category": "patterned",
+    "cropDims": {
+      "left": 110,
+      "top": 61,
+      "width": 744,
+      "height": 509,
+      "fallback": false,
+      "srcW": 1536,
+      "srcH": 1456
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753538/sov-textmask-test/diamond-tweed.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "80199a3e-d52c-431a-b53b-950b43042297",
+        "slug": "tweed",
+        "primary_name": "Tweed",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "tweed effect",
+          "colorwork"
+        ],
+        "construction_note": null,
+        "instructions": "Ch an even number of sts.\nRow 1 (RS): Sc in 2nd ch from hk, *ch 1, sk next ch, sc in next ch; rep from * across, turn.\nRow 2: Ch 1, sc in 1st sc, sc in next ch-1 sp, *ch 1, sk next sc, sc in next ch-1 sp; rep from * across to last sc, sc in last sc, turn.\nRow 3: Ch 1, sc in 1st sc, *ch 1, sk next sc, sc in next ch-1 sp; rep from * across to last 2 sts, ch 1, sk next sc, sc in last sc, turn.\nRep rows 2 and 3 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 194148.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745214/stitch-library/tweed.png",
+        "created_at": "2026-05-02T18:19:14.032123+00:00",
+        "updated_at": "2026-05-02T18:19:14.032123+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "This simple stitch pattern can transform itself into tweed when you crochet each row in a different color.",
+        "dimensions": "pattern_arrangement",
+        "difficulty": "beginner",
+        "common_uses": null
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": false
+    }
+  },
+  {
+    "slug": "solomons-knot-stitch",
+    "expected": "Solomon's Knot Stitch",
+    "category": "distinctive",
+    "cropDims": {
+      "left": 0,
+      "top": 489,
+      "width": 1534,
+      "height": 653,
+      "fallback": true,
+      "srcW": 1534,
+      "srcH": 1633
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753539/sov-textmask-test/solomons-knot-stitch.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "08e0ebe9-62d7-4705-9868-39be815f5df7",
+        "slug": "solomons-knot-stitch",
+        "primary_name": "Solomon's Knot Stitch",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "lacy loops",
+          "open mesh",
+          "elongated knots",
+          "airy fabric"
+        ],
+        "construction_note": null,
+        "instructions": "Main Solomon's Knot (msk): Draw up long lp on hk, ch 1 through the long lp, sc in blp of msk.\nEdge Solomon's Knot (esk): Draw up long lp on hk to about one-half length of the msk, yo, and draw the lp through the long lp, sc in blp of esk.\nBack Loop (blp): The back loop is the single strand of the Solomon's knot made from the ch 1, (the double strand is the front lp).\nCh 2.\nRow 1 (WS): Sc in 2nd ch from hk, esk across to desired length.\nRow 2: Esk, msk, turn, sk 1 esk, sc in next sc of esk, *work 2 msk, sk 1 sc, sc in next sc of esk; rep from * across.\nRow 3: Esk twice, msk, turn, sk 1st msk of row below, sc in next sc of msk,*msk twice, sk 2 msk, sc in next sc of esk; rep from * across.\nRep row 3 to desired length.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 212813.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745204/stitch-library/solomons-knot-stitch.png",
+        "created_at": "2026-05-02T18:19:14.955957+00:00",
+        "updated_at": "2026-05-02T18:19:14.955957+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "This classic stitch pattern can be super lacy or not at all, depending on the length of your main Solomon's Knot. Try swatching first to determine your favorite length.",
+        "dimensions": "pattern_arrangement",
+        "difficulty": "intermediate",
+        "common_uses": [
+          "shawls",
+          "scarves",
+          "lacy fabric"
+        ]
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": false
+    }
+  },
+  {
+    "slug": "broomstick-lace-flower",
+    "expected": "Broomstick Lace Flower",
+    "category": "distinctive",
+    "cropDims": {
+      "left": 0,
+      "top": 503,
+      "width": 1479,
+      "height": 670,
+      "fallback": true,
+      "srcW": 1479,
+      "srcH": 1677
+    },
+    "croppedUrl": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777753539/sov-textmask-test/broomstick-lace-flower.jpg",
+    "original": {
+      "matched": true,
+      "stitch": {
+        "id": "b4da74b6-a24b-4310-a3c9-8c8551cc3490",
+        "slug": "broomstick-lace-flower",
+        "primary_name": "Broomstick Lace Flower",
+        "abbreviation": null,
+        "symbol_description": null,
+        "visual_cues": [
+          "floral shape",
+          "looped petals",
+          "circular motif"
+        ],
+        "construction_note": null,
+        "instructions": "Ch 25.\nRnd 1 (RS): Sc in 2nd ch from hk and ea ch across, sl st to 1st sc, do not turnâ€”24 sc.\nRnd 2: Pull up lp in blp and flp of each sc around, remove all but last loop from hook, sl st back to foundation ch, turn work 180 degreesâ€”48 loops.\nRnd 3: Ch 1, *sc in next ch, sc2tog over next 2 ch; rep from * around, sl st to 1st sc, do not turnâ€”16 sc.\nRnd 4: Ch 1, (sc2tog over next 2 sc) across, do not turnâ€”8 sc.\nRnd 5: Rep rnd 4, fasten off, weave tail through center of motifâ€”4 sc.",
+        "also_known_as": [],
+        "bevs_tip": null,
+        "provenance": "canonical",
+        "verified_by_dani": false,
+        "source_filename": "Screenshot 2026-04-23 213143.png",
+        "usage_count": 0,
+        "confidence_score": null,
+        "version": 1,
+        "image_url": "https://res.cloudinary.com/dmaupzhcx/image/upload/v1777745123/stitch-library/broomstick-lace-flower.png",
+        "created_at": "2026-05-02T18:19:14.955957+00:00",
+        "updated_at": "2026-05-02T18:19:14.955957+00:00",
+        "created_by": "6e1a02d9-c210-4bc4-968e-dde3435565d1",
+        "description": "Using the lace loops as petals makes this motif perfect for alternative fibers like wire or plastic bags.",
+        "dimensions": "construction_method",
+        "difficulty": "intermediate",
+        "common_uses": [
+          "motifs",
+          "alternative fiber projects"
+        ]
+      },
+      "confidence": "high"
+    },
+    "cropped": {
+      "matched": false
+    }
+  }
+]

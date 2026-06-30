@@ -1,0 +1,352 @@
+{
+  "stitches": [
+    {
+      "primary_name": "Fleur Brussels Motif",
+      "slug": "fleur-brussels-motif",
+      "also_known_as": [],
+      "description": "Brussels lace can wrap around any shape to border it. This motif shows just one way you can use Brussels lace.",
+      "instructions": "Picot: Ch 3, sl st in 1st ch.\n\nFleur Motif\nMake an adjustable ring.\nRnd a: Ch 1, *[sc, ch 3, tr] in ring, picot, ch 4, sl st in 1st ch, picot, [tr, ch 3, 2 sc] in ring, ch 7, sc in ring; rep from * 3 more times, sl st to 1st sc, fasten off.\n\nBrussels Edging\nRow 1 (RS): Ch 9, dc in 6th ch from hk, dc in next 3 ch, turn.\nRow 2: Ch 2, tr in ch-7 sp on fleur, ch 2, dc in next 4 dc, turn.\nRow 3: Ch 5, dc in next 4 dc, turn.\nRow 4: Ch 2, sc in next ch-4 sp on fleur, ch 2, dc in next 4 dc, turn.\nRep row 3 on all odd rows.\nRow 6: Ch 2, tr in next ch-7 sp on fleur, ch 2, dc in next 4 dc, turn.\nRow 8: Ch 2, dtr in same ch-7 sp on fleur, ch 2, dc in next 4 dc, turn.\nRow 10: Ch 2, sl st to prev dtr, ch 2, dc in next 4 dc, turn.\nRep rows 2–11 around fleur, end with a row 10, fasten off whipstitch foundation chain and last row together.",
+      "dimension": "construction_method",
+      "difficulty": "advanced",
+      "common_uses": ["edging", "motifs", "borders"],
+      "visual_cues": ["floral center", "lace edging", "square motif", "open lacework"],
+      "source_filename": "Screenshot 2026-04-23 212725.png"
+    },
+    {
+      "primary_name": "Solomon's Knot Stitch",
+      "slug": "solomons-knot-stitch",
+      "also_known_as": [],
+      "description": "This classic stitch pattern can be super lacy or not at all, depending on the length of your main Solomon's Knot. Try swatching first to determine your favorite length.",
+      "instructions": "Main Solomon's Knot (msk): Draw up long lp on hk, ch 1 through the long lp, sc in blp of msk.\nEdge Solomon's Knot (esk): Draw up long lp on hk to about one-half length of the msk, yo, and draw the lp through the long lp, sc in blp of esk.\nBack Loop (blp): The back loop is the single strand of the Solomon's knot made from the ch 1, (the double strand is the front lp).\nCh 2.\nRow 1 (WS): Sc in 2nd ch from hk, esk across to desired length.\nRow 2: Esk, msk, turn, sk 1 esk, sc in next sc of esk, *work 2 msk, sk 1 sc, sc in next sc of esk; rep from * across.\nRow 3: Esk twice, msk, turn, sk 1st msk of row below, sc in next sc of msk,*msk twice, sk 2 msk, sc in next sc of esk; rep from * across.\nRep row 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["shawls", "scarves", "lacy fabric"],
+      "visual_cues": ["lacy loops", "open mesh", "elongated knots", "airy fabric"],
+      "source_filename": "Screenshot 2026-04-23 212813.png"
+    },
+    {
+      "primary_name": "Bathsheba Knot Stitch",
+      "slug": "bathsheba-knot-stitch",
+      "also_known_as": [],
+      "description": "Slightly more organized and advanced pattern based on the basic Solomon's Knot, Bathsheba Knot Stitch is perfect for lovely shawls.",
+      "instructions": "Main Solomon's Knot (msk): Draw up long lp on hk, ch 1 through the long lp, sc in blp of msk.\nEdge Solomon's Knot (esk): Draw up long lp on hk to about two-thirds length (about 3 ch lengths) of the msk, ch 1 through the long lp, sc in blp of esk.\nBack Loop (blp): The back loop is the single strand of the Solomon's Knot made from the ch 1 (the double strand is the front lp).\nStitch pattern is a multiple of 16 sts plus 2.\nRow 1 (RS): Sc in 2nd ch from hk, 'esk, sk 3 ch, sc in next ch; rep from * across, turn.\nRow 2: Ch 1, sc in 1st sc, 'msk, sk next sc, ttr in next sc, msk, sk next esk, sc in next sc; rep from * across, turn.\nRow 3: Ch 3, 'msk, sk dc, msk, sk dc, msk, sk dc in next st; rep from * across, turn.\nRow 4: Ch 6, 'esk, tr in next dc, esk, sc in next dc, esk, tr in next dc, ttr in next dc; rep from * across, turn.\nRow 5: Ch 1, sc in 1st st, sc in 1st sc, sk 1st sc, 'esk, 'sk 1 sc, sk, sc in next st; rep from * across to t-ch, sc in top of t-ch, tr in next sc, sk next sc, msk, ttr in next sc, msk, sc in next sc, sk next esk, msk, ttr in next sc, msk, sc in next sc, sk next esk; rep from * across, turn.\nRow 6: Rep row 3.\nRow 7: Rep row 5.\nRow 8: Ch 1, sc in 1st dc, 'esk, tr in next dc, esk, ttr in next dc, esk, sc in next dc; rep from * across, turn.\nRow 9: Rep row 5.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["shawls"],
+      "visual_cues": ["organized lace loops", "open mesh", "elongated knots", "structured pattern"],
+      "source_filename": "Screenshot 2026-04-23 212834.png"
+    },
+    {
+      "primary_name": "Abishag Cluster Knot",
+      "slug": "abishag-cluster-knot",
+      "also_known_as": [],
+      "description": "This is a slightly different take on the classic Solomon's Knot with clusters dotted throughout the pattern.",
+      "instructions": "Main Solomon's Knot (msk): Draw up long lp on hk, ch 1 through the long lp, sc in blp of msk.\nEdge Solomon's Knot (esk): Draw up long lp on hk to about one-half length of the msk, ch 1 through the long lp, sc in blp of esk.\nBack Loop (blp): The back loop is the single strand of the Solomon's Knot made from the ch 1 (the double strand is the front lp).\nCh 2.\nRow 1 (WS): Sc in 2nd ch from hk, esk, in a multiple of 2 to desired length, turn.\nRow 2: Ch 1, sc in 1st sc of esk, *msk twice, sk 1 esk, sc in next sc of esk; rep from * across, turn.\nRow 3: Ch 6, esk, *sk 1 sc, sk 1 msk, 3 dc-cl in next sc of msk, msk,; rep from * across to last sc, esk, ttr in last sc, turn.\nRow 4: Ch 4, msk, *sc in next dc-cl, msk twice; rep from * to last dc-cl, sc in last dc-cl, msk, tr in top of t-ch, turn.\nRow 5: Ch 2, dc in tr, *msk, sk 2 msk, 3 dc-cl in next sc of msk; rep from * across to t-ch, 2 dc-cl in top of t-ch, turn.\nRow 6: Ch 1, sc in 1st dc-cl, *msk twice, sc in next dc-cl; rep from * across, turn.\nRep rows 3–6 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["lacy loops", "cluster accents", "open mesh", "dotted texture"],
+      "source_filename": "Screenshot 2026-04-23 213033.png"
+    },
+    {
+      "primary_name": "Classic Broomstick Lace",
+      "slug": "classic-broomstick-lace",
+      "also_known_as": [],
+      "description": "Classic broomstick lace highlights the strands of yarn encased in rows of single crochet.",
+      "instructions": "Ch a multiple of 4 sts plus 1.\nRow 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in ea sc across, turn.\nRow 3: Pull up lp in ea sc across, moving lps to broomstick holder, ch 1 in last lp to lock st, turn.\nRow 4: Ch 1, working from right to left, *insert hook in first 4 loops at once, 4 sc in group; rep from * in groups of 4 lps across, turn.\nRow 5: Rep row 2.\nRep rows 2–5 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["encased yarn strands", "grouped loops", "horizontal texture", "fan-like clusters"],
+      "source_filename": "Screenshot 2026-04-23 213122.png"
+    },
+    {
+      "primary_name": "Broomstick Lace Flower",
+      "slug": "broomstick-lace-flower",
+      "also_known_as": [],
+      "description": "Using the lace loops as petals makes this motif perfect for alternative fibers like wire or plastic bags.",
+      "instructions": "Ch 25.\nRnd 1 (RS): Sc in 2nd ch from hk and ea ch across, sl st to 1st sc, do not turn—24 sc.\nRnd 2: Pull up lp in blp and flp of each sc around, remove all but last loop from hook, sl st back to foundation ch, turn work 180 degrees—48 loops.\nRnd 3: Ch 1, *sc in next ch, sc2tog over next 2 ch; rep from * around, sl st to 1st sc, do not turn—16 sc.\nRnd 4: Ch 1, (sc2tog over next 2 sc) across, do not turn—8 sc.\nRnd 5: Rep rnd 4, fasten off, weave tail through center of motif—4 sc.",
+      "dimension": "construction_method",
+      "difficulty": "intermediate",
+      "common_uses": ["motifs", "alternative fiber projects"],
+      "visual_cues": ["floral shape", "looped petals", "circular motif"],
+      "source_filename": "Screenshot 2026-04-23 213143.png"
+    },
+    {
+      "primary_name": "Madena Lace",
+      "slug": "madena-lace",
+      "also_known_as": [],
+      "description": "Teardrops are combined with picot edgings for a pretty paisley design.",
+      "instructions": "Picot: Ch 3, sl st in 1st ch.\nCh 5, sl st to 1st ch to form ring.\nRow 1: Ch 4 (counts as dc, ch 1), [dc, ch 1, dc] in ring, turn.\nRow 2: Ch 5, 2 sc in ch-1 sp, ch 4, 2 sc in last ch-sp, ch 2, dc in 3rd ch of t-ch, turn.\nRow 3: Ch 3, dc in ch-2 sp, ch 7, sk ch-4 sp, 2 dc in last ch-sp, turn.\nRow 4: Ch 1, sc in 1st dc, [2 sc, 2 hdc, 6 dc, 2 hdc, 2 sc] in ch-7 sp, sc in top of t-ch, turn.\nRow 5: Ch 2, sk 2 sc, sk 1 hdc, [dc in next st, ch 1] 7 times, dc2tog in next hdc and last sc, turn.\nRow 6: Ch 1, sc in 1st st, [sc, ch 4, sc] in ea ch-1 sp across, sc in last st, turn.\nNext Motif\nRow 7: Ch 3, dc in last sc of prev row, ch 4 (counts as dc, ch 1), [dc, ch 1, dc] around post of dc, sl st to edge of prev motif, turn.\nRow 8: Ch 5, 2 sc in ch-1 sp, ch 4, 2 sc in last ch-sp, ch 2, dc in 3rd ch of t-ch, turn.\nRow 9: Ch 3, dc in ch-2 sp, ch 7, sk ch-4 sp, 2 dc in last ch-sp, sl st to edge of prev motif, turn.\nRow 10: Sc in 1st dc, [2 sc, 2 hdc, 6 dc, 2 hdc, 2 sc] in ch-7 sp, sc in top of t-ch, turn.\nRow 11: Ch 2, sk 2 sc, sk 1 hdc, [dc in next st, ch 1] 7 times, dc2tog in next hdc and last sc, sl st to edge of prev motif, turn.\nRow 12: Sc in 1st st, [sc, ch 4, sc] in ea ch-1 sp across, sc in last st, turn.\nRep Next Motif to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["edging", "lace fabric"],
+      "visual_cues": ["paisley design", "teardrop shapes", "picot edging", "partial motifs joined in strip"],
+      "source_filename": "Screenshot 2026-04-23 213211.png"
+    },
+    {
+      "primary_name": "Anesha Lace",
+      "slug": "anesha-lace",
+      "also_known_as": [],
+      "description": "Flowers are combined off-center for a petal-like wave pattern.",
+      "instructions": "Four Double Crochet Cluster (4 dc-cl): *Yo, insert hk into st indicated and pull up lp, yo, pull through 2 lps on hk; rep from * once in same st and twice in next st indicated, yo and pull through all lps on hk.\nThree Double Crochet Cluster (3 dc-cl): *Yo, insert hk into st indicated and pull up lp, yo, pull through 2 lps on hk; rep from * once in same st and once in next st indicated, yo and pull through all lps on hk.\nCh 9, sl st to 1st ch to form ring.\nRow 1 (RS): Ch 3, 11 dc in ring, turn.\nRow 2: Ch 4, [dc, ch 1] in ea dc across to t-ch, dc in top of t-ch, turn.\nRow 3: Ch 2, sk 1 ch-1 sp, 2 dc-cl in next ch-1 sp, *ch 5, 4 dc-cl over prev ch-1 sp and ch-1 sp 2 away (skipping 1 ch-1 sp); rep from * across to last ch-1 sp, ch 5, 3 dc-cl in prev ch-1 sp and 3rd ch of t-ch, turn.\nRow 4: Ch 1, [Sc, hdc, 6 dc, hdc, sc] in ea ch-5 sp across.\nNext Motif\nRow 5: Ch 7, tr in 5th ch from hk, ch 3, 11 dc in ring, sl st to edge of prev motif, turn.\nRow 6: Ch 2, sl st to edge of prev motif, ch 1, [dc, ch 1] in ea dc across to t-ch, dc in top of t-ch, turn.\nRow 7: Ch 2, sk 1 ch-1 sp, 2 dc-cl in next ch-1 sp, *ch 5, 4 dc-cl over prev ch-1 sp and ch-1 sp 2 away (skipping 1 ch-1 sp); rep from * across to last ch-1 sp, ch 5, 3 dc-cl in prev ch-1 sp and 3rd ch of t-ch, sl st to edge of prev motif, turn.\nRow 8: Ch 1, [Sc, hdc, 6 dc, hdc, sc] in ea ch-5 sp across.\nRep Next Motif to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["edging", "lace strips"],
+      "visual_cues": ["off-center flowers", "petal wave", "shell-like fans", "partial motifs"],
+      "source_filename": "Screenshot 2026-04-23 213245.png"
+    },
+    {
+      "primary_name": "Zaria Lace",
+      "slug": "zaria-lace",
+      "also_known_as": [],
+      "description": "Partial snowflakes are combined along a petal seam to look like the rows are continuous between motifs.",
+      "instructions": "Picot: Ch 3, sl st in 1st ch from hk.\nFirst Motif\nCh 8, sl st to 1st ch to form ring.\nRow 1 (WS): Ch 3 (counts as dc), 11 dc in ring, turn—12 dc.\nRow 2: Ch 3 (counts as dc), dc in next dc, *ch 3, dc in next 4 dc; rep from * once, ch 3, dc in next dc, dc in top of t-ch, turn—12 dc.\nRow 3: Ch 3 (counts as dc), dc in next dc, *ch 4, dc in next 4 dc; rep from * once, ch 4, dc in next dc, dc in top of t-ch, turn—12 dc.\nRow 4: Ch 3 (counts as dc), dc in next dc, *ch 5, dc in next 4 dc; rep from * once, ch 5, dc in next dc, dc in top of t-ch, turn—12 dc.\nRow 5: Ch 3 (counts as dc), dc in next dc, *ch 7, dc in next 4 dc; rep from * once, ch 7, dc in next dc, dc in top of t-ch, turn—12 dc.\nRow 6: Ch 1, *sc in next dc, [2 dc, picot, 3 dc, picot, 3 dc, picot, 2 dc] in next ch-7 sp, sk next dc, sc in next dc; rep from * across, ch 5, dc in last sc, turn—30 dc.\nNext Motif\nRow 7 (RS): Ch 3 (counts as dc), 11 dc in ch-5 sp, sl st to top of t-ch on prev motif's row 5, turn—12 dc.\nRow 8: Ch 3 (counts as dc), dc in next dc, *ch 3, dc in next 4 dc; rep from * once, ch 3, dc in next dc, dc in top of t-ch, turn—12 dc.\nRow 9: Ch 3 (counts as dc), dc in next dc, *ch 4, dc in next 4 dc; rep from * once, ch 4, dc in next dc, dc in top of t-ch, sl st to top of t-ch on prev motif's row 3, turn—12 dc.\nRow 10: Ch 3 (counts as dc), dc in next dc, *ch 5, dc in next 4 dc; rep from * once, ch 5, dc in next dc, dc in top of t-ch, turn—12 dc.\nRow 11: Ch 3 (counts as dc), dc in next dc, *ch 7, dc in next 4 dc; rep from * once, ch 7, dc in next dc, dc in top of t-ch, sl st to top of t-ch on prev motif's row 1, turn—12 dc.\nRow 12: Ch 1, *sc in next dc, [2 dc, picot, 3 dc, picot, 2 dc] in next ch-7 sp, sk next dc, sc in next dc; rep from * across, ch 5, dc in last sc, turn—30 dc.\nRep Next Motif to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["edging", "lace strips"],
+      "visual_cues": ["partial snowflakes", "picot edging", "connected motifs", "delicate lace"],
+      "source_filename": "Screenshot 2026-04-23 213328.png"
+    },
+    {
+      "primary_name": "Innya Lace",
+      "slug": "innya-lace",
+      "also_known_as": [],
+      "description": "Half doilies are stacked on top of each other at angles for a layered look.",
+      "instructions": "First Motif\nCh 8, sl st to 1st ch to form ring.\nRow 1 (RS): Ch 4, [dc, ch 1] 6 times in ring, dc in ring, turn.\nRow 2: Ch 4, [2 dc-cl, ch 2] in ea ch-1 sp around, [2 dc-cl, ch 1, dc] in t-ch, turn.\nRow 3: Ch 2, [dc, ch 3, dc] in ea dc-cl to last, dc in last dc-cl, ch 3, dc2tog in last dc-cl and 3rd ch of t-ch, turn.\nRow 4: Ch 6, *dc2tog over next 2 dc, ch 5, rep from * around to last 2 dc, dc2tog over last 2 dc, ch 3, dc in last dc, turn.\nSecond Motif\nRow 5 (RS): Ch 7, dc in 1st dc2tog, ch 4, [dc, ch 1] 6 times in ring, dc in ring, turn.\nRow 6: Ch 4, [2 dc-cl, ch 2] in ea ch-1 sp around, [2 dc-cl, ch 1, dc] in t-ch, sl st to top edge of prev motif, turn.\nRow 7: Ch 2, [dc, ch 3, dc] in ea dc-cl to last, dc in last dc-cl, ch 3, dc2tog in last dc-cl and 3rd ch of t-ch, turn.\nRow 8: Ch 6, *dc2tog over next 2 dc, ch 5, rep from * around to last 2 dc, dc2tog over last 2 dc, turn.\nNext Motif\nRow 9 (RS): Dtr in 3rd ch-sp from end of 2nd prev motif, ch 4, [dc, ch 1] 6 times in ring, dc in ring, turn.\nRow 10: Ch 2, sc in ch-sp of 2nd prev motif, ch 1, [2 dc-cl, ch 2] in ea ch-1 sp around, [2 dc-cl, ch 1, dc] in t-ch, sc to top edge of prev motif, turn.\nRow 11: Ch 2, [dc, ch 3, dc] in ea dc-cl to last, dc in last dc-cl, ch 3, dc2tog in last dc-cl and 3rd ch of t-ch, turn.\nRow 12: Ch 2, sc in next ch-sp of 2nd prev motif, ch 3, [dc2tog, ch 5] in ea ch-3 sp around to last, dc2tog in last ch-3 sp, turn.\nRep Next Motif to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["edging", "lace strips"],
+      "visual_cues": ["half doilies", "layered angles", "stacked motifs", "open lacework"],
+      "source_filename": "Screenshot 2026-04-23 213348.png"
+    },
+    {
+      "primary_name": "Nadja Lace",
+      "slug": "nadja-lace",
+      "also_known_as": [],
+      "description": "Combining one petal along its seam makes a triangular motif with teardrop voids.",
+      "instructions": "Trefoil: Ch 4, sl st to 2nd ch, ch 3, sl st to 1st ch, ch 4, sl st to 2nd ch.\nFirst Motif\nCh 5, sl st to 1st ch to form ring.\nRow 1: Ch 5, dc2tog in ring, ch 2, dc in ring, turn.\nRow 2: Ch 3, 3 dc in ch-2 sp, 4 dc in t-ch sp, turn.\nRow 3: Ch 3, dc in next 3 dc, FPdtr, ch 4, FPquadtr, ch 4, FPdtr around dc2tog on row 1, dc in next 3 dc, dc in top of t-ch, turn.\nRow 4: Ch 1, sc in 1st dc, [2 dc, ch 3, 2 dc] in ch-4 sp, ch 3, turn, dtr in 1st sc, ch 1, turn, 3 sc in ch-3 sp, ch 1, [2 dc, ch 3, 2 dc] in same ch-4 sp, , trefoil, [(2 dc, ch 3) 3 times, 2 dc] in ch-4 sp, sc in top of t-ch, ch 8, turn, sk 1 ch-3 sp, sl st to next ch-3 sp, turn, 3 sc in ch-3 sp, do not turn.\nNext Motif\nCh 3, dc in 1st ch.\nRow 1: Ch 5, [dc2tog, ch 2, dc] around post of dc, sl st to edge of prev motif, turn.\nRow 2: Ch 3, 3 dc in ch-2 sp, 4 dc in t-ch sp, turn.\nRow 3: Ch 3, dc in next 3 dc, [BPdtr, ch 4, BPquadtr, ch 4, BPdtr] around dc2tog on row 1, dc in next 3 dc, dc in top of t-ch, sl st to edge of prev motif, turn.\nRow 4: Sc in 1st dc, [2 dc, ch 3, 2 dc] in ch-4 sp, ch 3, turn, dtr in 1st sc, sl st in edge of prev motif, ch 1, turn, 3 sc in ch-3 sp, ch 1, [2 dc, ch 3, 2 dc] in same ch-4 sp, trefoil, [(2 dc, ch 3) 3 times, 2 dc] in ch-4 sp, sc in top of t-ch, ch 8, turn, sk 1 ch-3 sp, sl st to next ch-3 sp, turn, 3 sc in ch-3 sp, do not turn.\nRep Next Motif, alternating front and back post stitch on row 3 for every new motif.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["edging", "lace strips"],
+      "visual_cues": ["triangular motifs", "teardrop voids", "petal seams", "trefoil accents"],
+      "source_filename": "Screenshot 2026-04-24 054151.png"
+    },
+    {
+      "primary_name": "Popsicle Spike",
+      "slug": "popsicle-spike",
+      "also_known_as": [],
+      "description": "This simple pattern just drops a stitch down every so often to give the look of bricks. Using bold colors for the rows of single crochet and a muted color for the spike stitches, you get an eye-catching fabric.",
+      "instructions": "Single Crochet Spike (sc spike): Insert hk into next st 3 rows below and pull up a lp, yo and pull through all the lps on the hk.\nCh a multiple of 6 sts plus 5.\nRow 1 (WS): Sc in the 2nd ch from hk and ea ch across, change color, turn.\nRows 2 and 3: Ch 1, sc in ea sc across, turn.\nRow 4: Change color, ch 1, sc in 1st sc, *sc spike over next 2 sc, sc in next 4 sc; rep from * across to last 3 sts, sc over next 2 sc, sc in last sc, turn.\nRow 5: Ch 1, sc in ea sc across, change color, turn.\nRows 6 and 7: Rep rows 2 and 3.\nRow 8: Change color, ch 1, *sc in next 4 sc, sc spike over next 2 sc; rep from * across to last 4 sts, sc in last 4 sc, turn.\nRow 9: Ch 1, sc in ea sc across, change color, turn.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": ["scarves", "colorwork fabric"],
+      "visual_cues": ["brick-like look", "spike stitches", "horizontal color stripes", "dropped stitch accent"],
+      "source_filename": "Screenshot 2026-04-24 054235.png"
+    },
+    {
+      "primary_name": "Ridge Diagonal",
+      "slug": "ridge-diagonal",
+      "also_known_as": [],
+      "description": "Dropping a stitch every few post stitches creates the look of the stitch falling down, while the post gives a bit of texture to the whole fabric. Using an odd number of colors makes changes a breeze.",
+      "instructions": "Ch a multiple of 4 sts plus 1.\nRow 1 (WS): Dc in 4th ch from hk (sk ch counts as dc), dc in next ch and ea ch across, change color, turn.\nRow 2: Ch 3 (counts as dc), dc in next 2 dc, *FPtr in next dc, dc in next 3 dc; rep from * across, dc in t-ch, change color, turn.\nRow 3: Ch 3 (counts as dc), *dc in next 3 dc, BPtr in next dc; rep from * across to last 2 dc, dc in next dc, dc in t-ch, change color, turn.\nRow 4: Ch 3 (counts as dc), *FPtr in next dc, dc in next 3 dc; rep from * across to last 2 dc, FPtr in next dc, dc in t-ch, change color, turn.\nRow 5: Ch 3 (counts as dc), dc in next dc, *BPtr in next dc, dc in next 3 dc; rep from * across to t-ch, dc in t-ch, change colors, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["scarves", "blankets"],
+      "visual_cues": ["diagonal ridges", "post stitch texture", "color stripes", "falling stitch effect"],
+      "source_filename": "Screenshot 2026-04-24 054305.png"
+    },
+    {
+      "primary_name": "Dotted Frieze",
+      "slug": "dotted-frieze",
+      "also_known_as": [],
+      "description": "The dropped stitches in this pattern make squares in the rows appear from thin air.",
+      "instructions": "Ch a multiple of 4 sts plus 3.\nRow 1 (WS): Sc in 2nd ch from hk and ea ch across, change color, turn.\nRow 2: Ch 3 (counts as dc), dc in next dc, *ch 2, sk 2 sc, dc in next 2 sc; rep from * across, turn.\nRow 3: Ch 1, sc in 1st 2 sc, *ch 2, sk ch-sp, sc in next 2 dc; rep from * across to end, change color, turn.\nRow 4: Ch 1, sc in 1st 2 sc, *dtr in next 2 sts 3 rows below (in front of ch-sps), sc in next 2 sc; rep from * across, change color, turn.\nRow 5: Ch 1, sc in ea sc across, turn.\nRow 6: Sl st in ea sc across, change color, turn.\nRow 7: Ch 1, sc in ea sc 2 rows below, change color, turn.\nRep rows 2–7 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["colorwork fabric", "scarves"],
+      "visual_cues": ["square dots", "dropped stitches", "color stripes", "geometric pattern"],
+      "source_filename": "Screenshot 2026-04-24 054436.png"
+    },
+    {
+      "primary_name": "Wave Tote",
+      "slug": "wave-tote",
+      "also_known_as": [],
+      "description": "When you vary stitch heights, a bold wave pops into your project.",
+      "instructions": "Single Crochet Spike (sc spike): Insert hk into next st 3 rows below and pull up a lp, yo and pull through all the lps on the hk.\nCh a multiple of 10 sts plus 2.\nRow 1 (RS): Sc in 2nd ch, and ea ch across, change color, turn.\nRow 2: Ch 1, sc in 1st sc, *sc in next sc, hdc in next sc, dc in next 5 sc, hdc in next sc, sc in next sc, ch 1, sk 1 sc; rep from * across to last sc, sc in last sc, turn.\nRow 3: Ch 1, sc in 1st sc, *sc in next sc, hdc in next hdc, dc in next 5 dc, hdc in next hdc, sc in next sc, ch 1, sk ch-sp; rep from * across to last sc, sc in last sc, change color, turn.\nRow 4: Ch 1, sc in 1st sc, *sc in next 9 sc, sc spike over ch-sp in sc 2 rows below; rep from * across to last 10 sts, sc in last 10 sts, turn.\nRow 5: Ch 1, sc in ea sc across, change color, turn.\nRow 6: Ch 3 (counts as dc), *dc in next 2 sc, hdc in next sc, sc in next sc, ch 1, sk 1 sc, sc in next sc, hdc in next sc, dc in next 3 sc; rep from * across, turn.\nRow 7: Ch 1, sc in 1st sc, *dc in next 2 dc, hdc in next hdc, sc in next sc, ch 1, sk ch-sp, sc in next sc, hdc in next hdc, dc in next 3 dc; rep from * across, change color, turn.\nRow 8: Ch 1, sc in 1st sc, *sc in next 4 sc, sc spike over ch-sp in sc 2 rows below, sc in next 5 sc; rep from * across, turn.\nRow 9: Ch 1, sc in ea sc across, change color, turn.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["totes", "bags", "colorwork projects"],
+      "visual_cues": ["bold waves", "varying stitch heights", "color stripes", "wave silhouette"],
+      "source_filename": "Screenshot 2026-04-24 054512.png"
+    },
+    {
+      "primary_name": "Gentle Wave",
+      "slug": "gentle-wave",
+      "also_known_as": [],
+      "description": "The gentle waves are highlighted in this pattern, separated by rows of single crochet.",
+      "instructions": "Ch a multiple of 14 sts plus 2.\nRow 1 (WS): Sc in 2nd ch from hk and ea ch across, change color, turn.\nRow 2: Ch 1, sc in 1st sc, *sc in next sc, hdc in next 2 sc, dc in next 2 sc, tr in next 3 sc, dc in next 2 sc, hdc in next 2 sc, sc in next 2 sc; rep from * across, do not turn.\nRow 3: Pick up yarn from 2 rows below, with right side facing, sc in 1st sc and ea across, change color, turn.\nRow 4: Ch 4 (counts as tr), *tr in next sc, dc in next 2 sc, hdc in next 2 sc, sc in next 3 sc, hdc in next 2 sc, dc in next 2 sc, tr in next 2 sc; rep from * across, do not turn.\nRow 5: Rep row 3 with WS facing do not turn.\nRow 6: Pick up yarn from 2 rows below, rep row 2, turn.\nRow 7: Rep Row 3, do not turn.\nRow 8: Pick up yarn, Rep Row 4, turn.\nRow 9: Ch 1, Rep Row 3 with WS facing, turn.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["scarves", "colorwork fabric"],
+      "visual_cues": ["gentle waves", "varying stitch heights", "color stripes", "wave texture"],
+      "source_filename": "Screenshot 2026-04-24 054536.png"
+    },
+    {
+      "primary_name": "Twilight",
+      "slug": "twilight",
+      "also_known_as": [],
+      "description": "The stars in this pattern bring a smile to the fabric with the night sky effect that emerges.",
+      "instructions": "Star Spike: Insert hk into 2nd prev st 1 row below and pull up a lp, insert hk into prev st 2 rows below and pull up a lp, insert hk into next st 3 rows below and pull up a lp, insert hk into st 1 away and 2 rows below and pull up a lp, insert hk into st 2 away and 1 row below and pull up a lp, yo and pull through all lps on hk.\nCh a multiple of 8 sts.\nRow 1 (WS): Sc in 2nd ch from hk and ea ch across, turn.\nRows 2 and 3: Ch 1, sc in ea sc across, turn.\nRow 4: Change color, ch 1, sc in 1st 3 sc, *star spike over next st (sk st behind), sc in next 7 sc; rep from * across to last 4 sts, star spike over next st, sc in last 3 sc, turn.\nRows 5–7: Ch 1, sc in ea sc across, turn.\nRow 8: Change color, ch 1, sc in 1st 7 sc, star spike over next st (sk st behind), sc in next 7 sc; rep from * across, turn.\nRow 9: Ch 1, sc in ea sc across, turn.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["scarves", "colorwork fabric"],
+      "visual_cues": ["star shapes", "night sky effect", "spike stitches", "two-color pattern"],
+      "source_filename": "Screenshot 2026-04-24 054559.png"
+    },
+    {
+      "primary_name": "Gambia",
+      "slug": "gambia",
+      "also_known_as": [],
+      "description": "This stitch pattern really does not have a right or wrong side, making it perfect for scarves or blankets.",
+      "instructions": "Ch a multiple of 8 sts plus 7.\nRow 1 (WS): Dc in 4th ch from hk, dc in next 3 ch, *ch 3, sk 1 ch, sc in next ch, ch 3, sk 1 ch, dc in next 5 ch; rep from * across, change color, turn.\nRow 2: Ch 1, sc in 1st 5 dc, *ch 1, 3 dc-cl in sc, ch 1, sc in next 5 dc; rep from * across, turn.\nRow 3: Ch 6 (counts as dc, ch 3), sk 2 sc, sc in next sc, ch 3, sk next sc, *dc in next sc, dc in next ch-1 sp, dc in next dc-cl, dc in next ch-1 sp, dc in next sc, ch 3, sk 1 sc, sc in next sc, ch 3, sk 1 sc; rep from * across to last sc, dc in last sc, change color, turn.\nRow 4: Ch 1, sc in dc, *ch 1, 3 dc-cl in sc, ch 1, sc in next 5 dc; rep from * across to last sc, ch 1, 3 dc-cl in next sc, ch 1, sc in 3rd ch of t-ch, turn.\nRow 5: Ch 3 (counts as dc), dc in next ch-1 sp, dc in next dc-cl, dc in next ch-1 sp, dc in next sc, *ch 3, sk 1 sc, sc in next sc, ch 3, sk 1 sc, dc in next sc, dc in next ch-1 sp, dc in next dc-cl, dc in next ch-1 sp, dc in next sc; rep from * across, change color, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["scarves", "blankets"],
+      "visual_cues": ["reversible fabric", "cluster accents", "chevron-like waves", "two-color pattern"],
+      "source_filename": "Screenshot 2026-04-24 054626.png"
+    }
+  ],
+  "entries_skipped": [
+    {
+      "source_filename": "Screenshot 2026-04-23 212756.png",
+      "reason": "continuation of Fleur Brussels Motif"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 212822.png",
+      "reason": "continuation of Solomon's Knot Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213001.png",
+      "reason": "continuation of Bathsheba Knot Stitch (duplicate scroll view of swatch/chart)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213006.png",
+      "reason": "continuation of Bathsheba Knot Stitch (duplicate scroll view of swatch/chart)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213016.png",
+      "reason": "continuation of Bathsheba Knot Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213042.png",
+      "reason": "continuation of Abishag Cluster Knot"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213102.png",
+      "reason": "continuation of Abishag Cluster Knot"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213132.png",
+      "reason": "continuation of Classic Broomstick Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213155.png",
+      "reason": "continuation of Broomstick Lace Flower"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213225.png",
+      "reason": "continuation of Madena Lace (chart + rows 1-6 and Next Motif header)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213233.png",
+      "reason": "continuation of Madena Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213250.png",
+      "reason": "continuation of Anesha Lace (partial swatch view)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213255.png",
+      "reason": "continuation of Anesha Lace (full swatch view)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213306.png",
+      "reason": "continuation of Anesha Lace (chart + description + rows 1-4)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213312.png",
+      "reason": "continuation of Anesha Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213336.png",
+      "reason": "continuation of Zaria Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213357.png",
+      "reason": "continuation of Innya Lace (chart + description + first motif rows 1-3)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213548.png",
+      "reason": "continuation of Zaria Lace (duplicate scroll showing full instruction text)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213649.png",
+      "reason": "continuation of Innya Lace (duplicate swatch view)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213657.png",
+      "reason": "continuation of Innya Lace (chart + description repeated)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 213704.png",
+      "reason": "continuation of Innya Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054200.png",
+      "reason": "continuation of Nadja Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054215.png",
+      "reason": "section header page: Chapter 5 Colorwork Stitch Patterns"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054251.png",
+      "reason": "continuation of Popsicle Spike"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054327.png",
+      "reason": "continuation of Ridge Diagonal (truncated text view)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054332.png",
+      "reason": "continuation of Ridge Diagonal"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054452.png",
+      "reason": "continuation of Dotted Frieze"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054523.png",
+      "reason": "continuation of Wave Tote"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054545.png",
+      "reason": "continuation of Gentle Wave"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054608.png",
+      "reason": "continuation of Twilight"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-24 054636.png",
+      "reason": "continuation of Gambia"
+    }
+  ],
+  "duplicates_skipped": [
+    {
+      "primary_name": "Zaria Lace",
+      "source_filename": "Screenshot 2026-04-23 213537.png"
+    }
+  ]
+}

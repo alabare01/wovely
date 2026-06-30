@@ -1,0 +1,399 @@
+{
+  "stitches": [
+    {
+      "primary_name": "Romeo Cluster Stitch",
+      "slug": "romeo-cluster-stitch",
+      "also_known_as": [],
+      "description": "This simple fabric pattern staggers little dots of texture throughout, making it a great pattern for kids' clothes.",
+      "instructions": "Ch a multiple of 6 sts plus 3.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in ea dc across to t-ch, sc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), dc in next 2 sc, *sk next sc, 2 dc-cl in next sc, 2 dc-cl in skipped sc (behind prev 2 dc-cl), dc in next 4 dc; rep from * across to last 4 sc, sk next sc, 2 dc-cl in next sc, 2 dc-cl in skipped sc, dc in last 2 dc, turn.\nRow 4: Ch 1, sc in ea st across to t-ch, sc on top of t-ch, turn.\nRow 5: Ch 3 (counts as dc), dc in ea sc across, turn.\nRow 6: Rep row 2 once.\nRow 7: Ch 3 (counts as dc), dc in next 5 sc, *sk next sc, 2 dc-cl in next sc, 2 dc-cl in skipped sc, dc in next 4 dc; rep from * across to last 7 sc, sk next sc, 2 dc-cl in next sc, 2 dc-cl in skipped sc, dc in last 5 dc, turn.\nRows 8 and 9: Rep rows 4 and 5.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["kids' clothes"],
+      "visual_cues": ["staggered texture dots", "cluster stitches", "raised bobble detail"],
+      "source_filename": "Screenshot 2026-04-23 200407.png"
+    },
+    {
+      "primary_name": "Kyla Shell Stitch",
+      "slug": "kyla-shell-stitch",
+      "also_known_as": [],
+      "description": "Half double crochet clusters make the shells come alive in this pattern, perfect for afghans.",
+      "instructions": "Shell (sh): [(3 hdc-cl, ch 2) twice, 3 hdc-cl] in st indicated.\nCh a multiple of 8 sts plus 2.\nRow 1 (RS): Sc in 2nd ch from hk, *sk 3 ch, sh in next ch, ch 1, sk 3 ch, sc in next ch; rep from * across, turn.\nRow 2: Ch 3 (counts as dc), dc in 1st sc, *ch 2, sk 1 hdc-cl, sc in next hdc-cl, ch 2, 3 dc in next sc; rep from * across to last sc, 2 dc in last sc, turn.\nRow 3: Ch 2, [hdc, ch 2, 3 hdc-cl] in 1st dc, ch 1, *sc in next sc, sk 1 dc, sh in next dc, ch 1; rep from * to last sc, sc in last sc; [3 hdc-cl, ch 2, 2 hdc-cl] in top of t-ch, turn.\nRow 4: Ch 1, sc in hdc-cl, *ch 2, 3 dc in next sc, ch 2, sk hdc-cl, sc in next hdc-cl; rep from * across, turn.\nRow 5: Ch 1, sc in 1st sc, *sk 1 dc, sh in next dc, ch 1, sc in next sc; rep from * across, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["afghans"],
+      "visual_cues": ["shell pattern", "half double crochet clusters", "open lace structure"],
+      "source_filename": "Screenshot 2026-04-23 200444.png"
+    },
+    {
+      "primary_name": "Marguerite Stitch",
+      "slug": "marguerite-stitch",
+      "also_known_as": [],
+      "description": "The half double stitches make the yarn strands star in this fabric.",
+      "instructions": "Half Double Crochet Five Together (hdc5tog): Yo, insert hk in top of hdctog just made and pull up a lp, yo, insert hk around post of hdctog just made and pull up a lp, yo, insert hk into prev sc and pull up a lp, [yo, insert hk into next sc and pull up a lp] twice, yo, pull through all lps on hk.\nCh an even number of sts.\nRow 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 3, hdc5tog over [2nd ch, 3rd ch, next 3 sc], *ch 1, hdc5tog; rep from * across to end, turn.\nRow 3: Ch 1, *sc in hdctog, sc in ch-1 sp; rep from * across to t-ch, sc in 1st ch of t-ch, sc in 2nd ch of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["star texture", "yarn strands radiate", "dense fabric"],
+      "source_filename": "Screenshot 2026-04-23 200507.png"
+    },
+    {
+      "primary_name": "Bobblet Stitch",
+      "slug": "bobblet-stitch",
+      "also_known_as": [],
+      "description": "The extended stitches in the fabric are a great substitute for classic bobbles, making this fabric gentle enough for wearable projects.",
+      "instructions": "Extra Extended Single Crochet (eesc): Insert hk into st indicated and pull up a lp, [yo and pull through 1 lp on hk] twice, yo and pull through all lps on hk.\nCh an even number of sts.\nRow 1 (WS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in 1st sc, *eesc in next sc, sc in next sc; rep from * across, turn.\nRow 3: Ch 1, sc in ea st across, turn.\nRow 4: Ch 1, sc in 1st 2 sc, *eesc in next sc, sc in next sc; rep from * across to last sc, sc in last sc, turn.\nRow 5: Ch 1, sc in ea st across, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": ["wearable projects"],
+      "visual_cues": ["extended stitch bobbles", "subtle texture dots", "soft fabric"],
+      "source_filename": "Screenshot 2026-04-23 200521.png"
+    },
+    {
+      "primary_name": "Diagonal Bob Stitch",
+      "slug": "diagonal-bob-stitch",
+      "also_known_as": [],
+      "description": "By moving the extended stitches over one stitch every other row, you create diagonal bobble lines in a soft fabric.",
+      "instructions": "Extra Extended Single Crochet (eesc): Insert hk into st indicated and pull up a lp, [yo and pull through 1 lp on hk] twice, yo and pull through all lps on hk.\nCh a multiple of 6 sts.\nRow 1 (WS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in 1st sc, *eesc in next sc, sc in next sc, eesc in next sc, sc in next 3 sc; rep from * to last 4 sc, [eesc in next sc, sc in next sc] twice, turn.\nRow 3: Ch 1, sc in ea st across, turn.\nRow 4: Ch 1, sc in 1st 2 sc, *eesc in next sc, sc in next sc, eesc in next sc, sc in next 3 sc; rep from * to last 3 sc, eesc in next sc, sc in last 2 sc, turn.\nRow 5: Ch 1, sc in ea st across, turn.\nRow 6: Ch 1, sc in 1st 3 sc, *eesc in next sc, sc in next sc, eesc in next sc, sc in next 3 sc; rep from * to last 2 sc, eesc in next sc, sc in last sc, turn.\nRow 7: Ch 1, sc in ea st across, turn.\nRow 8: Ch 1, sc in 1st 4 sc, *eesc in next sc, sc in next sc, eesc in next sc, sc in next 3 sc; rep from * to last sc, sc in last sc, turn.\nRow 9: Ch 1, sc in ea st across, turn.\nRow 10: Ch 1, sc in 1st sc, eesc in next sc, sc in next 3 sc, *eesc in next sc, sc in next sc, eesc in next sc, sc in next 3 sc; rep from * to end, turn.\nRow 11: Ch 1, sc in ea st across, turn.\nRow 12: Ch 1, sc in 1st 2 sc, eesc in next sc, *sc in next 3 sc, eesc in next sc, sc in next sc, eesc in next sc; rep from * to last 2 sc, sc in last 2 sc, turn.\nRow 13: Ch 1, sc in ea st across, turn.\nRep rows 2–13 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["diagonal bobble lines", "extended stitches", "soft fabric"],
+      "source_filename": "Screenshot 2026-04-23 201532.png"
+    },
+    {
+      "primary_name": "Filet Bobbles Stitch",
+      "slug": "filet-bobbles-stitch",
+      "also_known_as": [],
+      "description": "Half double clusters transform the classic filet stitch pattern to a sculptural fabric.",
+      "instructions": "Ch a multiple of 8 sts.\nRow 1 (WS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 4 (counts as dc, ch 1), sk 1st 2 sc, *dc in next sc, ch 1, sk next sc; rep from * across to last sc, dc in last sc, turn.\nRow 3: Ch 1, *sc in dc, sc in ch-1 sp; rep from * across to t-ch, sc in 4th ch of t-ch, sc in 3rd ch of t-ch, turn.\nRow 4: Ch 4 (counts as dc, ch 1), sk 1st 2 sc, *dc in next sc, 4 hdc-cl in next sc, [dc in next sc, ch 1, sk next sc] 3 times; rep from * across to last 5 sc, dc in next sc, 4 hdc-cl in next sc, dc in next sc, ch 1, dc in last sc, turn.\nRow 5: Ch 1, sc in ea st across, turn.\nRows 6 and 7: Rep rows 2 and 3 once.\nRow 8: Ch 4 (counts as dc, ch 1), sk 1st 2 sc, [dc in next sc, ch 1, sk next sc] twice, *dc in next sc, 4 hdc-cl in next sc, [dc in next sc, ch 1, sk next sc] 3 times; rep from * across to last sc, dc in last sc, turn.\nRow 9: Rep row 5.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": [],
+      "visual_cues": ["filet mesh", "half double crochet clusters", "sculptural fabric", "open and solid sections"],
+      "source_filename": "Screenshot 2026-04-23 201556.png"
+    },
+    {
+      "primary_name": "Diamante Bobble Stitch",
+      "slug": "diamante-bobble-stitch",
+      "also_known_as": [],
+      "description": "Alternating bobbles create columns of diamonds that are still lacy enough for garment projects as well.",
+      "instructions": "Ch a multiple of 8 sts plus 2.\nRow 1 (WS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 2 (counts as hdc), hdc in next 2 sc, *ch 1, sk next sc, 3 hdc-cl in next sc, ch 1, sk next sc, hdc in next 5 sc; rep from * across to last 6 sc, ch 1, sk next sc, 3 hdc-cl in next sc, ch 1, sk next sc, hdc in last 3 sc, turn.\nRow 3: Ch 1, sc in ea hdc and ch-1 sp across, turn.\nRow 4: Ch 2 (counts as hdc), hdc in next 2 sc, *3 hdc-cl in next sc, ch 1, sk next sc, 3 hdc-cl in next sc, hdc in next 5 sc; rep from * across to last 6 sc, 3 hdc-cl in next sc, ch 1, sk next sc, 3 hdc-cl in next sc, hdc in last 3 sc, turn.\nRow 5: Ch 1, sc in ea hdc and ch-1 sp across, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["garments"],
+      "visual_cues": ["diamond columns", "alternating bobbles", "lacy texture"],
+      "source_filename": "Screenshot 2026-04-23 201628.png"
+    },
+    {
+      "primary_name": "Popcorn Line Stitch",
+      "slug": "popcorn-line-stitch",
+      "also_known_as": [],
+      "description": "Popcorn all lined up in neat rows makes this pattern great for geometric and symmetric projects, as in a block in an afghan.",
+      "instructions": "Popcorn (pop): 5 dc in st indicated, remove hk, insert hk into 1st dc (from front to back), place free lp back on hk and pull through 1st dc.\nCh a multiple of 4 sts plus 2.\nRow 1 (RS): [Sc, ch 3, pop] in 2nd ch from hk, *sk 3 ch, [sc, ch 3, pop] in next ch; rep from * across to last 4 ch, sk 3 ch, sc in last sc, turn.\nRow 2: Ch 3 (counts as dc), *[2 sc, hdc] in next ch-3 sp, dc in next sc; rep from * across, turn.\nRow 3: Ch 1, *[sc, ch 3, pop] in dc, sk 3 sts; rep from * across to t-ch, sc in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["afghans"],
+      "visual_cues": ["popcorn stitches", "geometric rows", "raised texture", "symmetric pattern"],
+      "source_filename": "Screenshot 2026-04-23 201648.png"
+    },
+    {
+      "primary_name": "Balloon Stitch",
+      "slug": "balloon-stitch",
+      "also_known_as": [],
+      "description": "Clusters pop from the fabric, making this stitch pattern great for fun projects like hats and mittens.",
+      "instructions": "Ch a multiple of 6 sts plus 1.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in 1st 2 dc, *5 dc-cl in next dc, sc in next 5 dc; rep from * across to last 3 sts, 5 dc-cl in next sc, sc in last dc, sc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), dc in ea st across, turn.\nRow 4: Ch 1, sc in 1st 5 dc, *5 dc-cl in next dc, sc in next 5 dc; rep from * across, turn.\nRow 5: Ch 3 (counts as dc), dc in ea st across, turn.\nRep rows 2–5 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["hats", "mittens"],
+      "visual_cues": ["cluster pops", "raised texture", "staggered bobbles"],
+      "source_filename": "Screenshot 2026-04-23 202345.png"
+    },
+    {
+      "primary_name": "Judith Bobble Stitch",
+      "slug": "judith-bobble-stitch",
+      "also_known_as": [],
+      "description": "This beautifully classic cable fabric looks equally great in projects from sweaters to afghans.",
+      "instructions": "Ch a multiple of 12 sts plus 8.\nRow 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 1, sc in ea st across, turn.\nRow 3: Ch 1, sc in 1st 2 sc, *FPdc around next st 2 rows below, sc in next sc, FPdc around next st 2 rows below, sc in next 4 sc, 4 hdc-cl in next sc, sc in next 4 sc; rep from * across to last 5 sts, FPdc around next st 2 rows below, sc in next sc, FPdc around next st 2 rows below, sc in last 2 sc, turn.\nRow 4: Rep row 2.\nRow 5: Ch 1, sc in 1st 2 sc, *FPdc around next st 2 rows below, sc in next sc, FPdc around next st 2 rows below, sc in next 2 sc, 4 hdc-cl in next sc, sc in next 3 sc, 4 hdc-cl in next sc, sc in next 2 sc; rep from * across to last 5 sts, FPdc around next st 2 rows below, sc in next sc, FPdc around next st 2 rows below, sc in last 2 sc, turn.\nRows 6 and 7: Rep rows 2 and 3.\nRow 8: Rep row 2.\nRow 9: Ch 1, sc in 1st 2 sc, *FPdc around next st 2 rows below, sc in next sc, FPdc around next st 2 rows below, sc in next 9 sc; rep from * across to last 5 sts, FPdc around next st 2 rows below, sc in next sc, FPdc around next st 2 rows below, sc in last 2 sc, turn.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["sweaters", "afghans"],
+      "visual_cues": ["cable fabric", "bobble clusters", "front post stitches", "raised texture"],
+      "source_filename": "Screenshot 2026-04-23 202356.png"
+    },
+    {
+      "primary_name": "Popping Cable Stitch",
+      "slug": "popping-cable-stitch",
+      "also_known_as": [],
+      "description": "The cables in this pattern literally jump off the fabric surface, making this stitch great for accessories that can handle the three-dimensional nature of this fabric.",
+      "instructions": "Cable: Ch 4, sl st around post of next sc 3 rows below, turn, 4 sc in ch-4 sp, turn.\nCh a multiple of 6 sts.\nRow 1 (RS): Sc in 2nd ch from hk and ea ch across, turn.\nRows 2–4: Ch 1, sc in ea sc across, turn.\nRow 5: Ch 1, sc in 1st 2 sc, *cable in next sc 3 rows below, sk next sc on current row, sc in next 5 sc; rep from * to last 3 sc, cable in next sc 3 rows below, sc in last 2 sc, turn.\nRow 6: Ch 1, sc in ea st across, turn.\nRow 7: Ch 1, sc in 1st 2 sc, *cable in next sc 3 rows below (behind prev cable), sk next sc on row, sc in next 5 sc; rep from * to last 3 sc, cable in next sc 3 rows below, sc in last 2 sc, turn.\nRep rows 6–7 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["accessories"],
+      "visual_cues": ["three-dimensional cables", "raised surface cables", "bold texture"],
+      "source_filename": "Screenshot 2026-04-23 202533.png"
+    },
+    {
+      "primary_name": "Popping Circle Stitch",
+      "slug": "popping-circle-stitch",
+      "also_known_as": [],
+      "description": "Bursting from the fabric are sculptural circles that you can highlight even more with a color change.",
+      "instructions": "Circle: 6 dc around post of next dc, turn work 180 degrees, 6 dc around post of prev dc (circle made).\nCh a multiple of 8 sts plus 2.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 3 (counts as dc), dc in ea dc across, dc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), dc in next 3 dc, *circle around post of next and prev dc, dc in top of same dc (behind circle), dc in next 7 dc; rep from * across to last 4 dc, circle in around post of next and prev dc, dc in top of same dc (behind circle), dc in next 2 dc, dc in top of t-ch, turn.\nRows 4–6: Ch 3 (counts as dc), dc in ea dc across, turn.\nRow 7: Ch 3 (counts as dc), dc in next 7 dc, *circle around post of next and prev dc, dc in top of same dc (behind circle), dc in next 7 dc; rep from * across, turn.\nRows 8–10: Ch 3 (counts as dc), dc in ea dc across, turn.\nRep rows 3–10 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["sculptural circles", "three-dimensional circles", "bold raised texture"],
+      "source_filename": "Screenshot 2026-04-23 202549.png"
+    },
+    {
+      "primary_name": "Popping Flower Stitch",
+      "slug": "popping-flower-stitch",
+      "also_known_as": [],
+      "description": "By adding a few chains, you can turn the circles in the Popping Circle Stitch into flowers. This fabric is great for playmats for babies or for statement scarves.",
+      "instructions": "Flower: [(Dc, ch 3) 6 times] around post of next dc, turn work 180 degrees, [(dc, ch 3) 5 times, dc] around post of prev dc.\nCh a multiple of 12 sts.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRows 2–4: Ch 3 (counts as dc), dc in ea dc across, dc in top of t-ch, turn.\nRow 5: Ch 3 (counts as dc), dc in next 4 dc, *flower around post of next and prev dc, dc in top of same dc (behind flower), dc in next 11 dc; rep from * across to last 5 dc, flower around post of next and prev dc, dc in top of same dc (behind circle), dc in next 3 dc, dc in top of t-ch, turn.\nRows 6–8: Ch 3 (counts as dc), dc in ea dc across, turn.\nRow 9: Ch 3 (counts as dc), dc in next 4 dc, *dc in next 6 dc, flower around post of next and prev dc, dc in top of same dc (behind flower), dc in next 5 dc; rep from * across to last 5 dc, dc in next 4 dc, dc in top of t-ch, turn.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["playmats", "scarves"],
+      "visual_cues": ["sculptural flowers", "three-dimensional floral motifs", "raised surface flowers"],
+      "source_filename": "Screenshot 2026-04-23 202913.png"
+    },
+    {
+      "primary_name": "Single Rib",
+      "slug": "single-rib",
+      "also_known_as": [],
+      "description": "The start of every good cable comes down to just a simple post stitch. This pattern highlights the beauty in the simplicity.",
+      "instructions": "Ch an even number of sts.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 3 (counts as dc), *FPdc in next dc, BPdc in next dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRep row 2 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": [],
+      "visual_cues": ["ribbed texture", "post stitches", "vertical columns"],
+      "source_filename": "Screenshot 2026-04-23 202937.png"
+    },
+    {
+      "primary_name": "Basketweave Stitch",
+      "slug": "basketweave-stitch",
+      "also_known_as": [],
+      "description": "This classic stitch works great for home projects from blankets to pillows.",
+      "instructions": "Ch a multiple of 8 sts plus 4.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 3 (counts as dc), *FPdc in next 4 dc, BPdc in next 4 dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), *BPdc in next 4 dc, FPdc in next 4 dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRows 4 and 5: Rep rows 2 and 3 once.\nRow 6: Ch 3 (counts as dc), *BPdc in next 4 dc, FPdc in next 4 dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRow 7: Ch 3 (counts as dc), *FPdc in next 4 dc, BPdc in next 4 dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRows 8 and 9: Rep rows 6 and 7 once.\nRep rows 2–9 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "beginner",
+      "common_uses": ["blankets", "pillows"],
+      "visual_cues": ["basketweave texture", "woven appearance", "post stitch blocks"],
+      "source_filename": "Screenshot 2026-04-23 202957.png"
+    },
+    {
+      "primary_name": "Woven Stitch",
+      "slug": "woven-stitch",
+      "also_known_as": [],
+      "description": "Alternating post stitches creates a woven-like fabric that is thick and soft. This makes great hats and slippers.",
+      "instructions": "Ch an even number of sts.\nRow 1 (RS): Dc in 4th ch from hk and ea ch across, turn.\nRow 2: Ch 3 (counts as dc), *FPdc in next dc, BPdc in next dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), *BPdc in next dc, FPdc in next dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "stitch_technique",
+      "difficulty": "beginner",
+      "common_uses": ["hats", "slippers"],
+      "visual_cues": ["woven-like fabric", "thick fabric", "soft texture", "alternating post stitches"],
+      "source_filename": "Screenshot 2026-04-23 203026.png"
+    },
+    {
+      "primary_name": "Cable Towers",
+      "slug": "cable-towers",
+      "also_known_as": [],
+      "description": "The taller stitches in these classic cables give you a slight extra drape that makes this pattern great for afghans.",
+      "instructions": "Ch a multiple of 8 sts plus 3.\nRow 1 (RS): Hdc in 3rd ch from hk and ea ch across, turn.\nRow 2: Ch 2 (counts as hdc), hdc in ea st across, hdc in top of t-ch, turn.\nRow 3: Ch 2 (counts as hdc), hdc in next 2 hdc, *FPtr in next 4 sts 2 rows below, hdc in next 4 hdc; rep from * across, ending hdc in last 3 sts, turn.\nRow 4: Rep row 2.\nRow 5: Ch 2 (counts as hdc), hdc in next 2 hdc, *sk 2 sts, FPtr in next 2 sts 2 rows below, FPtr in skipped 2 sts 2 rows below, hdc in next 4 sts; rep from * across, ending hdc in last 3 sts, turn.\nRows 6 and 7: Rep rows 2 and 3.\nRep rows 2–7 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["afghans"],
+      "visual_cues": ["cable columns", "treble post stitches", "raised cables", "classic cable look"],
+      "source_filename": "Screenshot 2026-04-23 203044.png"
+    },
+    {
+      "primary_name": "Petal Link Stitch",
+      "slug": "petal-link-stitch",
+      "also_known_as": [],
+      "description": "The mix of lace and post stitches makes the clusters in this pattern pop in and out of the fabric, allowing you to make fantastic garments.",
+      "instructions": "Shell (sh): [Dc2tog, ch 2, dc2tog] in st indicated.\nCh a multiple of 6 sts plus 3.\nRow 1 (RS): Sh in 6th ch from hk, *sk 2 ch, dc in next ch, sk 2 ch, sh in next ch; rep from * across to last 3 ch, sk 2 ch, dc in last ch, turn.\nRow 2: Ch 3 (counts as dc), *sh in ch-2 sp of next sh, BPdc around next dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRow 3: Ch 4 (counts as dc, ch-1 sp), 2 dc-cl in 1st dc, *dc in ch-2 sp of next sh, sh in next dc; rep from * across to last sh, dc in ch-2 sp of last sh, [2 dc-cl, ch 1, dc] in top of t-ch, turn.\nRow 4: Ch 4 (counts as dc, ch-1 sp), 2 dc-cl in 1st dc, *BPdc around next dc, sh in ch-2 sp of next sh; rep from * across to last sh, BPdc around next dc, [2 dc-cl, ch 1, dc] in 3rd ch of t-ch, turn.\nRow 5: Ch 3 (counts as dc), *sh in next dc, dc in ch-2 sp of next sh; rep from * across to last sh, sh in next dc, dc in 3rd ch of t-ch, turn.\nRow 6: Ch 3 (counts as dc), *sh in ch-2 sp of next sh, BPdc around next dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRep rows 3–6 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["garments"],
+      "visual_cues": ["lace and cable mix", "cluster pops", "shell motifs", "open fabric"],
+      "source_filename": "Screenshot 2026-04-23 203103.png"
+    },
+    {
+      "primary_name": "Greene Lace",
+      "slug": "greene-lace",
+      "also_known_as": [],
+      "description": "Sometimes opposites do attract, especially in this fabric of lace and cables; both make the other look even more impressive.",
+      "instructions": "Shell (sh): [(Dc, ch 1) 3 times, dc] in st indicated.\nCh a multiple of 14 sts plus 4.\nRow 1 (RS): Sh in 6th ch from hk, sk next 2 ch, *dc in next 4 ch, sk 2 ch, sh in next ch, sk 4 ch, sh in next ch, sk 2 ch; rep from * across to last 10 ch, dc in next 4 ch, sk 2 ch, sh in next ch, dc in last ch, turn.\nRow 2: Ch 3 (counts as dc), sh in center ch-1 sp of next sh, sk [dc, ch 1, dc], *BPtr in next 4 sts, [sh in center ch-1 sp of next sh] twice, sk [dc, ch1, dc]; rep from * across to last sh, sh in center ch-1 sp of last sh, dc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), sh in center ch-1 sp of next sh, *FPtr in next tr, sk next tr, FPtr in next tr, FPtr in skipped tr (crossing in front of prev st), FPtr in next tr, [sh in center ch-1 sp of next sh] twice; rep from * across to last 4 tr, FPtr in next tr, sk 1 tr, FPtr in next tr, FPtr in skipped tr (in front of prev st), FPtr in next tr, sh in center ch-1 sp of last sh, dc in top of t-ch, turn.\nRep rows 2 and 3 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["lace and cable combination", "shell motifs", "cable crosses", "open fabric"],
+      "source_filename": "Screenshot 2026-04-23 203125.png"
+    },
+    {
+      "primary_name": "Ginger Stitch",
+      "slug": "ginger-stitch",
+      "also_known_as": [],
+      "description": "Post stitches in this lace pattern help pop the pattern into your vision. This fabric is equally great for garments or blankets.",
+      "instructions": "Shell (sh): [2 dc, ch 1, 2 dc] in st indicated.\nV-Stitch (v-st): [Dc, ch 1, dc] in st indicated.\nCh a multiple of 8 sts plus 4.\nRow 1 (RS): 2 dc in 4th ch from hk (counts as half sh), *sk 3 ch, v-st in next ch, sk 3 ch, sh in next ch; rep from * across to last 8 ch, sk 3 ch, v-st in next ch, sk 3 ch, 3 dc in last ch, turn.\nRow 2: Ch 3 (counts as dc), 2 dc in 1st dc (counts as half sh), *sk 2 dc, BPdc around next dc, ch 1, BPdc around next dc, sh in ch-1 sp of next sh; rep from * across to last 5 dc, BPdc around next dc, ch 1, BPdc around next dc, 3 dc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), 2 dc in 1st dc, *sk 2 dc, FPdc around next dc, ch 1, FPdc around next dc, sh in ch-1 of next sh; rep from * across to last 5 dc, FPdc around next dc, ch 1, FPdc around next dc, 3 dc in top of t-ch, turn.\nRow 4: Ch 3 (counts as dc), dc in 1st dc, *sh in next ch-1 sp, v-st in ch-1 sp of next sh; rep from * across to last ch-1 sp, sh in last ch-1 sp, 2 dc in top of t-ch, turn.\nRow 5: Ch 3 (counts as dc), dc in next dc, *sh in ch-1 sp of next sh, sk 2 dc, FPdc around next dc, ch 1, FPdc around next dc; rep from * across to last ch-1 sp, sh in last ch-1 sp, 2 dc in top of t-ch, turn.\nRow 6: Ch 3 (counts as dc), dc in next dc, *sh in ch-1 sp of next sh, sk 2 dc, BPdc around next dc, ch 1, BPdc around next dc; rep from * across to last ch-1 sp, sh in last ch-1 sp, 2 dc in top of t-ch, turn.\nRow 7: Ch 3 (counts as dc), 2dc in 1st dc, *v-st in ch-1 sp of next sh, sh in next ch-1 sp; rep from * across to last ch-1 sp, v-st in last ch-1 sp, 3 dc in top of t-ch, turn.\nRep rows 2–7 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["garments", "blankets"],
+      "visual_cues": ["lace with post stitches", "shell motifs", "V-stitch", "open fabric"],
+      "source_filename": "Screenshot 2026-04-23 203329.png"
+    },
+    {
+      "primary_name": "Ripple Lace",
+      "slug": "ripple-lace",
+      "also_known_as": [],
+      "description": "Simple diagonal lines of post stitches make a unique fabric that looks amazing in scarves and shawls.",
+      "instructions": "Ch a multiple of 3 sts.\nRow 1 (WS): Sc in 2nd ch from hk and ea ch across, turn.\nRow 2: Ch 3 (counts as dc), sk 1st sc, *sk next 2 sc, dc in next sc, ch 1, dc in 1st sk sc; rep from * to last sc, dc in last sc, turn.\nRow 3: Ch 1, sc in ea st and ch-sp across, turn.\nRow 4: Ch 3 (counts as dc), sk 1st sc, *sk next 2 sc, FPtr in next dc 2 rows below, ch 1, dc in 1st sk sc; rep from * to last sc, dc in last sc, turn.\nRep rows 3 and 4 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "intermediate",
+      "common_uses": ["scarves", "shawls"],
+      "visual_cues": ["diagonal lines", "post stitches", "lacy fabric", "open structure"],
+      "source_filename": "Screenshot 2026-04-23 203355.png"
+    },
+    {
+      "primary_name": "Pine Tree Stitch",
+      "slug": "pine-tree-stitch",
+      "also_known_as": [],
+      "description": "Post stitches combined with crocheting into previous stitches create a forest of trees in this stitch pattern.",
+      "instructions": "Pine Tree Stitch (tree): [Ch 1, ttr, ch 1, dtr in 4th horiz bar of prev ttr, ch 1, tr in 3rd horiz bar of prev dtr, ch 1, dc in 2nd horiz bar of prev tr, ch 2, hdc in horiz bar of prev dc, ch 1, dc in 2nd horiz bar of prev tr, ch 1, tr in 3rd horiz bar of prev dtr, ch 1, dtr in 4th horiz bar of prev ttr, ch 1] in st indicated.\nBack Post Treble Four Together (BPtr4tog): *Sk next ch-sp, yo twice, insert hk around post of next st from back to front to back, and pull up a lp, [yo and pull through 2 lps] twice; rep from * 3 more times.\nBack Post Treble Eight Together (BPtr8tog): *Yo twice, insert hk around post of next st, from back to front to back, and pull up a lp, [yo and pull through 2 lps] twice, sk ch-sp; rep from * 3 more times, sk next (ch-1, sc, ch-1); rep from * 4 times.\nLeft Decrease (left dec): *Yo twice, insert hk around post of next st from back to front to back and pull up a lp, [yo and pull through 2 lps] twice; rep from * 3 more times, yo 3 times, insert hk in last sc and pull up a lp, [yo and pull through 2 lps] 3 times, yo, [yo and pull through 2 lps] 3 times, yo and pull through all lps on hk.\nRight Decrease (right dec): *Yo twice, insert hk around post of next st from front to back to front and pull up a lp, [yo and pull through 2 lps] twice; rep from * 3 more times, yo 3 times, insert hk in last sc and pull up a lp, [yo and pull through 2 lps] 3 times, yo, [yo and pull through 2 lps] 3 times, yo and pull through all lps on hk.\nFront Post Treble Four Together (FPtr4tog): Work as for BPtr4tog except insert hk from front to back to front around post of indicated st.\nFront Post Treble Eight Together (FPtr8tog): Work as for BPtr8tog except insert hk from front to back to front around post of indicated st.\nCh a multiple of 10 sts plus 4.\nRow 1 (RS): 3 dc in 4th ch from hk, sk 4 ch, sc in next ch, *sk 4 ch, 7 dc in next ch, sk 4 ch, sc in next ch; rep from * to last 5 ch, sk 4 ch, 4 dc in last ch, turn.\nRow 2: Ch 1, sc in 1st dc, *tree in next sc, sk 3 dc, sc in next dc; rep from * across to t-ch, sc in top of t-ch, turn.\nRow 3: Ch 5, BPtr4tog over next 4 sts, ch 4, *sc in next ch-2 sp, ch 4, BPtr8tog over next 8 sts, ch 4; rep from * across to last ch-2 sp, sc in last ch-2 sp, ch 4, left dec over last 5 sts (skipping ch-sps), turn.\nRow 4: Ch 3 (counts as dc), 3 dc in 1st st, *sc in next sc, sk ch-4 sp, 7 dc in next st; rep from * to last sc, sc in in last sc, 4 dc in last st, turn.\nRow 5: Rep row 2.\nRow 6: Ch 5, FPtr4tog over next 4 sts, ch 4, *sc in next ch-2 sp, ch 4, FPtr8tog over next 8 sts, ch 4; rep from * across to last ch-2 sp, sc in last ch-2 sp, ch 4, right dec over last 5 sts (skipping ch-sps), turn.\nRow 7: Rep row 4.\nRep rows 2–7 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": [],
+      "visual_cues": ["tree motifs", "pine tree silhouette", "post stitches", "lacy open fabric"],
+      "source_filename": "Screenshot 2026-04-23 203527.png"
+    },
+    {
+      "primary_name": "Cable Lattice Stitch",
+      "slug": "cable-lattice-stitch",
+      "also_known_as": [],
+      "description": "Post stitches in this lace pattern mimic a lattice fabric that you can use for anything from shawls to sweaters.",
+      "instructions": "Left Decrease (left dec): Yo, insert hk around st from front to back to front and pull up a lp, yo and pull through 2 lps on hk, yo, insert hk into next st and pull up a lp, yo and pull through 2 lps on hk, yo and pull through all lps on hk.\nShell (sh): 5 dc in same sp.\nCh a multiple of 12 sts plus 11.\nRow 1 (WS): Sc in 2nd ch from hk, sc in next 9 sc, *ch 4, sk 2 ch, sc in next 10 sc; rep from * across, sc in last ch, turn.\nRow 2: Ch 5 (as tr, ch-1 sp), *sk 3 sc, dc in next 2 sc, tr in 2nd sk sc (in front of prev sts), sk 3 sc, tr in next sc, dc in in 1st and 2nd sk sc (behind tr), ch 1, sh in ch-4 sp, ch 1; rep from * across to last ch-sp, sk 3 sc, dc in next 2 sc, tr in 2nd sk sc (in front of prev sts), sk 3 sc, tr in next sc, dc in 1st and 2nd sk sc (behind tr), ch 1, tr in last sc, turn.\nRow 3: Ch 3 (counts as hdc, ch 1), sk 1st tr, sk ch-1 sp, sk 2 dc, *BPtr around next tr, dc in next 2 dc (behind tr, in front of dc), ch 2, 2 sc in center st of next sh, ch 2; rep from * across to last 2 tr, BPtr around next tr, dc in next 2 dc (behind tr), ch 2, dc in next 2 dc, tr in sk tr (behind tr, in front of dc), ch 1, hdc in 4th ch of t-ch, turn.\nRow 4: Ch 2, FPdc around next tr, dc in next 2 dc (in sk ch-1 sp (behind tr), *ch 1, sh in next ch-2 sp, ch 1, 2 sc in center st of sh, ch 2, FPtr in next tr, 2 dc in sk ch-2 sp (behind tr); rep from * across to last ch-2 sp, ch 1, sh in next ch-4 sp, ch 1, dc in t-ch, left dec in last tr and t-ch, turn.\nRow 5: Ch 2, sk 1st st, dc in next dc, *ch 2, 2 sc in center st of sh, ch 2, dc in 1st st (in front of prev dc), ch 2, 2 sc in center st of sh, ch 2, dc in next dc, tr in sk tr (behind tr, in front of dc); rep from * across to last 7 dc, ch 2, 2 sc in center st of sh, 2 sc in next dc, ch 2, dc in next dc, tr in sk tr (behind tr, in front of dc), ch 1, dc in in next 2 dc, dc2tog in sk dc and last dc (behind prev dc), turn.\nRow 6: Ch 5 (counts as hdc, ch 1), 2, FPtr in sk tr tr (in front of prev sts), FPtr in next tr, 2 dc in sk ch-2 sp (behind tr); rep from * across to last ch-2 sp, ch 1, tr in last st, turn.\nRep rows 3–6 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["shawls", "sweaters"],
+      "visual_cues": ["lattice pattern", "lace and cable mix", "shell motifs", "diagonal lines"],
+      "source_filename": "Screenshot 2026-04-23 203609.png"
+    },
+    {
+      "primary_name": "Diamond Stitch",
+      "slug": "diamond-stitch",
+      "also_known_as": [],
+      "description": "This subtle diamond pattern makes a great overall fabric that is versatile enough for projects from hats to bags.",
+      "instructions": "Front Post Double Crochet Two Together (FPdc2tog): Dc2tog around the post of the sts indicated, inserting hk from front to back to front.\nBack Post Double Crochet Two Together (BPdc2tog): Dc2tog around the post of the sts indicated, inserting hk from back to front to back.\nFront Post or Back Post Double Crochet Three Together (FP or BPdc3tog): Dc3tog around the post of the sts indicated, inserting hk from back to front to back for \"BP\" and from front to back to front for \"FP\".\nCh a multiple of 10 sts plus 5.\nRow 1 (WS): Dc in 4th ch from hk, dc in next 4 ch, *ch 1, sk 1 ch, dc in next 9 ch; rep from * across to last 7 ch, ch 1, sk 1 ch, dc in last 6 ch, turn.\nRow 2: Ch 3 (counts as dc), dc in next 3 dc, FPdc2tog over next 2 dc, *ch 1, dc in next ch-1 sp, ch 1, FPdc2tog over next 2 dc; rep from * across to last ch-1 sp, ch 1, dc in in last ch-1 sp, ch 1, FPdc2tog in over next 2 dc, dc in next 3 dc, dc in top of t-ch, turn.\nRow 3: Ch 3 (counts as dc), dc in next 2 dc, BPdc2tog over next 2 dc, *ch 1, dc in ch-1 sp, dc in dc, dc in ch-1 sp, ch 1, BPdc2tog across to last 2 ch-sps, ch 1, dc in ch-1 sp, ch 1; rep from * across to last 2 ch-sps, ch 1, dc in ch-1 sp, dc in dc, dc in ch-1 sp, ch 1, BPdc2tog over next 2 dc, dc in next 2 dc, dc in top of t-ch, turn.\nRow 4: Ch 3 (counts as dc), dc in next dc, *FPdc2tog over next 2 dc, ch 1, dc in next ch-1 sp, dc in next 3 dc, dc in ch-1 sp, ch 1, FPdc2tog over next 2 dc, dc in next dc; rep from * across to t-ch, dc in top of t-ch, turn.\nRow 5: Ch 3 (counts as dc), BPdc2tog over next 2 dc, *ch 1, dc in ch-1 sp, ch 1, dc in next 5 dc, dc in ch-1 sp, ch 1, 1, BPdc3tog over next 3 dc; rep from * across to last 3 dc, BPdc2tog over next 2 dc, dc in top of t-ch, turn.\nRow 6: Ch 4 (counts as dc, ch 1), dc in ch-1 sp, ch 1, *dc in next 7 dc, dc in next ch-1 sp, ch 1, ch 1, sk 1 st; rep from * across to t-ch, dc in top of t-ch, turn.\nRow 7: Ch 3 (counts as dc), *dc in ch-1 sp, ch 1, BPdc2tog over next 2 dc, dc in next 5 dc, BPdc2tog over next 2 dc, ch 1; rep from * across to last dc-sp, dc in last ch-1 sp, dc in 3rd ch of t-ch, turn.\nRow 8: Ch 3 (counts as dc), dc in next dc, *dc in ch-1 sp, ch 1, FPdc2tog over next 2 dc, dc in next 3 dc, FFPdc2tog over next 2 dc, dc in next dc, dc in ch-1 sp; rep from * across, dc in top of t-ch, turn.\nRow 9: Ch 3 (counts as dc), dc in next 2 dc, *dc in ch-1 sp, ch 1, BPdc2tog over next 2 dc, dc in next dc, BPdc2tog over next 2 dc, dc in next dc, dc in ch-1 sp; rep from * across; turn.\nRow 10: Ch 3 (counts as dc), *dc in next 3 dc, dc in ch-1 sp, ch 1, FPdc3tog over next 3 dc, ch 1, dc in in ch-1 sp, dc in next 2 dc; rep from * across to last 2 dc, dc in next dc, dc in top of t-ch, turn.\nRow 11: Ch 3 (counts as dc), dc in next ch-1 sp, ch 1, *dc in next 7 dc, dc in next ch-1 sp, ch 1, sk next st, *dc in ch-1 sp, ch 1, sk next st; rep from * across to last 5 sts, dc in next 4 dc, dc in top of t-ch, turn.\nRep rows 2–11 to desired length.",
+      "dimension": "pattern_arrangement",
+      "difficulty": "advanced",
+      "common_uses": ["hats", "bags"],
+      "visual_cues": ["diamond pattern", "post stitch decreases", "subtle texture", "geometric fabric"],
+      "source_filename": "Screenshot 2026-04-23 203703.png"
+    }
+  ],
+  "entries_skipped": [
+    {
+      "source_filename": "Screenshot 2026-04-23 200422.png",
+      "reason": "continuation of Romeo Cluster Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 200455.png",
+      "reason": "continuation of Kyla Shell Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 200538.png",
+      "reason": "continuation of Bobblet Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 201544.png",
+      "reason": "continuation of Diagonal Bob Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 201603.png",
+      "reason": "continuation of Filet Bobbles Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 201611.png",
+      "reason": "continuation of Filet Bobbles Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 201622.png",
+      "reason": "partial/clipped page showing only stitch title — no usable content"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 201636.png",
+      "reason": "continuation of Diamante Bobble Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 202448.png",
+      "reason": "continuation of Judith Bobble Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 202541.png",
+      "reason": "continuation of Popping Cable Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 202615.png",
+      "reason": "duplicate screenshot of Popping Circle Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 202643.png",
+      "reason": "continuation of Popping Circle Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 202924.png",
+      "reason": "continuation of Popping Flower Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 202946.png",
+      "reason": "continuation of Single Rib (Tip box text overflow)"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203014.png",
+      "reason": "continuation of Basketweave Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203051.png",
+      "reason": "continuation of Cable Towers"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203113.png",
+      "reason": "continuation of Petal Link Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203134.png",
+      "reason": "continuation of Greene Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203139.png",
+      "reason": "duplicate screenshot of Greene Lace continuation"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203340.png",
+      "reason": "continuation of Ginger Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203456.png",
+      "reason": "continuation of Ripple Lace"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203539.png",
+      "reason": "continuation of Pine Tree Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203551.png",
+      "reason": "continuation of Pine Tree Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203630.png",
+      "reason": "continuation of Cable Lattice Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203733.png",
+      "reason": "continuation of Diamond Stitch"
+    },
+    {
+      "source_filename": "Screenshot 2026-04-23 203742.png",
+      "reason": "continuation of Diamond Stitch"
+    }
+  ],
+  "duplicates_skipped": []
+}
