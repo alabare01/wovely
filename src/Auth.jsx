@@ -24,11 +24,18 @@ const DesktopShowcase = () => {
         }}>
           <div style={{
             display: "grid",
-            gridTemplateColumns: "1fr",
+            gridTemplateColumns: "1fr 1fr",
             gap: 12,
             marginBottom: 12
           }}>
             {[
+              {
+                title: "My Finished Amigurumi",
+                author: "Completed projects",
+                type: "Stuffed toys & creatures",
+                pct: 100,
+                img: "/mommy_fiora.png"
+              },
               {
                 title: "Marina the Manatee",
                 author: "by craftybee",
@@ -207,28 +214,16 @@ const DesktopShowcase = () => {
       subtitle: "12-clue MKAL? Unify materials, track each clue, see your progress together.",
       mockup: (
         <div style={{
-          background: `url('/wovely_landing_bg_v1.png')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(155,126,200,0.2)",
           borderRadius: 16,
           padding: 16,
           maxWidth: 340,
           margin: "0 auto",
-          animation: "slideUp 600ms ease-out",
-          position: "relative",
-          minHeight: 240
+          animation: "slideUp 600ms ease-out"
         }}>
-          <div style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(255,255,255,0.65)",
-            borderRadius: 16,
-            backdropFilter: "blur(8px)"
-          }} />
-          <div style={{
-            position: "relative",
-            zIndex: 1
-          }}>
+          <div>
             <div style={{
               fontFamily: T.serif,
               fontSize: 13,
@@ -294,7 +289,6 @@ const DesktopShowcase = () => {
               marginTop: 12,
               textAlign: "center"
             }}>Shared: 850g yarn, 5.5mm hook</div>
-          </div>
         </div>
       )
     }
