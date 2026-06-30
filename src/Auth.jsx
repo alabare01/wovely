@@ -407,7 +407,9 @@ const MobileShowcase = () => {
   return (
     <div style={{
       padding: "40px 20px",
-      background: `linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`
+      background: `url('/wovely_landing_bg_v1.png') center/cover no-repeat fixed, linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`,
+      backgroundBlendMode: "overlay",
+      minHeight: "100vh"
     }}>
       {/* Header with BIG BEV */}
       <div style={{
@@ -485,11 +487,13 @@ const MobileShowcase = () => {
           }
         ].map((feature, i) => (
           <div key={i} style={{
-            background: "rgba(255,255,255,0.85)",
+            background: "rgba(255,255,255,0.82)",
             backdropFilter: "blur(16px)",
+            WebkitBackdropFilter: "blur(16px)",
             border: "1px solid rgba(155,126,200,0.2)",
-            borderRadius: 12,
-            overflow: "hidden"
+            borderRadius: 16,
+            overflow: "hidden",
+            boxShadow: "0 2px 8px rgba(155,126,200,0.1)"
           }}>
             {feature.img && (
               <img
