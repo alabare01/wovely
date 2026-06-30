@@ -478,7 +478,7 @@ const MobileShowcase = () => {
             author: "12-clue monthly CAL",
             type: "3 of 12 clues released",
             desc: "One collection. Shared materials. Unified progress.",
-            img: "/mommy_fiora.png"
+            img: "/pattern-mkal-screenshot.png"
           },
           {
             title: "Finished projects",
@@ -489,13 +489,13 @@ const MobileShowcase = () => {
           }
         ].map((feature, i) => (
           <div key={i} style={{
-            background: "rgba(255,255,255,0.82)",
-            backdropFilter: "blur(16px)",
-            WebkitBackdropFilter: "blur(16px)",
-            border: "1px solid rgba(155,126,200,0.2)",
+            background: "rgba(255,255,255,0.75)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            border: "1px solid rgba(155,126,200,0.35)",
             borderRadius: 16,
             overflow: "hidden",
-            boxShadow: "0 2px 8px rgba(155,126,200,0.1)"
+            boxShadow: "0 4px 16px rgba(155,126,200,0.15), inset 0 0 1px rgba(255,255,255,0.8)"
           }}>
             {feature.img && (
               <img
