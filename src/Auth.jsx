@@ -223,72 +223,71 @@ const DesktopShowcase = () => {
           margin: "0 auto",
           animation: "slideUp 600ms ease-out"
         }}>
-          <div>
-            <div style={{
-              fontFamily: T.serif,
-              fontSize: 13,
-              fontWeight: 700,
-              color: T.ink,
-              marginBottom: 4
-            }}>Spring MKAL 2025</div>
-            <div style={{
-              fontSize: 11,
-              color: T.ink2,
-              marginBottom: 12,
-              fontWeight: 400
-            }}>12-clue monthly CAL</div>
-            <div style={{
-              fontFamily: T.serif,
-              fontSize: 12,
-              fontWeight: 700,
-              color: T.terra,
-              marginBottom: 12
-            }}>3 of 12 clues released</div>
-            {[
-              { name: "Clue 1: Foundation", progress: 100, done: true },
-              { name: "Clue 2: Center Design", progress: 75, done: false },
-              { name: "Clue 3: Border", progress: 40, done: false }
-            ].map((clue, i) => (
-              <div key={i} style={{ marginBottom: i < 2 ? 12 : 0 }}>
+          <div style={{
+            fontFamily: T.serif,
+            fontSize: 13,
+            fontWeight: 700,
+            color: T.ink,
+            marginBottom: 4
+          }}>Spring MKAL 2025</div>
+          <div style={{
+            fontSize: 11,
+            color: T.ink2,
+            marginBottom: 12,
+            fontWeight: 400
+          }}>12-clue monthly CAL</div>
+          <div style={{
+            fontFamily: T.serif,
+            fontSize: 12,
+            fontWeight: 700,
+            color: T.terra,
+            marginBottom: 12
+          }}>3 of 12 clues released</div>
+          {[
+            { name: "Clue 1: Foundation", progress: 100, done: true },
+            { name: "Clue 2: Center Design", progress: 75, done: false },
+            { name: "Clue 3: Border", progress: 40, done: false }
+          ].map((clue, i) => (
+            <div key={i} style={{ marginBottom: i < 2 ? 12 : 0 }}>
+              <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 4
+              }}>
                 <div style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 4
-                }}>
-                  <div style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: T.ink
-                  }}>{clue.name}</div>
-                  <div style={{
-                    fontSize: 10,
-                    color: T.terra,
-                    fontWeight: 600
-                  }}>{clue.progress}%</div>
-                </div>
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: T.ink
+                }}>{clue.name}</div>
                 <div style={{
-                  height: 6,
-                  background: "#EDE4F7",
-                  borderRadius: 3,
-                  overflow: "hidden"
-                }}>
-                  <div style={{
-                    height: "100%",
-                    width: `${clue.progress}%`,
-                    background: clue.done ? T.sage : T.terra,
-                    transition: "width 0.3s"
-                  }} />
-                </div>
+                  fontSize: 10,
+                  color: T.terra,
+                  fontWeight: 600
+                }}>{clue.progress}%</div>
               </div>
-            ))}
-            <div style={{
-              fontSize: 10,
-              color: T.terra,
-              fontWeight: 600,
-              marginTop: 12,
-              textAlign: "center"
-            }}>Shared: 850g yarn, 5.5mm hook</div>
+              <div style={{
+                height: 6,
+                background: "#EDE4F7",
+                borderRadius: 3,
+                overflow: "hidden"
+              }}>
+                <div style={{
+                  height: "100%",
+                  width: `${clue.progress}%`,
+                  background: clue.done ? T.sage : T.terra,
+                  transition: "width 0.3s"
+                }} />
+              </div>
+            </div>
+          ))}
+          <div style={{
+            fontSize: 10,
+            color: T.terra,
+            fontWeight: 600,
+            marginTop: 12,
+            textAlign: "center"
+          }}>Shared: 850g yarn, 5.5mm hook</div>
         </div>
       )
     }
