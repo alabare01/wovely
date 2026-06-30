@@ -24,18 +24,11 @@ const DesktopShowcase = () => {
         }}>
           <div style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            gridTemplateColumns: "1fr",
             gap: 12,
             marginBottom: 12
           }}>
             {[
-              {
-                title: "Baby Blanket",
-                author: "by yarn_dreams",
-                type: "Granny Square",
-                pct: 75,
-                img: "/mommy_fiora.png"
-              },
               {
                 title: "Marina the Manatee",
                 author: "by craftybee",
@@ -228,7 +221,7 @@ const DesktopShowcase = () => {
           <div style={{
             position: "absolute",
             inset: 0,
-            background: "rgba(255,255,255,0.9)",
+            background: "rgba(255,255,255,0.65)",
             borderRadius: 16,
             backdropFilter: "blur(8px)"
           }} />
