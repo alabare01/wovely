@@ -2,6 +2,122 @@ import { useState, useEffect, useRef } from "react";
 import { T, useBreakpoint } from "./theme.jsx";
 import { supabaseAuth } from "./supabase.js";
 
+/* ── Mobile Preview Component (Simplified) ── */
+const MobilePreview = () => {
+  return (
+    <div style={{
+      padding: "40px 20px",
+      background: `linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`,
+      textAlign: "center",
+      minHeight: "auto"
+    }}>
+      {/* Header with Bev */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 12,
+        marginBottom: 32
+      }}>
+        <img src="/bev_neutral.png" alt="Bev" style={{ height: 40, width: "auto" }} />
+        <div style={{
+          fontFamily: T.serif,
+          fontSize: 24,
+          fontWeight: 700,
+          color: T.ink
+        }}>Wovely</div>
+      </div>
+
+      {/* Feature highlights for mobile */}
+      <div style={{ maxWidth: "100%" }}>
+        <h2 style={{
+          fontFamily: T.serif,
+          fontSize: 24,
+          fontWeight: 700,
+          color: T.ink,
+          marginBottom: 24,
+          lineHeight: 1.2
+        }}>
+          Import. Track. Organize.
+        </h2>
+
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+          marginBottom: 24
+        }}>
+          <div style={{
+            background: "rgba(255,255,255,0.85)",
+            backdropFilter: "blur(16px)",
+            border: "1px solid rgba(155,126,200,0.2)",
+            borderRadius: 12,
+            padding: 16,
+            textAlign: "left"
+          }}>
+            <div style={{
+              fontFamily: T.serif,
+              fontSize: 16,
+              fontWeight: 700,
+              color: T.terra,
+              marginBottom: 8
+            }}>Track Progress</div>
+            <div style={{
+              fontSize: 13,
+              color: T.ink2,
+              lineHeight: 1.5
+            }}>See your progress across all patterns. Never lose your place again.</div>
+          </div>
+
+          <div style={{
+            background: "rgba(255,255,255,0.85)",
+            backdropFilter: "blur(16px)",
+            border: "1px solid rgba(155,126,200,0.2)",
+            borderRadius: 12,
+            padding: 16,
+            textAlign: "left"
+          }}>
+            <div style={{
+              fontFamily: T.serif,
+              fontSize: 16,
+              fontWeight: 700,
+              color: T.terra,
+              marginBottom: 8
+            }}>Organize Collections</div>
+            <div style={{
+              fontSize: 13,
+              color: T.ink2,
+              lineHeight: 1.5
+            }}>Group MKALs, bundles, and big projects in one place.</div>
+          </div>
+
+          <div style={{
+            background: "rgba(255,255,255,0.85)",
+            backdropFilter: "blur(16px)",
+            border: "1px solid rgba(155,126,200,0.2)",
+            borderRadius: 12,
+            padding: 16,
+            textAlign: "left"
+          }}>
+            <div style={{
+              fontFamily: T.serif,
+              fontSize: 16,
+              fontWeight: 700,
+              color: T.terra,
+              marginBottom: 8
+            }}>Get BevCheck</div>
+            <div style={{
+              fontSize: 13,
+              color: T.ink2,
+              lineHeight: 1.5
+            }}>AI-powered pattern analysis. Spot issues before they cost you.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* ── Animated Product Preview Component (Real Features) ── */
 const AnimatedProductPreview = () => {
   const [step, setStep] = useState(0);
@@ -694,20 +810,11 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
         }
       `}</style>
 
+      {/* On mobile: preview FIRST, then form. On desktop: preview left, form right */}
+      {isMobile && <MobilePreview />}
       {!isMobile && <AnimatedProductPreview />}
-      <AuthForm onEnter={onEnter} onEnterAsNew={onEnterAsNew} onTryAnonymous={onTryAnonymous} />
 
-      {isMobile && (
-        <div style={{
-          padding: "24px",
-          background: T.surface,
-          textAlign: "center",
-          fontSize: 13,
-          color: T.ink2
-        }}>
-          <AnimatedProductPreview />
-        </div>
-      )}
+      <AuthForm onEnter={onEnter} onEnterAsNew={onEnterAsNew} onTryAnonymous={onTryAnonymous} />
     </div>
   );
 };
