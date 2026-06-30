@@ -29,8 +29,20 @@ const DesktopShowcase = () => {
             marginBottom: 12
           }}>
             {[
-              { title: "Baby Blanket", pct: 75, img: "/mommy_fiora.png" },
-              { title: "Manatee Friend", pct: 100, img: "/manatee_hero.png" }
+              {
+                title: "Baby Blanket",
+                author: "by yarn_dreams",
+                type: "Granny Square",
+                pct: 75,
+                img: "/mommy_fiora.png"
+              },
+              {
+                title: "Marina the Manatee",
+                author: "by craftybee",
+                type: "Amigurumi",
+                pct: 100,
+                img: "/manatee_hero.png"
+              }
             ].map((p, i) => (
               <div key={i} style={{
                 background: "rgba(255,255,255,0.85)",
@@ -134,12 +146,25 @@ const DesktopShowcase = () => {
             fontSize: 13,
             fontWeight: 700,
             color: T.ink,
+            marginBottom: 4
+          }}>Marina the Manatee</div>
+          <div style={{
+            fontSize: 11,
+            color: T.ink2,
+            marginBottom: 12,
+            fontWeight: 400
+          }}>by craftybee • Amigurumi</div>
+          <div style={{
+            fontFamily: T.serif,
+            fontSize: 12,
+            fontWeight: 700,
+            color: T.terra,
             marginBottom: 12
-          }}>Baby Blanket • Round 42 of 68</div>
+          }}>Round 22 of 30</div>
           {[
-            { row: "Rnd 41", text: "(sc, dc) x 12", done: true },
-            { row: "Rnd 42", text: "(sc, inc) x 12", done: false },
-            { row: "Rnd 43", text: "sc in each st", done: false }
+            { row: "Rnd 21", text: "(sc, dc) x 12", done: true },
+            { row: "Rnd 22", text: "(sc, inc) x 12", done: false },
+            { row: "Rnd 23", text: "sc in each st", done: false }
           ].map((r, i) => (
             <div key={i} style={{
               display: "flex",
@@ -180,7 +205,7 @@ const DesktopShowcase = () => {
             fontWeight: 600,
             marginTop: 12,
             textAlign: "center"
-          }}>Progress: 62% (42 of 68 rounds)</div>
+          }}>Progress: 73% (22 of 30 rounds)</div>
         </div>
       )
     },
@@ -197,12 +222,13 @@ const DesktopShowcase = () => {
           maxWidth: 340,
           margin: "0 auto",
           animation: "slideUp 600ms ease-out",
-          position: "relative"
+          position: "relative",
+          minHeight: 240
         }}>
           <div style={{
             position: "absolute",
             inset: 0,
-            background: "rgba(255,255,255,0.92)",
+            background: "rgba(255,255,255,0.9)",
             borderRadius: 16,
             backdropFilter: "blur(8px)"
           }} />
@@ -215,8 +241,21 @@ const DesktopShowcase = () => {
               fontSize: 13,
               fontWeight: 700,
               color: T.ink,
+              marginBottom: 4
+            }}>Spring MKAL 2025</div>
+            <div style={{
+              fontSize: 11,
+              color: T.ink2,
+              marginBottom: 12,
+              fontWeight: 400
+            }}>12-clue monthly CAL</div>
+            <div style={{
+              fontFamily: T.serif,
+              fontSize: 12,
+              fontWeight: 700,
+              color: T.terra,
               marginBottom: 12
-            }}>Spring MKAL 2025 • 3/12 clues done</div>
+            }}>3 of 12 clues released</div>
             {[
               { name: "Clue 1: Foundation", progress: 100, done: true },
               { name: "Clue 2: Center Design", progress: 75, done: false },
@@ -261,7 +300,7 @@ const DesktopShowcase = () => {
               fontWeight: 600,
               marginTop: 12,
               textAlign: "center"
-            }}>Shared materials: 850g yarn, 5.5mm hook</div>
+            }}>Shared: 850g yarn, 5.5mm hook</div>
           </div>
         </div>
       )
@@ -422,7 +461,7 @@ const MobileShowcase = () => {
         Stop losing patterns.<br />Start tracking progress.
       </h2>
 
-      {/* Feature cards with REAL VISUALS */}
+      {/* Feature cards with REAL IMAGES as <img> tags */}
       <div style={{
         display: "flex",
         flexDirection: "column",
@@ -432,22 +471,30 @@ const MobileShowcase = () => {
         {[
           {
             title: "Upload from anywhere",
+            author: "by yarn_dreams",
+            type: "Granny Square",
             desc: "Phone, desktop, tablet. PDF, link, manual. We sync it all.",
             img: "/mommy_fiora.png"
           },
           {
-            title: "Track row by row",
-            desc: "Never lose your place in a 100-page pattern. Visual progress.",
-            detail: "Rnd 42 of 68 • 62% complete"
+            title: "Marina the Manatee",
+            author: "by craftybee",
+            type: "Amigurumi • Rnd 22 of 30",
+            desc: "Track row by row. Never lose your place in a 100-page pattern.",
+            detail: "73% complete"
           },
           {
-            title: "Organize MKALs",
-            desc: "12-clue project? One collection. Shared materials. Unified progress.",
+            title: "Spring MKAL 2025",
+            author: "12-clue monthly CAL",
+            type: "3 of 12 clues released",
+            desc: "One collection. Shared materials. Unified progress.",
             img: "/wovely_landing_bg_v1.png"
           },
           {
-            title: "Share your build",
-            desc: "Show friends what you're making. Collaborate on group projects.",
+            title: "Finished projects",
+            author: "by the community",
+            type: "Showcase & share",
+            desc: "Show friends what you're making. Celebrate your builds.",
             img: "/manatee_hero.png"
           }
         ].map((feature, i) => (
@@ -459,29 +506,42 @@ const MobileShowcase = () => {
             overflow: "hidden"
           }}>
             {feature.img && (
-              <div style={{
-                height: 80,
-                background: `url('${feature.img}')`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-                position: "relative"
-              }}>
-                <div style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(to bottom, transparent, rgba(255,255,255,0.3))"
-                }} />
-              </div>
+              <img
+                src={feature.img}
+                alt={feature.title}
+                style={{
+                  width: "100%",
+                  height: 120,
+                  objectFit: "cover",
+                  display: "block"
+                }}
+              />
             )}
             <div style={{ padding: 16 }}>
               <div style={{
                 fontFamily: T.serif,
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: 700,
-                color: T.terra,
-                marginBottom: 6
+                color: T.ink,
+                marginBottom: 2
               }}>
                 {feature.title}
+              </div>
+              <div style={{
+                fontSize: 11,
+                color: T.ink2,
+                fontWeight: 400,
+                marginBottom: 6
+              }}>
+                {feature.author}
+              </div>
+              <div style={{
+                fontSize: 11,
+                color: T.terra,
+                fontWeight: 600,
+                marginBottom: 8
+              }}>
+                {feature.type}
               </div>
               <div style={{
                 fontSize: 13,
@@ -499,8 +559,7 @@ const MobileShowcase = () => {
                   fontWeight: 600,
                   background: "rgba(155,126,200,0.06)",
                   padding: "6px 8px",
-                  borderRadius: 4,
-                  marginTop: 8
+                  borderRadius: 4
                 }}>
                   ✓ {feature.detail}
                 </div>
