@@ -2,132 +2,180 @@ import { useState, useEffect, useRef } from "react";
 import { T, useBreakpoint } from "./theme.jsx";
 import { supabaseAuth } from "./supabase.js";
 
-/* ── Mobile Preview Component (Simplified) ── */
-const MobilePreview = () => {
-  return (
-    <div style={{
-      padding: "40px 20px",
-      background: `linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`,
-      textAlign: "center",
-      minHeight: "auto"
-    }}>
-      {/* Header with Bev */}
-      <div style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 12,
-        marginBottom: 32
-      }}>
-        <img src="/bev_neutral.png" alt="Bev" style={{ height: 40, width: "auto" }} />
-        <div style={{
-          fontFamily: T.serif,
-          fontSize: 24,
-          fontWeight: 700,
-          color: T.ink
-        }}>Wovely</div>
-      </div>
-
-      {/* Feature highlights for mobile */}
-      <div style={{ maxWidth: "100%" }}>
-        <h2 style={{
-          fontFamily: T.serif,
-          fontSize: 24,
-          fontWeight: 700,
-          color: T.ink,
-          marginBottom: 24,
-          lineHeight: 1.2
-        }}>
-          Import. Track. Organize.
-        </h2>
-
-        <div style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 16,
-          marginBottom: 24
-        }}>
-          <div style={{
-            background: "rgba(255,255,255,0.85)",
-            backdropFilter: "blur(16px)",
-            border: "1px solid rgba(155,126,200,0.2)",
-            borderRadius: 12,
-            padding: 16,
-            textAlign: "left"
-          }}>
-            <div style={{
-              fontFamily: T.serif,
-              fontSize: 16,
-              fontWeight: 700,
-              color: T.terra,
-              marginBottom: 8
-            }}>Track Progress</div>
-            <div style={{
-              fontSize: 13,
-              color: T.ink2,
-              lineHeight: 1.5
-            }}>See your progress across all patterns. Never lose your place again.</div>
-          </div>
-
-          <div style={{
-            background: "rgba(255,255,255,0.85)",
-            backdropFilter: "blur(16px)",
-            border: "1px solid rgba(155,126,200,0.2)",
-            borderRadius: 12,
-            padding: 16,
-            textAlign: "left"
-          }}>
-            <div style={{
-              fontFamily: T.serif,
-              fontSize: 16,
-              fontWeight: 700,
-              color: T.terra,
-              marginBottom: 8
-            }}>Organize Collections</div>
-            <div style={{
-              fontSize: 13,
-              color: T.ink2,
-              lineHeight: 1.5
-            }}>Group MKALs, bundles, and big projects in one place.</div>
-          </div>
-
-          <div style={{
-            background: "rgba(255,255,255,0.85)",
-            backdropFilter: "blur(16px)",
-            border: "1px solid rgba(155,126,200,0.2)",
-            borderRadius: 12,
-            padding: 16,
-            textAlign: "left"
-          }}>
-            <div style={{
-              fontFamily: T.serif,
-              fontSize: 16,
-              fontWeight: 700,
-              color: T.terra,
-              marginBottom: 8
-            }}>Get BevCheck</div>
-            <div style={{
-              fontSize: 13,
-              color: T.ink2,
-              lineHeight: 1.5
-            }}>AI-powered pattern analysis. Spot issues before they cost you.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* ── Animated Product Preview Component (Real Features) ── */
-const AnimatedProductPreview = () => {
+/* ── Desktop Landing: Problem → Solution Story ── */
+const DesktopLanding = () => {
   const [step, setStep] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setStep((s) => (s + 1) % 3);
-    }, 5000);
+      setStep((s) => (s + 1) % 4);
+    }, 6000);
     return () => clearInterval(interval);
   }, []);
+
+  const slides = [
+    {
+      title: "Your patterns are everywhere.",
+      subtitle: "Ravelry, PDFs, screenshots, old books, links. Scattered.",
+      visual: (
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 12,
+          maxWidth: 300,
+          margin: "0 auto"
+        }}>
+          {[
+            { name: "PDF", icon: "📄", color: "rgba(229, 57, 53, 0.15)" },
+            { name: "Ravelry", icon: "🧶", color: "rgba(25, 118, 210, 0.15)" },
+            { name: "Screenshot", icon: "📸", color: "rgba(251, 140, 0, 0.15)" },
+            { name: "Bookmarked", icon: "🔗", color: "rgba(56, 142, 60, 0.15)" }
+          ].map((item, i) => (
+            <div key={i} style={{
+              background: item.color,
+              border: "1px solid rgba(155,126,200,0.2)",
+              borderRadius: 12,
+              padding: 16,
+              textAlign: "center",
+              animation: `slideUp 600ms ease-out ${i * 100}ms both`
+            }}>
+              <div style={{ fontSize: 32, marginBottom: 8 }}>{item.icon}</div>
+              <div style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: T.ink,
+                fontFamily: T.sans
+              }}>{item.name}</div>
+            </div>
+          ))}
+        </div>
+      )
+    },
+    {
+      title: "Wovely collects them all.",
+      subtitle: "Upload from any device, any format. We handle it.",
+      visual: (
+        <div style={{
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(155,126,200,0.2)",
+          borderRadius: 16,
+          padding: 24,
+          maxWidth: 320,
+          margin: "0 auto",
+          textAlign: "center",
+          animation: "slideUp 600ms ease-out"
+        }}>
+          <div style={{
+            fontSize: 48,
+            marginBottom: 12
+          }}>📱</div>
+          <div style={{
+            fontFamily: T.serif,
+            fontSize: 16,
+            fontWeight: 700,
+            color: T.terra,
+            marginBottom: 8
+          }}>Tap to upload</div>
+          <div style={{
+            fontSize: 12,
+            color: T.ink2,
+            lineHeight: 1.5,
+            marginBottom: 16
+          }}>PDF, link, or manual entry. Upload from phone, desktop, anywhere.</div>
+          <div style={{
+            display: "flex",
+            gap: 8,
+            justifyContent: "center",
+            fontSize: 28
+          }}>
+            📄 🔗 ✏️
+          </div>
+        </div>
+      )
+    },
+    {
+      title: "Track progress across every device.",
+      subtitle: "Start on your phone, continue on desktop. Never lose your place.",
+      visual: (
+        <div style={{
+          display: "flex",
+          gap: 12,
+          justifyContent: "center",
+          maxWidth: 320,
+          margin: "0 auto"
+        }}>
+          {[
+            { name: "Phone", size: "60px", icon: "📱" },
+            { name: "Tablet", size: "80px", icon: "📱" },
+            { name: "Desktop", size: "100px", icon: "💻" }
+          ].map((device, i) => (
+            <div key={i} style={{
+              textAlign: "center",
+              animation: `slideUp 600ms ease-out ${i * 100}ms both`
+            }}>
+              <div style={{
+                fontSize: device.size,
+                marginBottom: 8
+              }}>{device.icon}</div>
+              <div style={{
+                fontSize: 11,
+                fontWeight: 600,
+                color: T.ink,
+                fontFamily: T.sans
+              }}>{device.name}</div>
+              <div style={{
+                fontSize: 10,
+                color: T.terra,
+                fontFamily: T.sans,
+                marginTop: 4
+              }}>Sync</div>
+            </div>
+          ))}
+        </div>
+      )
+    },
+    {
+      title: "Share your progress. Build together.",
+      subtitle: "Show friends your patterns, celebrate finished projects.",
+      visual: (
+        <div style={{
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(155,126,200,0.2)",
+          borderRadius: 16,
+          padding: 24,
+          maxWidth: 320,
+          margin: "0 auto",
+          animation: "slideUp 600ms ease-out"
+        }}>
+          <div style={{
+            fontSize: 28,
+            textAlign: "center",
+            marginBottom: 12
+          }}>👯</div>
+          <div style={{
+            fontFamily: T.serif,
+            fontSize: 14,
+            fontWeight: 700,
+            color: T.ink,
+            marginBottom: 8,
+            textAlign: "center"
+          }}>Shared MKAL progress</div>
+          <div style={{
+            fontSize: 12,
+            color: T.ink2,
+            lineHeight: 1.5,
+            textAlign: "center"
+          }}>
+            12-clue MKAL, all in one place. Track what everyone's made. Organize shared materials.
+          </div>
+        </div>
+      )
+    }
+  ];
+
+  const current = slides[step];
 
   return (
     <div style={{
@@ -142,7 +190,7 @@ const AnimatedProductPreview = () => {
       position: "relative",
       overflow: "hidden"
     }}>
-      {/* Wovely header */}
+      {/* Header */}
       <div style={{
         position: "absolute",
         top: 40,
@@ -161,270 +209,34 @@ const AnimatedProductPreview = () => {
         }}>Wovely</div>
       </div>
 
-      {/* Feature carousel */}
-      <div style={{ maxWidth: 480, margin: "0 auto" }}>
-        {step === 0 && (
-          <div style={{ animation: "fadeIn 600ms ease-out", opacity: 1 }}>
-            <h2 style={{
-              fontFamily: T.serif,
-              fontSize: 28,
-              fontWeight: 700,
-              color: T.ink,
-              marginBottom: 28,
-              textAlign: "center"
-            }}>
-              Save & Track Every Pattern
-            </h2>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 16
-            }}>
-              {/* Mock pattern cards with REAL product images */}
-              {[
-                { title: "Amigurumi Set", pct: 100, img: "/mommy_fiora.png", cover: "cover" },
-                { title: "Manatee Friend", pct: 75, img: "/manatee_hero.png", cover: "contain" },
-                { title: "Baby Blanket", pct: 45, img: "/wovely_landing_bg_v1.png", cover: "cover" },
-                { title: "Progress Tracker", pct: 20, img: "/mommy_fiora.png", cover: "cover" }
-              ].map((p, i) => (
-                <div key={i} style={{
-                  background: "rgba(255,255,255,0.85)",
-                  backdropFilter: "blur(16px)",
-                  border: "1px solid rgba(155,126,200,0.2)",
-                  borderRadius: 16,
-                  overflow: "hidden",
-                  cursor: "pointer",
-                  transition: "transform 0.2s, box-shadow 0.2s",
-                  animation: `slideUp 600ms ease-out ${i * 100}ms both`
-                }}>
-                  <div style={{
-                    height: 140,
-                    background: `url('${p.img}')`,
-                    backgroundSize: p.cover,
-                    backgroundPosition: "center",
-                    backgroundRepeat: "no-repeat",
-                    display: "flex",
-                    alignItems: "flex-end",
-                    padding: 12,
-                    position: "relative"
-                  }}>
-                    {p.pct === 100 && (
-                      <span style={{
-                        position: "absolute",
-                        top: 8,
-                        right: 8,
-                        background: T.sage,
-                        color: "#fff",
-                        fontSize: 10,
-                        fontWeight: 700,
-                        padding: "3px 8px",
-                        borderRadius: 99
-                      }}>DONE</span>
-                    )}
-                    {p.pct > 0 && p.pct < 100 && (
-                      <div style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        height: 3,
-                        background: "#EDE4F7",
-                        overflow: "hidden"
-                      }}>
-                        <div style={{
-                          height: "100%",
-                          width: `${p.pct}%`,
-                          background: T.terra,
-                          transition: "width 0.3s"
-                        }} />
-                      </div>
-                    )}
-                  </div>
-                  <div style={{
-                    padding: "12px 14px",
-                    textAlign: "center"
-                  }}>
-                    <div style={{
-                      fontFamily: T.serif,
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: T.ink,
-                      marginBottom: 4
-                    }}>{p.title}</div>
-                    <div style={{
-                      fontSize: 12,
-                      color: T.terra,
-                      fontWeight: 600
-                    }}>{p.pct}% complete</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+      {/* Animated story */}
+      <div style={{ maxWidth: 480, margin: "0 auto", textAlign: "center" }}>
+        <h2 style={{
+          fontFamily: T.serif,
+          fontSize: 32,
+          fontWeight: 700,
+          color: T.ink,
+          marginBottom: 12,
+          lineHeight: 1.2,
+          minHeight: 80
+        }}>
+          {current.title}
+        </h2>
+        <p style={{
+          fontFamily: T.sans,
+          fontSize: 15,
+          color: T.ink2,
+          lineHeight: 1.6,
+          marginBottom: 32,
+          minHeight: 50
+        }}>
+          {current.subtitle}
+        </p>
 
-        {step === 1 && (
-          <div style={{ animation: "fadeIn 600ms ease-out", opacity: 1 }}>
-            <h2 style={{
-              fontFamily: T.serif,
-              fontSize: 28,
-              fontWeight: 700,
-              color: T.ink,
-              marginBottom: 28,
-              textAlign: "center"
-            }}>
-              Bev Analyzes Your Patterns
-            </h2>
-            {/* BevCheck gauge mockup */}
-            <div style={{
-              background: "rgba(255,255,255,0.87)",
-              backdropFilter: "blur(18px)",
-              border: "1px solid rgba(255,255,255,0.75)",
-              borderRadius: 24,
-              padding: "28px 24px",
-              textAlign: "center",
-              animation: "slideUp 600ms ease-out"
-            }}>
-              <span style={{
-                display: "inline-block",
-                fontFamily: T.sans,
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                color: T.terra,
-                padding: "3px 10px",
-                borderRadius: 99,
-                background: "rgba(155,126,200,0.12)",
-                marginBottom: 12
-              }}>BevCheck</span>
-
-              <div style={{
-                fontSize: 20,
-                fontFamily: T.serif,
-                fontWeight: 700,
-                color: "#2D3A7C",
-                marginBottom: 20
-              }}>Pattern Quality</div>
-
-              {/* Gauge SVG */}
-              <svg viewBox="0 0 240 140" style={{ width: "100%", maxWidth: 240, margin: "0 auto 20px" }}>
-                <defs>
-                  <linearGradient id="gaugeGrad" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#CEA0A4" />
-                    <stop offset="50%" stopColor="#E2D985" />
-                    <stop offset="100%" stopColor="#A4C2C3" />
-                  </linearGradient>
-                </defs>
-                {/* Arc */}
-                <path d="M 20 120 A 100 100 0 0 1 220 120" fill="none" stroke="#EDE4F7" strokeWidth="12" strokeLinecap="round" />
-                <path d="M 20 120 A 100 100 0 0 1 220 120" fill="none" stroke="url(#gaugeGrad)" strokeWidth="12" strokeLinecap="round" opacity="0.85" />
-                {/* Needle */}
-                <g>
-                  <line x1="120" y1="120" x2="160" y2="75" stroke={T.terra} strokeWidth="2.5" strokeLinecap="round" />
-                  <circle cx="120" cy="120" r="6" fill={T.terra} />
-                </g>
-              </svg>
-
-              <div style={{
-                fontFamily: T.serif,
-                fontSize: 36,
-                fontWeight: 700,
-                color: "#2D3A7C",
-                marginBottom: 12,
-                lineHeight: 1
-              }}>85%</div>
-
-              <div style={{
-                fontFamily: T.serif,
-                fontSize: 16,
-                fontWeight: 600,
-                color: "#2D3A7C",
-                marginBottom: 14
-              }}>Looks Good</div>
-
-              <div style={{
-                fontSize: 12,
-                color: T.ink2,
-                lineHeight: 1.5
-              }}>Pattern structure is clear. One minor stitch count to verify in round 12.</div>
-            </div>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div style={{ animation: "fadeIn 600ms ease-out", opacity: 1 }}>
-            <h2 style={{
-              fontFamily: T.serif,
-              fontSize: 28,
-              fontWeight: 700,
-              color: T.ink,
-              marginBottom: 28,
-              textAlign: "center"
-            }}>
-              Organize Multi-Part Projects
-            </h2>
-            <div style={{
-              background: "rgba(255,255,255,0.85)",
-              backdropFilter: "blur(16px)",
-              border: "1px solid rgba(155,126,200,0.2)",
-              borderRadius: 20,
-              padding: "20px 18px",
-              animation: "slideUp 600ms ease-out"
-            }}>
-              <div style={{
-                fontFamily: T.serif,
-                fontSize: 16,
-                fontWeight: 700,
-                color: T.ink,
-                marginBottom: 16
-              }}>Spring MKAL 2025</div>
-
-              {[
-                { name: "Clue 1: Base", progress: 100, done: true },
-                { name: "Clue 2: Stripes", progress: 60, done: false },
-                { name: "Clue 3: Border", progress: 0, done: false }
-              ].map((clue, i) => (
-                <div key={i} style={{
-                  marginBottom: i < 2 ? 14 : 0
-                }}>
-                  <div style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: 6
-                  }}>
-                    <span style={{
-                      fontSize: 13,
-                      fontFamily: T.sans,
-                      color: T.ink,
-                      fontWeight: 600
-                    }}>{clue.name}</span>
-                    <span style={{
-                      fontSize: 12,
-                      color: T.terra,
-                      fontWeight: 600
-                    }}>{clue.progress}%</span>
-                  </div>
-                  <div style={{
-                    height: 6,
-                    background: "#EDE4F7",
-                    borderRadius: 3,
-                    overflow: "hidden"
-                  }}>
-                    <div style={{
-                      height: "100%",
-                      width: `${clue.progress}%`,
-                      background: clue.done ? T.sage : T.terra,
-                      transition: "width 0.4s ease-out",
-                      borderRadius: 3
-                    }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Visual */}
+        <div style={{ marginBottom: 24, minHeight: 160 }}>
+          {current.visual}
+        </div>
       </div>
 
       {/* Progress dots */}
@@ -435,11 +247,11 @@ const AnimatedProductPreview = () => {
         gap: 12,
         justifyContent: "center"
       }}>
-        {[0, 1, 2].map((i) => (
+        {[0, 1, 2, 3].map((i) => (
           <div
             key={i}
             style={{
-              width: i === step ? 28 : 8,
+              width: i === step ? 32 : 8,
               height: 8,
               borderRadius: 4,
               background: i === step ? T.terra : "#EDE4F7",
@@ -456,11 +268,139 @@ const AnimatedProductPreview = () => {
           from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
       `}</style>
+    </div>
+  );
+};
+
+/* ── Mobile Preview: Value Flow ── */
+const MobileValueFlow = () => {
+  return (
+    <div style={{
+      padding: "40px 20px",
+      background: `linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`,
+      textAlign: "center"
+    }}>
+      {/* Header */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 12,
+        marginBottom: 32
+      }}>
+        <img src="/bev_neutral.png" alt="Bev" style={{ height: 40, width: "auto" }} />
+        <div style={{
+          fontFamily: T.serif,
+          fontSize: 24,
+          fontWeight: 700,
+          color: T.ink
+        }}>Wovely</div>
+      </div>
+
+      {/* Main value prop */}
+      <h2 style={{
+        fontFamily: T.serif,
+        fontSize: 26,
+        fontWeight: 700,
+        color: T.ink,
+        marginBottom: 24,
+        lineHeight: 1.2
+      }}>
+        All your patterns.<br />One home.<br />Real progress.
+      </h2>
+
+      {/* Value flow */}
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 16,
+        marginBottom: 24
+      }}>
+        <div style={{
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(155,126,200,0.2)",
+          borderRadius: 12,
+          padding: 16,
+          textAlign: "left"
+        }}>
+          <div style={{
+            fontSize: 24,
+            marginBottom: 8
+          }}>📱 Upload Anywhere</div>
+          <div style={{
+            fontSize: 13,
+            color: T.ink2,
+            lineHeight: 1.5
+          }}>
+            PDF, link, or type it in. From your phone, laptop, anywhere. We handle it.
+          </div>
+        </div>
+
+        <div style={{
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(155,126,200,0.2)",
+          borderRadius: 12,
+          padding: 16,
+          textAlign: "left"
+        }}>
+          <div style={{
+            fontSize: 24,
+            marginBottom: 8
+          }}>✓ Track Row by Row</div>
+          <div style={{
+            fontSize: 13,
+            color: T.ink2,
+            lineHeight: 1.5
+          }}>
+            Never lose your place. Track every stitch. See progress in real time.
+          </div>
+        </div>
+
+        <div style={{
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(155,126,200,0.2)",
+          borderRadius: 12,
+          padding: 16,
+          textAlign: "left"
+        }}>
+          <div style={{
+            fontSize: 24,
+            marginBottom: 8
+          }}>🔄 Sync Everything</div>
+          <div style={{
+            fontSize: 13,
+            color: T.ink2,
+            lineHeight: 1.5
+          }}>
+            Work on your phone, continue on desktop. Progress saves instantly.
+          </div>
+        </div>
+
+        <div style={{
+          background: "rgba(255,255,255,0.85)",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(155,126,200,0.2)",
+          borderRadius: 12,
+          padding: 16,
+          textAlign: "left"
+        }}>
+          <div style={{
+            fontSize: 24,
+            marginBottom: 8
+          }}>👯 Share Your Build</div>
+          <div style={{
+            fontSize: 13,
+            color: T.ink2,
+            lineHeight: 1.5
+          }}>
+            Show friends your patterns. Organize group MKALs together.
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -517,7 +457,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
       boxSizing: "border-box",
       background: "#FFFFFF"
     }}>
-      {/* Sign-in / Sign-up Toggle (equal weight) */}
+      {/* Auth Toggle */}
       <div style={{
         display: "flex",
         gap: 0,
@@ -527,7 +467,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
         background: T.surface
       }}>
         <button
-          onClick={() => { setIsSignIn(false); setMode("form"); setAuthError(null); }}
+          onClick={() => { setIsSignIn(false); setAuthError(null); }}
           style={{
             flex: 1,
             padding: "10px 16px",
@@ -543,10 +483,10 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             boxShadow: !isSignIn ? "0 1px 3px rgba(61,70,33,0.08)" : "none"
           }}
         >
-          Create account
+          Try Free
         </button>
         <button
-          onClick={() => { setIsSignIn(true); setMode("signin"); setAuthError(null); }}
+          onClick={() => { setIsSignIn(true); setAuthError(null); }}
           style={{
             flex: 1,
             padding: "10px 16px",
@@ -562,7 +502,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             boxShadow: isSignIn ? "0 1px 3px rgba(61,70,33,0.08)" : "none"
           }}
         >
-          Sign in
+          Sign In
         </button>
       </div>
 
@@ -576,7 +516,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
           marginBottom: 8,
           lineHeight: 1.2
         }}>
-          {isSignIn ? "Welcome back" : "Your patterns, organized"}
+          {isSignIn ? "Welcome back" : "Upload your first pattern"}
         </h1>
         <p style={{
           fontFamily: T.sans,
@@ -585,12 +525,12 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
           lineHeight: 1.6
         }}>
           {isSignIn
-            ? "Pick up right where you left off."
-            : "Free: 5 patterns. Craft: Unlimited tracking, Collections, and BevCheck pattern analysis."}
+            ? "Pick up where you left off."
+            : "Free: Upload and organize patterns. Track progress. Share builds."}
         </p>
       </div>
 
-      {/* Try for free button (signup only) */}
+      {/* Try Free Button */}
       {!isSignIn && onTryAnonymous && (
         <>
           <button
@@ -613,7 +553,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             onMouseEnter={(e) => e.target.style.boxShadow = "0 4px 12px rgba(155,126,200,0.3)"}
             onMouseLeave={(e) => e.target.style.boxShadow = "0 2px 8px rgba(155,126,200,0.2)"}
           >
-            Try free for 5 patterns
+            Try free — no credit card
           </button>
           <div style={{
             display: "flex",
@@ -622,39 +562,61 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             margin: "16px 0 20px"
           }}>
             <div style={{ flex: 1, height: 1, background: T.border }} />
-            <div style={{ fontSize: 12, color: T.ink2, whiteSpace: "nowrap" }}>or create an account</div>
+            <div style={{ fontSize: 12, color: T.ink2, whiteSpace: "nowrap" }}>or create account</div>
             <div style={{ flex: 1, height: 1, background: T.border }} />
           </div>
         </>
       )}
 
-      {/* Email + password form */}
+      {/* Form */}
       <div onKeyDown={onKey}>
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="your@email.com"
+          type="email"
+          style={{
+            width: "100%",
+            padding: "11px 14px",
+            marginBottom: 10,
+            background: T.surface,
+            border: `1px solid ${T.border}`,
+            borderRadius: 8,
+            fontSize: 14,
+            color: T.ink,
+            fontFamily: T.sans,
+            outline: "none",
+            transition: "border-color 200ms"
+          }}
+          onFocus={(e) => e.target.style.borderColor = T.terra}
+          onBlur={(e) => e.target.style.borderColor = T.border}
+        />
+        <input
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
+          placeholder={isSignIn ? "Password" : "Create a password"}
+          type="password"
+          style={{
+            width: "100%",
+            padding: "11px 14px",
+            marginBottom: 10,
+            background: T.surface,
+            border: `1px solid ${T.border}`,
+            borderRadius: 8,
+            fontSize: 14,
+            color: T.ink,
+            fontFamily: T.sans,
+            outline: "none",
+            transition: "border-color 200ms"
+          }}
+          onFocus={(e) => e.target.style.borderColor = T.terra}
+          onBlur={(e) => e.target.style.borderColor = T.border}
+        />
+        {!isSignIn && (
           <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            type="email"
-            style={{
-              width: "100%",
-              padding: "11px 14px",
-              marginBottom: 10,
-              background: T.surface,
-              border: `1px solid ${T.border}`,
-              borderRadius: 8,
-              fontSize: 14,
-              color: T.ink,
-              fontFamily: T.sans,
-              outline: "none",
-              transition: "border-color 200ms"
-            }}
-            onFocus={(e) => e.target.style.borderColor = T.terra}
-            onBlur={(e) => e.target.style.borderColor = T.border}
-          />
-          <input
-            value={pass}
-            onChange={(e) => setPass(e.target.value)}
-            placeholder={isSignIn ? "Password" : "Create a password"}
+            value={confirmPass}
+            onChange={(e) => setConfirmPass(e.target.value)}
+            placeholder="Confirm password"
             type="password"
             style={{
               width: "100%",
@@ -672,43 +634,21 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             onFocus={(e) => e.target.style.borderColor = T.terra}
             onBlur={(e) => e.target.style.borderColor = T.border}
           />
-          {!isSignIn && (
-            <input
-              value={confirmPass}
-              onChange={(e) => setConfirmPass(e.target.value)}
-              placeholder="Confirm password"
-              type="password"
-              style={{
-                width: "100%",
-                padding: "11px 14px",
-                marginBottom: 10,
-                background: T.surface,
-                border: `1px solid ${T.border}`,
-                borderRadius: 8,
-                fontSize: 14,
-                color: T.ink,
-                fontFamily: T.sans,
-                outline: "none",
-                transition: "border-color 200ms"
-              }}
-              onFocus={(e) => e.target.style.borderColor = T.terra}
-              onBlur={(e) => e.target.style.borderColor = T.border}
-            />
-          )}
+        )}
 
-          {authError && (
-            <div style={{
-              background: T.surface,
-              color: T.ochre,
-              padding: "8px 12px",
-              borderRadius: 8,
-              fontSize: 12,
-              marginBottom: 12,
-              fontFamily: T.sans
-            }}>
-              {authError}
-            </div>
-          )}
+        {authError && (
+          <div style={{
+            background: T.surface,
+            color: T.terra,
+            padding: "8px 12px",
+            borderRadius: 8,
+            fontSize: 12,
+            marginBottom: 12,
+            fontFamily: T.sans
+          }}>
+            {authError}
+          </div>
+        )}
 
         <button
           onClick={isSignIn ? handleSignin : handleSignup}
@@ -776,7 +716,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
         </button>
       </div>
 
-      {/* Footer social proof */}
+      {/* Footer */}
       <div style={{
         marginTop: 24,
         textAlign: "center",
@@ -784,7 +724,7 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
         color: T.ink2,
         fontFamily: T.sans
       }}>
-        ✓ Trusted by makers like you • No credit card needed
+        ✓ Free forever on the basics • Upload, track, share
       </div>
     </div>
   );
@@ -808,15 +748,12 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
         @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Raleway:wght@400;500;600;700&display=swap');
         * { box-sizing: border-box; }
         body { margin: 0; padding: 0; }
-        #__ph_survey_widget, div[class*="PostHog"], div[id*="posthog"], .__ph-toolbar {
+        #__ph_survey_widget, div[class*="PostHog"], div[id*="posthog"], .__ph_toolbar {
           display: none !important;
         }
       `}</style>
 
-      {/* On mobile: preview FIRST, then form. On desktop: preview left, form right */}
-      {isMobile && <MobilePreview />}
-      {!isMobile && <AnimatedProductPreview />}
-
+      {isMobile ? <MobileValueFlow /> : <DesktopLanding />}
       <AuthForm onEnter={onEnter} onEnterAsNew={onEnterAsNew} onTryAnonymous={onTryAnonymous} />
     </div>
   );
