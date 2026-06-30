@@ -470,13 +470,15 @@ const MobileShowcase = () => {
             author: "by craftybee",
             type: "Amigurumi • Rnd 22 of 30",
             desc: "Track row by row. Never lose your place in a 100-page pattern.",
-            detail: "73% complete"
+            detail: "73% complete",
+            img: "/manatee_hero.png"
           },
           {
             title: "Spring MKAL 2025",
             author: "12-clue monthly CAL",
             type: "3 of 12 clues released",
-            desc: "One collection. Shared materials. Unified progress."
+            desc: "One collection. Shared materials. Unified progress.",
+            img: "/mommy_fiora.png"
           },
           {
             title: "Finished projects",
