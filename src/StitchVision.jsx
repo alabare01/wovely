@@ -8,7 +8,7 @@ const MSGS = [
   "Almost there…",
 ];
 
-const DIFF_COLORS = { Beginner: "#5C9E7A", Intermediate: "#C9853A", Advanced: "#C05A5A" };
+const DIFF_COLORS = { Beginner: "#1E8A63", Intermediate: "#B07B1E", Advanced: "#C2564A" };
 
 const compressForVision = (file) => new Promise((resolve, reject) => {
   const url = URL.createObjectURL(file);
@@ -172,9 +172,9 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
   if (stage === "limit") return (
     <div style={{ padding: "60px 20px", textAlign: "center", maxWidth: 400, margin: "0 auto" }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
-      <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: "#2D3A7C", marginBottom: 8 }}>You've used your 3 free identifications this month</div>
+      <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 8 }}>You've used your 3 free identifications this month</div>
       <div style={{ fontSize: 14, color: T.ink2, lineHeight: 1.7, marginBottom: 24 }}>Upgrade to Craft for unlimited Stitch-O-Vision.</div>
-      {onUpgrade && <button onClick={onUpgrade} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,.3)", marginBottom: 12 }}>Upgrade to Craft</button>}
+      {onUpgrade && <button onClick={onUpgrade} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(123,106,212,.3)", marginBottom: 12 }}>Upgrade to Craft</button>}
       <div><button onClick={reset} style={{ background: "none", border: "none", color: T.terra, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: 8 }}>← Back</button></div>
     </div>
   );
@@ -184,11 +184,11 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
     <div style={{ padding: "80px 20px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
       <style>{`@keyframes svSpin{to{transform:rotate(360deg)}}@keyframes svFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <div style={{ position: "relative", width: 60, height: 60, marginBottom: 24 }}>
-        <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "4px solid transparent", borderTopColor: "#9B7EC8", animation: "svSpin 1s linear infinite" }} />
+        <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "4px solid transparent", borderTopColor: "#7B6AD4", animation: "svSpin 1s linear infinite" }} />
         <img src="/bev_neutral.png" alt="Bev" style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 40, height: 40, objectFit: "contain" }} />
       </div>
-      <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 600, color: "#2D2D4E", marginBottom: 8 }}>Identifying your stitch…</div>
-      <div key={loadingMsg} style={{ fontSize: 13, color: "#9B7EC8", animation: "svFade .4s ease both" }}>{loadingMsg}</div>
+      <div style={{ fontFamily: "'Fredoka',serif", fontSize: 20, fontWeight: 600, color: "#2E2748", marginBottom: 8 }}>Identifying your stitch…</div>
+      <div key={loadingMsg} style={{ fontSize: 13, color: "#7B6AD4", animation: "svFade .4s ease both" }}>{loadingMsg}</div>
     </div>
   );
 
@@ -206,16 +206,16 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
     if (result?.not_stitch) return (
       <div style={{ padding: "40px 20px 60px", textAlign: "center", maxWidth: 440, margin: "0 auto" }}>
         {thumb && <img src={thumb} alt="" style={{ width: "100%", maxHeight: 180, objectFit: "cover", borderRadius: 12, marginBottom: 20 }} />}
-        <img src="/bev_neutral.png" alt="Bev" style={{ width: 110, height: "auto", margin: "0 auto 16px", display: "block", filter: "drop-shadow(0 4px 16px rgba(155,126,200,0.3))" }} />
-        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, color: "#2D3A7C", marginBottom: 8 }}>That looks like a pattern, not a stitch</div>
-        <div style={{ fontSize: 13, color: "#6B6B8A", lineHeight: 1.7, marginBottom: 20 }}>
+        <img src="/bev_neutral.png" alt="Bev" style={{ width: 110, height: "auto", margin: "0 auto 16px", display: "block", filter: "drop-shadow(0 4px 16px rgba(123,106,212,0.3))" }} />
+        <div style={{ fontFamily: "'Fredoka',serif", fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 8 }}>That looks like a pattern, not a stitch</div>
+        <div style={{ fontSize: 13, color: "#726A92", lineHeight: 1.7, marginBottom: 20 }}>
           Stitch-O-Vision identifies stitches from photos of actual fabric. Looks like you uploaded a pattern page — Bev can import that for you instead.
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {onImportAsPattern && (
             <button
               onClick={() => onImportAsPattern()}
-              style={{ width: "100%", background: "#9B7EC8", color: "#fff", border: "none", borderRadius: 99, padding: "13px 28px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
+              style={{ width: "100%", background: "#7B6AD4", color: "#fff", border: "none", borderRadius: 99, padding: "13px 28px", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
             >
               Import as a pattern instead
             </button>
@@ -253,12 +253,12 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
     if (isLowConf) return (
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "24px 20px", textAlign: "center" }}>
         {thumb && <img src={thumb} alt="" style={{ width: "100%", height: 150, objectFit: "cover", borderRadius: 12, marginBottom: 20 }} />}
-        <img src="/bev_neutral.png" alt="Bev" style={{ width: 120, height: "auto", margin: "0 auto 16px", display: "block", filter: "drop-shadow(0 4px 16px rgba(155,126,200,0.3))" }} />
-        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, color: "#2D3A7C", marginBottom: 8 }}>Bev's not quite sure about this one...</div>
-        {result.stitch_name && <div style={{ fontSize: 14, color: "#6B6B8A", marginBottom: 16 }}>This might be a <span style={{ fontWeight: 600, color: "#9B7EC8" }}>{result.stitch_name}</span></div>}
-        {result.base_stitch && <div style={{ display: "inline-block", background: "#9B7EC8", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600, marginBottom: 16 }}>Base stitch: {result.base_stitch}</div>}
-        <div style={{ background: "#F8F6FF", border: "1px solid #EDE4F7", borderRadius: 12, padding: "14px 16px", marginBottom: 20, textAlign: "left" }}>
-          <div style={{ fontSize: 13, color: "#2D2D4E", lineHeight: 1.6 }}>💡 Try a closer shot focusing just on the stitch texture — Bev gets more confident with detail shots!</div>
+        <img src="/bev_neutral.png" alt="Bev" style={{ width: 120, height: "auto", margin: "0 auto 16px", display: "block", filter: "drop-shadow(0 4px 16px rgba(123,106,212,0.3))" }} />
+        <div style={{ fontFamily: "'Fredoka',serif", fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 8 }}>Bev's not quite sure about this one...</div>
+        {result.stitch_name && <div style={{ fontSize: 14, color: "#726A92", marginBottom: 16 }}>This might be a <span style={{ fontWeight: 600, color: "#7B6AD4" }}>{result.stitch_name}</span></div>}
+        {result.base_stitch && <div style={{ display: "inline-block", background: "#7B6AD4", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600, marginBottom: 16 }}>Base stitch: {result.base_stitch}</div>}
+        <div style={{ background: "#F5F2FF", border: "1px solid #ECE6F8", borderRadius: 12, padding: "14px 16px", marginBottom: 20, textAlign: "left" }}>
+          <div style={{ fontSize: 13, color: "#2E2748", lineHeight: 1.6 }}>💡 Try a closer shot focusing just on the stitch texture — Bev gets more confident with detail shots!</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {shareId && result.stitch_name && (
@@ -276,13 +276,13 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "24px 20px" }}>
         {thumb && <img src={thumb} alt="" style={{ width: "100%", height: 150, objectFit: "cover", borderRadius: 12, marginBottom: 16 }} />}
 
-        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 24, fontWeight: 700, color: "#2D3A7C", marginBottom: 6 }}>{result.primary_identifier || result.stitch_name}</div>
+        <div style={{ fontFamily: "'Fredoka',serif", fontSize: 24, fontWeight: 700, color: T.ink, marginBottom: 6 }}>{result.primary_identifier || result.stitch_name}</div>
 
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
           <span style={{ background: diffColor + "22", color: diffColor, borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>{result.difficulty}</span>
-          {result.confidence === "high" && <span style={{ background: "#D8EAD8", color: "#5C9E7A", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>High confidence</span>}
-          {result.confidence === "medium" && <span style={{ background: "#FDF3D7", color: "#A88730", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>Medium confidence</span>}
-          {(result.stitch_technique || result.base_stitch) && <span style={{ background: "#9B7EC8", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>Stitch: {result.stitch_technique || result.base_stitch}</span>}
+          {result.confidence === "high" && <span style={{ background: "#E7F6F0", color: T.success, borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>High confidence</span>}
+          {result.confidence === "medium" && <span style={{ background: "#FDF3D7", color: T.warning, borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>Medium confidence</span>}
+          {(result.stitch_technique || result.base_stitch) && <span style={{ background: "#7B6AD4", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>Stitch: {result.stitch_technique || result.base_stitch}</span>}
           {result.pattern_arrangement && <span style={{ background: "#E8DFF5", color: "#5E4680", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>Arrangement: {result.pattern_arrangement}</span>}
           {result.construction_method && <span style={{ background: "#D5E0F0", color: "#3D5A8C", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>Construction: {result.construction_method}</span>}
           {(result.also_known_as || []).map(name => (
@@ -302,8 +302,8 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
         )}
 
         {showDebug && (result.observation_notes || result.candidate_analysis) && (
-          <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(155, 126, 200, 0.06)', borderRadius: '12px', border: '1px dashed rgba(155, 126, 200, 0.3)' }}>
-            <div style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#2D3A7C', opacity: 0.7, marginBottom: '0.5rem' }}>Debug: Reasoning Trace</div>
+          <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'rgba(123,106,212, 0.06)', borderRadius: '12px', border: '1px dashed rgba(123,106,212, 0.3)' }}>
+            <div style={{ fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: T.ink, opacity: 0.7, marginBottom: '0.5rem' }}>Debug: Reasoning Trace</div>
             {result.observation_notes && (
               <div style={{ marginBottom: '0.75rem' }}>
                 <strong style={{ fontSize: '0.85rem' }}>Observations:</strong>
@@ -327,7 +327,7 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
         )}
 
         {result.tutorial_search && (
-          <button onClick={() => window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(result.tutorial_search), "_blank")} style={{ width: "100%", background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "14px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,.3)", marginBottom: 12 }}>
+          <button onClick={() => window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(result.tutorial_search), "_blank")} style={{ width: "100%", background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "14px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(123,106,212,.3)", marginBottom: 12 }}>
             Watch a tutorial →
           </button>
         )}
@@ -353,7 +353,7 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
   return (
     <div style={{ maxWidth: 480, margin: "0 auto", padding: "40px 24px", textAlign: "center" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 6 }}>
-        <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 26, fontWeight: 700, color: "#2D3A7C" }}>Stitch-O-Vision</div>
+        <div style={{ fontFamily: "'Fredoka',serif", fontSize: 26, fontWeight: 700, color: T.ink }}>Stitch-O-Vision</div>
         <img src="/bev_neutral.png" alt="Bev" style={{ width: 20, height: 20, objectFit: "contain" }} />
       </div>
       <div style={{ fontSize: 14, color: T.ink2, lineHeight: 1.7, marginBottom: 24 }}>Photograph any stitch — we'll tell you what it is</div>

@@ -5,12 +5,12 @@ import { T, useBreakpoint } from "./theme.jsx";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, getSession } from "./supabase.js";
 
 const C = {
-  lavender: "#9B7EC8",
-  navy: "#2D3A7C",
-  border: "#EDE4F7",
-  text: "#2D2D4E",
-  sub: "#6B6B8A",
-  surface: "#F8F6FF",
+  lavender: T.accent,
+  navy: T.ink,
+  border: T.line,
+  text: T.ink,
+  sub: T.muted,
+  surface: T.linen,
 };
 
 const inputBase = {
@@ -27,7 +27,7 @@ const inputBase = {
   transition: "border-color .15s ease, box-shadow .15s ease",
 };
 
-const focusStyle = { borderColor: C.lavender, boxShadow: "0 0 0 3px rgba(155,126,200,0.15)" };
+const focusStyle = { borderColor: C.lavender, boxShadow: "0 0 0 3px rgba(123,106,212,0.15)" };
 const blurStyle = { borderColor: C.border, boxShadow: "none" };
 
 function Input({ rows = 3, placeholder, value, onChange, required }) {
@@ -233,7 +233,7 @@ export default function FeedbackWidget({ user }) {
       <svg width="28" height="26" viewBox="0 0 24 24" fill={C.lavender} xmlns="http://www.w3.org/2000/svg">
         <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/>
       </svg>
-      <div style={{ fontSize: 9, fontWeight: 600, color: "#9B7EC8", letterSpacing: 0.5, textTransform: "uppercase", marginTop: 2, fontFamily: "Inter, sans-serif", lineHeight: 1 }}>Talk to Us</div>
+      <div style={{ fontSize: 9, fontWeight: 600, color: "#7B6AD4", letterSpacing: 0.5, textTransform: "uppercase", marginTop: 2, fontFamily: "Nunito, sans-serif", lineHeight: 1 }}>Talk to Us</div>
     </button>
   );
 
@@ -250,7 +250,7 @@ export default function FeedbackWidget({ user }) {
   const bugForm = (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 6, fontFamily: T.sans }}>What went wrong? <span style={{ color: "#C05A5A" }}>*</span></div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 6, fontFamily: T.sans }}>What went wrong? <span style={{ color: "#C2564A" }}>*</span></div>
         <Input rows={3} placeholder="Describe what happened..." value={bugWhat} onChange={setBugWhat} required />
       </div>
       <div>
@@ -268,10 +268,10 @@ export default function FeedbackWidget({ user }) {
         <input ref={fileInputRef} type="file" accept="image/*,application/pdf,.pdf" onChange={handleFileSelect} onClick={e=>e.stopPropagation()} style={{ display: "none" }} />
         {attachedFile ? (
           <div style={{
-            border: `1px solid #5C9E7A`, borderRadius: 12, padding: "12px 16px",
+            border: `1px solid #1E8A63`, borderRadius: 12, padding: "12px 16px",
             display: "flex", alignItems: "center", gap: 10, background: "#F0F8F0",
           }}>
-            <span style={{ color: "#5C9E7A", fontSize: 16 }}>✓</span>
+            <span style={{ color: "#1E8A63", fontSize: 16 }}>✓</span>
             <span style={{ fontSize: 13, color: C.text, fontFamily: T.sans, flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{attachedFile.name}</span>
             <button onClick={() => setAttachedFile(null)} style={{
               background: "none", border: "none", fontSize: 14, color: C.sub, cursor: "pointer", padding: 2, lineHeight: 1,
@@ -288,7 +288,7 @@ export default function FeedbackWidget({ user }) {
             </span>
           </div>
         )}
-        {uploadError && <div style={{ color: "#C05A5A", fontSize: 12, marginTop: 6, fontFamily: T.sans }}>{uploadError}</div>}
+        {uploadError && <div style={{ color: "#C2564A", fontSize: 12, marginTop: 6, fontFamily: T.sans }}>{uploadError}</div>}
       </div>
     </div>
   );
@@ -296,7 +296,7 @@ export default function FeedbackWidget({ user }) {
   const ideaForm = (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
       <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 6, fontFamily: T.sans }}>What's your idea? <span style={{ color: "#C05A5A" }}>*</span></div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 6, fontFamily: T.sans }}>What's your idea? <span style={{ color: "#C2564A" }}>*</span></div>
         <Input rows={4} placeholder="Tell us what you'd love to see in Wovely..." value={ideaWhat} onChange={setIdeaWhat} required />
       </div>
       <div>
@@ -347,7 +347,7 @@ export default function FeedbackWidget({ user }) {
       {category === "Love it" && loveForm}
 
       {/* Error */}
-      {error && <div style={{ color: "#C05A5A", fontSize: 13, textAlign: "center", fontFamily: T.sans }}>{error}</div>}
+      {error && <div style={{ color: "#C2564A", fontSize: 13, textAlign: "center", fontFamily: T.sans }}>{error}</div>}
 
       {/* Submit */}
       {category && (
@@ -368,7 +368,7 @@ export default function FeedbackWidget({ user }) {
   const overlay = open ? (
     <>
       <div onClick={handleClose} style={{
-        position: "fixed", inset: 0, background: "rgba(45,58,124,0.25)",
+        position: "fixed", inset: 0, background: "rgba(90,66,160,0.25)",
         backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
         zIndex: 200, animation: "fbFadeIn .2s ease",
       }} />
@@ -376,7 +376,7 @@ export default function FeedbackWidget({ user }) {
         <div style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 201,
           background: "#fff", borderRadius: "20px 20px 0 0",
-          boxShadow: "0 8px 40px rgba(45,58,124,0.15)",
+          boxShadow: "0 8px 40px rgba(90,66,160,0.15)",
           animation: "slideUp .3s ease", maxHeight: "90vh", overflowY: "auto",
         }}>
           <div style={{ display: "flex", justifyContent: "center", padding: "12px 0 4px" }}>
@@ -392,7 +392,7 @@ export default function FeedbackWidget({ user }) {
         <div style={{
           position: "fixed", top: "50%", left: "50%", transform: "translate(-50%, -50%)",
           zIndex: 201, background: "#fff", borderRadius: 20,
-          boxShadow: "0 8px 40px rgba(45,58,124,0.15)",
+          boxShadow: "0 8px 40px rgba(90,66,160,0.15)",
           width: "100%", maxWidth: 480, animation: "modalPop .25s ease",
           overflowY: "auto", maxHeight: "90vh",
         }}>

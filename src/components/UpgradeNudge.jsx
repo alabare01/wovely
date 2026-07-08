@@ -51,7 +51,7 @@ export default function UpgradeNudge({ feature, currentTier, onUpgrade, dismissi
       border: "1px solid rgba(255,255,255,0.45)",
       borderLeft: `4px solid ${T.terra}`,
       borderRadius: 16,
-      boxShadow: "0 4px 24px rgba(45,58,124,0.08)",
+      boxShadow: "0 4px 24px rgba(90,66,160,0.08)",
       padding: "16px 18px",
       fontFamily: T.sans,
       display: "flex",
@@ -83,7 +83,7 @@ export default function UpgradeNudge({ feature, currentTier, onUpgrade, dismissi
             fontSize: 13,
             fontWeight: 600,
             cursor: "pointer",
-            boxShadow: "0 4px 14px rgba(155,126,200,0.3)",
+            boxShadow: "0 4px 14px rgba(123,106,212,0.3)",
           }}
         >{ctaLabel}</button>
         <span style={{fontSize:11,color:T.ink3}}>Current plan: {tierLabel(safe)}</span>

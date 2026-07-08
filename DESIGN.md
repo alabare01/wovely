@@ -2,46 +2,64 @@
 
 > Mobile-first, responsive, accessible. Tokens for web → iOS/Android.
 
+> ⚠️ **SUPERSEDED by Design System 2b (2026-07-06).** The v1 palette/type below is historical.
+> Live source of truth: `design/Wovely App 2b.dc.html` + `10 Canon/Design System 2b.md`.
+> Code mirrors: `src/theme.jsx` (`T`) and `:root` in `src/index.css`.
+> **2b at a glance:** Accent `#7B6AD4` · Deep `#6E5AC8` · Canvas `#FBF9FF` · Ink `#2E2748` · Muted `#726A92` ·
+> Line `#ECE6F8` · Coral `#FF8A73` · Sun/Gold `#FFC24B` (scarce) · Mint `#5EC9AE` · Sky `#6FB7F0` · Pink `#C98BE0`.
+> Type: **Fredoka** (display) + **Nunito** (body). Woven 45° crosshatch on canvases.
+
 ---
 
-## Color System (OKLCH)
+## Color System (2b — current)
 
 ### Primary Brand
-- **Terra (Lavender):** `#9B7EC8` · OKLCH(68.5%, 0.14, 290°) — Accents, CTAs, highlights
-- **Terra Light:** `#EDE4F7` · OKLCH(88%, 0.05, 280°) — Subtle backgrounds, borders
+- **Accent (Lavender):** `#7B6AD4` — Accents, CTAs, highlights, current selection
+- **Deep Accent:** `#6E5AC8` — Gradients (sidebar, buttons), pressed states
+- **Soft Lavender:** `#F2EEFB` — Icon chips, subtle fills, pill backgrounds
 
-### Semantic
-- **Success (Sage):** `#5C9E7A` — Completion, positive feedback
-- **Warning (Gold):** `#C9853A` — Caution, alerts
-- **Error (Rose):** `#C05A5A` — Errors, destructive actions
+### Semantic (accessible text tones)
+- **Success:** `#1E8A63` (fills use Mint `#5EC9AE`) — Completion, positive feedback
+- **Warning:** `#B07B1E` (fills use Sun `#FFC24B`) — Caution, alerts
+- **Error:** `#C2564A` (fills use Coral `#FF8A73`) — Errors, destructive actions
 
-### Neutral Grays (Text & Structure)
-- **Ink (Dark):** `#2D2D4E` — Primary text, headings
-- **Ink 2 (Secondary):** `#6B6B8A` — Secondary text, meta info
-- **Disabled:** `#B0AEC4` — Disabled states, placeholders
+### Neutral (Text & Structure)
+- **Ink:** `#2E2748` — Primary text, headings
+- **Muted:** `#726A92` — Secondary text, meta info
+- **Line:** `#ECE6F8` — Borders, dividers
+- **Disabled:** `#B8B2CC` — Disabled states, placeholders
 
 ### Backgrounds
-- **Body bg:** `#FAF8F5` · OKLCH(96.5%, 0.02, 75°) — Warm cream, not off-white
-- **Surface:** `#F8F6FF` · OKLCH(95%, 0.03, 280°) — Subtle lavender tint
-- **Card bg:** `#FFFFFF` · OKLCH(100%, 0, n/a) — Pure white, with glass-card effect
+- **Canvas / body bg:** `#FBF9FF` — Cool lavender-white (NOT warm cream) + crosshatch texture
+- **Panel / card:** `#FFFFFF` — Solid white cards on the canvas
 
-### Glass-Card Effect (CSS)
+### Card / Glass (CSS)
 ```css
-background: rgba(255, 255, 255, 0.84);
-border: 1px solid rgba(155, 126, 200, 0.18);
-border-radius: 12px;
-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-backdrop-filter: blur(12px); /* Optional on web, easier on perf */
+/* Standard 2b card — solid white on the woven canvas */
+background: #FFFFFF;
+border: 1px solid #ECE6F8;
+border-radius: 22px;
+box-shadow: 0 16px 34px -22px rgba(90,66,160,0.4);
+/* Glass/blur reserved for surfaces over photography (e.g. sticky topbar): */
+/* background: rgba(251,249,255,0.86); backdrop-filter: blur(8px); */
 ```
+
+<details><summary>Historical — v1 palette (do not use)</summary>
+
+- Terra `#9B7EC8` · Terra Light `#EDE4F7` · Sage `#5C9E7A` · Gold `#C9853A` · Rose `#C05A5A`
+- Ink `#2D2D4E` · Ink2 `#6B6B8A` · Body bg `#FAF8F5` (warm cream) · Surface `#F8F6FF`
+- Fonts: Playfair Display + Inter
+
+</details>
 
 ---
 
 ## Typography
 
-### Font Stack
-- **Serif (Display/Headings):** Playfair Display (400, 500, 700 weights)
-- **Sans (Body/UI):** Inter (300, 400, 500, 600 weights)
-- **Fallbacks:** Georgia, -apple-system, system-ui
+### Font Stack (2b)
+- **Display (Headings):** Fredoka (400, 500, 600, 700 weights) — rounded, warm, playful
+- **Body/UI:** Nunito (500, 600, 700, 800, 900 weights) — friendly, highly readable
+- **Fallbacks:** "Segoe UI", -apple-system, system-ui, sans-serif
 
 ### Scale (Responsive)
 

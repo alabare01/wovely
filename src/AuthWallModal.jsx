@@ -18,10 +18,10 @@ const waitForSession = async () => {
 };
 
 const INPUT_STYLE = {
-  width: "100%", height: 41, padding: "0 14px", background: "#F8F6FF",
-  border: "1px solid #EDE4F7", borderRadius: 10, fontSize: 13,
-  color: "#2D2D4E", outline: "none", boxSizing: "border-box",
-  fontFamily: "Inter,sans-serif",
+  width: "100%", height: 41, padding: "0 14px", background: "#F5F2FF",
+  border: "1px solid #ECE6F8", borderRadius: 10, fontSize: 13,
+  color: "#2E2748", outline: "none", boxSizing: "border-box",
+  fontFamily: "Nunito,sans-serif",
 };
 
 const AuthWallModal = ({
@@ -92,8 +92,8 @@ const AuthWallModal = ({
 
   const onKey = e => { if (e.key === "Enter" && !loading) handleSubmit(); };
 
-  const focusBorder = e => { e.target.style.borderColor = "#9B7EC8"; };
-  const blurBorder  = e => { e.target.style.borderColor = "#EDE4F7"; };
+  const focusBorder = e => { e.target.style.borderColor = "#7B6AD4"; };
+  const blurBorder  = e => { e.target.style.borderColor = "#ECE6F8"; };
 
   const submitLabel = loading
     ? (mode === "signup" ? "Creating…" : "Signing in…")
@@ -106,10 +106,10 @@ const AuthWallModal = ({
       onClick={onClose}
       style={{
         position: "fixed", inset: 0, zIndex: 800,
-        background: "rgba(45,58,124,0.4)",
+        background: "rgba(90,66,160,0.4)",
         backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
         display: "flex", alignItems: "center", justifyContent: "center",
-        padding: 20, fontFamily: "Inter,sans-serif",
+        padding: 20, fontFamily: "Nunito,sans-serif",
       }}
     >
       <div
@@ -117,7 +117,7 @@ const AuthWallModal = ({
         style={{
           position: "relative", width: "100%", maxWidth: 420,
           background: "#FFFFFF", borderRadius: 16, padding: 32,
-          boxShadow: "0 20px 60px rgba(45,58,124,0.18)",
+          boxShadow: "0 20px 60px rgba(90,66,160,0.18)",
           boxSizing: "border-box",
         }}
       >
@@ -127,7 +127,7 @@ const AuthWallModal = ({
           style={{
             position: "absolute", top: 12, right: 12,
             background: "none", border: "none", cursor: "pointer",
-            fontSize: 24, color: "#6B6B8A", lineHeight: 1,
+            fontSize: 24, color: "#726A92", lineHeight: 1,
             width: 32, height: 32, display: "flex",
             alignItems: "center", justifyContent: "center",
             padding: 0,
@@ -143,14 +143,14 @@ const AuthWallModal = ({
         </div>
 
         <div style={{
-          fontFamily: "'Playfair Display', Georgia, serif",
-          fontSize: 24, fontWeight: 700, color: "#2D3A7C",
+          fontFamily: "'Fredoka', Georgia, serif",
+          fontSize: 24, fontWeight: 700, color: "#2E2748",
           textAlign: "center", marginBottom: 6, lineHeight: 1.25,
         }}>
           {mode === "signup" ? title : "Welcome back"}
         </div>
         <div style={{
-          fontFamily: "Inter,sans-serif", fontSize: 14, color: "#6B6B8A",
+          fontFamily: "Nunito,sans-serif", fontSize: 14, color: "#726A92",
           textAlign: "center", marginBottom: 20, lineHeight: 1.5,
         }}>
           {mode === "signup" ? subtitle : "Sign in to continue."}
@@ -208,7 +208,7 @@ const AuthWallModal = ({
         {error && (
           <div style={{
             color: "#C0544A", fontSize: 13, marginTop: 10, lineHeight: 1.5,
-            fontFamily: "Inter,sans-serif",
+            fontFamily: "Nunito,sans-serif",
           }}>{error}</div>
         )}
 
@@ -217,9 +217,9 @@ const AuthWallModal = ({
           disabled={loading}
           style={{
             width: "100%", height: 43, marginTop: 14,
-            background: "#9B7EC8", color: "#fff",
+            background: "#7B6AD4", color: "#fff",
             border: "none", borderRadius: 10,
-            fontSize: 14, fontWeight: 600, fontFamily: "Inter,sans-serif",
+            fontSize: 14, fontWeight: 600, fontFamily: "Nunito,sans-serif",
             cursor: loading ? "default" : "pointer",
             opacity: loading ? 0.6 : 1,
           }}
@@ -228,18 +228,18 @@ const AuthWallModal = ({
         <div style={{ textAlign: "center", marginTop: 14, fontSize: 12.5 }}>
           {mode === "signup" ? (
             <>
-              <span style={{ color: "#6B6B8A" }}>Already have an account? </span>
+              <span style={{ color: "#726A92" }}>Already have an account? </span>
               <span
                 onClick={() => { setMode("signin"); setError(null); setPass(""); setConfirmPass(""); }}
-                style={{ color: "#9B7EC8", cursor: "pointer", fontWeight: 600 }}
+                style={{ color: "#7B6AD4", cursor: "pointer", fontWeight: 600 }}
               >Sign in</span>
             </>
           ) : (
             <>
-              <span style={{ color: "#6B6B8A" }}>New to Wovely? </span>
+              <span style={{ color: "#726A92" }}>New to Wovely? </span>
               <span
                 onClick={() => { setMode("signup"); setError(null); setPass(""); setConfirmPass(""); }}
-                style={{ color: "#9B7EC8", cursor: "pointer", fontWeight: 600 }}
+                style={{ color: "#7B6AD4", cursor: "pointer", fontWeight: 600 }}
               >Create account</span>
             </>
           )}

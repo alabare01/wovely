@@ -9,9 +9,9 @@ import { isReferenceChip } from "../utils/docType.js";
 // PatternDetail opens the scoped section view (instructions + notes).
 
 // Single lavender accent (no loud per-card colors, no repeated cover thumbnail).
-// Cards are Bev's space: glass treatment, Playfair title, a numbered lavender
+// Cards are Bev's space: 2b card treatment, Fredoka title, a numbered lavender
 // badge, one quiet metadata line.
-const LAV = "#9B7EC8";
+const LAV = "#7B6AD4";
 const LAV_BG = "#F3EEFA";
 
 const cleanName = (text) => (text || "").replace(/──/g, "").trim() || "Section";
@@ -22,7 +22,7 @@ const GLASS = {
   WebkitBackdropFilter: "blur(16px)",
   border: "1px solid rgba(255,255,255,0.45)",
   borderRadius: 16,
-  boxShadow: "0 4px 24px rgba(45,58,124,0.08)",
+  boxShadow: "0 4px 24px rgba(90,66,160,0.08)",
 };
 
 const splitSections = (rows) => {
@@ -47,7 +47,7 @@ const SectionHub = ({ rows, onSelect, Bar }) => {
     // Soft lavender wash behind the grid so the frosted (translucent) cards have
     // something to blur against — on a flat white page the glass token reads as
     // a plain white box. This is the backdrop that makes the glass read as glass.
-    <div style={{ background: "linear-gradient(160deg, #F3EEFA 0%, #F8F6FF 70%)", borderRadius: 18, padding: "18px 16px" }}>
+    <div style={{ background: "linear-gradient(160deg, #F3EEFA 0%, #F5F2FF 70%)", borderRadius: 18, padding: "18px 16px" }}>
       <div style={{ fontFamily: T.serif, fontSize: 18, color: T.ink, marginBottom: 4 }}>The parts</div>
       <div style={{ fontSize: 12.5, color: T.ink3, marginBottom: 14, lineHeight: 1.5 }}>
         Bev laid this project out in {sections.length} parts. Tap one to work it, in any order.
@@ -68,7 +68,7 @@ const SectionHub = ({ rows, onSelect, Bar }) => {
           // (S76 part D cosmetic).
           if (isReference) {
             return (
-              <div key={key} style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed rgba(155,126,200,0.30)", borderRadius: 12, background: "rgba(255,255,255,0.55)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}>
+              <div key={key} style={{ gridColumn: "1 / -1", display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", border: "1px dashed rgba(123,106,212,0.30)", borderRadius: 12, background: "rgba(255,255,255,0.55)", backdropFilter: "blur(10px)", WebkitBackdropFilter: "blur(10px)" }}>
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".06em", color: T.ink3, background: "#fff", border: `1px solid ${T.border}`, borderRadius: 6, padding: "2px 6px" }}>REF</span>
                 <span style={{ fontSize: 13, color: T.ink2, fontWeight: 600 }}>{name}</span>
               </div>

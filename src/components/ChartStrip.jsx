@@ -31,7 +31,7 @@ export const BevInlineSpinner = ({ size = 24 }) => (
     <div style={{
       position: "absolute", inset: -3, borderRadius: "50%",
       border: "2px solid transparent",
-      borderTopColor: "#9B7EC8",
+      borderTopColor: "#7B6AD4",
       animation: "wovelyChartsRing 1s linear infinite",
     }}/>
     <img
@@ -97,9 +97,9 @@ export const ChartLightbox = ({ images, startIndex, onClose, canPin = false, pin
           aria-label={isPinned ? "Unpin" : "Pin"}
           style={{
             position: "absolute", top: 16, left: 16,
-            background: isPinned ? "#9B7EC8" : "rgba(255,255,255,0.15)", color: "#fff", border: "none",
+            background: isPinned ? "#7B6AD4" : "rgba(255,255,255,0.15)", color: "#fff", border: "none",
             borderRadius: 99, height: 40, padding: "0 16px", cursor: "pointer",
-            fontSize: 13, fontWeight: 600, fontFamily: "Inter, sans-serif",
+            fontSize: 13, fontWeight: 600, fontFamily: "Nunito, sans-serif",
             display: "flex", alignItems: "center", gap: 6,
           }}
         >📌 {isPinned ? "Unpin" : "Pin"}</button>
@@ -117,7 +117,7 @@ export const ChartLightbox = ({ images, startIndex, onClose, canPin = false, pin
       <div onClick={(e) => e.stopPropagation()} style={{ marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
         <ChartTypePill type={img.image_type} />
         {images.length > 1 && (
-          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontFamily: "Inter, sans-serif" }}>
+          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontFamily: "Nunito, sans-serif" }}>
             {idx + 1} / {images.length}
           </span>
         )}
@@ -152,7 +152,7 @@ export const ChartLightbox = ({ images, startIndex, onClose, canPin = false, pin
           />
         ) : (
           <div style={{
-            color: "rgba(255,255,255,0.7)", fontFamily: "Inter, sans-serif",
+            color: "rgba(255,255,255,0.7)", fontFamily: "Nunito, sans-serif",
             fontSize: 14, padding: "60px 40px", textAlign: "center",
           }}>Bev is preparing this image…</div>
         )}
@@ -175,12 +175,12 @@ export const ChartLightbox = ({ images, startIndex, onClose, canPin = false, pin
           onClick={(e) => e.stopPropagation()}
           style={{
             marginTop: 14, maxWidth: "90vw", textAlign: "center",
-            color: "#fff", fontFamily: "Inter, sans-serif",
+            color: "#fff", fontFamily: "Nunito, sans-serif",
             fontSize: 13, lineHeight: 1.5,
           }}
         >
           {img.component_name && (
-            <div style={{ fontWeight: 600, marginBottom: 4, fontFamily: "'Playfair Display', Georgia, serif", fontSize: 15 }}>
+            <div style={{ fontWeight: 600, marginBottom: 4, fontFamily: "'Fredoka', Georgia, serif", fontSize: 15 }}>
               {img.component_name}
             </div>
           )}
@@ -204,7 +204,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
     background: "rgba(255,255,255,0.82)",
     backdropFilter: "blur(16px)",
     WebkitBackdropFilter: "blur(16px)",
-    borderBottom: "1px solid #EDE4F7",
+    borderBottom: "1px solid #ECE6F8",
     padding: "12px 16px",
     position: "relative",
   };
@@ -230,7 +230,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
           {Array.from({ length: placeholderCount }).map((_, i) => (
             <div key={i} style={{
               flexShrink: 0, height: 120, width: 92, borderRadius: 12,
-              border: "1px solid #EDE4F7", background: "linear-gradient(135deg, #EDE4F7, #F8F6FF)",
+              border: "1px solid #ECE6F8", background: "linear-gradient(135deg, #ECE6F8, #F5F2FF)",
             }}/>
           ))}
         </div>
@@ -239,13 +239,13 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
           alignItems: "center", justifyContent: "center", gap: 4,
           background: "rgba(248,246,255,0.55)", backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
         }}>
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#2D2D4E", fontWeight: 600 }}>
+          <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#2E2748", fontWeight: 600 }}>
             Bev found charts in this pattern
           </div>
           {onShowUpgrade && (
             <button onClick={onShowUpgrade} style={{
               background: "transparent", border: "none", padding: 0, cursor: "pointer",
-              fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 700, color: "#9B7EC8",
+              fontFamily: "Nunito, sans-serif", fontSize: 12, fontWeight: 700, color: "#7B6AD4",
             }}>See plans</button>
           )}
         </div>
@@ -269,7 +269,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
         {keyframeStyle}
         <div style={{ ...bandStyle, display: "flex", alignItems: "center", gap: 12, minHeight: 120 }}>
           <BevInlineSpinner size={28} />
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#6B6B8A" }}>
+          <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#726A92" }}>
             {pendingLabel || "Bev is preparing your charts..."}
           </div>
         </div>
@@ -302,7 +302,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
               >
                 <div style={{
                   position: "relative", height: 120, borderRadius: 12, overflow: "hidden",
-                  border: "1px solid #EDE4F7", background: tappable ? "#EDE4F7" : "#F8F6FF",
+                  border: "1px solid #ECE6F8", background: tappable ? "#ECE6F8" : "#F5F2FF",
                   ...(tappable ? {} : { width: 92, display: "flex", alignItems: "center", justifyContent: "center" }),
                 }}>
                   {tappable ? (
@@ -321,8 +321,8 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
                 </div>
                 {label && (
                   <div style={{
-                    marginTop: 4, maxWidth: 240, fontSize: 10, fontFamily: "Inter, sans-serif",
-                    color: "#6B6B8A", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    marginTop: 4, maxWidth: 240, fontSize: 10, fontFamily: "Nunito, sans-serif",
+                    color: "#726A92", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                   }}>{label}</div>
                 )}
               </button>
@@ -334,7 +334,7 @@ export const ChartStripView = ({ images, labelFor, canPin = false, pinnedImageId
           background: "linear-gradient(to right, rgba(255,255,255,0), rgba(248,246,255,0.92))",
           pointerEvents: "none",
         }}/>
-        <div style={{ marginTop: 6, fontSize: 11, color: "#6B6B8A", fontFamily: "Inter, sans-serif" }}>
+        <div style={{ marginTop: 6, fontSize: 11, color: "#726A92", fontFamily: "Nunito, sans-serif" }}>
           {ready.length === 0 && pendingLabel ? pendingLabel : "Tap to enlarge"}
         </div>
       </div>
@@ -362,14 +362,14 @@ export const PinnedThumbnail = ({ image, onOpen, onUnpin }) => {
     <div style={{
       position: "fixed", bottom: 20, left: 20, zIndex: 45,
       width: 80, height: 80, borderRadius: 8, overflow: "visible",
-      boxShadow: "0 4px 16px rgba(45,58,124,0.15)",
+      boxShadow: "0 4px 16px rgba(90,66,160,0.15)",
     }}>
       <button
         onClick={onOpen}
         aria-label="Open pinned image"
         style={{
           width: 80, height: 80, borderRadius: 8, overflow: "hidden", padding: 0,
-          border: "1px solid #EDE4F7", background: "#EDE4F7", cursor: "pointer", display: "block",
+          border: "1px solid #ECE6F8", background: "#ECE6F8", cursor: "pointer", display: "block",
         }}
       >
         <img src={image.cloudinary_url} alt={image.caption || imageTypeLabel(image.image_type)}
@@ -381,9 +381,9 @@ export const PinnedThumbnail = ({ image, onOpen, onUnpin }) => {
         style={{
           position: "absolute", top: -8, right: -8,
           width: 22, height: 22, borderRadius: 99, cursor: "pointer",
-          background: "#2D3A7C", color: "#fff", border: "2px solid #fff",
+          background: T.ink, color: "#fff", border: "2px solid #fff",
           fontSize: 13, lineHeight: 1, display: "flex", alignItems: "center", justifyContent: "center",
-          boxShadow: "0 2px 8px rgba(45,58,124,0.25)",
+          boxShadow: "0 2px 8px rgba(90,66,160,0.25)",
         }}
       >×</button>
     </div>

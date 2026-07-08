@@ -45,8 +45,8 @@ export const checkTier = (c) => c.tier || (ADVISORY_IDS.has(c.id) ? "advisory" :
 // --- Shared palette ---
 
 const ZONE = { pass: "#A4C2C3", warning: "#E2D985", issues: "#CEA0A4" };
-const NAVY = "#2D3A7C";
-const LAVENDER = "#9B7EC8";
+const NAVY = "#2E2748";
+const LAVENDER = "#7B6AD4";
 
 // --- Internal helpers ---
 
@@ -114,7 +114,7 @@ const CompactGauge = ({ state, label, angleDeg }) => {
         {/* White edge arc */}
         <path d="M 16 100 A 84 84 0 0 1 184 100" fill="none" stroke="#fff" strokeWidth="22" strokeLinecap="round" />
         {/* Background arc */}
-        <path d="M 16 100 A 84 84 0 0 1 184 100" fill="none" stroke="#EDE4F7" strokeWidth="18" strokeLinecap="round" />
+        <path d="M 16 100 A 84 84 0 0 1 184 100" fill="none" stroke="#ECE6F8" strokeWidth="18" strokeLinecap="round" />
         {/* Colored arc (new pastel palette) */}
         <path d="M 16 100 A 84 84 0 0 1 184 100" fill="none" stroke="url(#bevCompactGrad)" strokeWidth="18" strokeLinecap="round" />
         {/* Needle */}
@@ -128,11 +128,11 @@ const CompactGauge = ({ state, label, angleDeg }) => {
       </svg>
       {/* Zone labels row — ISSUES on left, PASS on right (S67 flip) */}
       <div style={{ display: "flex", justifyContent: "space-between", width: "100%", maxWidth: 280, margin: "4px auto 0" }}>
-        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: state === "issues" ? 700 : 600, color: LAVENDER, opacity: state === "issues" ? 1 : 0.5 }}>ISSUES</span>
-        <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 10, fontWeight: state === "pass" ? 700 : 600, color: LAVENDER, opacity: state === "pass" ? 1 : 0.5 }}>PASS</span>
+        <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: 10, fontWeight: state === "issues" ? 700 : 600, color: LAVENDER, opacity: state === "issues" ? 1 : 0.5 }}>ISSUES</span>
+        <span style={{ fontFamily: "'Nunito', sans-serif", fontSize: 10, fontWeight: state === "pass" ? 700 : 600, color: LAVENDER, opacity: state === "pass" ? 1 : 0.5 }}>PASS</span>
       </div>
-      {/* State label — navy for all states (rose #CEA0A4 fails AA at 18px on #F8F6FF; revisit later) */}
-      <div style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, fontWeight: 700, color: NAVY, marginTop: 4 }}>{label}</div>
+      {/* State label — navy for all states (rose #CEA0A4 fails AA at 18px on #F5F2FF; revisit later) */}
+      <div style={{ fontFamily: "'Fredoka', serif", fontSize: 18, fontWeight: 700, color: NAVY, marginTop: 4 }}>{label}</div>
     </div>
   );
 };
@@ -168,7 +168,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
         border: "1px solid rgba(255,255,255,0.75)",
         borderRadius: 24,
         boxShadow:
-          "0 1px 0 rgba(255,255,255,0.95) inset, 0 2px 4px rgba(0,0,0,0.04), 0 18px 44px rgba(45,58,124,0.12), 0 36px 80px rgba(155,126,200,0.18)",
+          "0 1px 0 rgba(255,255,255,0.95) inset, 0 2px 4px rgba(0,0,0,0.04), 0 18px 44px rgba(90,66,160,0.12), 0 36px 80px rgba(123,106,212,0.18)",
         padding: "28px 36px 32px",
         maxWidth: 440,
         width: "100%",
@@ -181,7 +181,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
           display: "inline-flex",
           alignItems: "center",
           gap: 6,
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "'Nunito', sans-serif",
           fontSize: 10,
           fontWeight: 700,
           letterSpacing: "0.16em",
@@ -189,7 +189,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
           color: LAVENDER,
           padding: "3px 10px 3px 8px",
           borderRadius: 99,
-          background: "rgba(155,126,200,0.12)",
+          background: "rgba(123,106,212,0.12)",
           marginBottom: 8,
         }}
       >
@@ -200,7 +200,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
             height: 6,
             borderRadius: "50%",
             background: LAVENDER,
-            boxShadow: "0 0 0 3px rgba(155,126,200,0.18)",
+            boxShadow: "0 0 0 3px rgba(123,106,212,0.18)",
           }}
         />
         BevCheck
@@ -209,7 +209,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
       {/* Row 2: Title */}
       <h3
         style={{
-          fontFamily: "'Playfair Display', Georgia, serif",
+          fontFamily: "'Fredoka', Georgia, serif",
           fontWeight: 700,
           fontSize: 26,
           letterSpacing: "-0.015em",
@@ -274,9 +274,9 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
             <circle cx="240" cy="132" r="36" />
           </clipPath>
           <radialGradient id="bevFade" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(155,126,200,0.22)" />
-            <stop offset="70%" stopColor="rgba(155,126,200,0.06)" />
-            <stop offset="100%" stopColor="rgba(155,126,200,0)" />
+            <stop offset="0%" stopColor="rgba(123,106,212,0.22)" />
+            <stop offset="70%" stopColor="rgba(123,106,212,0.06)" />
+            <stop offset="100%" stopColor="rgba(123,106,212,0)" />
           </radialGradient>
         </defs>
 
@@ -307,7 +307,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
         <path d="M 90 180 A 150 150 0 0 1 390 180" fill="none" stroke="url(#bevGRimLight)" strokeWidth="1.2" strokeLinecap="round" transform="translate(0,-10.5)" />
 
         {/* Ticks — flush inside the 24px stroke band */}
-        <g stroke="#2D2D4E" strokeLinecap="round">
+        <g stroke="#2E2748" strokeLinecap="round">
           {/* MAJOR 0/25/50/75/100 */}
           <line x1="94" y1="180" x2="102" y2="180" strokeWidth="2" />
           <line x1="136.76" y1="76.76" x2="142.42" y2="82.42" strokeWidth="2" />
@@ -324,7 +324,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
         </g>
 
         {/* Zone labels — navy text with colored dots. ISSUES left, PASS right (S67 flip) */}
-        <g fontFamily="Inter,sans-serif" fontSize="11" fontWeight="700" letterSpacing="0.14em" fill={NAVY}>
+        <g fontFamily="Nunito,sans-serif" fontSize="11" fontWeight="700" letterSpacing="0.14em" fill={NAVY}>
           <circle cx="26" cy="180" r="4" fill={ZONE.issues} />
           <text x="54" y="184" textAnchor="middle">ISSUES</text>
           <circle cx="240" cy="6" r="4" fill={ZONE.warning} />
@@ -334,7 +334,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
         </g>
 
         {/* Endpoint labels */}
-        <g fontFamily="Inter,sans-serif" fontSize="10" fontWeight="600" fill="#6B6B8A">
+        <g fontFamily="Nunito,sans-serif" fontSize="10" fontWeight="600" fill="#726A92">
           <text x="94" y="208" textAnchor="middle">0%</text>
           <text x="386" y="208" textAnchor="middle">100%</text>
         </g>
@@ -355,7 +355,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
           style={{
             textAlign: "center",
             marginTop: 14,
-            fontFamily: "'Playfair Display', serif",
+            fontFamily: "'Fredoka', serif",
             fontWeight: 700,
             color: NAVY,
             fontSize: 64,
@@ -364,7 +364,7 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
           }}
         >
           {scoreText}
-          <small style={{ fontSize: 28, color: "#6B6B8A", fontWeight: 400, marginLeft: 2 }}>%</small>
+          <small style={{ fontSize: 28, color: "#726A92", fontWeight: 400, marginLeft: 2 }}>%</small>
         </div>
       )}
 
@@ -376,11 +376,11 @@ const HeroGauge = ({ state, label, angleDeg, hasScore, score, issueCount }) => {
             paddingTop: 14,
             borderTop: "1px solid rgba(237,228,247,0.8)",
             textAlign: "center",
-            fontFamily: "'Playfair Display', serif",
+            fontFamily: "'Fredoka', serif",
             fontStyle: "italic",
             fontSize: 17,
             lineHeight: 1.4,
-            color: "#6B6B8A",
+            color: "#726A92",
           }}
         >
           Bev spotted{" "}

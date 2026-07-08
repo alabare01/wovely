@@ -9,47 +9,55 @@ Non-negotiable rules and patterns for the Wovely codebase. Read this before writ
 
 ---
 
-## Style Guide (LOCKED — never deviate)
+## Style Guide — Design System 2b (LOCKED — supersedes v1.0)
+
+> Source of truth: `design/Wovely App 2b.dc.html` + `10 Canon/Design System 2b.md` (Wovely Vault).
+> Token mirrors: `src/theme.jsx` (`T`) and `:root` in `src/index.css`. Change tokens there, not inline.
 
 ```
-Primary (lavender):  #9B7EC8
-Navy:                #2D3A7C
-White:               #FFFFFF
-Surface:             #F8F6FF
-Border:              #EDE4F7
-Text primary:        #2D2D4E
-Text secondary:      #6B6B8A
-Danger:              #C0544A
+Accent (lavender):   #7B6AD4   (T.accent / --accent)
+Deep accent:         #6E5AC8   (T.accentD / --accentD)   ← gradients, pressed states
+Canvas / bg:         #FBF9FF   (T.bg / --bg)              ← cool, NOT warm cream
+Panel / card:        #FFFFFF   (T.panel)
+Soft lavender fill:  #F2EEFB   (T.soft)
+Line / border:       #ECE6F8   (T.line / --line)
+Text primary (ink):  #2E2748   (T.ink)
+Text secondary:      #726A92   (T.muted / T.ink2)
 ```
 
-**Stitch Check colors:** green `#5B9B6B` (80%+), amber `#C9A84C` (60–79%), red `#C0544A` (<60%)
+**Full palette (playful, used deliberately):** Coral `#FF8A73` · Sun/Gold `#FFC24B` · Mint `#5EC9AE` · Sky `#6FB7F0` · Pink `#C98BE0`
 
-**Fonts:** Playfair Display (headings), Inter (body)
+**Gold is SCARCE** — yarn cord + Craft/premium treatments only. Never decorative.
 
-**NEVER USE:** `#1A1A2E`, terracotta/salmon `#B85A3C` or `#C05A5A`, cream `#FAF7F2`
+**Stitch Check / BevCheck gauge:** ok green `#1E8A63` (80%+), warn amber `#B07B1E` (60–79%), low coral `#C2564A` (<60%)
+
+**Fonts:** **Fredoka** (display/headings, weights 400–700) + **Nunito** (body/UI, weights 500–900). Loaded in `index.html`.
+
+**Texture:** woven 45° crosshatch on canvases (`T.crosshatch` / `--crosshatch`).
+
+**NEVER USE:** the old palette (`#9B7EC8` lavender, `#2D3A7C` navy, Playfair/Inter, warm cream `#FAF8F5`/`#FAF7F2`), `#1A1A2E`, terracotta/salmon `#B85A3C`.
 
 ---
 
-## Glass Card Treatment (the design language)
+## Card Treatment — 2b (the design language)
 
-My Wovely (Dashboard.jsx) is the gold standard. All pages must match it.
+2b cards are **solid white panels on the woven canvas** — soft hairline border + layered lavender shadow, generous radius. (Heavy glass/blur is reserved for surfaces that sit directly over photography, e.g. sticky topbar `rgba(251,249,255,.86)+blur(8px)`.) My Wovely (Dashboard.jsx) is the gold standard.
 
 ```js
-// Standard glass card — use everywhere
+// Standard 2b card — use everywhere
 const CARD = {
-  background: 'rgba(255,255,255,0.82)',
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  border: '1px solid rgba(255,255,255,0.45)',
-  borderRadius: 16,
-  boxShadow: '0 4px 24px rgba(45,58,124,0.08)',
+  background: '#FFFFFF',            // T.panel
+  border: '1px solid #ECE6F8',     // T.line
+  borderRadius: 22,
+  boxShadow: '0 16px 34px -22px rgba(90,66,160,0.4)',   // T.shadowLg
 };
+// Hover lift: translateY(-4px) + shadow → 0 26px 46px -22px rgba(90,66,160,0.5)
 
 // Standard page content container — stops wall-to-wall stretch
 const PAGE_CONTAINER = {
-  maxWidth: 960,
+  maxWidth: 1180,        // 2b .content width
   margin: '0 auto',
-  padding: '24px 24px',
+  padding: '8px 40px 48px',
 };
 ```
 

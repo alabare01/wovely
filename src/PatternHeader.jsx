@@ -40,7 +40,7 @@ const PatternHeader = ({
       {/* ── HERO: Snap & Stitch patterns get split photo+wireframe, others get clean fixed-height photo ── */}
       {p.snapConfidence&&p.snapComponents?.length ? (
         /* ── SNAP & STITCH SPLIT HERO ── */
-        <div style={{flexShrink:0,background:"#2D2D4E",marginTop:milestone?56:0,transition:"margin .3s"}}>
+        <div style={{flexShrink:0,background:"#2E2748",marginTop:milestone?56:0,transition:"margin .3s"}}>
           {/* top bar */}
           <div style={{position:"relative",zIndex:2,padding:"12px 18px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
             <button onClick={onBack} style={{background:"rgba(255,255,255,.12)",backdropFilter:"blur(8px)",border:"1px solid rgba(255,255,255,.15)",borderRadius:10,padding:"7px 16px",color:"#fff",cursor:"pointer",fontSize:13,fontWeight:500}}>{backText}</button>
@@ -63,12 +63,12 @@ const PatternHeader = ({
                   :<div style={{fontFamily:T.serif,fontSize:isDesktop?20:15,fontWeight:700,color:"#fff",lineHeight:1.2,paddingRight:8}}>{p.title}</div>}
               </div>
               {/* Snap & Stitch badge */}
-              <div style={{position:"absolute",top:10,left:10,background:"rgba(155,126,200,.9)",borderRadius:8,padding:"3px 9px",fontSize:9,fontWeight:700,color:"#fff",display:"flex",alignItems:"center",gap:4}}>
+              <div style={{position:"absolute",top:10,left:10,background:"rgba(123,106,212,.9)",borderRadius:8,padding:"3px 9px",fontSize:9,fontWeight:700,color:"#fff",display:"flex",alignItems:"center",gap:4}}>
                 ✨ Snap & Stitch · {p.snapConfidence}%
               </div>
             </div>
             {/* right: interactive wireframe */}
-            <div style={{position:"relative",background:"#F8F6FF",borderLeft:"1px solid rgba(255,255,255,.08)"}}>
+            <div style={{position:"relative",background:"#F5F2FF",borderLeft:"1px solid rgba(255,255,255,.08)"}}>
               <WireframeViewer components={p.snapComponents} labeled={true} fillContainer={true}/>
               <div style={{position:"absolute",top:10,right:10,background:"rgba(28,23,20,.55)",backdropFilter:"blur(6px)",borderRadius:8,padding:"3px 9px",fontSize:9,color:"rgba(255,255,255,.8)",fontWeight:600,pointerEvents:"none"}}>
                 3D Component Map
@@ -76,7 +76,7 @@ const PatternHeader = ({
             </div>
           </div>
           {/* progress bar row */}
-          <div style={{padding:"10px 18px 12px",background:"#2D2D4E"}}>
+          <div style={{padding:"10px 18px 12px",background:"#2E2748"}}>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <div style={{flex:1}}><Bar val={done} color={T.terra} h={3} bg="rgba(255,255,255,.15)"/></div>
               <span style={{color:"rgba(255,255,255,.7)",fontSize:12,fontWeight:600,minWidth:36}}>{done}%</span>

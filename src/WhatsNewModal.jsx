@@ -117,27 +117,27 @@ export default function WhatsNewModal() {
 
         {/* Header */}
         <div style={{
-          background: "linear-gradient(135deg, #9B7EC8, #7B5EA8)",
+          background: "linear-gradient(135deg, #7B6AD4, #7B5EA8)",
           padding: 24, display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
           borderRadius: "20px 20px 0 0",
         }}>
           <img src="/bev_neutral.png" alt="Bev" style={{ width: 64, height: 64, borderRadius: "50%", border: "3px solid white", objectFit: "cover" }} />
-          <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, color: "#fff", textAlign: "center" }}>What's New in Wovely 🎉</div>
-          <div style={{ fontFamily: "Inter,sans-serif", fontSize: 14, color: "rgba(255,255,255,0.85)", textAlign: "center" }}>Here's what we've been building for you</div>
+          <div style={{ fontFamily: "'Fredoka',serif", fontSize: 22, fontWeight: 700, color: "#fff", textAlign: "center" }}>What's New in Wovely 🎉</div>
+          <div style={{ fontFamily: "Nunito,sans-serif", fontSize: 14, color: "rgba(255,255,255,0.85)", textAlign: "center" }}>Here's what we've been building for you</div>
         </div>
 
         {/* Body */}
         <div style={{ padding: 20 }}>
           {entries.map((entry, i) => (
             <div key={entry.version}>
-              {i > 0 && <div style={{ height: 1, background: "#EDE4F7", margin: "16px 0" }} />}
-              <div style={{ fontFamily: "Inter,sans-serif", fontSize: 11, fontWeight: 600, color: "#9B7EC8", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
+              {i > 0 && <div style={{ height: 1, background: "#ECE6F8", margin: "16px 0" }} />}
+              <div style={{ fontFamily: "Nunito,sans-serif", fontSize: 11, fontWeight: 600, color: "#7B6AD4", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 10 }}>
                 {formatDate(entry.date)}
               </div>
               {entry.updates.map((u, j) => (
                 <div key={j} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
-                  <div style={{ width: 34, height: 34, background: "#F8F6FF", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{u.emoji}</div>
-                  <div style={{ fontFamily: "Inter,sans-serif", fontSize: 14, color: "#2D2D4E", lineHeight: 1.4 }}>{u.text}</div>
+                  <div style={{ width: 34, height: 34, background: "#F5F2FF", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{u.emoji}</div>
+                  <div style={{ fontFamily: "Nunito,sans-serif", fontSize: 14, color: "#2E2748", lineHeight: 1.4 }}>{u.text}</div>
                 </div>
               ))}
             </div>
@@ -147,9 +147,9 @@ export default function WhatsNewModal() {
         {/* Footer */}
         <div style={{ padding: "0 20px 24px" }}>
           <button onClick={dismiss} style={{
-            background: "#9B7EC8", color: "#fff", border: "none", borderRadius: 12,
+            background: "#7B6AD4", color: "#fff", border: "none", borderRadius: 12,
             padding: 14, fontSize: 15, fontWeight: 600, width: "100%", cursor: "pointer",
-            fontFamily: "Inter,sans-serif",
+            fontFamily: "Nunito,sans-serif",
           }}>Got it, let's go! →</button>
         </div>
       </div>

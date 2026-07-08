@@ -13,14 +13,27 @@ html {
   overflow-x: clip;
 }
 
+/* ── Design System 2b tokens (mirror of src/theme.jsx `T` for CSS-side use) ── */
+:root {
+  --bg:#FBF9FF; --panel:#FFFFFF; --ink:#2E2748; --muted:#726A92;
+  --accent:#7B6AD4; --accentD:#6E5AC8; --line:#ECE6F8; --soft:#F2EEFB;
+  --coral:#FF8A73; --sun:#FFC24B; --mint:#5EC9AE; --sky:#6FB7F0; --pink:#C98BE0;
+  --disp:'Fredoka','Segoe UI',sans-serif; --body:'Nunito',-apple-system,sans-serif;
+  /* woven 45° crosshatch — the 2b canvas texture */
+  --crosshatch:repeating-linear-gradient(45deg,rgba(123,106,212,.03) 0 2px,transparent 2px 12px),repeating-linear-gradient(-45deg,rgba(123,106,212,.03) 0 2px,transparent 2px 12px);
+}
+
 body {
   height: 100%;
   min-height: 100vh;
-  background-color: #FAF8F5;
+  background-color: #FBF9FF;
   position: relative;
   max-width: 100%;
   overflow-x: hidden;
   overflow-x: clip;
+  font-family: var(--body);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
 }
 
 body::before {
@@ -49,22 +62,27 @@ body::after {
   left: 0;
   width: 100%;
   height: 100vh;
-  background: linear-gradient(
-    160deg,
-    rgba(250,248,245,0.82) 0%,
-    rgba(245,240,250,0.79) 100%
-  );
+  /* 2b canvas: cool lavender-white wash + woven crosshatch over the photo */
+  background:
+    var(--crosshatch),
+    linear-gradient(
+      160deg,
+      rgba(251,249,255,0.88) 0%,
+      rgba(244,239,251,0.85) 100%
+    );
   z-index: -1;
   pointer-events: none;
 }
 
 @media (max-width: 768px) {
   body::after {
-    background: linear-gradient(
-      160deg,
-      rgba(250,248,245,0.72) 0%,
-      rgba(245,240,250,0.68) 100%
-    );
+    background:
+      var(--crosshatch),
+      linear-gradient(
+        160deg,
+        rgba(251,249,255,0.80) 0%,
+        rgba(244,239,251,0.77) 100%
+      );
   }
 }
 

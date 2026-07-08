@@ -37,13 +37,6 @@ import { canAccess, requiredTier, ANON_PATTERN_CAP } from "./utils/featureGates.
 import { DOC_TYPES, importRouteMismatch, resolveChildSourceUrl } from "./utils/docType.js";
 import { markImagesPending } from "./utils/patternImages.js";
 
-if (typeof document !== "undefined" && !document.getElementById("sb-font")) {
-  const l = document.createElement("link");
-  l.id = "sb-font"; l.rel = "stylesheet";
-  l.href = "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap";
-  document.head.appendChild(l);
-}
-
 // Parse Supabase auth tokens from the email-confirmation URL hash and write
 // the session to localStorage BEFORE React mounts. Users arriving from a
 // Resend confirmation link land at wovely.app/#access_token=...&type=signup —
@@ -163,15 +156,15 @@ const CSS = () => (
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #EAE0D5; border-radius: 99px; }
-    body { font-family: "Inter", -apple-system, sans-serif; }
-    input, textarea, button, select { font-family: "Inter", -apple-system, sans-serif; }
+    body { font-family: "Nunito", -apple-system, sans-serif; }
+    input, textarea, button, select { font-family: "Nunito", -apple-system, sans-serif; }
     @keyframes fadeUp    { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
     @keyframes slideUp   { from{opacity:0;transform:translateY(40px)} to{opacity:1;transform:translateY(0)} }
     @keyframes slideInLeft  { from{transform:translateX(-100%);opacity:0} to{transform:translateX(0);opacity:1} }
     @keyframes slideOutLeft { from{transform:translateX(0);opacity:1} to{transform:translateX(-100%);opacity:0} }
     @keyframes dimIn  { from{opacity:0} to{opacity:1} }
     @keyframes dimOut { from{opacity:1} to{opacity:0} }
-    @keyframes fabPulse { 0%,100%{box-shadow:0 6px 24px rgba(155,126,200,.45)} 50%{box-shadow:0 6px 32px rgba(155,126,200,.7)} }
+    @keyframes fabPulse { 0%,100%{box-shadow:0 6px 24px rgba(123,106,212,.45)} 50%{box-shadow:0 6px 32px rgba(123,106,212,.7)} }
     @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
     @keyframes progressShimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
     @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:.7} }
@@ -185,12 +178,12 @@ const CSS = () => (
     .spinner { animation:spin .8s linear infinite; }
     .conf-pop { animation:confidencePop .5s cubic-bezier(.22,.68,0,1.05) both; }
     .card { transition:transform .18s,box-shadow .18s; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
-    .card:hover { transform:translateY(-1px) !important; box-shadow:0 4px 16px rgba(155,126,200,0.12) !important; }
+    .card:hover { transform:translateY(-1px) !important; box-shadow:0 4px 16px rgba(123,106,212,0.12) !important; }
     .tap { transition:opacity .15s; cursor:pointer; }
     .tap:hover { opacity:.85; }
     .method-card { transition:all .15s; }
-    .method-card:hover { background:#EDE4F7 !important; border-color:#9B7EC8 !important; transform:translateY(-1px); }
-    .progress-bar-fill { background:linear-gradient(90deg,#9B7EC8 0%,#B9A3DC 50%,#9B7EC8 100%); background-size:200% 100%; animation:progressShimmer 1.5s ease infinite; }
+    .method-card:hover { background:#ECE6F8 !important; border-color:#7B6AD4 !important; transform:translateY(-1px); }
+    .progress-bar-fill { background:linear-gradient(90deg,#7B6AD4 0%,#B9A3DC 50%,#7B6AD4 100%); background-size:200% 100%; animation:progressShimmer 1.5s ease infinite; }
     .wireframe-container canvas { touch-action: none; }
     .h-scroll { display:flex; gap:12px; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory; padding-bottom:8px; scrollbar-width:none; }
     .h-scroll::-webkit-scrollbar { display:none; }
@@ -205,7 +198,7 @@ const CSS = () => (
     }
     input:focus, textarea:focus, select:focus { outline:none; }
     input[type="password"]::placeholder { opacity:.4; }
-    @media(hover:hover) { .nav-item:hover { background:rgba(255,255,255,0.1) !important; } .site-row:hover { background:#F8F6FF !important; } }
+    @media(hover:hover) { .nav-item:hover { background:rgba(255,255,255,0.1) !important; } .site-row:hover { background:#F5F2FF !important; } }
   `}</style>
 );
 
@@ -291,10 +284,10 @@ const Btn = ({children,onClick,variant="primary",full=true,small=false,disabled=
     secondary:{background:T.linen,color:T.ink,border:`1px solid ${T.border}`},
     ghost:{background:"none",color:T.ink3,border:"none"},
     sage:{background:T.sage,color:"#fff",border:"none"},
-    danger:{background:"#C05A5A",color:"#fff",border:"none"},
+    danger:{background:"#C2564A",color:"#fff",border:"none"},
     gold:{background:"linear-gradient(135deg,#C9A84C,#8B6914)",color:"#fff",border:"none"},
   };
-  return <button onClick={onClick} disabled={disabled} className="tap" style={{...styles[variant],borderRadius:12,padding:small?"8px 16px":"14px 20px",fontSize:small?13:15,fontWeight:600,cursor:disabled?"not-allowed":"pointer",width:full?"100%":"auto",opacity:disabled?.6:1,boxShadow:variant==="primary"?"0 4px 16px rgba(155,126,200,.3)":variant==="sage"?"0 4px 16px rgba(92,122,94,.3)":variant==="gold"?"0 4px 16px rgba(184,144,44,.35)":"none",...sx}}>{children}</button>;
+  return <button onClick={onClick} disabled={disabled} className="tap" style={{...styles[variant],borderRadius:12,padding:small?"8px 16px":"14px 20px",fontSize:small?13:15,fontWeight:600,cursor:disabled?"not-allowed":"pointer",width:full?"100%":"auto",opacity:disabled?.6:1,boxShadow:variant==="primary"?"0 4px 16px rgba(123,106,212,.3)":variant==="sage"?"0 4px 16px rgba(92,122,94,.3)":variant==="gold"?"0 4px 16px rgba(184,144,44,.35)":"none",...sx}}>{children}</button>;
 };
 // Field imported from ./theme.js
 
@@ -421,7 +414,7 @@ const WireframeViewer = ({components,labeled=false,height=220,fillContainer=fals
           if(labeled){
             const cv=document.createElement("canvas"); cv.width=320; cv.height=58;
             const ctx=cv.getContext("2d"); ctx.clearRect(0,0,320,58);
-            ctx.fillStyle="#9B7EC8"; ctx.font="bold 22px Inter, sans-serif"; ctx.textAlign="center";
+            ctx.fillStyle="#7B6AD4"; ctx.font="bold 22px Nunito, sans-serif"; ctx.textAlign="center";
             const rawLabel=comp.label||rawRole;
             const displayLabel=(rawLabel!=="unknown"&&rawLabel!=="detail")?rawLabel.toUpperCase():slot!=="detail"?slot.toUpperCase():primitive.toUpperCase();
             ctx.fillText(displayLabel,160,40);
@@ -647,7 +640,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
                 border:"none",cursor:"pointer",borderRadius:99,padding:"7px 20px",fontSize:13,fontWeight:600,
                 background:cadence===key?T.terra:"transparent",
                 color:cadence===key?"#fff":T.ink2,
-                boxShadow:cadence===key?"0 2px 8px rgba(155,126,200,.3)":"none",
+                boxShadow:cadence===key?"0 2px 8px rgba(123,106,212,.3)":"none",
                 transition:"background .15s,color .15s",
               }}>{label}</button>
             ))}
@@ -688,7 +681,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
               WebkitBackdropFilter: "blur(16px)",
               border: isRecommended ? `1.5px solid ${T.terra}` : "1px solid rgba(255,255,255,0.45)",
               borderRadius: 16,
-              boxShadow: isRecommended ? "0 8px 32px rgba(155,126,200,0.18)" : "0 4px 24px rgba(45,58,124,0.08)",
+              boxShadow: isRecommended ? "0 8px 32px rgba(123,106,212,0.18)" : "0 4px 24px rgba(90,66,160,0.08)",
               padding: 20,
               position: "relative",
               display: "flex",
@@ -765,7 +758,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
                         fontSize: 14,
                         fontWeight: 600,
                         cursor: isCheckingOut ? "wait" : "pointer",
-                        boxShadow: isRecommended ? "0 4px 16px rgba(155,126,200,.3)" : "none",
+                        boxShadow: isRecommended ? "0 4px 16px rgba(123,106,212,.3)" : "none",
                         opacity: isCheckingOut ? 0.7 : 1,
                       }}
                     >{isCheckingOut ? "Opening checkout..." : `${isAnonymous ? "Create account & get" : "Get"} ${def.name} — ${chargeLabel}`}</button>
@@ -805,11 +798,11 @@ const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,o
   // guests, which hid the comparison before they ever saw it.
   const handlePlansClick = () => { onUpgrade(); };
   return (
-    <div style={{width:260,background:"#9B7EC8",height:"100vh",position:"sticky",top:0,display:"flex",flexDirection:"column",flexShrink:0}}>
+    <div style={{width:260,background:"#7B6AD4",height:"100vh",position:"sticky",top:0,display:"flex",flexDirection:"column",flexShrink:0}}>
       <div onClick={()=>onNavigate("collection")} style={{display:"flex",flexDirection:"column",alignItems:"center",padding:"24px 16px 20px",gap:8,cursor:"pointer",transition:"opacity .15s"}} onMouseEnter={e=>e.currentTarget.style.opacity=".85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
         <div style={{width:72,height:72,borderRadius:"50%",background:"rgba(255,255,255,0.95)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 16px rgba(0,0,0,0.15)",marginBottom:4}}><img src="/bev_neutral.png" alt="Bev" style={{width:58,height:58,borderRadius:"50%",objectFit:"cover"}}/></div>
-        <span style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:700,color:"#fff",letterSpacing:"-0.01em",lineHeight:1}}>Wovely</span>
-        <span style={{fontFamily:"Inter,sans-serif",fontSize:11,color:"rgba(255,255,255,0.55)",letterSpacing:"0.04em",lineHeight:1}}>Your crochet space</span>
+        <span style={{fontFamily:"'Fredoka',serif",fontSize:22,fontWeight:700,color:"#fff",letterSpacing:"-0.01em",lineHeight:1}}>Wovely</span>
+        <span style={{fontFamily:"Nunito,sans-serif",fontSize:11,color:"rgba(255,255,255,0.55)",letterSpacing:"0.04em",lineHeight:1}}>Your crochet space</span>
       </div>
       <div style={{padding:"0 16px 8px"}}><button onClick={onAddPattern} style={{width:"100%",background:"rgba(255,255,255,.2)",color:"#fff",border:"none",borderRadius:9999,padding:"12px",fontSize:14,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"background .15s"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,.3)"} onMouseLeave={e=>e.currentTarget.style.background="rgba(255,255,255,.2)"}><span style={{fontSize:18}}>+</span> Add Pattern</button></div>
       <div style={{flex:1,overflowY:"auto",padding:"8px 0"}}>
@@ -876,10 +869,10 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
   return (
     <div style={{position:"fixed",inset:0,zIndex:100}}>
       <div className={closing?"dim-out":"dim-in"} onClick={dismiss} style={{position:"absolute",inset:0,background:"rgba(28,23,20,.52)",backdropFilter:"blur(3px)"}}/>
-      <div className={closing?"nav-close":"nav-open"} style={{position:"absolute",top:0,left:0,bottom:0,width:"80%",maxWidth:320,background:"#9B7EC8",display:"flex",flexDirection:"column",overflow:"hidden",boxShadow:"6px 0 40px rgba(28,23,20,.2)"}}>
+      <div className={closing?"nav-close":"nav-open"} style={{position:"absolute",top:0,left:0,bottom:0,width:"80%",maxWidth:320,background:"#7B6AD4",display:"flex",flexDirection:"column",overflow:"hidden",boxShadow:"6px 0 40px rgba(28,23,20,.2)"}}>
         <div onClick={()=>go("collection")} style={{display:"flex",alignItems:"center",gap:10,padding:"14px 16px 10px",cursor:"pointer",transition:"opacity .15s",flexShrink:0}} onMouseEnter={e=>e.currentTarget.style.opacity=".85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
           <div style={{width:40,height:40,borderRadius:"50%",background:"rgba(255,255,255,0.95)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(0,0,0,0.15)",flexShrink:0}}><img src="/bev_neutral.png" alt="Bev" style={{width:32,height:32,borderRadius:"50%",objectFit:"cover"}}/></div>
-          <div><span style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:700,color:"#fff",letterSpacing:"-0.01em",lineHeight:1,display:"block"}}>Wovely</span><span style={{fontFamily:"Inter,sans-serif",fontSize:10,color:"rgba(255,255,255,0.5)",letterSpacing:"0.04em",lineHeight:1,display:"block",marginTop:2}}>Your crochet space</span></div>
+          <div><span style={{fontFamily:"'Fredoka',serif",fontSize:18,fontWeight:700,color:"#fff",letterSpacing:"-0.01em",lineHeight:1,display:"block"}}>Wovely</span><span style={{fontFamily:"Nunito,sans-serif",fontSize:10,color:"rgba(255,255,255,0.5)",letterSpacing:"0.04em",lineHeight:1,display:"block",marginTop:2}}>Your crochet space</span></div>
         </div>
         <div style={{flex:1,overflowY:"auto"}}>
           {ITEMS.map(item=>{const active=view===item.key;const locked=item.proOnly&&!isPro&&!isAnonymous;const dis=!!item.disabled;return(
@@ -907,7 +900,7 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
             <div className="nav-item" onClick={()=>go("profile")} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 20px",background:active?"rgba(255,255,255,0.25)":"transparent",cursor:"pointer",transition:"background .12s"}}>
               <span style={{fontSize:20,width:26,textAlign:"center"}}>👤</span>
               <div style={{flex:1}}>
-                <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>Profile & Settings</div>{isPro&&<span style={{background:"rgba(155,126,200,0.6)",color:"#fff",fontSize:10,fontWeight:700,padding:"1px 6px",borderRadius:4}}>{tierLabel(tier).toUpperCase()}</span>}</div>
+                <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>Profile & Settings</div>{isPro&&<span style={{background:"rgba(123,106,212,0.6)",color:"#fff",fontSize:10,fontWeight:700,padding:"1px 6px",borderRadius:4}}>{tierLabel(tier).toUpperCase()}</span>}</div>
                 {isAnonymous&&<div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>Sign in to save</div>}
               </div>
               {active&&<div style={{width:6,height:6,borderRadius:99,background:"#fff"}}/>}
@@ -948,14 +941,14 @@ const CollectionSuggestionPrompt = ({ pattern, meta, onYes, onNo }) => {
   const name = meta?.collection_name || pattern?.title || "this project";
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", fontFamily: T.sans }}>
-      <div className="fu" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.45)", borderRadius: 16, boxShadow: "0 20px 60px rgba(45,58,124,0.28)", padding: 24, width: "100%", maxWidth: 420 }}>
+      <div className="fu" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.45)", borderRadius: 16, boxShadow: "0 20px 60px rgba(90,66,160,0.28)", padding: 24, width: "100%", maxWidth: 420 }}>
         <div style={{ fontFamily: T.serif, fontSize: 20, fontWeight: 700, color: T.ink, marginBottom: 8, lineHeight: 1.25 }}>This looks like part of a larger project</div>
         <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.55, marginBottom: 18 }}>
           Bev spotted that this pattern might be {label.toLowerCase()} {meta?.current_part_number || 1}{total ? ` of ${total}` : ""} of <strong>{name}</strong>. Want to start a collection so the other {label.toLowerCase()}s can join it?
         </div>
         <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
           <button onClick={onNo} style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "10px 18px", fontSize: 13, color: T.ink2, cursor: "pointer", fontWeight: 600 }}>Keep standalone</button>
-          <button onClick={onYes} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)" }}>Yes, create collection</button>
+          <button onClick={onYes} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(123,106,212,0.3)" }}>Yes, create collection</button>
         </div>
       </div>
     </div>
@@ -969,7 +962,7 @@ const CollectionSuggestionPrompt = ({ pattern, meta, onYes, onNo }) => {
 // with a gentle Craft upsell tail.
 const MultiSectionAnnouncePrompt = ({ count, isCraft, onGo, onSeeCraft }) => (
   <div style={{ position: "fixed", inset: 0, zIndex: 700, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", fontFamily: T.sans }}>
-    <div className="fu" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.45)", borderRadius: 16, boxShadow: "0 20px 60px rgba(45,58,124,0.28)", padding: 24, width: "100%", maxWidth: 440 }}>
+    <div className="fu" style={{ background: "rgba(255,255,255,0.92)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.45)", borderRadius: 16, boxShadow: "0 20px 60px rgba(90,66,160,0.28)", padding: 24, width: "100%", maxWidth: 440 }}>
       <div style={{ fontFamily: T.serif, fontSize: 20, fontWeight: 700, color: T.ink, marginBottom: 8, lineHeight: 1.25 }}>A project worth its own workspace</div>
       <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.6, marginBottom: 18 }}>
         This one's big. {count} parts, each made on its own, then assembled into the finished piece. Bev laid every part out separately so you can work them in any order and always know where you left off.
@@ -979,11 +972,11 @@ const MultiSectionAnnouncePrompt = ({ count, isCraft, onGo, onSeeCraft }) => (
       </div>
       <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
         {isCraft ? (
-          <button onClick={onGo} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)" }}>Show me the parts</button>
+          <button onClick={onGo} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(123,106,212,0.3)" }}>Show me the parts</button>
         ) : (
           <>
             <button onClick={onGo} style={{ background: T.linen, border: `1px solid ${T.border}`, borderRadius: 99, padding: "10px 18px", fontSize: 13, color: T.ink2, cursor: "pointer", fontWeight: 600 }}>Open the pattern</button>
-            <button onClick={onSeeCraft} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)" }}>See Craft</button>
+            <button onClick={onSeeCraft} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(123,106,212,0.3)" }}>See Craft</button>
           </>
         )}
       </div>
@@ -1064,7 +1057,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
 
   const SECTION = {background:T.card,borderRadius:16,padding:isDesktop?"28px 32px":"24px 20px",boxShadow:T.shadowLg};
   const SC_LABEL = {fontSize:10,fontVariant:"small-caps",color:T.ink3,textTransform:"lowercase",letterSpacing:".14em",fontWeight:500};
-  const SECTION_TITLE = {fontFamily:T.serif,fontSize:18,fontWeight:700,color:"#2D3A7C",marginBottom:20};
+  const SECTION_TITLE = {fontFamily:T.serif,fontSize:18,fontWeight:700,color:T.ink,marginBottom:20};
   const DIVIDER = <div style={{height:16}}/>;
   const Msg = ({msg}) => msg ? <div style={{background:msg.type==="ok"?"rgba(92,122,94,.1)":T.terraLt,borderRadius:12,padding:"10px 14px",fontSize:12,color:msg.type==="ok"?T.sage:T.terra,lineHeight:1.5,marginBottom:8}}>{msg.text}</div> : null;
 
@@ -1080,7 +1073,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
           <div style={{position:"relative",zIndex:1,height:"100%",display:"flex",flexDirection:"column",justifyContent:"center",paddingLeft:32}}>
             <div style={{fontFamily:T.serif,fontSize:32,fontWeight:700,color:"#fff",marginBottom:8,lineHeight:1.2}}>Welcome to Wovely. 🧶</div>
             <div style={{fontSize:15,color:"rgba(255,255,255,0.88)",marginBottom:20}}>Your collection is ready. Time to make something.</div>
-            <div><button onClick={()=>{setWelcomeDismissed(true);localStorage.setItem("yh_welcome_dismissed","true");onGoHome();}} style={{background:"#9B7EC8",color:"#fff",border:"none",borderRadius:10,padding:"12px 24px",fontSize:15,fontWeight:600,cursor:"pointer"}}>Go to My Wovely →</button></div>
+            <div><button onClick={()=>{setWelcomeDismissed(true);localStorage.setItem("yh_welcome_dismissed","true");onGoHome();}} style={{background:"#7B6AD4",color:"#fff",border:"none",borderRadius:10,padding:"12px 24px",fontSize:15,fontWeight:600,cursor:"pointer"}}>Go to My Wovely →</button></div>
           </div>
         </div>
       )}
@@ -1099,7 +1092,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
       <div style={SECTION}>
         <div style={SECTION_TITLE}>Your Profile</div>
         <div style={{textAlign:"center",marginBottom:24}}>
-          <div style={{width:100,height:100,borderRadius:"50%",background:T.linen,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:34,fontWeight:700,color:T.terra,border:`3px solid ${T.terra}`,boxShadow:"0 0 0 6px rgba(155,126,200,.1)"}}>{(displayName||"Y").charAt(0).toUpperCase()}{(username||"H").charAt(0).toUpperCase()}</div>
+          <div style={{width:100,height:100,borderRadius:"50%",background:T.linen,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:34,fontWeight:700,color:T.terra,border:`3px solid ${T.terra}`,boxShadow:"0 0 0 6px rgba(123,106,212,.1)"}}>{(displayName||"Y").charAt(0).toUpperCase()}{(username||"H").charAt(0).toUpperCase()}</div>
           <div style={{fontSize:16,fontWeight:600,color:T.ink,marginTop:12}}>{displayName||"Your Name"}</div>
           <div style={{fontSize:13,color:T.ink3,marginTop:2}}>{username?"@"+username:"Set your username"}</div>
         </div>
@@ -1119,7 +1112,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
           <Field label="Ravelry username" placeholder="yourhandle" value={socialRavelry} onChange={e=>setSocialRavelry(e.target.value)}/>
         </div>
         <Msg msg={profileMsg}/>
-        <button onClick={()=>gateAction?.({ intent: "profile_edit", title: "Create a free account to save your profile", subtitle: "Your name, handle, and socials stay with you across devices." }, handleProfileSave)} disabled={profileSaving} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"12px 28px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)",opacity:profileSaving?.6:1}}>{profileSaving?"Saving…":saveBtnText}</button>
+        <button onClick={()=>gateAction?.({ intent: "profile_edit", title: "Create a free account to save your profile", subtitle: "Your name, handle, and socials stay with you across devices." }, handleProfileSave)} disabled={profileSaving} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"12px 28px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",opacity:profileSaving?.6:1}}>{profileSaving?"Saving…":saveBtnText}</button>
       </div>
 
       {DIVIDER}
@@ -1135,14 +1128,14 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
           <Field label="Current password" placeholder="••••••••" value={curPass} onChange={e=>setCurPass(e.target.value)} type="password"/>
           <Field label="New password" placeholder="••••••••" value={newPass} onChange={e=>setNewPass(e.target.value)} type="password"/>
           <Msg msg={passMsg}/>
-          <button onClick={()=>gateAction?.({ intent: "change_password", title: "Create a free account first", subtitle: "Sign up to set a password." }, handleChangePassword)} disabled={passSaving} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"10px 24px",fontSize:13,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)",opacity:passSaving?.6:1}}>{passSaving?"Saving…":"Update Password"}</button>
+          <button onClick={()=>gateAction?.({ intent: "change_password", title: "Create a free account first", subtitle: "Sign up to set a password." }, handleChangePassword)} disabled={passSaving} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"10px 24px",fontSize:13,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",opacity:passSaving?.6:1}}>{passSaving?"Saving…":"Update Password"}</button>
         </div>
       </div>
 
       {DIVIDER}
 
       {isPro
-        ? <div style={{...SECTION,background:`linear-gradient(135deg,#2D3A7C,${T.terra})`,border:"none"}}>
+        ? <div style={{...SECTION,background:`linear-gradient(135deg,${T.accent},${T.accentD})`,border:"none"}}>
             <div style={{display:"flex",alignItems:"center",gap:10}}>
               <span style={{fontSize:18}}>✨</span>
               <div style={{flex:1,minWidth:0}}>
@@ -1151,7 +1144,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
               </div>
             </div>
           </div>
-        : <div style={{...SECTION,background:`linear-gradient(135deg,#2D3A7C,${T.terra})`,border:"none"}}>
+        : <div style={{...SECTION,background:`linear-gradient(135deg,${T.accent},${T.accentD})`,border:"none"}}>
             <div style={{fontSize:14,fontWeight:700,color:"#fff",marginBottom:4}}>✨ Upgrade your plan</div>
             <div style={{fontSize:12,color:"rgba(255,255,255,.75)",lineHeight:1.5,marginBottom:12}}>Craft gives you big imports, a large library, Collections, and BevCheck.</div>
             <div onClick={onOpenProModal} style={{background:"rgba(255,255,255,.2)",borderRadius:10,padding:"10px",textAlign:"center",fontSize:14,fontWeight:700,color:"#fff",cursor:"pointer"}}>See plans</div>
@@ -1184,10 +1177,10 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
         </div>
       </div>
 
-      <div style={{textAlign:"center",padding:"20px 0 8px",fontSize:12,color:"#6B6B8A"}}>
-        <span onClick={()=>profileNav("/privacy")} style={{color:"#6B6B8A",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#9B7EC8"} onMouseLeave={e=>e.target.style.color="#6B6B8A"}>Privacy Policy</span>
+      <div style={{textAlign:"center",padding:"20px 0 8px",fontSize:12,color:"#726A92"}}>
+        <span onClick={()=>profileNav("/privacy")} style={{color:"#726A92",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Privacy Policy</span>
         <span style={{margin:"0 8px",opacity:.5}}>|</span>
-        <span onClick={()=>profileNav("/terms")} style={{color:"#6B6B8A",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#9B7EC8"} onMouseLeave={e=>e.target.style.color="#6B6B8A"}>Terms of Service</span>
+        <span onClick={()=>profileNav("/terms")} style={{color:"#726A92",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Terms of Service</span>
       </div>
     </div>
   );
@@ -1216,59 +1209,59 @@ const BrowseSitesView = ({onImportUrl}) => {
   return (
     <div style={{padding:isDesktop?"24px 24px 80px":"16px 20px 100px",maxWidth:960,margin:"0 auto",background:"transparent"}}>
       {/* Section 1 — URL Import */}
-      <div style={{background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,border:"1px solid rgba(255,255,255,0.6)",padding:isDesktop?"32px":"24px 20px",marginBottom:32,boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(155,126,200,0.13)",maxWidth:700}}>
-        <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:20,fontWeight:700,color:"#2D2D4E",marginBottom:8,borderLeft:"3px solid #9B7EC8",paddingLeft:10}}>Import a Pattern</div>
-        <div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.7,marginBottom:20}}>Find a pattern on any crochet site, copy the URL from your browser, and paste it below to import it directly into Wovely.</div>
+      <div style={{background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,border:"1px solid rgba(255,255,255,0.6)",padding:isDesktop?"32px":"24px 20px",marginBottom:32,boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)",maxWidth:700}}>
+        <div style={{fontFamily:"'Fredoka',Georgia,serif",fontSize:20,fontWeight:700,color:"#2E2748",marginBottom:8,borderLeft:"3px solid #7B6AD4",paddingLeft:10}}>Import a Pattern</div>
+        <div style={{fontSize:14,color:"#726A92",lineHeight:1.7,marginBottom:20}}>Find a pattern on any crochet site, copy the URL from your browser, and paste it below to import it directly into Wovely.</div>
         <div style={{display:"flex",gap:10,flexDirection:isMobile?"column":"row"}}>
           <div style={{flex:1,display:"flex",alignItems:"center",background:T.linen,border:`1.5px solid ${T.border}`,borderRadius:12,padding:"12px 16px",gap:10}}>
             <span style={{color:T.ink3,flexShrink:0}}>🔗</span>
             <input value={url} onChange={e=>setUrl(e.target.value)} onKeyDown={e=>e.key==="Enter"&&doImport()} placeholder="https://allfreecrochet.com/..." style={{border:"none",background:"transparent",flex:1,fontSize:14,color:T.ink,outline:"none",minWidth:0}}/>
           </div>
-          <button onClick={doImport} disabled={!url.trim()} style={{background:"#9B7EC8",color:"#fff",border:"none",borderRadius:12,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:!url.trim()?"not-allowed":"pointer",opacity:!url.trim()?.6:1,whiteSpace:"nowrap",flexShrink:0}}>Import Pattern →</button>
+          <button onClick={doImport} disabled={!url.trim()} style={{background:"#7B6AD4",color:"#fff",border:"none",borderRadius:12,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:!url.trim()?"not-allowed":"pointer",opacity:!url.trim()?.6:1,whiteSpace:"nowrap",flexShrink:0}}>Import Pattern →</button>
         </div>
-        <div style={{background:"#FFF8E7",border:"1px solid #F0C040",borderRadius:8,padding:"8px 12px",marginTop:12,fontSize:12,color:"#856404",lineHeight:1.5,fontFamily:"Inter,sans-serif"}}>⚠️ Patterns behind a paywall or login wall can't be imported by URL. Download the PDF and use our PDF import instead.</div>
+        <div style={{background:"#FFF8E7",border:"1px solid #F0C040",borderRadius:8,padding:"8px 12px",marginTop:12,fontSize:12,color:"#856404",lineHeight:1.5,fontFamily:"Nunito,sans-serif"}}>⚠️ Patterns behind a paywall or login wall can't be imported by URL. Download the PDF and use our PDF import instead.</div>
       </div>
 
       {/* Section 2 — Partner Sites Grid */}
       <div style={{marginBottom:32}}>
-        <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:18,fontWeight:700,color:"#2D2D4E",marginBottom:6,borderLeft:"3px solid #9B7EC8",paddingLeft:10}}>Browse Partner Sites</div>
-        <div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.7,marginBottom:20}}>Open any site below to browse their patterns. When you find one you love, copy the URL and paste it above.</div>
+        <div style={{fontFamily:"'Fredoka',Georgia,serif",fontSize:18,fontWeight:700,color:"#2E2748",marginBottom:6,borderLeft:"3px solid #7B6AD4",paddingLeft:10}}>Browse Partner Sites</div>
+        <div style={{fontSize:14,color:"#726A92",lineHeight:1.7,marginBottom:20}}>Open any site below to browse their patterns. When you find one you love, copy the URL and paste it above.</div>
         <div style={{display:"grid",gridTemplateColumns:isDesktop?"repeat(3,1fr)":isTablet?"repeat(2,1fr)":"1fr",gap:16}}>
           {SITES.map(s=>(
-            <div key={s.name} style={{background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,border:"1px solid rgba(255,255,255,0.6)",boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(155,126,200,0.13)",overflow:"hidden",transition:"transform .15s,box-shadow .15s"}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(155,126,200,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(155,126,200,0.13)";}}>
-              <div style={{background:"linear-gradient(135deg, #EDE4F7 0%, #F8F6FF 100%)",height:72,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
-                <div style={{fontFamily:T.serif,fontSize:17,fontWeight:600,color:"#2D2D4E"}}>{s.name}</div>
-                <div style={{position:"absolute",top:10,right:10}}><div style={{background:s.free?"#5C9E7A":"#2D3A7C",borderRadius:9999,padding:"2px 8px",fontSize:9,fontWeight:700,color:"#fff"}}>{s.free?"FREE":"FREE + PAID"}</div></div>
+            <div key={s.name} style={{background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,border:"1px solid rgba(255,255,255,0.6)",boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)",overflow:"hidden",transition:"transform .15s,box-shadow .15s"}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(123,106,212,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)";}}>
+              <div style={{background:"linear-gradient(135deg, #ECE6F8 0%, #F5F2FF 100%)",height:72,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
+                <div style={{fontFamily:T.serif,fontSize:17,fontWeight:600,color:"#2E2748"}}>{s.name}</div>
+                <div style={{position:"absolute",top:10,right:10}}><div style={{background:s.free?T.success:T.accentD,borderRadius:9999,padding:"2px 8px",fontSize:9,fontWeight:700,color:"#fff"}}>{s.free?"FREE":"FREE + PAID"}</div></div>
               </div>
               <div style={{padding:"14px 18px 18px"}}>
-                <div style={{fontSize:13,color:"#6B6B8A",lineHeight:1.5,marginBottom:10}}>{s.desc}</div>
-                <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:14}}>{s.tags.map(t=><div key={t} style={{background:"#EDE4F7",borderRadius:9999,padding:"2px 8px",fontSize:10,fontWeight:600,color:"#9B7EC8"}}>{t}</div>)}</div>
-                <a href={s.url} target="_blank" rel="noopener noreferrer" style={{display:"block",width:"100%",background:"#9B7EC8",color:"#fff",border:"none",borderRadius:9999,padding:"10px",fontSize:13,fontWeight:600,cursor:"pointer",textAlign:"center",textDecoration:"none",boxSizing:"border-box"}}>Visit {s.name} →</a>
+                <div style={{fontSize:13,color:"#726A92",lineHeight:1.5,marginBottom:10}}>{s.desc}</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:14}}>{s.tags.map(t=><div key={t} style={{background:"#ECE6F8",borderRadius:9999,padding:"2px 8px",fontSize:10,fontWeight:600,color:"#7B6AD4"}}>{t}</div>)}</div>
+                <a href={s.url} target="_blank" rel="noopener noreferrer" style={{display:"block",width:"100%",background:"#7B6AD4",color:"#fff",border:"none",borderRadius:9999,padding:"10px",fontSize:13,fontWeight:600,cursor:"pointer",textAlign:"center",textDecoration:"none",boxSizing:"border-box"}}>Visit {s.name} →</a>
                 <div style={{fontSize:11,color:"#9B9B9B",textAlign:"center",marginTop:6}}>Opens in new tab</div>
               </div>
             </div>
           ))}
-          <div style={{background:"#F8F6FF",borderRadius:16,border:"1.5px dashed #EDE4F7",display:"flex",alignItems:"center",justifyContent:"center",minHeight:200}}>
+          <div style={{background:"#F5F2FF",borderRadius:16,border:"1.5px dashed #ECE6F8",display:"flex",alignItems:"center",justifyContent:"center",minHeight:200}}>
             <div style={{textAlign:"center",padding:20}}><div style={{fontSize:24,marginBottom:8,opacity:.4}}>🌐</div><div style={{fontSize:13,color:"#9B9B9B",fontWeight:500}}>More sites coming soon</div></div>
           </div>
         </div>
       </div>
 
       {/* Section 3 — Coming Soon Banner */}
-      <div style={{background:"#EDE4F7",borderRadius:16,padding:isDesktop?"28px 32px":"24px 20px",display:"flex",flexDirection:isMobile?"column":"row",alignItems:isMobile?"flex-start":"center",gap:isMobile?20:32}}>
+      <div style={{background:"#ECE6F8",borderRadius:16,padding:isDesktop?"28px 32px":"24px 20px",display:"flex",flexDirection:isMobile?"column":"row",alignItems:isMobile?"flex-start":"center",gap:isMobile?20:32}}>
         <div style={{flex:1}}>
           <div style={{marginBottom:10}}><img src="/bev_neutral.png" alt="Bev" style={{width:48,height:48,objectFit:"contain"}} onError={e=>{e.target.style.display="none";e.target.parentElement.innerHTML="🐍";}}/></div>
-          <div style={{fontFamily:"'Playfair Display',Georgia,serif",fontSize:18,fontWeight:700,color:"#2D2D4E",marginBottom:8}}>Seamless browsing is coming.</div>
-          <div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.7}}>The Wovely app will let you browse any crochet site and save patterns with a single tap — no copying, no pasting.</div>
+          <div style={{fontFamily:"'Fredoka',Georgia,serif",fontSize:18,fontWeight:700,color:"#2E2748",marginBottom:8}}>Seamless browsing is coming.</div>
+          <div style={{fontSize:14,color:"#726A92",lineHeight:1.7}}>The Wovely app will let you browse any crochet site and save patterns with a single tap — no copying, no pasting.</div>
         </div>
         <div style={{display:"flex",gap:12,flexDirection:isMobile?"column":"row",alignItems:"center",flexShrink:0}}>
           <div style={{background:"#1C1C1E",borderRadius:12,padding:"12px 20px",display:"flex",alignItems:"center",gap:10,opacity:.7,cursor:"default",minWidth:120}}>
             <svg width="20" height="24" viewBox="0 0 384 512" fill="#fff"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
-            <div><div style={{fontSize:13,fontWeight:600,color:"#fff",fontFamily:"Inter,sans-serif",lineHeight:1.2}}>App Store</div><div style={{fontSize:10,color:"rgba(255,255,255,.6)",fontFamily:"Inter,sans-serif"}}>Coming Soon</div></div>
+            <div><div style={{fontSize:13,fontWeight:600,color:"#fff",fontFamily:"Nunito,sans-serif",lineHeight:1.2}}>App Store</div><div style={{fontSize:10,color:"rgba(255,255,255,.6)",fontFamily:"Nunito,sans-serif"}}>Coming Soon</div></div>
           </div>
           <div style={{background:"#1C1C1E",borderRadius:12,padding:"12px 20px",display:"flex",alignItems:"center",gap:10,opacity:.7,cursor:"default",minWidth:120}}>
             <svg width="18" height="20" viewBox="0 0 512 512" fill="#fff"><path d="M93.6 28.3l187.2 107.5L93.6 483.7c-5.1-4.4-8.2-10.8-8.2-18V46.3c0-7.2 3.1-13.6 8.2-18zm22.7-17L330 135.8 282.4 256 116.3 11.3zm0 473.4L282.4 256l47.6 120.2-213.7 124.5zM345.6 256l80.8-46.4c14.3-8.2 14.3-28.9 0-37.2L345.6 126l-52.8 130 52.8 130z"/></svg>
-            <div><div style={{fontSize:13,fontWeight:600,color:"#fff",fontFamily:"Inter,sans-serif",lineHeight:1.2}}>Google Play</div><div style={{fontSize:10,color:"rgba(255,255,255,.6)",fontFamily:"Inter,sans-serif"}}>Coming Soon</div></div>
+            <div><div style={{fontSize:13,fontWeight:600,color:"#fff",fontFamily:"Nunito,sans-serif",lineHeight:1.2}}>Google Play</div><div style={{fontSize:10,color:"rgba(255,255,255,.6)",fontFamily:"Nunito,sans-serif"}}>Coming Soon</div></div>
           </div>
         </div>
       </div>
@@ -1300,7 +1293,7 @@ const YarnStash = ({gateAction}) => {
   const gateAddYarn=()=>gateAction?gateAction({ intent: "add_stash", title: "Create a free account to save your stash", subtitle: "Track every skein, on every device." },addYarn):addYarn();
   const{isDesktop:isD}=useBreakpoint();
   const SC_LABEL = {fontSize:10,fontVariant:"small-caps",color:T.ink3,textTransform:"lowercase",letterSpacing:".14em",fontWeight:500};
-  const CARD = {background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,border:"1px solid rgba(255,255,255,0.6)",padding:24,boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(155,126,200,0.13)"};
+  const CARD = {background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,border:"1px solid rgba(255,255,255,0.6)",padding:24,boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)"};
 
   if(stash.length===0&&!adding) return (
     <div style={{padding:isD?"24px 24px 100px":"0 18px 100px",maxWidth:960,margin:"0 auto"}}>
@@ -1308,7 +1301,7 @@ const YarnStash = ({gateAction}) => {
         <div style={{fontSize:48,marginBottom:16}}>🧶</div>
         <div style={{fontFamily:T.serif,fontSize:22,fontWeight:700,color:T.ink,marginBottom:8}}>Your stash lives here</div>
         <div style={{fontSize:14,color:T.ink3,lineHeight:1.6,marginBottom:24,maxWidth:320,margin:"0 auto 24px"}}>Add your first yarn to get started — track every skein so you always know what you have before you buy.</div>
-        <button onClick={gateOpenAdd} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"14px 32px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)"}}>+ Add Your First Yarn</button>
+        <button onClick={gateOpenAdd} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"14px 32px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>+ Add Your First Yarn</button>
       </div>
     </div>
   );
@@ -1324,7 +1317,7 @@ const YarnStash = ({gateAction}) => {
           </div>
         ))}
       </div>
-      <button onClick={()=>{ if(adding){setAdding(false);return;} gateOpenAdd(); }} style={{width:"100%",background:adding?"transparent":T.terra,color:adding?T.ink3:"#fff",border:adding?`1.5px solid ${T.border}`:"none",borderRadius:99,padding:"14px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:adding?"none":"0 4px 16px rgba(155,126,200,.3)",marginBottom:20}}>{adding?"Cancel":"+ Add Yarn to Stash"}</button>
+      <button onClick={()=>{ if(adding){setAdding(false);return;} gateOpenAdd(); }} style={{width:"100%",background:adding?"transparent":T.terra,color:adding?T.ink3:"#fff",border:adding?`1.5px solid ${T.border}`:"none",borderRadius:99,padding:"14px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:adding?"none":"0 4px 16px rgba(123,106,212,.3)",marginBottom:20}}>{adding?"Cancel":"+ Add Yarn to Stash"}</button>
       {adding&&(
         <div className="fu" style={{...CARD,marginBottom:20}}>
           <Field label="Brand" placeholder="e.g. Lion Brand" value={brand} onChange={e=>setBrand(e.target.value)}/>
@@ -1337,7 +1330,7 @@ const YarnStash = ({gateAction}) => {
             <div style={{flex:1}}><Field label="Yds per Skein" placeholder="315" value={yardage} onChange={e=>setYardage(e.target.value)}/></div>
             <div style={{flex:1}}><Field label="# of Skeins" placeholder="2" value={skeins} onChange={e=>setSkeins(e.target.value)}/></div>
           </div>
-          <button onClick={gateAddYarn} disabled={!brand||!name} style={{width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"14px",fontSize:15,fontWeight:600,cursor:(!brand||!name)?"not-allowed":"pointer",opacity:(!brand||!name)?.5:1,boxShadow:"0 4px 16px rgba(155,126,200,.3)"}}>Add to Stash</button>
+          <button onClick={gateAddYarn} disabled={!brand||!name} style={{width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"14px",fontSize:15,fontWeight:600,cursor:(!brand||!name)?"not-allowed":"pointer",opacity:(!brand||!name)?.5:1,boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Add to Stash</button>
         </div>
       )}
       {stash.map(y=>(
@@ -1377,7 +1370,7 @@ const ShoppingList = ({gateAction}) => {
   const gateAddItem=()=>gateAction?gateAction({ intent: "add_shopping", title: "Create a free account to save your list", subtitle: "Your supply run syncs across every device." },addItem):addItem();
   const unchecked=items.filter(i=>!i.checked),checked=items.filter(i=>i.checked);
   const SC_LABEL = {fontSize:10,fontVariant:"small-caps",color:T.ink3,textTransform:"lowercase",letterSpacing:".14em",fontWeight:500};
-  const CARD = {background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,border:"1px solid rgba(255,255,255,0.6)",padding:24,boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(155,126,200,0.13)"};
+  const CARD = {background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,border:"1px solid rgba(255,255,255,0.6)",padding:24,boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)"};
 
   if(items.length===0) return (
     <div style={{padding:isDsl?"24px 24px 100px":"0 18px 100px",maxWidth:960,margin:"0 auto"}}>
@@ -1389,7 +1382,7 @@ const ShoppingList = ({gateAction}) => {
         <div style={{fontSize:14,color:T.ink3,lineHeight:1.6,maxWidth:320,margin:"0 auto 24px"}}>Add items as you plan your next project — yarn, hooks, and notions all in one place.</div>
         <div style={{display:"flex",gap:8,maxWidth:380,margin:"0 auto"}}>
           <input value={newItem} onChange={e=>setNewItem(e.target.value)} onKeyDown={e=>e.key==="Enter"&&gateAddItem()} placeholder="Add an item..." style={{flex:1,padding:"13px 16px",background:"transparent",border:"none",borderBottom:`1.5px solid ${T.border}`,color:T.ink,fontSize:14,outline:"none",transition:"border-color .2s"}} onFocus={e=>e.target.style.borderBottomColor=T.terra} onBlur={e=>e.target.style.borderBottomColor=T.border}/>
-          <button onClick={gateAddItem} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)"}}>Add</button>
+          <button onClick={gateAddItem} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Add</button>
         </div>
       </div>
     </div>
@@ -1426,7 +1419,7 @@ const ShoppingList = ({gateAction}) => {
 
       <div style={{display:"flex",gap:10,marginTop:20}}>
         <input value={newItem} onChange={e=>setNewItem(e.target.value)} onKeyDown={e=>e.key==="Enter"&&gateAddItem()} placeholder="Add an item..." style={{flex:1,padding:"13px 16px",background:"transparent",border:"none",borderBottom:`1.5px solid ${T.border}`,color:T.ink,fontSize:14,outline:"none",transition:"border-color .2s"}} onFocus={e=>e.target.style.borderBottomColor=T.terra} onBlur={e=>e.target.style.borderBottomColor=T.border}/>
-        <button onClick={gateAddItem} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)"}}>Add</button>
+        <button onClick={gateAddItem} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Add</button>
       </div>
     </div>
   );
@@ -1438,16 +1431,16 @@ const STARTER_PHOTO_MAP = {Blankets:PHOTOS.blanket,Amigurumi:PHOTOS.granny,Weara
 const LegalFooter = () => {
   const legalNav=useNavigate();
   return (
-    <div style={{textAlign:"center",padding:"24px 16px 32px",fontSize:12,color:"#6B6B8A"}}>
-      <span onClick={()=>legalNav("/privacy")} style={{color:"#6B6B8A",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#9B7EC8"} onMouseLeave={e=>e.target.style.color="#6B6B8A"}>Privacy Policy</span>
+    <div style={{textAlign:"center",padding:"24px 16px 32px",fontSize:12,color:"#726A92"}}>
+      <span onClick={()=>legalNav("/privacy")} style={{color:"#726A92",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Privacy Policy</span>
       <span style={{margin:"0 8px",opacity:.5}}>|</span>
-      <span onClick={()=>legalNav("/terms")} style={{color:"#6B6B8A",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#9B7EC8"} onMouseLeave={e=>e.target.style.color="#6B6B8A"}>Terms of Service</span>
+      <span onClick={()=>legalNav("/terms")} style={{color:"#726A92",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Terms of Service</span>
     </div>
   );
 };
 
 const WelcomeToast = ({visible}) => (
-  <div style={{position:"fixed",top:16,right:16,zIndex:900,background:T.terra,color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(155,126,200,.4)",display:"flex",alignItems:"center",gap:8,opacity:visible?1:0,transform:visible?"translateX(0)":"translateX(20px)",transition:"opacity .4s ease, transform .4s ease",pointerEvents:"none"}}>
+  <div style={{position:"fixed",top:16,right:16,zIndex:900,background:T.terra,color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(123,106,212,.4)",display:"flex",alignItems:"center",gap:8,opacity:visible?1:0,transform:visible?"translateX(0)":"translateX(20px)",transition:"opacity .4s ease, transform .4s ease",pointerEvents:"none"}}>
     <span style={{fontSize:18}}>🧶</span> Welcome back! Your Wovely is ready.
   </div>
 );
@@ -1513,7 +1506,7 @@ const OnboardingScreen = ({onComplete,onBackToAuth}) => {
   return (
     <div style={{position:"fixed",inset:0,zIndex:700,display:"flex",alignItems:"center",justifyContent:"center",padding:24,fontFamily:T.sans}}>
       <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",backdropFilter:"blur(12px)"}}/>
-      <div style={{position:"relative",zIndex:1,width:"100%",maxWidth:480,maxHeight:"80vh",display:"flex",flexDirection:"column",background:"rgba(250,247,243,0.96)",borderRadius:28,boxShadow:"0 20px 60px rgba(155,126,200,.15), 0 0 0 1px rgba(255,255,255,0.45) inset",border:"1px solid rgba(255,255,255,0.38)"}}>
+      <div style={{position:"relative",zIndex:1,width:"100%",maxWidth:480,maxHeight:"80vh",display:"flex",flexDirection:"column",background:"rgba(250,247,243,0.96)",borderRadius:28,boxShadow:"0 20px 60px rgba(123,106,212,.15), 0 0 0 1px rgba(255,255,255,0.45) inset",border:"1px solid rgba(255,255,255,0.38)"}}>
         <div style={{overflowY:"auto",padding:isDesktop?"44px 48px 40px":"28px 24px 32px"}}>
           <button onClick={onBackToAuth} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Back</button>
           <div style={{textAlign:"center",marginBottom:28}}>
@@ -1550,8 +1543,8 @@ const OnboardingScreen = ({onComplete,onBackToAuth}) => {
               <div style={{width:22,height:22,borderRadius:11,background:"#fff",position:"absolute",top:2,left:smsOptIn?20:2,boxShadow:"0 1px 3px rgba(0,0,0,.15)",transition:"left .2s ease"}}/>
             </button>
           </div>
-          {error&&<div style={{background:T.terraLt,border:"1px solid rgba(155,126,200,.2)",borderRadius:10,padding:"10px 14px",fontSize:12,color:T.terra,lineHeight:1.5,marginBottom:8}}>{error}</div>}
-          <button onClick={handleSave} disabled={saving} style={{width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:14,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)",marginTop:4,opacity:saving?.6:1}}>{saving?"Setting up…":"Set up my profile"}</button>
+          {error&&<div style={{background:T.terraLt,border:"1px solid rgba(123,106,212,.2)",borderRadius:10,padding:"10px 14px",fontSize:12,color:T.terra,lineHeight:1.5,marginBottom:8}}>{error}</div>}
+          <button onClick={handleSave} disabled={saving} style={{width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:14,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",marginTop:4,opacity:saving?.6:1}}>{saving?"Setting up…":"Set up my profile"}</button>
         </div>
       </div>
     </div>
@@ -1641,10 +1634,10 @@ const MasterDocView = () => {
               <div style={{position:"absolute",left:isDesktop?10:6,top:6,width:entry.major?22:16,height:entry.major?22:16,borderRadius:99,background:entry.major?T.terra:T.surface,border:`3px solid ${entry.major?T.terra:T.border}`,zIndex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
                 {entry.major && <div style={{width:8,height:8,borderRadius:99,background:"#fff"}}/>}
               </div>
-              <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,overflow:"hidden",boxShadow:entry.major?"0 4px 24px rgba(155,126,200,.1)":T.shadow}}>
+              <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,overflow:"hidden",boxShadow:entry.major?"0 4px 24px rgba(123,106,212,.1)":T.shadow}}>
                 <div style={{padding:isDesktop?"22px 28px 18px":"18px 20px 14px",borderBottom:`1px solid ${T.border}`,background:entry.major?"linear-gradient(135deg, #FAF0EC 0%, "+T.card+" 100%)":T.card}}>
                   <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
-                    <span style={{fontFamily:"'Inter', monospace",fontSize:isDesktop?22:18,fontWeight:700,color:T.ink,letterSpacing:"-0.02em"}}>{entry.version}</span>
+                    <span style={{fontFamily:"'Nunito', monospace",fontSize:isDesktop?22:18,fontWeight:700,color:T.ink,letterSpacing:"-0.02em"}}>{entry.version}</span>
                     {entry.major && <span style={{fontSize:16}} title="Major release">🧶</span>}
                     <span style={{fontSize:12,color:T.ink3,fontWeight:500,marginLeft:"auto"}}>{entry.date}</span>
                   </div>
@@ -1679,36 +1672,36 @@ const MasterDocView = () => {
   };
 
   if(authed) return (
-    <div style={{minHeight:"100vh",background:"#FFFFFF",fontFamily:'"Inter",-apple-system,sans-serif'}}>
+    <div style={{minHeight:"100vh",background:"#FFFFFF",fontFamily:'"Nunito",-apple-system,sans-serif'}}>
       <style>{`
-        .md-doc h1,.md-doc h2,.md-doc h3{font-family:"Playfair Display",Georgia,serif;color:#2D2D4E;margin:1.5em 0 .5em;}
-        .md-doc h1{font-size:32px;border-bottom:2px solid #EDE4F7;padding-bottom:12px;}
-        .md-doc h2{font-size:24px;color:#9B7EC8;}
+        .md-doc h1,.md-doc h2,.md-doc h3{font-family:"Fredoka",Georgia,serif;color:#2E2748;margin:1.5em 0 .5em;}
+        .md-doc h1{font-size:32px;border-bottom:2px solid #ECE6F8;padding-bottom:12px;}
+        .md-doc h2{font-size:24px;color:#7B6AD4;}
         .md-doc h3{font-size:18px;}
-        .md-doc p{line-height:1.8;color:#6B6B8A;margin:.8em 0;}
-        .md-doc ul,.md-doc ol{padding-left:24px;color:#6B6B8A;line-height:1.8;}
+        .md-doc p{line-height:1.8;color:#726A92;margin:.8em 0;}
+        .md-doc ul,.md-doc ol{padding-left:24px;color:#726A92;line-height:1.8;}
         .md-doc table{width:100%;border-collapse:collapse;margin:1em 0;}
-        .md-doc th,.md-doc td{border:1px solid #EDE4F7;padding:10px 14px;text-align:left;font-size:14px;}
-        .md-doc th{background:#F8F6FF;font-weight:600;color:#2D2D4E;}
-        .md-doc code{background:#F8F6FF;padding:2px 6px;border-radius:4px;font-size:13px;font-family:monospace;}
-        .md-doc pre{background:#F8F6FF;padding:16px;border-radius:10px;overflow-x:auto;margin:1em 0;}
+        .md-doc th,.md-doc td{border:1px solid #ECE6F8;padding:10px 14px;text-align:left;font-size:14px;}
+        .md-doc th{background:#F5F2FF;font-weight:600;color:#2E2748;}
+        .md-doc code{background:#F5F2FF;padding:2px 6px;border-radius:4px;font-size:13px;font-family:monospace;}
+        .md-doc pre{background:#F5F2FF;padding:16px;border-radius:10px;overflow-x:auto;margin:1em 0;}
         .md-doc pre code{background:none;padding:0;}
-        .md-doc a{color:#9B7EC8;text-decoration:underline;}
-        .md-doc blockquote{border-left:4px solid #9B7EC8;margin:1em 0;padding:8px 16px;background:#EDE4F7;border-radius:0 8px 8px 0;}
+        .md-doc a{color:#7B6AD4;text-decoration:underline;}
+        .md-doc blockquote{border-left:4px solid #7B6AD4;margin:1em 0;padding:8px 16px;background:#ECE6F8;border-radius:0 8px 8px 0;}
       `}</style>
       <CSS/>
       <div style={{maxWidth:900,margin:"0 auto",padding:"40px 24px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:24}}>
           <div>
-            <div style={{fontFamily:'"Playfair Display",Georgia,serif',fontSize:28,fontWeight:700,color:"#2D2D4E"}}>Wovely Admin</div>
-            <div style={{fontSize:13,color:"#6B6B8A",marginTop:4}}>{doc?`Version ${doc.version} · Updated ${new Date(doc.updated_at).toLocaleDateString()}`:""}</div>
+            <div style={{fontFamily:'"Fredoka",Georgia,serif',fontSize:28,fontWeight:700,color:"#2E2748"}}>Wovely Admin</div>
+            <div style={{fontSize:13,color:"#726A92",marginTop:4}}>{doc?`Version ${doc.version} · Updated ${new Date(doc.updated_at).toLocaleDateString()}`:""}</div>
           </div>
-          <button onClick={()=>{sessionStorage.removeItem("yh_master_pw");setDoc(null);setAuthed(false);setPw("");}} style={{background:"#F8F6FF",border:"1px solid #EDE4F7",borderRadius:8,padding:"8px 16px",fontSize:13,color:"#5C4F44",cursor:"pointer"}}>Lock</button>
+          <button onClick={()=>{sessionStorage.removeItem("yh_master_pw");setDoc(null);setAuthed(false);setPw("");}} style={{background:"#F5F2FF",border:"1px solid #ECE6F8",borderRadius:8,padding:"8px 16px",fontSize:13,color:"#5C4F44",cursor:"pointer"}}>Lock</button>
         </div>
         <TabBar/>
         {activeTab==="master-doc" && doc && (
           <>
-            {doc.change_summary&&<div style={{background:"#EDE4F7",borderRadius:10,padding:"12px 16px",marginBottom:24,fontSize:13,color:"#9B7EC8",lineHeight:1.6}}>Latest changes: {doc.change_summary}</div>}
+            {doc.change_summary&&<div style={{background:"#ECE6F8",borderRadius:10,padding:"12px 16px",marginBottom:24,fontSize:13,color:"#7B6AD4",lineHeight:1.6}}>Latest changes: {doc.change_summary}</div>}
             <div className="md-doc" dangerouslySetInnerHTML={{__html:renderMarkdown(doc.content)}}/>
           </>
         )}
@@ -1718,16 +1711,16 @@ const MasterDocView = () => {
   );
 
   return (
-    <div style={{minHeight:"100vh",background:"#FFFFFF",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:'"Inter",-apple-system,sans-serif'}}>
-      <div style={{width:"100%",maxWidth:380,padding:"40px 32px",background:"#FFFFFF",borderRadius:20,border:"1px solid #EDE4F7",boxShadow:"0 8px 32px rgba(155,126,200,.08)"}}>
+    <div style={{minHeight:"100vh",background:"#FFFFFF",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:'"Nunito",-apple-system,sans-serif'}}>
+      <div style={{width:"100%",maxWidth:380,padding:"40px 32px",background:"#FFFFFF",borderRadius:20,border:"1px solid #ECE6F8",boxShadow:"0 8px 32px rgba(123,106,212,.08)"}}>
         <div style={{textAlign:"center",marginBottom:28}}>
           <div style={{fontSize:40,marginBottom:12}}>🧶</div>
-          <div style={{fontFamily:'"Playfair Display",Georgia,serif',fontSize:22,fontWeight:700,color:"#2D2D4E"}}>Wovely Admin</div>
-          <div style={{fontSize:13,color:"#6B6B8A",marginTop:6}}>Enter password to view</div>
+          <div style={{fontFamily:'"Fredoka",Georgia,serif',fontSize:22,fontWeight:700,color:"#2E2748"}}>Wovely Admin</div>
+          <div style={{fontSize:13,color:"#726A92",marginTop:6}}>Enter password to view</div>
         </div>
-        <input value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&fetchDoc(pw)} type="password" placeholder="Password" style={{width:"100%",padding:"13px 16px",background:"#F8F6FF",border:"1.5px solid #EDE4F7",borderRadius:12,color:"#2D2D4E",fontSize:15,marginBottom:12,outline:"none"}}/>
-        {error&&<div style={{fontSize:12,color:"#9B7EC8",marginBottom:10}}>{error}</div>}
-        <button onClick={()=>fetchDoc(pw)} disabled={loading||!pw} style={{width:"100%",background:"#9B7EC8",color:"#fff",border:"none",borderRadius:12,padding:"14px",fontSize:15,fontWeight:600,cursor:"pointer",opacity:loading?.6:1}}>{loading?"Loading…":"Unlock"}</button>
+        <input value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&fetchDoc(pw)} type="password" placeholder="Password" style={{width:"100%",padding:"13px 16px",background:"#F5F2FF",border:"1.5px solid #ECE6F8",borderRadius:12,color:"#2E2748",fontSize:15,marginBottom:12,outline:"none"}}/>
+        {error&&<div style={{fontSize:12,color:"#7B6AD4",marginBottom:10}}>{error}</div>}
+        <button onClick={()=>fetchDoc(pw)} disabled={loading||!pw} style={{width:"100%",background:"#7B6AD4",color:"#fff",border:"none",borderRadius:12,padding:"14px",fontSize:15,fontWeight:600,cursor:"pointer",opacity:loading?.6:1}}>{loading?"Loading…":"Unlock"}</button>
       </div>
     </div>
   );
@@ -1886,11 +1879,11 @@ const ChangelogPage = () => {
               </div>
 
               {/* Version card */}
-              <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,overflow:"hidden",boxShadow:entry.major?"0 4px 24px rgba(155,126,200,.1)":T.shadow}}>
+              <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,overflow:"hidden",boxShadow:entry.major?"0 4px 24px rgba(123,106,212,.1)":T.shadow}}>
                 {/* Version header */}
                 <div style={{padding:isDesktop?"22px 28px 18px":"18px 20px 14px",borderBottom:`1px solid ${T.border}`,background:entry.major?"linear-gradient(135deg, #FAF0EC 0%, "+T.card+" 100%)":T.card}}>
                   <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
-                    <span style={{fontFamily:"'Inter', monospace",fontSize:isDesktop?22:18,fontWeight:700,color:T.ink,letterSpacing:"-0.02em"}}>{entry.version}</span>
+                    <span style={{fontFamily:"'Nunito', monospace",fontSize:isDesktop?22:18,fontWeight:700,color:T.ink,letterSpacing:"-0.02em"}}>{entry.version}</span>
                     {entry.major && <span style={{fontSize:16}} title="Major release">🧶</span>}
                     <span style={{fontSize:12,color:T.ink3,fontWeight:500,marginLeft:"auto"}}>{entry.date}</span>
                   </div>
@@ -1923,7 +1916,7 @@ const ChangelogPage = () => {
           <div style={{width:40,height:1,background:T.border,margin:"0 auto 20px"}}/>
           <p style={{fontSize:13,color:T.ink3,lineHeight:1.6}}>That's everything so far. More stitches coming soon.</p>
           <div style={{marginTop:16}}>
-            <button onClick={()=>navigate("/")} style={{background:T.terra,color:"#fff",border:"none",borderRadius:12,padding:"12px 28px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)"}}>Open Wovely</button>
+            <button onClick={()=>navigate("/")} style={{background:T.terra,color:"#fff",border:"none",borderRadius:12,padding:"12px 28px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Open Wovely</button>
           </div>
         </div>
       </div>
@@ -3445,7 +3438,7 @@ export default function Wovely() {
       {collectionSuggestion && <CollectionSuggestionPrompt pattern={collectionSuggestion.pattern} meta={collectionSuggestion.meta} onYes={handleAcceptCollectionSuggestion} onNo={()=>setCollectionSuggestion(null)} />}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id} initialIsStarter={(pendingExtractedHandoff?.fileType==='pdf'&&!!pendingExtractedHandoff?.isStarter)||(pendingResumeJobId?.fileType==='pdf'&&isStarterJobId(pendingResumeJobId.jobId))}/>}
       {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
-      {addMenuOpen&&menuAnchor&&<><div onClick={()=>{setAddMenuOpen(false);setMenuAnchor(null);}} style={{position:"fixed",inset:0,zIndex:49}}/><div style={{position:"fixed",top:menuAnchor.top,left:menuAnchor.left,zIndex:50,background:"#fff",border:`1px solid ${T.border}`,borderRadius:14,boxShadow:"0 8px 32px rgba(45,45,78,.12)",minWidth:220,padding:"6px 0",fontFamily:"Inter,sans-serif"}}>{[{icon:"📄",label:"Add PDF",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openImageImport();}},{icon:"🔗",label:"Paste a URL",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 16px",cursor:"pointer",fontSize:13,fontWeight:500,color:T.ink,transition:"background .12s"}} onMouseEnter={e=>e.currentTarget.style.background=T.linen} onMouseLeave={e=>e.currentTarget.style.background="transparent"}><span style={{fontSize:16,width:22,textAlign:"center"}}>{item.icon}</span>{item.label}</div>))}</div></>}
+      {addMenuOpen&&menuAnchor&&<><div onClick={()=>{setAddMenuOpen(false);setMenuAnchor(null);}} style={{position:"fixed",inset:0,zIndex:49}}/><div style={{position:"fixed",top:menuAnchor.top,left:menuAnchor.left,zIndex:50,background:"#fff",border:`1px solid ${T.border}`,borderRadius:14,boxShadow:"0 8px 32px rgba(45,45,78,.12)",minWidth:220,padding:"6px 0",fontFamily:"Nunito,sans-serif"}}>{[{icon:"📄",label:"Add PDF",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openImageImport();}},{icon:"🔗",label:"Paste a URL",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 16px",cursor:"pointer",fontSize:13,fontWeight:500,color:T.ink,transition:"background .12s"}} onMouseEnter={e=>e.currentTarget.style.background=T.linen} onMouseLeave={e=>e.currentTarget.style.background="transparent"}><span style={{fontSize:16,width:22,textAlign:"center"}}>{item.icon}</span>{item.label}</div>))}</div></>}
       {createdPattern&&<PatternCreatedOverlay pattern={createdPattern} onStartBuilding={()=>{const p=createdPattern;const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);startAndOpenPattern(p);}} onGoToHive={()=>{const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);if(ctx?.id){setSelectedCollection(ctx);navigate("/collections/"+ctx.id);}else{navigateToView("collection");}}}/>}
       {multiSectionNotice&&<MultiSectionAnnouncePrompt count={multiSectionNotice.count} isCraft={tier===TIER_CRAFT} onGo={()=>{const pat=multiSectionNotice.pattern;setMultiSectionNotice(null);if(pat)startAndOpenPattern(pat);}} onSeeCraft={()=>{setMultiSectionNotice(null);setPaywallRecommend(requiredTier('collections'));setShowPaywall(true);}}/>}
       {pinnedImage?.image && <PinnedThumbnail image={pinnedImage.image} onOpen={()=>setPinnedLightboxOpen(true)} onUnpin={()=>{setPinnedImage(null);setPinnedLightboxOpen(false);}} />}
@@ -3454,21 +3447,21 @@ export default function Wovely() {
       {deleteTarget&&<DeleteConfirmModal pattern={deleteTarget} isPro={isPro} onCancel={()=>setDeleteTarget(null)} onDelete={confirmDelete} onPark={parkInsteadOfDelete} onGoPro={()=>{setDeleteTarget(null);setShowProModal(true);}}/>}
       {coverPickerTarget&&<CoverImagePicker pattern={coverPickerTarget} onConfirm={handleCoverConfirm} onClose={()=>setCoverPickerTarget(null)} pdfThumbUrl={pdfThumbUrl} CAT_IMG={CAT_IMG} ALL_CAT_ENTRIES={ALL_CAT_ENTRIES}/>}
       <WelcomeToast visible={showWelcomeToast}/>
-      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
+      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
       <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e?.currentTarget?.getBoundingClientRect();if(r)setMenuAnchor({top:r.bottom+8,left:r.left});setAddMenuOpen(true);}} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall} userPatterns={userPatterns} allPatterns={allPatterns}/>
       <div ref={mainScrollRef} style={{flex:1,minWidth:0,overflowY:"auto",display:"flex",flexDirection:"column",background:"transparent"}}>
         <WelcomeBanner visible={showWelcomeBanner}/>
-        <div style={{background:"#FFFFFF",borderBottom:"1px solid #EDE4F7",padding:"0 32px",height:64,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0}}>
+        <div style={{background:"#FFFFFF",borderBottom:"1px solid #ECE6F8",padding:"0 32px",height:64,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0}}>
           <div onClick={isAdam?handleLogoTap:undefined} style={{fontFamily:T.serif,fontSize:28,fontWeight:700,color:T.ink,cursor:isAdam?"pointer":"default"}}>{TITLE_MAP[view]!==null?TITLE_MAP[view]:""}</div>
           <div style={{display:"flex",alignItems:"center",gap:12,position:"relative"}}>
             <FeedbackWidget user={supabaseAuth.getUser()}/>
             {isPro&&<div style={{background:T.terraLt,borderRadius:9999,padding:"4px 10px",fontSize:11,fontWeight:600,color:T.terra}}>✨ {tierLabel(tier)}</div>}
-            <button onClick={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e.currentTarget.getBoundingClientRect();setMenuAnchor({top:r.bottom+8,left:r.right-220});setAddMenuOpen(true);}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:9999,padding:"10px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)",display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:18}}>+</span> Add Pattern</button>
+            <button onClick={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e.currentTarget.getBoundingClientRect();setMenuAnchor({top:r.bottom+8,left:r.right-220});setAddMenuOpen(true);}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:9999,padding:"10px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:18}}>+</span> Add Pattern</button>
           </div>
         </div>
         <div style={{flex:1,padding:"0 32px",minHeight:"100vh"}}>
           {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>)}
-          {view==="wip"&&<div style={{padding:"24px 0 80px"}}><button onClick={()=>navigateToView("collection")} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Back</button>{inProgress.length===0?<div style={{textAlign:"center",padding:"80px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:20,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
+          {view==="wip"&&<div style={{padding:"24px 0 80px"}}><button onClick={()=>navigateToView("collection")} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Back</button>{inProgress.length===0?<div style={{textAlign:"center",padding:"80px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:20,fontWeight:600,color:"#2E2748",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#726A92",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
           {view==="detail"&&selected&&<div style={{margin:"0 -40px"}}><Detail key={selected._supabaseId||selected.id} p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selected?.collection_id ?? null)} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>{setPaywallRecommend(requiredTier('collections'));setShowProModal(true);}} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/></div>}
           {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
           {view==="stash"&&<div style={{paddingTop:24}}><YarnStash gateAction={gateAction}/></div>}
@@ -3477,7 +3470,7 @@ export default function Wovely() {
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
           {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
           {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
-          {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #EDE4F7",borderTopColor:"#9B7EC8",borderRadius:"50%",margin:"0 auto"}}/></div>}
+          {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
           {view==="privacy"&&<PrivacyPolicy/>}
           {view==="terms"&&<TermsOfService/>}
           {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:24}}><StitchResultPage/></div>}
@@ -3494,7 +3487,7 @@ export default function Wovely() {
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
-      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#5B9B6B":"#6B6B8A",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
+      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
       <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall}/>
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       {showFairUseWall&&<FairUseWall cap={TIER_CONFIG.craft.patternCap} onClose={()=>setShowFairUseWall(false)}/>}
@@ -3509,18 +3502,18 @@ export default function Wovely() {
       {readyPromptPattern&&<ReadyToBuildPrompt pattern={readyPromptPattern} onStartBuilding={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);startAndOpenPattern(p);}} onViewDetails={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);setSelected(p);navigateToView("detail",p._supabaseId||p.id);}} onDismiss={()=>setReadyPromptPattern(null)}/>}
       {deleteTarget&&<DeleteConfirmModal pattern={deleteTarget} isPro={isPro} onCancel={()=>setDeleteTarget(null)} onDelete={confirmDelete} onPark={parkInsteadOfDelete} onGoPro={()=>{setDeleteTarget(null);setShowProModal(true);}}/>}
       {showWelcomeBanner&&<WelcomeBanner onDismiss={()=>setShowWelcomeBanner(false)}/>}
-      <div style={{background:"#FFFFFF",borderBottom:"1px solid #EDE4F7",padding:"0 18px",height:56,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0}}>
+      <div style={{background:"#FFFFFF",borderBottom:"1px solid #ECE6F8",padding:"0 18px",height:56,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0}}>
         <button onClick={()=>setNavOpen(true)} style={{background:"none",border:"none",cursor:"pointer",padding:"8px 8px 8px 0",display:"flex",flexDirection:"column",gap:5}}><div style={{width:22,height:1.5,background:T.ink,borderRadius:99}}/><div style={{width:15,height:1.5,background:T.ink,borderRadius:99}}/><div style={{width:22,height:1.5,background:T.ink,borderRadius:99}}/></button>
         <div onClick={isAdam?handleLogoTap:undefined} style={{fontFamily:T.serif,fontSize:20,fontWeight:700,color:T.ink,cursor:isAdam?"pointer":"default"}}>{TITLE_MAP[view]!==null?TITLE_MAP[view]:""}</div>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <FeedbackWidget user={supabaseAuth.getUser()}/>
-          <button onClick={()=>{if(tierGate.atCap){triggerAtCap();return;}setAddMenuOpen(v=>!v);}} style={{background:T.terra,border:"none",borderRadius:9999,width:34,height:34,cursor:"pointer",color:"#fff",fontSize:20,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(155,126,200,.4)"}}>+</button>
+          <button onClick={()=>{if(tierGate.atCap){triggerAtCap();return;}setAddMenuOpen(v=>!v);}} style={{background:T.terra,border:"none",borderRadius:9999,width:34,height:34,cursor:"pointer",color:"#fff",fontSize:20,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(123,106,212,.4)"}}>+</button>
         </div>
       </div>
-      {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Inter,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}
+      {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Nunito,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}
       <div ref={mainScrollRef} style={{flex:1,overflowX:"hidden",overflowY:"auto",paddingBottom:100,minHeight:"100vh"}}>
         {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>)}
-        {view==="wip"&&<div style={{padding:"16px 18px 80px"}}>{inProgress.length===0?<div style={{textAlign:"center",padding:"60px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#6B6B8A",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
+        {view==="wip"&&<div style={{padding:"16px 18px 80px"}}>{inProgress.length===0?<div style={{textAlign:"center",padding:"60px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:"#2E2748",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#726A92",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
         {view==="detail"&&selected&&<Detail key={selected._supabaseId||selected.id} p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selected?.collection_id ?? null)} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>{setPaywallRecommend(requiredTier('collections'));setShowProModal(true);}} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/>}
         {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
         {view==="stash"&&<div style={{paddingTop:18}}><YarnStash gateAction={gateAction}/></div>}
@@ -3529,12 +3522,12 @@ export default function Wovely() {
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
         {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
         {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
-          {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #EDE4F7",borderTopColor:"#9B7EC8",borderRadius:"50%",margin:"0 auto"}}/></div>}
+          {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
         {view==="privacy"&&<PrivacyPolicy/>}
         {view==="terms"&&<TermsOfService/>}
         {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:18}}><StitchResultPage/></div>}
       </div>
-      {!addOpen&&!imageImportOpen&&!addMenuOpen&&<button onClick={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} style={{position:"fixed",right:0,top:"50%",transform:"translateY(-50%)",zIndex:40,display:"flex",alignItems:"center",justifyContent:"center",writingMode:"vertical-rl",textOrientation:"mixed",background:"#9B7EC8",color:"#fff",fontFamily:"'Inter',sans-serif",fontSize:13,fontWeight:600,letterSpacing:"0.05em",padding:"16px 10px",borderRadius:"12px 0 0 12px",cursor:"pointer",boxShadow:"-3px 0 16px rgba(155,126,200,0.25)",userSelect:"none",border:"none",outline:"none"}}>+ Add Pattern</button>}
+      {!addOpen&&!imageImportOpen&&!addMenuOpen&&<button onClick={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} style={{position:"fixed",right:0,top:"50%",transform:"translateY(-50%)",zIndex:40,display:"flex",alignItems:"center",justifyContent:"center",writingMode:"vertical-rl",textOrientation:"mixed",background:"#7B6AD4",color:"#fff",fontFamily:"'Nunito',sans-serif",fontSize:13,fontWeight:600,letterSpacing:"0.05em",padding:"16px 10px",borderRadius:"12px 0 0 12px",cursor:"pointer",boxShadow:"-3px 0 16px rgba(123,106,212,0.25)",userSelect:"none",border:"none",outline:"none"}}>+ Add Pattern</button>}
     </div>
   );
 }

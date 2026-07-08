@@ -20,8 +20,8 @@ export const ensureRepeatBrackets = (rows) => rows.map(r => {
   return parsed.length > 0 ? { ...r, repeat_brackets: parsed } : r;
 });
 
-// ─── DOT COLOR CYCLE ──────────────────────────────────────────────────────
-const DOT_COLORS = [null, "#C0392B", "#F5C842", "#2980B9", "#27AE60"];
+// ─── DOT COLOR CYCLE (Design System 2b: coral → sun → sky → mint) ─────────
+const DOT_COLORS = [null, "#FF8A73", "#FFC24B", "#6FB7F0", "#5EC9AE"];
 const nextDotColor = (current) => {
   const idx = DOT_COLORS.indexOf(current);
   return DOT_COLORS[(idx + 1) % DOT_COLORS.length];
@@ -52,7 +52,7 @@ const SubCounter = ({row, globalIdx, onDotTap, onRepeatDone}) => {
       <div style={{fontSize:11, color:T.ink3, marginBottom:4}}>Repeat: {rb.sequence} × {rb.count}</div>
       <div style={{display:"flex", alignItems:"center", gap:10, flexWrap:"wrap"}}>
         {dots.map((color, di) => (
-          <div key={di} onClick={() => onDotTap(globalIdx, di)} style={{width:14, height:14, borderRadius:99, border: color ? "none" : "1.5px solid #ccc", background: color || "transparent", cursor:"pointer", transition:"all .15s"}} />
+          <div key={di} onClick={() => onDotTap(globalIdx, di)} onMouseEnter={e=>e.currentTarget.style.transform="scale(1.2)"} onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"} style={{width:15, height:15, borderRadius:99, border: color ? "none" : "1.5px dashed #C9BBEC", background: color || "transparent", cursor:"pointer", transition:"transform .15s"}} />
         ))}
       </div>
     </div>
@@ -236,7 +236,7 @@ const RowManager = ({
           <div style={{fontSize:40,marginBottom:14}}>🧶</div>
           <div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:T.ink2,marginBottom:8}}>No rows added yet</div>
           <div style={{fontSize:13,color:T.ink3,lineHeight:1.6,marginBottom:20}}>Add rows to start building this pattern step by step.</div>
-          <button onClick={()=>{if(!editing)setEditing(true);}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:12,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)"}}>Add Rows</button>
+          <button onClick={()=>{if(!editing)setEditing(true);}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:12,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Add Rows</button>
         </div>
       ):(()=>{
         const seenAbbr=new Set();
@@ -286,8 +286,8 @@ const RowManager = ({
               {hasBody&&<div style={{padding:"12px 14px",fontSize:13,color:T.ink2,lineHeight:1.7,whiteSpace:"pre-wrap",borderBottom:secTotal>0?`1px solid ${T.border}`:"none"}}>{sec.header.body}</div>}
               {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;return(
         <div key={r.id} id={`row-${i + 1}`} data-row={i + 1} style={{borderBottom:`1px solid ${focusHeaderId?"rgba(237,228,247,0.55)":T.border}`,background:flagStatus==="fail"?"rgba(192,84,74,0.08)":flagStatus==="warning"?"rgba(201,168,76,0.08)":r.isAction&&!rowLocked?"rgba(184,144,44,.06)":"transparent",borderLeft:flagStatus==="fail"?"3px solid #C0544A":flagStatus==="warning"?"3px solid #C9A84C":"none"}}>
-          <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:13,alignItems:"center",cursor:isAnonymous||rowLocked?"default":"pointer",background:isCurrent&&!rowLocked&&!isAnonymous?"rgba(155,126,200,.04)":"transparent",padding:focusHeaderId?"17px 14px":"14px 14px",margin:"0 -8px",opacity:rowLocked?.45:1,transition:"opacity .15s"}}>
-            <button type="button" className={!r.done&&isCurrent&&!rowLocked&&!isAnonymous?"wovely-current-ring":undefined} aria-label={r.done?"Mark row incomplete":"Mark row complete"} disabled={isAnonymous||rowLocked} onClick={e=>{e.stopPropagation();if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{position:"relative",overflow:"visible",width:18,height:18,borderRadius:99,flexShrink:0,padding:0,background:r.done?T.terra:rowLocked?"#E8E4DF":T.surface,border:"1.5px solid "+(r.done?T.terra:isCurrent&&!rowLocked&&!isAnonymous?T.terra:rowLocked?"#D5D0CA":T.border),display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",cursor:isAnonymous||rowLocked?"default":"pointer",boxShadow:r.done?"0 2px 8px rgba(155,126,200,.3)":isCurrent&&!rowLocked&&!isAnonymous?"0 0 0 3px rgba(155,126,200,.15)":"none"}}>
+          <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:13,alignItems:"center",cursor:isAnonymous||rowLocked?"default":"pointer",background:isCurrent&&!rowLocked&&!isAnonymous?"rgba(123,106,212,.04)":"transparent",padding:focusHeaderId?"17px 14px":"14px 14px",margin:"0 -8px",opacity:rowLocked?.45:1,transition:"opacity .15s"}}>
+            <button type="button" className={!r.done&&isCurrent&&!rowLocked&&!isAnonymous?"wovely-current-ring":undefined} aria-label={r.done?"Mark row incomplete":"Mark row complete"} disabled={isAnonymous||rowLocked} onClick={e=>{e.stopPropagation();if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{position:"relative",overflow:"visible",width:18,height:18,borderRadius:99,flexShrink:0,padding:0,background:r.done?T.terra:rowLocked?"#E8E4DF":T.surface,border:"1.5px solid "+(r.done?T.terra:isCurrent&&!rowLocked&&!isAnonymous?T.terra:rowLocked?"#D5D0CA":T.border),display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",cursor:isAnonymous||rowLocked?"default":"pointer",boxShadow:r.done?"0 2px 8px rgba(123,106,212,.3)":isCurrent&&!rowLocked&&!isAnonymous?"0 0 0 3px rgba(123,106,212,.15)":"none"}}>
               <span aria-hidden="true" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:44,height:44}}/>
               {!r.done&&isCurrent&&!rowLocked&&!isAnonymous&&<span aria-hidden="true" className="wovely-current-halo" style={{position:"absolute",top:0,left:0,right:0,bottom:0,margin:"auto",width:18,height:18,boxSizing:"border-box",borderRadius:99,border:`1.5px solid ${T.terra}`,opacity:0,pointerEvents:"none"}}/>}
               {r.done&&<span style={{color:"#fff",fontSize:9,fontWeight:700,lineHeight:1}}>✓</span>}
@@ -350,24 +350,24 @@ const RowManager = ({
             WebkitBackdropFilter:"blur(16px)",
             border:"1px solid rgba(255,255,255,0.45)",
             borderRadius:16,
-            boxShadow:"0 4px 24px rgba(45,58,124,0.08)",
+            boxShadow:"0 4px 24px rgba(90,66,160,0.08)",
             padding:"28px 24px",
             textAlign:"center",
           }}>
             <div style={{
-              fontFamily:"'Playfair Display', Georgia, serif",
+              fontFamily:"'Fredoka', Georgia, serif",
               fontSize:22,
               fontWeight:700,
-              color:"#2D3A7C",
+              color:T.ink,
               lineHeight:1.25,
               marginBottom:8,
             }}>
               You're just getting started
             </div>
             <div style={{
-              fontFamily:"Inter,sans-serif",
+              fontFamily:"Nunito,sans-serif",
               fontSize:14,
-              color:"#6B6B8A",
+              color:"#726A92",
               lineHeight:1.6,
               marginBottom:20,
               maxWidth:360,
@@ -378,7 +378,7 @@ const RowManager = ({
             <button
               onClick={()=>onSignUp&&onSignUp()}
               style={{
-                background:"#9B7EC8",
+                background:"#7B6AD4",
                 color:"#fff",
                 border:"none",
                 borderRadius:12,
@@ -386,15 +386,15 @@ const RowManager = ({
                 fontSize:14,
                 fontWeight:600,
                 cursor:"pointer",
-                boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
+                boxShadow:"0 4px 16px rgba(123,106,212,0.3)",
                 marginBottom:12,
               }}
             >Create Free Account</button>
-            <div style={{fontSize:12.5,color:"#6B6B8A"}}>
+            <div style={{fontSize:12.5,color:"#726A92"}}>
               Already have an account?{" "}
               <span
                 onClick={()=>onSignUp&&onSignUp()}
-                style={{color:"#9B7EC8",cursor:"pointer",fontWeight:600}}
+                style={{color:"#7B6AD4",cursor:"pointer",fontWeight:600}}
               >Sign in</span>
             </div>
           </div>
@@ -402,12 +402,12 @@ const RowManager = ({
       ) : (
         <div style={{display:"flex",gap:8,marginTop:16}}>
           <input value={newRow} onChange={e=>setNewRow(e.target.value)} onKeyDown={e=>e.key==="Enter"&&addRow()} placeholder="Add a row or step…" style={{flex:1,border:`1.5px solid ${T.border}`,borderRadius:11,padding:"10px 14px",fontSize:13,color:T.ink,background:T.linen,outline:"none"}} onFocus={e=>e.target.style.borderColor=T.terra} onBlur={e=>e.target.style.borderColor=T.border}/>
-          <button onClick={addRow} style={{background:T.terra,color:"#fff",border:"none",borderRadius:11,padding:"10px 18px",fontSize:22,cursor:"pointer",lineHeight:1,boxShadow:"0 4px 12px rgba(155,126,200,.35)"}}>+</button>
+          <button onClick={addRow} style={{background:T.terra,color:"#fff",border:"none",borderRadius:11,padding:"10px 18px",fontSize:22,cursor:"pointer",lineHeight:1,boxShadow:"0 4px 12px rgba(123,106,212,.35)"}}>+</button>
         </div>
       ))}
       {/* Floating source pattern pill — hidden for guests so it doesn't
           collide with the sticky signup bar at the same screen position. */}
-      {p.source_file_url&&onViewSource&&!isAnonymous&&!focusHeaderId&&<button onClick={onViewSource} style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:200,background:T.terra,color:"#fff",border:"none",borderRadius:999,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.4)",whiteSpace:"nowrap"}}>📄 View Source Pattern →</button>}
+      {p.source_file_url&&onViewSource&&!isAnonymous&&!focusHeaderId&&<button onClick={onViewSource} style={{position:"fixed",bottom:24,left:"50%",transform:"translateX(-50%)",zIndex:200,background:T.terra,color:"#fff",border:"none",borderRadius:999,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.4)",whiteSpace:"nowrap"}}>📄 View Source Pattern →</button>}
     </>
   );
 };

@@ -198,7 +198,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (dropRef.current) dropRef.current.style.borderColor = "#9B7EC8";
+    if (dropRef.current) dropRef.current.style.borderColor = "#7B6AD4";
   };
 
   const handleDragLeave = (e) => {
@@ -331,7 +331,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
   // ── PICK SCREEN ──
   const pickContent = (
     <div style={{ paddingBottom: 8 }}>
-      <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: "#2D3A7C", marginBottom: 6 }}>Import from photos</div>
+      <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 6 }}>Import from photos</div>
       <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.7, marginBottom: 18 }}>
         Select one or more photos of your pattern — screenshots, scans, or photos all work
       </div>
@@ -351,7 +351,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
         <div style={{ fontFamily: T.serif, fontSize: 17, color: T.ink, marginBottom: 6 }}>Drop photos here</div>
         <div style={{ fontSize: 13, color: T.ink3, marginBottom: 14 }}>or tap below to choose</div>
         <div style={{
-          background: "#9B7EC8", color: "#fff", borderRadius: 10, padding: "10px 20px",
+          background: "#7B6AD4", color: "#fff", borderRadius: 10, padding: "10px 20px",
           fontSize: 13, fontWeight: 600, display: "inline-block",
         }}>Choose photos</div>
       </div>
@@ -386,11 +386,11 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
               >
                 <img src={it.thumb} alt={`Page ${i + 1}`} style={{
                   width: 72, height: 72, borderRadius: 10, objectFit: "cover",
-                  border: dragIdx === i ? `2px solid #9B7EC8` : `1px solid ${T.border}`,
+                  border: dragIdx === i ? `2px solid #7B6AD4` : `1px solid ${T.border}`,
                 }} />
                 <div style={{
                   position: "absolute", top: -6, left: -6, width: 20, height: 20, borderRadius: 99,
-                  background: "#9B7EC8", color: "#fff", fontSize: 10, fontWeight: 700,
+                  background: "#7B6AD4", color: "#fff", fontSize: 10, fontWeight: 700,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   boxShadow: "0 1px 4px rgba(0,0,0,.15)",
                 }}>{i + 1}</div>
@@ -409,10 +409,10 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
         disabled={items.length === 0}
         style={{
           width: "100%", marginTop: 18,
-          background: items.length > 0 ? "#9B7EC8" : T.disabled,
+          background: items.length > 0 ? "#7B6AD4" : T.disabled,
           color: "#fff", border: "none", borderRadius: 99, padding: "14px",
           fontSize: 15, fontWeight: 600, cursor: items.length > 0 ? "pointer" : "not-allowed",
-          boxShadow: items.length > 0 ? "0 4px 16px rgba(155,126,200,.3)" : "none",
+          boxShadow: items.length > 0 ? "0 4px 16px rgba(123,106,212,.3)" : "none",
           transition: "background .2s",
         }}
       >Extract pattern</button>
@@ -429,14 +429,14 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
       {/* X removed in S1.5.3 — backdrop click or route nav dismisses. */}
       <style>{`@keyframes spinLoaderVision{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes fadeInMsgV{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <div style={{position:"relative",width:60,height:60,marginBottom:24}}>
-        <div style={{position:"absolute",inset:0,borderRadius:"50%",border:"4px solid transparent",borderTopColor:"#9B7EC8",animation:"spinLoaderVision 1s linear infinite"}}/>
+        <div style={{position:"absolute",inset:0,borderRadius:"50%",border:"4px solid transparent",borderTopColor:"#7B6AD4",animation:"spinLoaderVision 1s linear infinite"}}/>
         <img src="/bev_neutral.png" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:40,height:40,objectFit:"contain"}} alt="Bev"/>
       </div>
-      <div style={{ fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 600, color: "#2D2D4E", marginBottom: 8, lineHeight: 1.4 }}>
+      <div style={{ fontFamily: "'Fredoka',serif", fontSize: 20, fontWeight: 600, color: "#2E2748", marginBottom: 8, lineHeight: 1.4 }}>
         Extracting your pattern
       </div>
       <div key={loadingMsg} style={{
-        fontSize: 13, fontFamily: "Inter,sans-serif", fontWeight: 400, color: "#9B7EC8",
+        fontSize: 13, fontFamily: "Nunito,sans-serif", fontWeight: 400, color: "#7B6AD4",
         marginTop: 8, animation: "fadeInMsgV .4s ease both",
       }}>
         {loadingMsg}
@@ -453,7 +453,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
         {errorMsg || "We had trouble reading this pattern. Try clearer photos or fewer images."}
       </div>
       <button onClick={() => { setStage("pick"); setItems([]); setErrorMsg(""); }} style={{
-        width: "100%", background: "#9B7EC8", color: "#fff", border: "none", borderRadius: 99,
+        width: "100%", background: "#7B6AD4", color: "#fff", border: "none", borderRadius: 99,
         padding: "14px", fontSize: 15, fontWeight: 600, cursor: "pointer",
       }}>Try again</button>
     </div>
@@ -476,7 +476,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
         setCoverUploading(false);
       }} style={{display:"none"}}/>
       {/* ── HERO ZONE ── */}
-      <div style={{position:"relative",height:200,margin:"0 -22px",overflow:"hidden",background:"#2D2D4E"}}>
+      <div style={{position:"relative",height:200,margin:"0 -22px",overflow:"hidden",background:"#2E2748"}}>
         {heroImg&&<><img src={heroImg} alt="" style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover",filter:"blur(20px) saturate(1.2) brightness(0.6)",transform:"scale(1.1)",pointerEvents:"none"}}/>
         <img src={heroImg} alt={editTitle} style={{position:"absolute",left:"50%",transform:"translateX(-50%)",height:"100%",width:"auto",objectFit:"contain",zIndex:1}}/></>}
         {!heroImg&&<div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${T.terra},#6B2A10)`}}/>}
@@ -557,18 +557,18 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
               <div style={{fontSize:12,color:T.sage,textAlign:"center",maxWidth:200,lineHeight:1.5}}>Checking stitch counts, round sequence and math errors before you start crocheting.</div>
             </div>
           ):bevCheckFailed?(
-            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(155,126,200,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
-              <div style={{fontSize:11,color:"#6B6B8A",marginBottom:10}}>Bev couldn't check this one — try again</div>
+            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
+              <div style={{fontSize:11,color:"#726A92",marginBottom:10}}>Bev couldn't check this one — try again</div>
               <button onClick={()=>{setBevCheckFailed(false);setValidating(true);const valText=bevCheckTextRef.current;if(!valText){setBevCheckFailed(true);setValidating(false);return;}(async()=>{try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),90000);const vr=await fetch("/api/extract-pattern",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"bevcheck",patternText:valText}),signal:controller.signal});clearTimeout(timeout);const data=await vr.json();if(vr.ok&&!data.error){setValidationReport(data);}else{setBevCheckFailed(true);}}catch(e){console.warn("[ImageImport] BevCheck retry failed:",e);setBevCheckFailed(true);}setValidating(false);})();}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"6px 16px",fontSize:11,fontWeight:600,cursor:"pointer"}}>Retry BevCheck</button>
             </div>
           ):validationReport?(()=>{const scState=deriveState(validationReport);const allChecks=Array.isArray(validationReport.checks)?validationReport.checks:[];const scFailed=allChecks.filter(c=>c&&c.status&&c.status!=="pass").slice(0,3);return isPro?(
-            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(155,126,200,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
+            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
               <BevGauge variant="compact" state={scState} />
-              {scFailed.length>0&&<div style={{textAlign:"left",marginTop:8}}>{scFailed.map((c,i)=>(<div key={c.id||i} style={{display:"flex",gap:6,alignItems:"flex-start",marginBottom:4}}><span style={{fontSize:11,color:c.status==="fail"?"#C0544A":"#C9A84C",flexShrink:0}}>{c.status==="fail"?"✕":"⚠"}</span><span style={{fontSize:11,color:"#6B6B8A"}}>{sentenceCase(c.label||"Check")}</span></div>))}</div>}
+              {scFailed.length>0&&<div style={{textAlign:"left",marginTop:8}}>{scFailed.map((c,i)=>(<div key={c.id||i} style={{display:"flex",gap:6,alignItems:"flex-start",marginBottom:4}}><span style={{fontSize:11,color:c.status==="fail"?"#C0544A":"#C9A84C",flexShrink:0}}>{c.status==="fail"?"✕":"⚠"}</span><span style={{fontSize:11,color:"#726A92"}}>{sentenceCase(c.label||"Check")}</span></div>))}</div>}
               <button onClick={()=>setShowFullReport(true)} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:11,fontWeight:600,padding:0,marginTop:6,textDecoration:"underline"}}>Full Report →</button>
             </div>
           ):(
-            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(155,126,200,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
+            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
               <div style={{filter:"blur(6px)",WebkitFilter:"blur(6px)",userSelect:"none",pointerEvents:"none"}}>
                 <BevGauge variant="compact" state={scState} />
               </div>
@@ -578,7 +578,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
               </div>
             </div>
           );})():(
-            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(155,126,200,.08)",border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",minHeight:120,fontSize:11,color:T.ink3}}>BevCheck unavailable</div>
+            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",minHeight:120,fontSize:11,color:T.ink3}}>BevCheck unavailable</div>
           )}
         </div>
       </div>
@@ -594,14 +594,14 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
               state={typeof validationReport.score === "number" ? undefined : deriveState(validationReport)}
               issueCount={(validationReport.checks || []).filter(c => c.status === "fail" || c.status === "warning" || c.status === "warn").length}
             /></div>
-            {(()=>{const allChecks=validationReport.checks||[];const coreC=allChecks.filter(c=>checkTier(c)==="core");const advC=allChecks.filter(c=>checkTier(c)==="advisory");const renderC=(c,op)=>(<div key={c.id} style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 12px",marginBottom:6,display:"flex",gap:8,alignItems:"flex-start",opacity:op||1}}><span style={{fontSize:14,flexShrink:0}}>{CHECK_ICON[c.status]||"\u2753"}</span><div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:c.status==="fail"?"#C0544A":(c.status==="warning"||c.status==="warn")?"#C9A84C":T.ink,marginBottom:2}}>{sentenceCase(c.label)}</div><div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>{c.detail}</div></div></div>);return <>{coreC.map(c=>renderC(c))}{advC.length>0&&<><div style={{borderTop:"0.5px solid #EDE4F7",margin:"10px 0"}}/><div style={{fontSize:10,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:"#9B7EC8",fontFamily:"'Inter',sans-serif",marginBottom:8}}>Advisory</div>{advC.map(c=>renderC(c,0.85))}</>}</>;})()}
+            {(()=>{const allChecks=validationReport.checks||[];const coreC=allChecks.filter(c=>checkTier(c)==="core");const advC=allChecks.filter(c=>checkTier(c)==="advisory");const renderC=(c,op)=>(<div key={c.id} style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 12px",marginBottom:6,display:"flex",gap:8,alignItems:"flex-start",opacity:op||1}}><span style={{fontSize:14,flexShrink:0}}>{CHECK_ICON[c.status]||"\u2753"}</span><div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:c.status==="fail"?"#C0544A":(c.status==="warning"||c.status==="warn")?"#C9A84C":T.ink,marginBottom:2}}>{sentenceCase(c.label)}</div><div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>{c.detail}</div></div></div>);return <>{coreC.map(c=>renderC(c))}{advC.length>0&&<><div style={{borderTop:"0.5px solid #ECE6F8",margin:"10px 0"}}/><div style={{fontSize:10,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:"#7B6AD4",fontFamily:"'Nunito',sans-serif",marginBottom:8}}>Advisory</div>{advC.map(c=>renderC(c,0.85))}</>}</>;})()}
             {validationReport.summary&&<div style={{background:T.linen,borderRadius:12,padding:"12px 14px",marginTop:10,border:`1px solid ${T.border}`}}><div style={{fontSize:11,fontWeight:700,color:T.terra,marginBottom:4}}>Bev says:</div><div style={{fontSize:12,color:T.ink2,lineHeight:1.6}}>{validationReport.summary}</div></div>}
-            <button onClick={()=>{setShowFullReport(false);handleSave();}} style={{marginTop:14,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)"}}>Import Now</button>
+            <button onClick={()=>{setShowFullReport(false);handleSave();}} style={{marginTop:14,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Import Now</button>
           </div>
         </div>
       )}
       <div style={{height:20}}/>
-      <button onClick={handleSave} style={{width:"100%",background:`linear-gradient(135deg,${T.terra},#7B5FB5)`,color:"#fff",border:"none",borderRadius:99,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 8px 28px rgba(155,126,200,.5)",marginBottom:8}}>Looks good — save pattern</button>
+      <button onClick={handleSave} style={{width:"100%",background:`linear-gradient(135deg,${T.terra},#7B5FB5)`,color:"#fff",border:"none",borderRadius:99,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 8px 28px rgba(123,106,212,.5)",marginBottom:8}}>Looks good — save pattern</button>
       <button onClick={()=>{setStage("pick");setItems([]);setExtracted(null);}} style={{width:"100%",background:"transparent",color:T.ink3,border:"none",borderRadius:99,padding:"10px",fontSize:13,cursor:"pointer"}}>Try different photos</button>
     </div>
   ) : null;

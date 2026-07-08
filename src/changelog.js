@@ -1,5 +1,13 @@
 export const CHANGELOG = [
   {
+    version: "Session 78",
+    date: "2026-07-07",
+    updates: [
+      { emoji: "🎨", text: "Wovely has a fresh new look — warmer lavender, playful rounded headings, and a cozy woven texture throughout" },
+      { emoji: "🧶", text: "Every screen now matches: cards, buttons, and Bev's gauge all wear the new palette" },
+    ]
+  },
+  {
     version: "Session 77",
     date: "2026-05-30",
     updates: [
@@ -122,7 +130,7 @@ export const CHANGELOG = [
     version: "30",
     date: "2026-03-27",
     updates: [
-      { emoji: "🎨", text: "Full design system locked — lavender, navy, white, Playfair Display everywhere" },
+      { emoji: "🎨", text: "Full design system locked — lavender, navy, white, Fredoka everywhere" },
       { emoji: "🐍", text: "Bev is official — hyper-realistic lavender snake mascot live across the app" },
       { emoji: "📊", text: "PostHog analytics wired — we track what matters, nothing creepy" },
       { emoji: "⚖️", text: "Privacy Policy and Terms of Service live" },

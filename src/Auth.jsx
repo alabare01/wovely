@@ -47,7 +47,7 @@ const DesktopShowcase = () => {
               <div key={i} style={{
                 background: "rgba(255,255,255,0.85)",
                 backdropFilter: "blur(16px)",
-                border: "1px solid rgba(155,126,200,0.2)",
+                border: "1px solid rgba(123,106,212,0.2)",
                 borderRadius: 16,
                 overflow: "hidden",
                 animation: `slideUp 600ms ease-out ${i * 100}ms both`
@@ -91,7 +91,7 @@ const DesktopShowcase = () => {
                         left: 0,
                         right: 0,
                         height: 3,
-                        background: "#EDE4F7"
+                        background: "#ECE6F8"
                       }}>
                         <div style={{
                           height: "100%",
@@ -134,7 +134,7 @@ const DesktopShowcase = () => {
         <div style={{
           background: "rgba(255,255,255,0.85)",
           backdropFilter: "blur(16px)",
-          border: "1px solid rgba(155,126,200,0.2)",
+          border: "1px solid rgba(123,106,212,0.2)",
           borderRadius: 16,
           padding: 16,
           maxWidth: 340,
@@ -216,7 +216,7 @@ const DesktopShowcase = () => {
         <div style={{
           background: "rgba(255,255,255,0.85)",
           backdropFilter: "blur(16px)",
-          border: "1px solid rgba(155,126,200,0.2)",
+          border: "1px solid rgba(123,106,212,0.2)",
           borderRadius: 16,
           padding: 16,
           maxWidth: 340,
@@ -268,7 +268,7 @@ const DesktopShowcase = () => {
               </div>
               <div style={{
                 height: 6,
-                background: "#EDE4F7",
+                background: "#ECE6F8",
                 borderRadius: 3,
                 overflow: "hidden"
               }}>
@@ -304,7 +304,7 @@ const DesktopShowcase = () => {
       justifyContent: "center",
       alignItems: "center",
       minHeight: "100vh",
-      background: `url('/wovely_landing_bg_v1.png') center/cover no-repeat fixed, linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`,
+      background: `url('/wovely_landing_bg_v1.png') center/cover no-repeat fixed, linear-gradient(135deg, #FBF9FF 0%, rgba(237, 228, 247, 0.3) 100%)`,
       backgroundBlendMode: "overlay",
       position: "relative",
       overflow: "hidden"
@@ -383,7 +383,7 @@ const DesktopShowcase = () => {
               width: i === step ? 32 : 8,
               height: 8,
               borderRadius: 4,
-              background: i === step ? T.terra : "#EDE4F7",
+              background: i === step ? T.terra : "#ECE6F8",
               transition: "all 300ms ease",
               cursor: "pointer"
             }}
@@ -407,7 +407,7 @@ const MobileShowcase = () => {
   return (
     <div style={{
       padding: "40px 20px",
-      background: `url('/wovely_landing_bg_v1.png') center/cover no-repeat fixed, linear-gradient(135deg, #FAF8F5 0%, rgba(237, 228, 247, 0.3) 100%)`,
+      background: `url('/wovely_landing_bg_v1.png') center/cover no-repeat fixed, linear-gradient(135deg, #FBF9FF 0%, rgba(237, 228, 247, 0.3) 100%)`,
       backgroundBlendMode: "overlay",
       minHeight: "100vh"
     }}>
@@ -492,10 +492,10 @@ const MobileShowcase = () => {
             background: "rgba(255,255,255,0.75)",
             backdropFilter: "blur(20px)",
             WebkitBackdropFilter: "blur(20px)",
-            border: "1px solid rgba(155,126,200,0.35)",
+            border: "1px solid rgba(123,106,212,0.35)",
             borderRadius: 16,
             overflow: "hidden",
-            boxShadow: "0 4px 16px rgba(155,126,200,0.15), inset 0 0 1px rgba(255,255,255,0.8)"
+            boxShadow: "0 4px 16px rgba(123,106,212,0.15), inset 0 0 1px rgba(255,255,255,0.8)"
           }}>
             {feature.img && (
               <img
@@ -551,7 +551,7 @@ const MobileShowcase = () => {
                   color: T.ink,
                   fontFamily: T.sans,
                   fontWeight: 600,
-                  background: "rgba(155,126,200,0.06)",
+                  background: "rgba(123,106,212,0.06)",
                   padding: "6px 8px",
                   borderRadius: 4
                 }}>
@@ -718,10 +718,10 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
               fontFamily: T.sans,
               cursor: "pointer",
               transition: "all 200ms",
-              boxShadow: "0 2px 8px rgba(155,126,200,0.2)"
+              boxShadow: "0 2px 8px rgba(123,106,212,0.2)"
             }}
-            onMouseEnter={(e) => e.target.style.boxShadow = "0 4px 12px rgba(155,126,200,0.3)"}
-            onMouseLeave={(e) => e.target.style.boxShadow = "0 2px 8px rgba(155,126,200,0.2)"}
+            onMouseEnter={(e) => e.target.style.boxShadow = "0 4px 12px rgba(123,106,212,0.3)"}
+            onMouseLeave={(e) => e.target.style.boxShadow = "0 2px 8px rgba(123,106,212,0.2)"}
           >
             Try free — no credit card
           </button>
@@ -837,10 +837,10 @@ const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
             cursor: "pointer",
             opacity: loading ? 0.6 : 1,
             transition: "all 200ms",
-            boxShadow: "0 2px 8px rgba(155,126,200,0.2)"
+            boxShadow: "0 2px 8px rgba(123,106,212,0.2)"
           }}
-          onMouseEnter={(e) => !loading && (e.target.style.boxShadow = "0 4px 12px rgba(155,126,200,0.3)")}
-          onMouseLeave={(e) => e.target.style.boxShadow = "0 2px 8px rgba(155,126,200,0.2)"}
+          onMouseEnter={(e) => !loading && (e.target.style.boxShadow = "0 4px 12px rgba(123,106,212,0.3)")}
+          onMouseLeave={(e) => e.target.style.boxShadow = "0 2px 8px rgba(123,106,212,0.2)"}
         >
           {loading ? "Please wait..." : (isSignIn ? "Sign in" : "Create account")}
         </button>

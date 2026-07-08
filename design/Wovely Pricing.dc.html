@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet"><style>
+*{box-sizing:border-box}
+
+
+
+
+
+
+
+
+.page{font-family:var(--body)}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:26px 56px;border-bottom:1px solid var(--line);background:var(--bg)}
+.logo{font-family:var(--disp);font-weight:600;font-size:27px;letter-spacing:-.01em;color:var(--ink)}
+.logo b{color:var(--accent);font-weight:700}
+.barright{display:flex;align-items:center;gap:14px}
+.navlink{font-family:var(--body);font-weight:700;font-size:14px;color:var(--muted)}
+.navchip{font-family:var(--body);font-weight:800;font-size:13px;color:var(--muted);background:var(--panel);border:1px solid var(--line);padding:9px 16px;border-radius:999px}
+.hero{padding:78px 56px 8px;text-align:center;background:var(--bg)}
+.heroin{max-width:760px;margin:0 auto}
+.eyebrow{font-family:var(--body);font-weight:800;font-size:13px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent)}
+.h1{font-family:var(--disp);font-weight:600;font-size:58px;line-height:1.04;letter-spacing:-.02em;margin:18px 0 0;color:var(--ink)}
+.sub{font-family:var(--body);font-weight:500;font-size:19px;line-height:1.55;color:var(--muted);margin:22px auto 0;max-width:600px}
+.toggle{display:flex;align-items:center;justify-content:center;gap:16px;margin:38px 0 0}
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px;gap:2px}
+.seg button{border:0;background:transparent;font-family:var(--body);font-weight:800;font-size:15px;color:var(--muted);padding:11px 26px;border-radius:999px;cursor:pointer;transition:.18s}
+.seg button.on{background:var(--accent);color:#fff;box-shadow:0 8px 18px -8px var(--accent)}
+.savepill{font-family:var(--body);font-weight:800;font-size:13px;color:var(--accent2);background:color-mix(in srgb,var(--accent2) 15%,transparent);padding:9px 15px;border-radius:999px}
+.plans{display:grid;grid-template-columns:1fr 1.12fr;gap:24px;max-width:900px;margin:46px auto 0;padding:0 56px;align-items:stretch;background:var(--bg)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:calc(var(--radius) + 8px);padding:38px 34px;display:flex;flex-direction:column}
+.card.hot{border:2px solid var(--accent);box-shadow:0 34px 74px -36px var(--accent);position:relative}
+.pop{position:absolute;top:-15px;left:34px;background:var(--accent);color:#fff;font-family:var(--body);font-weight:800;font-size:12px;letter-spacing:.09em;text-transform:uppercase;padding:8px 15px;border-radius:999px}
+.pname{font-family:var(--disp);font-weight:600;font-size:27px;color:var(--ink)}
+.pdesc{font-family:var(--body);font-weight:600;font-size:14px;color:var(--muted);margin-top:6px;min-height:22px}
+.price{display:flex;align-items:baseline;gap:3px;margin-top:22px}
+.pcur{font-family:var(--disp);font-weight:600;font-size:28px;color:var(--ink)}
+.pamt{font-family:var(--disp);font-weight:600;font-size:58px;line-height:.9;color:var(--ink)}
+.pper{font-family:var(--body);font-weight:700;font-size:16px;color:var(--muted);margin-left:2px}
+.pbill{font-family:var(--body);font-weight:700;font-size:13px;color:var(--muted);margin-top:8px;min-height:18px}
+.plist{list-style:none;padding:0;margin:24px 0 0;display:flex;flex-direction:column;gap:13px}
+.plist li{display:flex;gap:11px;align-items:flex-start;font-family:var(--body);font-weight:600;font-size:15px;line-height:1.35;color:var(--ink)}
+.plist li.lead{font-weight:800;color:var(--muted);font-size:13px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
+.plist svg{flex:none;margin-top:1px;color:var(--accent)}
+.spacer{flex:1}
+.pcta{margin-top:26px;border:0;border-radius:14px;padding:16px;font-family:var(--body);font-weight:800;font-size:16px;cursor:pointer;transition:.18s}
+.pcta.solid{background:var(--accent);color:#fff;box-shadow:0 18px 32px -16px var(--accent)}
+.pcta.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.showcase{padding:86px 56px 8px;background:var(--bg)}
+.showin{max-width:1000px;margin:0 auto}
+.sc-h{font-family:var(--disp);font-weight:600;font-size:36px;text-align:center;color:var(--ink);letter-spacing:-.01em}
+.sc-sub{font-family:var(--body);font-weight:500;font-size:16px;color:var(--muted);text-align:center;margin:12px auto 0;max-width:520px;line-height:1.5}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:42px}
+.feat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+.ficon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--accent) 13%,transparent);color:var(--accent)}
+.ftitle{font-family:var(--disp);font-weight:600;font-size:20px;margin-top:18px;color:var(--ink)}
+.fdesc{font-family:var(--body);font-weight:500;font-size:14px;line-height:1.5;color:var(--muted);margin-top:8px}
+.trust{display:flex;flex-wrap:wrap;justify-content:center;gap:13px;padding:60px 56px 0;background:var(--bg)}
+.tchip{display:flex;align-items:center;gap:9px;font-family:var(--body);font-weight:700;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);padding:12px 18px;border-radius:999px}
+.tchip svg{color:var(--accent2)}
+.ctaband{margin:70px 44px 52px;background:var(--accent);border-radius:calc(var(--radius) + 12px);padding:58px;text-align:center;position:relative;overflow:hidden}
+.ctaband h3{font-family:var(--disp);font-weight:600;font-size:40px;color:#fff;margin:0;letter-spacing:-.01em}
+.ctaband p{font-family:var(--body);font-weight:500;font-size:17px;color:rgba(255,255,255,.85);margin:16px auto 0;max-width:470px;line-height:1.5}
+.ctaband button{margin-top:28px;background:#fff;color:var(--accent);border:0;border-radius:14px;padding:17px 42px;font-family:var(--body);font-weight:800;font-size:17px;cursor:pointer}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.playlav{--bg:#FBF9FF;--panel:#FFFFFF;--ink:#2E2748;--muted:#6E6690;--accent:#7B6AD4;--accent2:#FF8A73;--sun:#DCD0F7;--line:#ECE6F8;--radius:24px;--disp:'Fredoka',sans-serif;--body:'Nunito',sans-serif}
+.playlav .h1{font-weight:600}
+.playlav .h1 mark{background:var(--sun);color:var(--ink);padding:0 12px;border-radius:12px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.playlav .feat{border:0;box-shadow:0 14px 30px -18px rgba(90,66,180,.28)}
+.playlav .card.hot{border-color:var(--accent);box-shadow:0 34px 74px -36px rgba(123,106,212,.5)}
+.playlav .hero{background:radial-gradient(90% 70% at 50% 0%,#F1EBFF 0%,#FBF9FF 60%)}
+.playlav .c1{--accent:#7B6AD4}.playlav .c2{--accent:#8E9BF0}.playlav .c3{--accent:#C98BE0}.playlav .c4{--accent:#5EC9AE}.playlav .c5{--accent:#FF8A73}.playlav .c6{--accent:#6FB7F0}
+.playlav .savepill{color:#6E5AC8;background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.bev{border-radius:50%;object-fit:cover;display:block;border:3px solid #fff;box-shadow:0 14px 32px -14px rgba(90,66,160,.5)}
+.bev-sm{width:46px;height:46px}.bev-md{width:104px;height:104px}.bev-lg{width:150px;height:150px}
+.bevhero{margin:0 auto 6px}
+.logobev{display:flex;align-items:center;gap:12px}
+.bevrow{display:flex;align-items:center;justify-content:center;gap:16px;margin:0 0 8px}
+.bevbubble{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:11px 17px;font-family:var(--body);font-weight:800;font-size:15px;color:var(--ink);box-shadow:0 10px 24px -14px rgba(90,66,160,.3)}
+.bevbubble:after{content:"";position:absolute;left:-7px;top:50%;transform:translateY(-50%) rotate(45deg);width:12px;height:12px;background:var(--panel);border-left:1px solid var(--line);border-bottom:1px solid var(--line)}
+.scbev{display:flex;flex-direction:column;align-items:center;gap:14px}
+.ctaband.withbev{display:flex;align-items:center;justify-content:center;gap:40px;text-align:left}
+.ctaband.withbev .ctatext{max-width:470px}
+.ctaband .bevcta{border:4px solid rgba(255,255,255,.9);flex:none}
+.bevimg{display:block;object-fit:contain;filter:drop-shadow(0 18px 26px rgba(90,66,160,.34))}
+.bevimg-md{width:132px;height:132px}
+.bevimg-xl{width:224px;height:224px}
+.ficon svg{stroke-dasharray:2.6 2.4;stroke-linecap:round;stroke-linejoin:round}
+.page{min-height:100vh}@media (max-width:1024px) and (min-width:641px){.hero{padding:56px 40px 8px}.h1{font-size:46px}.plans{padding:0 40px;max-width:760px}.fgrid{grid-template-columns:repeat(2,1fr)}.showcase{padding:66px 40px 8px}.ctaband{margin:56px 32px 44px;padding:44px}}@media (max-width:640px){.bar{padding:16px 20px}.logo{font-size:22px}.navchip{display:none}.hero{padding:44px 20px 6px}.h1{font-size:33px}.sub{font-size:16px}.bevrow{flex-direction:column;gap:10px}.bevbubble:after{display:none}.bevimg-xl{width:150px;height:150px}.toggle{flex-wrap:wrap}.plans{grid-template-columns:1fr;padding:0 20px;gap:18px;max-width:100%}.card.hot{order:-1}.showcase{padding:56px 20px 6px}.sc-h{font-size:27px}.fgrid{grid-template-columns:1fr;gap:12px}.trust{padding:44px 20px 0}.ctaband{margin:44px 16px 32px;padding:34px 24px}.ctaband h3{font-size:28px}.ctaband.withbev{flex-direction:column;gap:18px;text-align:center}.bev-lg{width:110px;height:110px}}</style></helmet><div class="page playlav"><div class="bar"><div class="logobev"><img class="bev bev-sm" src="assets/bev.png" alt="Bev" width="46" height="46"><div class="logo">Wove<b>ly</b></div></div><div class="barright"><div class="navlink">Plans</div><div class="navchip">You're on Free</div></div></div><div class="hero"><div class="heroin"><div class="bevrow"><img class="bevimg bevimg-xl" src="assets/bev-hero.png" alt="Bev, the Wovely mascot" width="224" height="224"><div class="bevbubble">Hi, I'm Bev — let's get you sorted!</div></div><div class="eyebrow">Meet Craft</div><h1 class="h1">Crochet without the <mark>chaos.</mark></h1><p class="sub">Unlimited patterns, smart validation, and progress tracking that never loses your place — all in one cheerful little space made for makers.</p><div class="toggle"><div class="seg"><button class="{{ mOnE }}" onClick="{{ setMonthE }}">Monthly</button><button class="{{ yOnE }}" onClick="{{ setYearE }}">Annual</button></div><div class="savepill">Annual = 2 months free</div></div></div></div><div class="plans"><div class="card"><div class="pname">Free</div><div class="pdesc">Dip a toe in.</div><div class="price"><div class="pcur">$</div><div class="pamt">0</div><div class="pper">forever</div></div><div class="pbill">No card required</div><ul class="plist"><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Up to 5 patterns</li><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Basic progress tracking</li><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Browse community patterns</li><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Standard support</li></ul><div class="spacer"></div><button class="pcta ghost">Your current plan</button></div><div class="card hot"><div class="pop">Most loved</div><div class="pname">Craft</div><div class="pdesc">The whole yarn basket.</div><div class="price"><div class="pcur">$</div><div class="pamt">{{ priceE }}</div><div class="pper">/mo</div></div><div class="pbill">{{ billE }}</div><ul class="plist"><li class="lead">Everything in Free, plus</li><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Unlimited pattern storage</li><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>BevCheck validation & accuracy</li><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Complex + MCAL / MKAL storage</li><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Part-by-part progress tracking</li><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Gauge, yardage & scale calculators</li><li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>The Vault + dedicated 24/7 support</li></ul><div class="spacer"></div><button class="pcta solid">Upgrade to Craft</button></div></div><div class="showcase"><div class="showin"><div class="scbev"><img class="bevimg bevimg-md" src="assets/bev-hero.png" alt="Bev" width="132" height="132"><h2 class="sc-h">What you unlock</h2></div><p class="sc-sub">All the good stuff, none of the busywork.</p><div class="fgrid"><div class="feat c1"><div class="ficon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7.3"/><path d="M9 5.4c3 3.6 3 9.6 0 13.2"/><path d="M15 5.4c-3 3.6-3 9.6 0 13.2"/><path d="M5.3 9.6c4 1.9 9.4 1.9 13.4 0"/><path d="M5.3 14.4c4-1.9 9.4-1.9 13.4 0"/></svg></div><div class="ftitle">Unlimited storage</div><div class="fdesc">Hoard all the patterns you like. Seriously — there's no limit.</div></div><div class="feat c2"><div class="ficon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><div class="ftitle">BevCheck validation</div><div class="fdesc">We catch the wonky rows so you don't have to frog your afternoon.</div></div><div class="feat c3"><div class="ficon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9M10 19V5M16 19v-8M22 19H2"/></svg></div><div class="ftitle">Progress tracking</div><div class="fdesc">Tap out mid-round, come back, and land right where you left off.</div></div><div class="feat c4"><div class="ficon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></svg></div><div class="ftitle">Craft calculators</div><div class="fdesc">Gauge, yardage and scale, sorted. Resize any pattern without the maths.</div></div><div class="feat c5"><div class="ficon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></div><div class="ftitle">The Vault</div><div class="fdesc">A safe, backed-up spot for your fanciest and paid-for patterns.</div></div><div class="feat c6"><div class="ficon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12a7 7 0 0114 0v4a3 3 0 01-3 3h-1"/><rect x="3" y="12" width="3" height="6" rx="1.5"/><rect x="18" y="12" width="3" height="6" rx="1.5"/></svg></div><div class="ftitle">24/7 support</div><div class="fdesc">Friendly humans, any hour. Midnight yarn emergency? We got you.</div></div></div></div></div><div class="trust"><div class="tchip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Cancel anytime</div><div class="tchip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Secure checkout</div><div class="tchip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Real human support, 24/7</div><div class="tchip"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Made with makers</div></div><div class="ctaband withbev"><img class="bev bev-lg bevcta" src="assets/bev.png" alt="Bev" width="150" height="150"><div class="ctatext"><h3>Let's make something.</h3><p>Start free and upgrade whenever you're ready. Everything you've stitched together comes along.</p><button>Start free — it's fun, promise</button></div></div></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { annual: true };
+  renderVals() {
+    const a = this.state.annual;
+    return {
+      priceE: a ? '4.58' : '6.99',
+      billE: a ? '$54.99 billed yearly — 2 months free' : 'billed monthly',
+      mOnE: a ? '' : 'on', yOnE: a ? 'on' : '',
+      setMonthE: () => this.setState({ annual: false }),
+      setYearE: () => this.setState({ annual: true }),
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -542,7 +542,7 @@ const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer}) => {
       )}
       {error&&(
         <div style={{background:"#FFF0EE",borderRadius:12,padding:"14px 16px",marginBottom:14,border:"1px solid #F5C6BB"}}>
-          <div style={{fontSize:13,color:"#C05A5A",fontWeight:600,marginBottom:4}}>Couldn't read this photo</div>
+          <div style={{fontSize:13,color:"#C2564A",fontWeight:600,marginBottom:4}}>Couldn't read this photo</div>
           <div style={{fontSize:12,color:T.ink2,lineHeight:1.6}}>{error}</div>
           <div style={{marginTop:10}}><Btn variant="secondary" onClick={reset} small full={false}>Try again</Btn></div>
         </div>
@@ -571,7 +571,7 @@ const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer}) => {
                   <div style={{background:"rgba(0,0,0,.4)",borderRadius:6,padding:"2px 7px",fontSize:9,color:"rgba(255,255,255,.8)"}}>⤢ expand</div>
                 </div>
               </div>
-              <div style={{borderRadius:12,overflow:"hidden",border:`1px solid ${T.border}`,height:240,background:"#F8F6FF",position:"relative",cursor:"zoom-in"}} onClick={()=>setLightbox("wireframe")}>
+              <div style={{borderRadius:12,overflow:"hidden",border:`1px solid ${T.border}`,height:240,background:"#F5F2FF",position:"relative",cursor:"zoom-in"}} onClick={()=>setLightbox("wireframe")}>
                 <WireframeViewer components={analysis.components} labeled={wireframeMode==="labeled"} height={240}/>
                 <div style={{position:"absolute",bottom:8,right:10,background:"rgba(0,0,0,.35)",borderRadius:6,padding:"2px 7px",fontSize:9,color:"rgba(255,255,255,.8)",pointerEvents:"none"}}>⤢ expand</div>
               </div>
@@ -589,7 +589,7 @@ const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer}) => {
                   const conf=c.confidence>=75, label=c.label||c.role||c.primitive_type||"part";
                   const notes=c.construction?.notes||[c.construction?.technique?.replace(/_/g," "),c.construction?.increase_to?"~"+c.construction.increase_to+" sts":null,c.construction?.even_rounds?c.construction.even_rounds+" rnds":null,c.color?c.color+" yarn":null].filter(Boolean).join(" · ");
                   return (
-                    <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",padding:"8px 10px",background:conf?T.sageLt:T.terraLt,borderRadius:8,border:`1px solid ${conf?"rgba(92,122,94,.2)":"rgba(155,126,200,.2)"}`}}>
+                    <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",padding:"8px 10px",background:conf?T.sageLt:T.terraLt,borderRadius:8,border:`1px solid ${conf?"rgba(92,122,94,.2)":"rgba(123,106,212,.2)"}`}}>
                       <div style={{width:22,height:22,borderRadius:99,background:conf?T.sage:T.terra,color:"#fff",fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:11,fontWeight:700,color:conf?T.sage:T.terra,textTransform:"uppercase",marginBottom:2}}>{label} <span style={{fontWeight:400,opacity:.6}}>({c.primitive_type})</span></div>
@@ -828,9 +828,9 @@ const URLImportForm = ({onSave,Btn,Photo,initialUrl,onExtractionStart,onExtracti
     <div style={{padding:"48px 20px 36px",textAlign:"center",display:"flex",flexDirection:"column",alignItems:"center",position:"relative"}}>
       {/* X removed in S1.5.3 — backdrop click or route nav dismisses. */}
       <style>{`@keyframes spinLoader{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes fadeInMsg{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
-      <div style={{width:60,height:60,borderRadius:"50%",border:"4px solid transparent",borderTopColor:"#9B7EC8",animation:"spinLoader 1s linear infinite",marginBottom:24}}/>
-      <div style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:600,color:"#2D2D4E",marginBottom:8}}>Reading pattern page...</div>
-      <div key={stageText} style={{fontSize:13,fontFamily:"Inter,sans-serif",color:"#9B7EC8",animation:"fadeInMsg .4s ease both"}}>{stageText}</div>
+      <div style={{width:60,height:60,borderRadius:"50%",border:"4px solid transparent",borderTopColor:"#7B6AD4",animation:"spinLoader 1s linear infinite",marginBottom:24}}/>
+      <div style={{fontFamily:"'Fredoka',serif",fontSize:20,fontWeight:600,color:"#2E2748",marginBottom:8}}>Reading pattern page...</div>
+      <div key={stageText} style={{fontSize:13,fontFamily:"Nunito,sans-serif",color:"#7B6AD4",animation:"fadeInMsg .4s ease both"}}>{stageText}</div>
     </div>
   );
   return (
@@ -841,9 +841,9 @@ const URLImportForm = ({onSave,Btn,Photo,initialUrl,onExtractionStart,onExtracti
           <span style={{color:T.ink3}}>🔗</span>
           <input value={url} onChange={e=>setUrl(e.target.value)} onKeyDown={e=>e.key==="Enter"&&doImport()} placeholder="https://www.allfreecrochet.com/…" style={{border:"none",background:"transparent",flex:1,fontSize:14,color:T.ink,outline:"none"}}/>
         </div>
-        <button onClick={doImport} disabled={!url.trim()} style={{background:T.terra,color:"#fff",border:"none",borderRadius:12,padding:"0 18px",fontWeight:600,fontSize:14,cursor:"pointer",boxShadow:"0 4px 14px rgba(155,126,200,.3)",opacity:!url.trim()?0.6:1}}>Go</button>
+        <button onClick={doImport} disabled={!url.trim()} style={{background:T.terra,color:"#fff",border:"none",borderRadius:12,padding:"0 18px",fontWeight:600,fontSize:14,cursor:"pointer",boxShadow:"0 4px 14px rgba(123,106,212,.3)",opacity:!url.trim()?0.6:1}}>Go</button>
       </div>
-      {error&&<div style={{background:"#FFF0EE",borderRadius:12,padding:"14px 16px",marginBottom:14,border:"1px solid #F5C6BB"}}><div style={{fontSize:13,color:"#C05A5A",fontWeight:600,marginBottom:4}}>Couldn't read this URL</div><div style={{fontSize:12,color:T.ink2,lineHeight:1.6}}>{error}</div></div>}
+      {error&&<div style={{background:"#FFF0EE",borderRadius:12,padding:"14px 16px",marginBottom:14,border:"1px solid #F5C6BB"}}><div style={{fontSize:13,color:"#C2564A",fontWeight:600,marginBottom:4}}>Couldn't read this URL</div><div style={{fontSize:12,color:T.ink2,lineHeight:1.6}}>{error}</div></div>}
       {preview&&(
         <div className="fu" style={{background:T.linen,borderRadius:16,overflow:"hidden",border:`1px solid ${T.border}`}}>
           <div style={{height:100,position:"relative"}}><Photo src={preview.photo} alt="pattern" style={{width:"100%",height:"100%"}}/></div>
@@ -1292,17 +1292,17 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
           and the small ImportPill is the only minimized surface. */}
       <style>{`@keyframes spinLoader{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}`}</style>
       <div style={{position:"relative",width:60,height:60,marginBottom:24}}>
-        <div style={{position:"absolute",inset:0,borderRadius:"50%",border:"4px solid transparent",borderTopColor:"#9B7EC8",animation:"spinLoader 1s linear infinite"}}/>
+        <div style={{position:"absolute",inset:0,borderRadius:"50%",border:"4px solid transparent",borderTopColor:"#7B6AD4",animation:"spinLoader 1s linear infinite"}}/>
         <img src="/bev_neutral.png" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:40,height:40,objectFit:"contain"}} alt="Bev"/>
       </div>
-      <div key={loadingInfo.headline} style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:600,color:"#2D2D4E",marginBottom:8,lineHeight:1.4,animation:"fadeInMsg .4s ease both"}}>{loadingInfo.headline}</div>
+      <div key={loadingInfo.headline} style={{fontFamily:"'Fredoka',serif",fontSize:20,fontWeight:600,color:"#2E2748",marginBottom:8,lineHeight:1.4,animation:"fadeInMsg .4s ease both"}}>{loadingInfo.headline}</div>
       {loadingInfo.sub&&(
-        <div style={{fontSize:14,fontFamily:"Inter,sans-serif",fontWeight:400,color:"#6B6B8A",lineHeight:1.7,marginBottom:elapsedLabel?6:16,maxWidth:320}}>
+        <div style={{fontSize:14,fontFamily:"Nunito,sans-serif",fontWeight:400,color:"#726A92",lineHeight:1.7,marginBottom:elapsedLabel?6:16,maxWidth:320}}>
           {loadingInfo.sub}
         </div>
       )}
       {elapsedLabel && (
-        <div style={{fontSize:12,fontFamily:"Inter,sans-serif",color:"#9B87B8",fontVariantNumeric:"tabular-nums",marginBottom:10}}>
+        <div style={{fontSize:12,fontFamily:"Nunito,sans-serif",color:"#9B87B8",fontVariantNumeric:"tabular-nums",marginBottom:10}}>
           {elapsedLabel}
         </div>
       )}
@@ -1371,7 +1371,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
         setCoverUploading(false);
       }} style={{display:"none"}}/>
       {/* ── HERO ZONE ── */}
-      <div style={{position:"relative",height:200,margin:"0 -22px",overflow:"hidden",background:"#2D2D4E"}}>
+      <div style={{position:"relative",height:200,margin:"0 -22px",overflow:"hidden",background:"#2E2748"}}>
         {heroImg&&<><img src={heroImg} alt="" style={{position:"absolute",width:"100%",height:"100%",objectFit:"cover",filter:"blur(20px) saturate(1.2) brightness(0.6)",transform:"scale(1.1)",pointerEvents:"none"}}/>
         <img src={heroImg} alt={editTitle} style={{position:"absolute",left:"50%",transform:"translateX(-50%)",height:"100%",width:"auto",objectFit:"contain",zIndex:1}}/></>}
         {!heroImg&&<div style={{position:"absolute",inset:0,background:`linear-gradient(135deg,${T.terra},#6B2A10)`}}/>}
@@ -1441,8 +1441,8 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
               <div style={{fontSize:12,color:T.sage,textAlign:"center",maxWidth:200,lineHeight:1.5}}>Checking stitch counts, round sequence and math errors before you start crocheting.</div>
             </div>
           ):bevCheckFailed?(
-            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(155,126,200,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
-              <div style={{fontSize:11,color:"#6B6B8A",marginBottom:10}}>Bev couldn't check this one — try again</div>
+            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
+              <div style={{fontSize:11,color:"#726A92",marginBottom:10}}>Bev couldn't check this one — try again</div>
               <button onClick={()=>{setBevCheckFailed(false);setValidating(true);const valText=bevCheckTextRef.current;if(!valText){setBevCheckFailed(true);setValidating(false);return;}(async()=>{try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),90000);const vr=await fetch("/api/extract-pattern",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"bevcheck",patternText:valText}),signal:controller.signal});clearTimeout(timeout);const data=await vr.json();if(vr.ok&&!data.error){setValidationReport(data);}else{setBevCheckFailed(true);}}catch(e){console.warn("[Wovely] BevCheck retry failed:",e);setBevCheckFailed(true);}setValidating(false);})();}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"6px 16px",fontSize:11,fontWeight:600,cursor:"pointer"}}>Retry BevCheck</button>
             </div>
           ):validationReport?(()=>{const scState=deriveState(validationReport);const allChecks=Array.isArray(validationReport.checks)?validationReport.checks:[];const scFailed=allChecks.filter(c=>c&&c.status&&c.status!=="pass").slice(0,3);
@@ -1452,13 +1452,13 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
             // pill button just opens the full report.
             const hasIssues=allChecks.some(c=>c&&(c.status==="fail"||c.status==="warning"||c.status==="warn"));
             return isPro?(
-            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(155,126,200,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
+            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
               <BevGauge variant="compact" state={scState} />
-              {scFailed.length>0&&<div style={{textAlign:"left",marginTop:8}}>{scFailed.map((c,i)=>(<div key={c.id||i} style={{display:"flex",gap:6,alignItems:"flex-start",marginBottom:4}}><span style={{fontSize:11,color:c.status==="fail"?"#C0544A":"#C9A84C",flexShrink:0}}>{c.status==="fail"?"✕":"⚠"}</span><span style={{fontSize:11,color:"#6B6B8A"}}>{sentenceCase(c.label||"Check")}</span></div>))}</div>}
-              <button onClick={()=>setShowFullReport(true)} style={{marginTop:14,width:"100%",background:hasIssues?"#fff":T.terra,color:hasIssues?T.terra:"#fff",border:hasIssues?`1.5px solid ${T.terra}`:"none",borderRadius:99,padding:"12px",fontSize:13,fontWeight:600,cursor:"pointer",boxShadow:hasIssues?"none":"0 4px 16px rgba(155,126,200,.3)"}}>Full Report →</button>
+              {scFailed.length>0&&<div style={{textAlign:"left",marginTop:8}}>{scFailed.map((c,i)=>(<div key={c.id||i} style={{display:"flex",gap:6,alignItems:"flex-start",marginBottom:4}}><span style={{fontSize:11,color:c.status==="fail"?"#C0544A":"#C9A84C",flexShrink:0}}>{c.status==="fail"?"✕":"⚠"}</span><span style={{fontSize:11,color:"#726A92"}}>{sentenceCase(c.label||"Check")}</span></div>))}</div>}
+              <button onClick={()=>setShowFullReport(true)} style={{marginTop:14,width:"100%",background:hasIssues?"#fff":T.terra,color:hasIssues?T.terra:"#fff",border:hasIssues?`1.5px solid ${T.terra}`:"none",borderRadius:99,padding:"12px",fontSize:13,fontWeight:600,cursor:"pointer",boxShadow:hasIssues?"none":"0 4px 16px rgba(123,106,212,.3)"}}>Full Report →</button>
             </div>
           ):(
-            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(155,126,200,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
+            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
               <div style={{filter:"blur(6px)",WebkitFilter:"blur(6px)",userSelect:"none",pointerEvents:"none"}}>
                 <BevGauge variant="compact" state={scState} />
               </div>
@@ -1468,7 +1468,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
               </div>
             </div>
           );})():(
-            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(155,126,200,.08)",border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",minHeight:120,fontSize:11,color:T.ink3}}>BevCheck unavailable</div>
+            <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",minHeight:120,fontSize:11,color:T.ink3}}>BevCheck unavailable</div>
           )}
         </div>
       </div>
@@ -1488,18 +1488,18 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
               <div key={c.id} onClick={isIssue?()=>{setShowFullReport(false);const rows=buildRowsFromComponents(extracted.components);const mats=(extracted.materials||[]).map((m,i)=>({id:i+1,name:m.name||"",amount:m.amount||"",yardage:0,notes:m.notes||""}));const finalCover=coverUrl||fileInfo?.coverUrl||null;onSave({id:Date.now(),title:editTitle||"Imported Pattern",source:editDesigner||"PDF Import",cat:"Uncategorized",hook:editHook||"",weight:editWeight||"",notes:"",pattern_notes:extracted.pattern_notes||"",yardage:0,rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},materials:mats,rows,photo:finalCover||PILL[Math.floor(Math.random()*PILL.length)],cover_image_url:finalCover,source_file_url:fileInfo?.url||"",source_file_name:fileInfo?.name||"",source_file_type:fileInfo?.type||"",extracted_by_ai:true,components:extracted.components||[],assembly_notes:extracted.assembly_notes||"",difficulty:extracted.difficulty||"",abbreviations_map:extracted.abbreviations_map||{},suggested_resources:extracted.suggested_resources||[],validation_flags:validationFlags.length>0?validationFlags:null,validation_report:isPro&&validationReport?{...validationReport,flaggedRows:(validationReport.checks||[]).filter(ch=>ch.status==="fail"||ch.status==="warning"||ch.status==="warn").map(ch=>({rowNumber:extractFirstRowNumber(ch.detail),status:ch.status==="warn"?"warning":ch.status})).filter(f=>f.rowNumber!=null).filter((f,idx,arr)=>arr.findIndex(x=>x.rowNumber===f.rowNumber)===idx)}:null,_reviewRowNumber:checkRowNum});}:undefined} style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 12px",marginBottom:6,display:"flex",gap:8,alignItems:"flex-start",cursor:isIssue?"pointer":"default",transition:"transform .1s",opacity:op||1}} onMouseEnter={isIssue?e=>{e.currentTarget.style.transform="translateY(-1px)";}:undefined} onMouseLeave={isIssue?e=>{e.currentTarget.style.transform="none";}:undefined}>
                 <span style={{fontSize:14,flexShrink:0}}>{CHECK_ICON[c.status]||"❓"}</span>
                 <div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:c.status==="fail"?"#C0544A":(c.status==="warning"||c.status==="warn")?"#C9A84C":T.ink,marginBottom:2}}>{sentenceCase(c.label)}</div><div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>{c.detail}</div></div>
-                {isIssue&&<div style={{fontSize:11,color:"#9B7EC8",fontWeight:600,fontFamily:"'Inter',sans-serif",flexShrink:0,alignSelf:"center"}}>{checkRowNum?"→ Go to row":"→ Go to rows"}</div>}
-              </div>);};return <>{coreC.map(c=>renderC(c))}{advC.length>0&&<><div style={{borderTop:"0.5px solid #EDE4F7",margin:"10px 0"}}/><div style={{fontSize:10,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:"#9B7EC8",fontFamily:"'Inter',sans-serif",marginBottom:8}}>Advisory</div>{advC.map(c=>renderC(c,0.85))}</>}</>;})()}
+                {isIssue&&<div style={{fontSize:11,color:"#7B6AD4",fontWeight:600,fontFamily:"'Nunito',sans-serif",flexShrink:0,alignSelf:"center"}}>{checkRowNum?"→ Go to row":"→ Go to rows"}</div>}
+              </div>);};return <>{coreC.map(c=>renderC(c))}{advC.length>0&&<><div style={{borderTop:"0.5px solid #ECE6F8",margin:"10px 0"}}/><div style={{fontSize:10,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:"#7B6AD4",fontFamily:"'Nunito',sans-serif",marginBottom:8}}>Advisory</div>{advC.map(c=>renderC(c,0.85))}</>}</>;})()}
 
             {validationReport.summary&&<div style={{background:T.linen,borderRadius:12,padding:"12px 14px",marginTop:10,border:`1px solid ${T.border}`}}><div style={{fontSize:11,fontWeight:700,color:T.terra,marginBottom:4}}>Bev says:</div><div style={{fontSize:12,color:T.ink2,lineHeight:1.6}}>{validationReport.summary}</div></div>}
-            {(()=>{const checks=validationReport.checks||[];const hasIssues=checks.some(c=>c.status==="fail"||c.status==="warning"||c.status==="warn");if(!hasIssues) return <button onClick={()=>{setShowFullReport(false);handleSave();}} style={{marginTop:14,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)"}}>Import Now</button>;const firstIssue=checks.find(c=>c.status==="fail"||c.status==="warning"||c.status==="warn");const rowNum=firstIssue?extractFirstRowNumber(firstIssue.detail):null;return <div style={{marginTop:14,display:"flex",gap:10}}><button onClick={()=>{setShowFullReport(false);handleSave();}} style={{flex:1,background:"#fff",color:T.terra,border:`1.5px solid ${T.terra}`,borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",minHeight:44}}>Import Now</button><button onClick={()=>{setShowFullReport(false);const rows=buildRowsFromComponents(extracted.components);const mats=(extracted.materials||[]).map((m,i)=>({id:i+1,name:m.name||"",amount:m.amount||"",yardage:0,notes:m.notes||""}));const finalCover=coverUrl||fileInfo?.coverUrl||null;onSave({id:Date.now(),title:editTitle||"Imported Pattern",source:editDesigner||"PDF Import",cat:"Uncategorized",hook:editHook||"",weight:editWeight||"",notes:"",pattern_notes:extracted.pattern_notes||"",yardage:0,rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},materials:mats,rows,photo:finalCover||PILL[Math.floor(Math.random()*PILL.length)],cover_image_url:finalCover,source_file_url:fileInfo?.url||"",source_file_name:fileInfo?.name||"",source_file_type:fileInfo?.type||"",extracted_by_ai:true,components:extracted.components||[],assembly_notes:extracted.assembly_notes||"",difficulty:extracted.difficulty||"",abbreviations_map:extracted.abbreviations_map||{},suggested_resources:extracted.suggested_resources||[],validation_flags:validationFlags.length>0?validationFlags:null,validation_report:isPro&&validationReport?{...validationReport,flaggedRows:(validationReport.checks||[]).filter(ch=>ch.status==="fail"||ch.status==="warning"||ch.status==="warn").map(ch=>({rowNumber:extractFirstRowNumber(ch.detail),status:ch.status==="warn"?"warning":ch.status})).filter(f=>f.rowNumber!=null).filter((f,idx,arr)=>arr.findIndex(x=>x.rowNumber===f.rowNumber)===idx)}:null,_reviewRowNumber:rowNum});}} style={{flex:1,background:"#9B7EC8",color:"#fff",border:"none",borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)",minHeight:44}}>Review Issue →</button></div>;})()}
+            {(()=>{const checks=validationReport.checks||[];const hasIssues=checks.some(c=>c.status==="fail"||c.status==="warning"||c.status==="warn");if(!hasIssues) return <button onClick={()=>{setShowFullReport(false);handleSave();}} style={{marginTop:14,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Import Now</button>;const firstIssue=checks.find(c=>c.status==="fail"||c.status==="warning"||c.status==="warn");const rowNum=firstIssue?extractFirstRowNumber(firstIssue.detail):null;return <div style={{marginTop:14,display:"flex",gap:10}}><button onClick={()=>{setShowFullReport(false);handleSave();}} style={{flex:1,background:"#fff",color:T.terra,border:`1.5px solid ${T.terra}`,borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",minHeight:44}}>Import Now</button><button onClick={()=>{setShowFullReport(false);const rows=buildRowsFromComponents(extracted.components);const mats=(extracted.materials||[]).map((m,i)=>({id:i+1,name:m.name||"",amount:m.amount||"",yardage:0,notes:m.notes||""}));const finalCover=coverUrl||fileInfo?.coverUrl||null;onSave({id:Date.now(),title:editTitle||"Imported Pattern",source:editDesigner||"PDF Import",cat:"Uncategorized",hook:editHook||"",weight:editWeight||"",notes:"",pattern_notes:extracted.pattern_notes||"",yardage:0,rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},materials:mats,rows,photo:finalCover||PILL[Math.floor(Math.random()*PILL.length)],cover_image_url:finalCover,source_file_url:fileInfo?.url||"",source_file_name:fileInfo?.name||"",source_file_type:fileInfo?.type||"",extracted_by_ai:true,components:extracted.components||[],assembly_notes:extracted.assembly_notes||"",difficulty:extracted.difficulty||"",abbreviations_map:extracted.abbreviations_map||{},suggested_resources:extracted.suggested_resources||[],validation_flags:validationFlags.length>0?validationFlags:null,validation_report:isPro&&validationReport?{...validationReport,flaggedRows:(validationReport.checks||[]).filter(ch=>ch.status==="fail"||ch.status==="warning"||ch.status==="warn").map(ch=>({rowNumber:extractFirstRowNumber(ch.detail),status:ch.status==="warn"?"warning":ch.status})).filter(f=>f.rowNumber!=null).filter((f,idx,arr)=>arr.findIndex(x=>x.rowNumber===f.rowNumber)===idx)}:null,_reviewRowNumber:rowNum});}} style={{flex:1,background:"#7B6AD4",color:"#fff",border:"none",borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",minHeight:44}}>Review Issue →</button></div>;})()}
           </div>
         </div>
       )}
       {/* Section spacing */}
       <div style={{height:20}}/>
       {/* Accept/Save — full width terracotta */}
-      <button onClick={handleSave} style={{width:"100%",background:`linear-gradient(135deg,${T.terra},#7B5FB5)`,color:"#fff",border:"none",borderRadius:99,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 8px 28px rgba(155,126,200,.5)",marginBottom:8}}>Looks good — save pattern</button>
+      <button onClick={handleSave} style={{width:"100%",background:`linear-gradient(135deg,${T.terra},#7B5FB5)`,color:"#fff",border:"none",borderRadius:99,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 8px 28px rgba(123,106,212,.5)",marginBottom:8}}>Looks good — save pattern</button>
       <button onClick={()=>{setStage("pick");setProgress(0);setExtracted(null);}} style={{width:"100%",background:"transparent",color:T.ink3,border:"none",borderRadius:99,padding:"10px",fontSize:13,cursor:"pointer"}}>Try a different file</button>
     </div>
   );
@@ -1598,14 +1598,14 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
     <>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
         {METHODS.filter(m=>m.key!=="snap").map(m=>(
-          <div key={m.key} onClick={()=>setMethod(m.key)} style={{background:T.card,border:`1.5px solid ${T.border}`,borderRadius:16,padding:20,cursor:"pointer",transition:"all .15s",boxShadow:T.shadow}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(155,126,200,.12)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=T.shadow;}}>
+          <div key={m.key} onClick={()=>setMethod(m.key)} style={{background:T.card,border:`1.5px solid ${T.border}`,borderRadius:16,padding:20,cursor:"pointer",transition:"all .15s",boxShadow:T.shadow}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(123,106,212,.12)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=T.shadow;}}>
             <div style={{fontSize:32,marginBottom:10}}>{m.icon}</div>
             <div style={{fontSize:15,fontWeight:600,color:T.ink,marginBottom:4}}>{m.label==="Manual Entry"?"Write it yourself":m.label==="Smart Import"?"Paste a link":m.label==="PDF / Document"?"Upload a file":"Explore free patterns"}</div>
             <div style={{fontSize:12,color:T.ink3,lineHeight:1.5}}>{m.sub}</div>
           </div>
         ))}
       </div>
-      <div style={{background:"linear-gradient(135deg,#9B7EC8 0%,#8B3A2C 100%)",borderRadius:16,padding:20,cursor:"not-allowed",position:"relative",overflow:"hidden",opacity:.4}}>
+      <div style={{background:"linear-gradient(135deg,#7B6AD4 0%,#8B3A2C 100%)",borderRadius:16,padding:20,cursor:"not-allowed",position:"relative",overflow:"hidden",opacity:.4}}>
         <div style={{position:"absolute",top:10,right:12,background:"rgba(255,255,255,.25)",borderRadius:99,padding:"3px 10px",fontSize:10,fontWeight:700,color:"#fff"}}>Soon</div>
         <div style={{fontSize:32,marginBottom:8}}>✨</div>
         <div style={{fontSize:17,fontWeight:700,color:"#fff",marginBottom:4}}>Snap & Stitch — Point. Click. Stitch.</div>

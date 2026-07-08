@@ -77,7 +77,7 @@ const extractTextFromPDF = async (file) => {
   });
 };
 
-const BADGE = { valid: { color: "#5B9B6B", bg: T.sageLt, emoji: "\u2705", label: "Pattern Looks Good" }, review: { color: "#C9A84C", bg: "#FFF8EC", emoji: "\u26A0\uFE0F", label: "Review Suggested" }, issues: { color: "#C0544A", bg: "#FFF0EE", emoji: "\u274C", label: "Issues Found" } };
+const BADGE = { valid: { color: "#1E8A63", bg: T.sageLt, emoji: "\u2705", label: "Pattern Looks Good" }, review: { color: "#C9A84C", bg: "#FFF8EC", emoji: "\u26A0\uFE0F", label: "Review Suggested" }, issues: { color: "#C0544A", bg: "#FFF0EE", emoji: "\u274C", label: "Issues Found" } };
 const badgeForScore = (score) => score >= 80 ? BADGE.valid : score >= 60 ? BADGE.review : BADGE.issues;
 const CHECK_ICON = { pass: "\u2705", warn: "\u26A0\uFE0F", warning: "\u26A0\uFE0F", fail: "\u274C" };
 const displayScore = (report) => {
@@ -86,7 +86,7 @@ const displayScore = (report) => {
   return allPass ? 100 : report.score;
 };
 
-const CARD = {background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,padding:24,border:"1px solid rgba(255,255,255,0.6)",boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(155,126,200,0.13)"};
+const CARD = {background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,padding:24,border:"1px solid rgba(255,255,255,0.6)",boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)"};
 const LABEL = {fontSize:11,fontWeight:600,color:T.ink2,textTransform:"uppercase",letterSpacing:".05em",marginBottom:6};
 
 const extractFirstRowNumber = (text) => {
@@ -174,8 +174,8 @@ const StitchCheck = ({ onNavigateToRow, gateAction } = {}) => {
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 14, fontWeight: 600, color: isFail ? "#C0544A" : isWarning ? "#C9A84C" : T.ink, marginBottom: 4 }}>{sentenceCase(c.label)}</div>
             <div style={{ fontSize: 12, color: T.ink2, lineHeight: 1.7 }}>{c.detail}</div>
-            {isWarning && <div style={{ fontSize: 11, color: "#C9A84C", fontWeight: 600, fontFamily: "'Inter', sans-serif", marginTop: 6 }}>Bev couldn't verify this — review manually</div>}
-            {isActionable && <div style={{ fontSize: 11, color: "#9B7EC8", fontWeight: 600, fontFamily: "'Inter', sans-serif", marginTop: 6 }}>→ View in rows</div>}
+            {isWarning && <div style={{ fontSize: 11, color: "#C9A84C", fontWeight: 600, fontFamily: "'Nunito', sans-serif", marginTop: 6 }}>Bev couldn't verify this — review manually</div>}
+            {isActionable && <div style={{ fontSize: 11, color: "#7B6AD4", fontWeight: 600, fontFamily: "'Nunito', sans-serif", marginTop: 6 }}>→ View in rows</div>}
           </div>
         </div>
       );
@@ -202,8 +202,8 @@ const StitchCheck = ({ onNavigateToRow, gateAction } = {}) => {
           {/* Divider */}
           {advisoryChecks.length > 0 && (
             <>
-              <div style={{ borderTop: "0.5px solid #EDE4F7", margin: "16px 0" }} />
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#9B7EC8", fontFamily: "'Inter', sans-serif", marginBottom: 12 }}>Advisory</div>
+              <div style={{ borderTop: "0.5px solid #ECE6F8", margin: "16px 0" }} />
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#7B6AD4", fontFamily: "'Nunito', sans-serif", marginBottom: 12 }}>Advisory</div>
               {advisoryChecks.map(c => renderCheck(c, 0.85))}
             </>
           )}
@@ -232,7 +232,7 @@ const StitchCheck = ({ onNavigateToRow, gateAction } = {}) => {
 
       {error && (
         <div style={{ ...CARD, background: "#FFF0EE", borderColor: "rgba(192,90,90,.2)", marginBottom: 20 }}>
-          <div style={{ fontSize: 13, color: "#C05A5A", fontWeight: 600, marginBottom: 4 }}>Something went wrong</div>
+          <div style={{ fontSize: 13, color: "#C2564A", fontWeight: 600, marginBottom: 4 }}>Something went wrong</div>
           <div style={{ fontSize: 12, color: T.ink2, lineHeight: 1.6 }}>{error}</div>
         </div>
       )}

@@ -28,7 +28,7 @@ const GLASS = {
   WebkitBackdropFilter: "blur(16px)",
   border: "1px solid rgba(255,255,255,0.45)",
   borderRadius: 16,
-  boxShadow: "0 4px 24px rgba(45,58,124,0.08)",
+  boxShadow: "0 4px 24px rgba(90,66,160,0.08)",
 };
 
 const PAGE = { maxWidth: 960, margin: "0 auto", padding: "24px 24px" };
@@ -121,7 +121,7 @@ export const CollectionsListView = ({ tier, onOpenDetail, onStartCreate, onOpenU
             fontSize: 14,
             fontWeight: 600,
             cursor: atCap ? "not-allowed" : "pointer",
-            boxShadow: atCap ? "none" : "0 4px 16px rgba(155,126,200,0.3)",
+            boxShadow: atCap ? "none" : "0 4px 16px rgba(123,106,212,0.3)",
           }}
         >+ New Collection</button>
       </div>
@@ -142,7 +142,7 @@ export const CollectionsListView = ({ tier, onOpenDetail, onStartCreate, onOpenU
           </div>
           <button
             onClick={handleNew}
-            style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "13px 26px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)" }}
+            style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "13px 26px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(123,106,212,0.3)" }}
           >Create a Collection</button>
         </div>
       ) : (
@@ -188,7 +188,7 @@ const CollectionCard = ({ c, onOpen }) => {
         ) : (
           <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 40, opacity: 0.4 }}>📚</div>
         )}
-        <div style={{ position: "absolute", top: 8, left: 8, background: isMkal ? T.terra : "rgba(45,58,124,0.85)", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+        <div style={{ position: "absolute", top: 8, left: 8, background: isMkal ? T.terra : "rgba(90,66,160,0.85)", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
           {isMkal ? "MKAL" : "Collection"}
         </div>
       </div>
@@ -421,7 +421,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
           single cover with the same blurred-backdrop + sharp-centered
           treatment so the visual language stays consistent. */}
       <div style={{ ...GLASS, marginBottom: 16, overflow: "hidden" }}>
-        <div style={{ position: "relative", height: 200, background: bannerImage ? "transparent" : "linear-gradient(135deg, #EDE4F7 0%, #F5F0FA 100%)", overflow: "hidden" }}>
+        <div style={{ position: "relative", height: 200, background: bannerImage ? "transparent" : "linear-gradient(135deg, #ECE6F8 0%, #F5F0FA 100%)", overflow: "hidden" }}>
           {bannerImage && (
             <>
               {/* Blurred backdrop fills the frame; sharp image sits centered on top. */}
@@ -433,7 +433,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
           <div style={{ position: "absolute", left: 20, right: 20, bottom: 16, zIndex: 3, display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
             <div style={{ minWidth: 0, flex: 1 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <span style={{ background: isMkal ? T.terra : "rgba(45,58,124,0.85)", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                <span style={{ background: isMkal ? T.terra : "rgba(90,66,160,0.85)", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}>
                   {isMkal ? "MKAL" : "General"}
                 </span>
                 <span style={{ fontSize: 11, color: "rgba(255,255,255,0.78)", fontFamily: T.sans }}>{countText}</span>
@@ -504,7 +504,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
           the right state (uploaded thumbnails, loading spinner, or locked
           nudge) based on tier and image availability. */}
       {patterns.length > 0 && (
-        <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 16, boxShadow: "0 4px 24px rgba(45,58,124,0.08)" }}>
+        <div style={{ borderRadius: 16, overflow: "hidden", marginBottom: 16, boxShadow: "0 4px 24px rgba(90,66,160,0.08)" }}>
           <ChartStripView
             images={chartImages}
             labelFor={chartLabelFor}
@@ -546,7 +546,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
         <div style={{ ...GLASS, padding: "32px 24px", textAlign: "center", marginBottom: 16 }}>
           <div style={{ fontFamily: T.serif, fontSize: 17, fontWeight: 700, color: T.ink, marginBottom: 8 }}>No {partsLabelPlural.toLowerCase()} yet</div>
           <div style={{ fontSize: 13, color: T.ink2, marginBottom: 16 }}>{isMkal ? `Import ${partLabel} 1 to get started.` : "Add the first pattern to this collection."}</div>
-          <button onClick={() => onAddPattern?.(collection)} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)" }}>{isMkal ? `Import ${partLabel} 1` : "Add a Pattern"}</button>
+          <button onClick={() => onAddPattern?.(collection)} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(123,106,212,0.3)" }}>{isMkal ? `Import ${partLabel} 1` : "Add a Pattern"}</button>
         </div>
       ) : isMkal ? (
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
@@ -591,7 +591,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
 
       <button
         onClick={() => onAddPattern?.(collection)}
-        style={{ width: "100%", background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "13px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(155,126,200,0.3)", marginBottom: 24 }}
+        style={{ width: "100%", background: T.terra, color: "#fff", border: "none", borderRadius: 12, padding: "13px", fontSize: 14, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(123,106,212,0.3)", marginBottom: 24 }}
       >{isMkal ? `Import Next ${partLabel}` : "Add a Pattern"}</button>
 
       <div style={{ textAlign: "center", paddingTop: 8 }}>
@@ -603,7 +603,7 @@ export const CollectionDetailView = ({ collection: initial, onBack, onOpenPatter
         // the only red surface is the Delete button itself (#C0544A — the
         // existing Danger color, no new salmons or terracottas).
         <div onClick={() => setConfirmDelete(false)} style={{ position: "fixed", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", fontFamily: T.sans }}>
-          <div onClick={e => e.stopPropagation()} className="fu" style={{ ...GLASS, padding: 24, width: "100%", maxWidth: 380, boxShadow: "0 20px 60px rgba(45,58,124,0.28)" }}>
+          <div onClick={e => e.stopPropagation()} className="fu" style={{ ...GLASS, padding: 24, width: "100%", maxWidth: 380, boxShadow: "0 20px 60px rgba(90,66,160,0.28)" }}>
             <div style={{ fontFamily: T.serif, fontSize: 18, fontWeight: 700, color: T.ink, marginBottom: 8 }}>Delete this collection?</div>
             <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.55, marginBottom: 20 }}>This permanently deletes the collection and all of its clues. This can't be undone.</div>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
@@ -643,7 +643,7 @@ const UnimportedClueSlot = ({ clueNumber, partLabel = "Clue", onImport }) => (
     onMouseEnter={e => { e.currentTarget.style.borderColor = T.terra; e.currentTarget.style.background = "rgba(243,239,248,0.85)"; }}
     onMouseLeave={e => { e.currentTarget.style.borderColor = "#D4C5ED"; e.currentTarget.style.background = "rgba(253,251,255,0.7)"; }}
   >
-    <div style={{ width: 56, height: 56, borderRadius: 10, background: "linear-gradient(135deg,#EDE4F7,#F5F0FA)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+    <div style={{ width: 56, height: 56, borderRadius: 10, background: "linear-gradient(135deg,#ECE6F8,#F5F0FA)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
       <img src="/bev_neutral.png" alt="" style={{ width: 48, height: 48, objectFit: "contain", opacity: 0.85 }} />
     </div>
     <div style={{ flex: 1, minWidth: 0 }}>

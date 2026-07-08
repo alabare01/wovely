@@ -22,13 +22,13 @@ const timeAgo = (dateStr) => {
 };
 
 // ─── DESIGN TOKENS ──────────────────────────────────────────────────────────
-const PF = "'Playfair Display',Georgia,serif";
-const INTER = "Inter,sans-serif";
-const NAVY = "#2D3A7C";
-const INK = "#2D2D4E";
-const ACCENT = "#9B7EC8";
-const MUTED = "#6B6B8A";
-const PILL_BG = "#F3EFF8";
+const PF = "'Fredoka',Georgia,serif";
+const INTER = "Nunito,sans-serif";
+const NAVY = "#2E2748";
+const INK = "#2E2748";
+const ACCENT = "#7B6AD4";
+const MUTED = "#726A92";
+const PILL_BG = "#F2EEFB";
 
 // Glass card tokens
 const GLASS = {
@@ -36,7 +36,7 @@ const GLASS = {
   blur: "blur(16px)",
   radius: 20,
   border: "1px solid rgba(255,255,255,0.6)",
-  shadow: "0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(155,126,200,0.13)",
+  shadow: "0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)",
 };
 const GLASS_LIGHT = { ...GLASS, bg: "rgba(255,255,255,0.75)", blur: "blur(12px)" };
 
@@ -48,9 +48,9 @@ const RenameModal = ({pattern,onSave,onCancel}) => {
       <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.5)",backdropFilter:"blur(3px)"}}/>
       <div onClick={e=>e.stopPropagation()} style={{position:"relative",background:"#fff",borderRadius:16,padding:"24px 22px 20px",width:"100%",maxWidth:360,boxShadow:"0 12px 40px rgba(0,0,0,.2)"}}>
         <div style={{fontFamily:PF,fontSize:18,fontWeight:700,color:INK,marginBottom:14}}>Rename pattern</div>
-        <input value={val} onChange={e=>setVal(e.target.value)} autoFocus style={{width:"100%",padding:"10px 14px",border:"1.5px solid #EDE4F7",borderRadius:10,fontSize:14,fontFamily:INTER,color:INK,outline:"none",boxSizing:"border-box",marginBottom:16}} onFocus={e=>e.target.style.borderColor=ACCENT} onBlur={e=>e.target.style.borderColor="#EDE4F7"}/>
+        <input value={val} onChange={e=>setVal(e.target.value)} autoFocus style={{width:"100%",padding:"10px 14px",border:"1.5px solid #ECE6F8",borderRadius:10,fontSize:14,fontFamily:INTER,color:INK,outline:"none",boxSizing:"border-box",marginBottom:16}} onFocus={e=>e.target.style.borderColor=ACCENT} onBlur={e=>e.target.style.borderColor="#ECE6F8"}/>
         <div style={{display:"flex",gap:10,justifyContent:"flex-end"}}>
-          <button onClick={onCancel} style={{background:"none",border:"1px solid #EDE4F7",borderRadius:10,padding:"8px 18px",fontSize:13,fontWeight:600,color:MUTED,cursor:"pointer"}}>Cancel</button>
+          <button onClick={onCancel} style={{background:"none",border:"1px solid #ECE6F8",borderRadius:10,padding:"8px 18px",fontSize:13,fontWeight:600,color:MUTED,cursor:"pointer"}}>Cancel</button>
           <button onClick={()=>onSave(val.trim())} disabled={!val.trim()} style={{background:val.trim()?ACCENT:"#D5CBE8",border:"none",borderRadius:10,padding:"8px 18px",fontSize:13,fontWeight:600,color:"#fff",cursor:val.trim()?"pointer":"not-allowed"}}>Save</button>
         </div>
       </div>
@@ -68,21 +68,21 @@ const PatternCard = ({p,onClick,onPark,onUnpark,onDelete,onCoverChange,onRename,
   const isPlaceholder=!p.cover_image_url&&PILL.includes(p.photo);
   const hasImage = !!cardPhoto && !isPlaceholder;
   return (
-    <div className="card fu" onClick={onClick} style={{background:GLASS.bg,backdropFilter:GLASS.blur,WebkitBackdropFilter:GLASS.blur,borderRadius:GLASS.radius,overflow:"hidden",border:GLASS.border,cursor:"pointer",animationDelay:delay+"s",position:"relative",boxShadow:GLASS.shadow,transition:"transform 0.15s ease, box-shadow 0.15s ease"}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(155,126,200,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
+    <div className="card fu" onClick={onClick} style={{background:GLASS.bg,backdropFilter:GLASS.blur,WebkitBackdropFilter:GLASS.blur,borderRadius:GLASS.radius,overflow:"hidden",border:GLASS.border,cursor:"pointer",animationDelay:delay+"s",position:"relative",boxShadow:GLASS.shadow,transition:"transform 0.15s ease, box-shadow 0.15s ease"}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(123,106,212,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
       {renaming&&<RenameModal pattern={p} onCancel={()=>setRenaming(false)} onSave={newTitle=>{setRenaming(false);onRename&&onRename(p,newTitle);}}/>}
       {(onPark||onDelete)&&<div style={{position:"absolute",top:8,right:8,zIndex:5}}>
         <button onClick={e=>{e.stopPropagation();setMenuOpen(!menuOpen);}} style={{background:"rgba(0,0,0,.45)",backdropFilter:"blur(4px)",border:"none",borderRadius:99,width:28,height:28,cursor:"pointer",color:"#fff",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>⋮</button>
         {menuOpen&&<div onClick={e=>e.stopPropagation()} style={{position:"absolute",right:0,top:32,background:"rgba(255,255,255,0.95)",backdropFilter:"blur(12px)",border:GLASS.border,borderRadius:10,boxShadow:GLASS.shadow,zIndex:10,minWidth:150,overflow:"hidden"}}>
-          {onRename&&<div onClick={()=>{setMenuOpen(false);setRenaming(true);}} style={{padding:"10px 14px",fontSize:13,color:T.ink,cursor:"pointer",borderBottom:"1px solid #EDE4F7"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Rename pattern</div>}
-          {onCoverChange&&<div onClick={()=>{setMenuOpen(false);onCoverChange(p);}} style={{padding:"10px 14px",fontSize:13,color:T.ink,cursor:"pointer",borderBottom:"1px solid #EDE4F7"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Change cover image</div>}
+          {onRename&&<div onClick={()=>{setMenuOpen(false);setRenaming(true);}} style={{padding:"10px 14px",fontSize:13,color:T.ink,cursor:"pointer",borderBottom:"1px solid #ECE6F8"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Rename pattern</div>}
+          {onCoverChange&&<div onClick={()=>{setMenuOpen(false);onCoverChange(p);}} style={{padding:"10px 14px",fontSize:13,color:T.ink,cursor:"pointer",borderBottom:"1px solid #ECE6F8"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Change cover image</div>}
           {isParked
-            ?<div onClick={()=>{setMenuOpen(false);onUnpark&&onUnpark(p);}} style={{padding:"10px 14px",fontSize:13,color:T.ink,cursor:"pointer",borderBottom:"1px solid #EDE4F7"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Unpark</div>
-            :<div onClick={()=>{setMenuOpen(false);onPark&&onPark(p);}} style={{padding:"10px 14px",fontSize:13,color:T.ink,cursor:"pointer",borderBottom:"1px solid #EDE4F7"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Park for later</div>
+            ?<div onClick={()=>{setMenuOpen(false);onUnpark&&onUnpark(p);}} style={{padding:"10px 14px",fontSize:13,color:T.ink,cursor:"pointer",borderBottom:"1px solid #ECE6F8"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Unpark</div>
+            :<div onClick={()=>{setMenuOpen(false);onPark&&onPark(p);}} style={{padding:"10px 14px",fontSize:13,color:T.ink,cursor:"pointer",borderBottom:"1px solid #ECE6F8"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Park for later</div>
           }
-          <div onClick={()=>{setMenuOpen(false);onDelete&&onDelete(p);}} style={{padding:"10px 14px",fontSize:13,color:"#C05A5A",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Delete pattern</div>
+          <div onClick={()=>{setMenuOpen(false);onDelete&&onDelete(p);}} style={{padding:"10px 14px",fontSize:13,color:"#C2564A",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Delete pattern</div>
         </div>}
       </div>}
-      <div style={{position:"relative",height:200,overflow:"hidden",borderRadius:`${GLASS.radius}px ${GLASS.radius}px 0 0`,background:"linear-gradient(135deg, #EDE4F7 0%, #F5F0FA 100%)"}}>
+      <div style={{position:"relative",height:200,overflow:"hidden",borderRadius:`${GLASS.radius}px ${GLASS.radius}px 0 0`,background:"linear-gradient(135deg, #ECE6F8 0%, #F5F0FA 100%)"}}>
         {hasImage
           ? <Photo src={cardPhoto} alt={p.title} style={{width:"100%",height:"100%",objectFit:"contain",objectPosition:"center",display:"block"}}/>
           : <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -95,7 +95,7 @@ const PatternCard = ({p,onClick,onPark,onUnpark,onDelete,onCoverChange,onRename,
         :done>0&&done<100?<><div style={{position:"absolute",top:10,right:10,background:"rgba(28,23,20,.65)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:600,padding:"3px 8px",borderRadius:99}}>{done}%</div><div style={{position:"absolute",bottom:0,left:0,right:0}}><Bar val={done} color="rgba(255,255,255,.8)" h={3} bg="transparent"/></div></>
         :null}
         {!isParked&&!p.isStarter&&done===0&&!p.started&&p.rows&&p.rows.length>0&&<div style={{position:"absolute",top:10,right:10,background:"rgba(92,122,94,.85)",backdropFilter:"blur(4px)",color:"#fff",fontSize:9,fontWeight:600,padding:"3px 8px",borderRadius:99}}>Ready to build</div>}
-        {!p.isStarter&&p.snapConfidence&&<div style={{position:"absolute",top:10,left:10,background:"rgba(155,126,200,.85)",backdropFilter:"blur(4px)",color:"#fff",fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:99}}>✨ {p.snapConfidence}%</div>}
+        {!p.isStarter&&p.snapConfidence&&<div style={{position:"absolute",top:10,left:10,background:"rgba(123,106,212,.85)",backdropFilter:"blur(4px)",color:"#fff",fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:99}}>✨ {p.snapConfidence}%</div>}
         {isPlaceholder&&onCoverChange&&<button onClick={e=>{e.stopPropagation();onCoverChange(p);}} style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",background:"rgba(255,255,255,.15)",backdropFilter:"blur(4px)",border:`1.5px solid ${T.terra}`,borderRadius:10,padding:"6px 14px",fontSize:11,fontWeight:600,color:"#fff",cursor:"pointer",whiteSpace:"nowrap"}}>Set cover image</button>}
       </div>
       <div style={{padding:"14px 16px 16px"}}>
@@ -124,7 +124,7 @@ const EmptySlotCard = ({onClick,slotIndex=0}) => (
   </div>
 );
 
-// Playfair italic accent span helper
+// Fredoka italic accent span helper
 const Em = ({ children }) => <span style={{ fontFamily: PF, fontStyle: "italic", color: ACCENT }}>{children}</span>;
 
 // Info tooltip — hover on desktop, tap toggle on mobile
@@ -138,11 +138,11 @@ const InfoTooltip = ({ text, alignRight }) => {
   }, [visible]);
   return (
     <span style={{ position: "relative", display: "inline-flex", alignItems: "center", marginLeft: 8 }}>
-      <span onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} onTouchStart={e => { e.stopPropagation(); setVisible(v => !v); }} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: "50%", background: "rgba(155,126,200,0.15)", color: ACCENT, fontSize: 10, fontFamily: INTER, fontWeight: 700, cursor: "default", userSelect: "none", flexShrink: 0, lineHeight: 1 }}>i</span>
+      <span onMouseEnter={() => setVisible(true)} onMouseLeave={() => setVisible(false)} onTouchStart={e => { e.stopPropagation(); setVisible(v => !v); }} style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: "50%", background: "rgba(123,106,212,0.15)", color: ACCENT, fontSize: 10, fontFamily: INTER, fontWeight: 700, cursor: "default", userSelect: "none", flexShrink: 0, lineHeight: 1 }}>i</span>
       {visible && (
-        <span style={{ position: "absolute", bottom: "calc(100% + 8px)", background: "rgba(45,58,124,0.88)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", color: "#fff", fontFamily: INTER, fontSize: 12, fontWeight: 400, lineHeight: 1.5, padding: "8px 12px", borderRadius: 10, maxWidth: 260, minWidth: 180, whiteSpace: "normal", wordBreak: "break-word", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", zIndex: 100, pointerEvents: "none", ...(alignRight ? { right: 0, left: "auto", transform: "none" } : { left: "50%", transform: "translateX(-50%)" }) }}>
+        <span style={{ position: "absolute", bottom: "calc(100% + 8px)", background: "rgba(90,66,160,0.88)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", color: "#fff", fontFamily: INTER, fontSize: 12, fontWeight: 400, lineHeight: 1.5, padding: "8px 12px", borderRadius: 10, maxWidth: 260, minWidth: 180, whiteSpace: "normal", wordBreak: "break-word", boxShadow: "0 4px 16px rgba(0,0,0,0.15)", zIndex: 100, pointerEvents: "none", ...(alignRight ? { right: 0, left: "auto", transform: "none" } : { left: "50%", transform: "translateX(-50%)" }) }}>
           {text}
-          <span style={{ position: "absolute", top: "100%", borderWidth: 5, borderStyle: "solid", borderColor: "rgba(45,58,124,0.88) transparent transparent transparent", width: 0, height: 0, ...(alignRight ? { right: 12, left: "auto", transform: "none" } : { left: "50%", transform: "translateX(-50%)" }) }} />
+          <span style={{ position: "absolute", top: "100%", borderWidth: 5, borderStyle: "solid", borderColor: "rgba(90,66,160,0.88) transparent transparent transparent", width: 0, height: 0, ...(alignRight ? { right: 12, left: "auto", transform: "none" } : { left: "50%", transform: "translateX(-50%)" }) }} />
         </span>
       )}
     </span>
@@ -277,7 +277,7 @@ const BevCorner = ({ patterns, isMobile, isPro }) => {
     }}>
       <img src="/bev_neutral.png" alt="Bev" style={{
         width: isMobile ? 68 : 88, height: "auto", flexShrink: 0,
-        filter: "drop-shadow(0 6px 20px rgba(155,126,200,0.4))",
+        filter: "drop-shadow(0 6px 20px rgba(123,106,212,0.4))",
       }} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <p style={{ fontFamily: INTER, fontSize: 15, color: INK, lineHeight: 1.6, margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word", minHeight: "1.6em" }}>
@@ -387,7 +387,7 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
             return (
               <>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <span style={{ background: heroCollection.collection_type === "mkal" ? ACCENT : "rgba(45,58,124,0.85)", color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 99, letterSpacing: "0.06em", textTransform: "uppercase" }}>
+                  <span style={{ background: heroCollection.collection_type === "mkal" ? ACCENT : "rgba(90,66,160,0.85)", color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 99, letterSpacing: "0.06em", textTransform: "uppercase" }}>
                     {heroCollection.collection_type === "mkal" ? "MKAL" : "Collection"}
                   </span>
                   <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", minWidth: 0 }}>
@@ -406,7 +406,7 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
           </div>
           {totalRows > 0 && (
             <>
-              <div style={{ height: 6, background: "#EDE4F7", borderRadius: 3, overflow: "hidden", margin: "0 0 6px" }}>
+              <div style={{ height: 6, background: "#ECE6F8", borderRadius: 3, overflow: "hidden", margin: "0 0 6px" }}>
                 <div style={{ width: (doneRows / totalRows * 100) + "%", height: "100%", background: ACCENT, borderRadius: 3, transition: "width .3s" }} />
               </div>
               <div style={{ fontFamily: INTER, fontSize: 12, color: MUTED, marginBottom: 12 }}>{doneRows} of {totalRows} rows</div>
@@ -418,7 +418,7 @@ const OnTheHook = ({ inProgress, openDetail, onAddPattern, pct, catFallbackPhoto
             padding: "12px 20px", fontSize: 13, fontWeight: 600, cursor: "pointer",
             fontFamily: INTER, letterSpacing: "0.01em",
             transition: "transform 0.15s ease, box-shadow 0.15s ease",
-          }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 4px 16px rgba(155,126,200,0.35)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>Pick up where you left off →</button>
+          }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 4px 16px rgba(123,106,212,0.35)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>Pick up where you left off →</button>
           {/* "Also in progress" scroller dropped from above-the-fold —
               On the Hook stays compact here. Everything else in progress
               still lives in the library grid below and at /builds. */}
@@ -455,7 +455,7 @@ const BragShelf = ({ patterns, pct, isMobile }) => {
     { value: rowsTracked, label: "Rows Tracked" },
     { value: stitchCount, label: "Stitches Found" },
   ];
-  const skeleton = <div style={{ width: 40, height: 24, background: "#EDE4F7", borderRadius: 6, margin: "0 auto" }} />;
+  const skeleton = <div style={{ width: 40, height: 24, background: "#ECE6F8", borderRadius: 6, margin: "0 auto" }} />;
 
   // Always-horizontal compact stats row. Sits below On the Hook (left
   // column on desktop, second item on mobile) — it shouldn't compete
@@ -512,8 +512,8 @@ const CollectionPresenceRow = ({ c, parts, onOpen }) => {
       padding: "8px", cursor: "pointer", borderRadius: 10,
       minHeight: 48, boxSizing: "border-box",
       transition: "background .15s",
-    }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(155,126,200,0.08)"; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
-      <div style={{ width: 32, height: 32, borderRadius: 6, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #EDE4F7, #F5F0FA)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    }} onMouseEnter={e => { e.currentTarget.style.background = "rgba(123,106,212,0.08)"; }} onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+      <div style={{ width: 32, height: 32, borderRadius: 6, overflow: "hidden", flexShrink: 0, background: "linear-gradient(135deg, #ECE6F8, #F5F0FA)", display: "flex", alignItems: "center", justifyContent: "center" }}>
         {cover
           ? <img src={cover} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.5 }}><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
@@ -522,7 +522,7 @@ const CollectionPresenceRow = ({ c, parts, onOpen }) => {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontFamily: PF, fontSize: 13, fontWeight: 600, color: NAVY, lineHeight: 1.25, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.name}</div>
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 1 }}>
-          <span style={{ background: isMkal ? ACCENT : "rgba(45,58,124,0.85)", color: "#fff", fontSize: 8, fontWeight: 700, padding: "1px 6px", borderRadius: 99, letterSpacing: "0.06em", textTransform: "uppercase" }}>{isMkal ? "MKAL" : "General"}</span>
+          <span style={{ background: isMkal ? ACCENT : "rgba(90,66,160,0.85)", color: "#fff", fontSize: 8, fontWeight: 700, padding: "1px 6px", borderRadius: 99, letterSpacing: "0.06em", textTransform: "uppercase" }}>{isMkal ? "MKAL" : "General"}</span>
           <span style={{ fontFamily: INTER, fontSize: 11, color: MUTED, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{countText}</span>
         </div>
       </div>
@@ -629,7 +629,7 @@ const CraftServicesPanel = ({ tier, isAnonymous, collections = [], partsByCollec
           style={{
             background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
             padding: "10px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer",
-            fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
+            fontFamily: INTER, boxShadow: "0 4px 16px rgba(123,106,212,0.3)",
           }}
         >{locked ? "See plans" : "Start a Collection"}</button>
       </div>
@@ -651,7 +651,7 @@ const CraftServicesPanel = ({ tier, isAnonymous, collections = [], partsByCollec
           immediately. */}
       <div style={{
         flexShrink: 0,
-        background: "linear-gradient(135deg, #9B7EC8 0%, #7B5FB8 100%)",
+        background: "linear-gradient(135deg, #7B6AD4 0%, #7B5FB8 100%)",
         color: "#fff",
         padding: "10px 16px 12px",
         display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
@@ -734,7 +734,7 @@ const CollectionLibraryCard = ({c, parts, onOpen, onDelete, delay=0}) => {
       border: GLASS.border, cursor: "pointer", animationDelay: delay + "s",
       position: "relative", boxShadow: GLASS.shadow,
       transition: "transform 0.15s ease, box-shadow 0.15s ease",
-    }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(155,126,200,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
+    }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(123,106,212,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
       {/* Lavender top accent — the visual cue that this is a collection,
           not a single pattern. Subtle enough to not disrupt the grid. */}
       <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:`linear-gradient(90deg, ${ACCENT}, #B9A3DC, ${ACCENT})`,zIndex:5}}/>
@@ -745,12 +745,12 @@ const CollectionLibraryCard = ({c, parts, onOpen, onDelete, delay=0}) => {
         <button onClick={e=>{e.stopPropagation();setMenuOpen(!menuOpen);}} style={{background:"rgba(0,0,0,.45)",backdropFilter:"blur(4px)",border:"none",borderRadius:99,width:28,height:28,cursor:"pointer",color:"#fff",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>⋮</button>
         {menuOpen && (
           <div onClick={e=>e.stopPropagation()} style={{position:"absolute",right:0,top:32,background:"rgba(255,255,255,0.95)",backdropFilter:"blur(12px)",border:GLASS.border,borderRadius:10,boxShadow:GLASS.shadow,zIndex:10,minWidth:160,overflow:"hidden"}}>
-            <div onClick={()=>{setMenuOpen(false);onOpen();}} style={{padding:"10px 14px",fontSize:13,color:INK,cursor:"pointer",borderBottom:"1px solid #EDE4F7"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Edit collection</div>
+            <div onClick={()=>{setMenuOpen(false);onOpen();}} style={{padding:"10px 14px",fontSize:13,color:INK,cursor:"pointer",borderBottom:"1px solid #ECE6F8"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Edit collection</div>
             <div onClick={()=>{setMenuOpen(false);onDelete&&onDelete(c);}} style={{padding:"10px 14px",fontSize:13,color:"#C0544A",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Delete collection</div>
           </div>
         )}
       </div>
-      <div style={{position:"relative",height:200,overflow:"hidden",borderRadius:`${GLASS.radius}px ${GLASS.radius}px 0 0`,background:"linear-gradient(135deg, #EDE4F7 0%, #F5F0FA 100%)"}}>
+      <div style={{position:"relative",height:200,overflow:"hidden",borderRadius:`${GLASS.radius}px ${GLASS.radius}px 0 0`,background:"linear-gradient(135deg, #ECE6F8 0%, #F5F0FA 100%)"}}>
         {cover
           ? <img src={cover} alt={c.name} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
           : <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -760,7 +760,7 @@ const CollectionLibraryCard = ({c, parts, onOpen, onDelete, delay=0}) => {
               </svg>
             </div>
         }
-        <div style={{position:"absolute",top:10,left:10,background:isMkal?ACCENT:"rgba(45,58,124,0.85)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:600,padding:"3px 10px",borderRadius:20,letterSpacing:"0.06em",textTransform:"uppercase"}}>
+        <div style={{position:"absolute",top:10,left:10,background:isMkal?ACCENT:"rgba(90,66,160,0.85)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:600,padding:"3px 10px",borderRadius:20,letterSpacing:"0.06em",textTransform:"uppercase"}}>
           {isMkal ? "MKAL" : "General"}
         </div>
         {progress === 100 ? (
@@ -794,7 +794,7 @@ const StartCollectionPrompt = ({onStartCollection, isMobile}) => (
     transition: "border-color .15s, background .15s",
     marginBottom: 12,
   }} onMouseEnter={e=>{e.currentTarget.style.borderColor=ACCENT;e.currentTarget.style.background="rgba(243,239,248,0.9)";}} onMouseLeave={e=>{e.currentTarget.style.borderColor="#D4C5ED";e.currentTarget.style.background=GLASS.bg;}}>
-    <div style={{width:isMobile?44:52,height:isMobile?44:52,borderRadius:"50%",background:"linear-gradient(135deg, rgba(155,126,200,0.18), rgba(155,126,200,0.08))",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+    <div style={{width:isMobile?44:52,height:isMobile?44:52,borderRadius:"50%",background:"linear-gradient(135deg, rgba(123,106,212,0.18), rgba(123,106,212,0.08))",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
       <svg width={isMobile?22:26} height={isMobile?22:26} viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
         <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
@@ -808,7 +808,7 @@ const StartCollectionPrompt = ({onStartCollection, isMobile}) => (
       background: ACCENT, color: "#fff", border: "none", borderRadius: 12,
       padding: isMobile ? "8px 14px" : "9px 18px", fontSize: 13, fontWeight: 600,
       cursor: "pointer", fontFamily: INTER, flexShrink: 0,
-      boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
+      boxShadow: "0 4px 16px rgba(123,106,212,0.3)",
     }}>Start</button>
   </div>
 );
@@ -835,8 +835,8 @@ const CollectionTile = ({c, onOpen, isMobile}) => {
       borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
       overflow: "hidden", cursor: "pointer",
       transition: "transform 0.15s ease, box-shadow 0.15s ease",
-    }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(155,126,200,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
-      <div style={{height: 140, position: "relative", overflow: "hidden", borderRadius: `${GLASS.radius}px ${GLASS.radius}px 0 0`, background: "linear-gradient(135deg,#EDE4F7 0%,#F5F0FA 100%)"}}>
+    }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(123,106,212,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
+      <div style={{height: 140, position: "relative", overflow: "hidden", borderRadius: `${GLASS.radius}px ${GLASS.radius}px 0 0`, background: "linear-gradient(135deg,#ECE6F8 0%,#F5F0FA 100%)"}}>
         {cover
           ? <img src={cover} alt={c.name} style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
           : <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -846,7 +846,7 @@ const CollectionTile = ({c, onOpen, isMobile}) => {
               </svg>
             </div>
         }
-        <div style={{position:"absolute",top:10,left:10,background:"rgba(155,126,200,0.92)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:600,padding:"3px 10px",borderRadius:20,letterSpacing:"0.06em",textTransform:"uppercase"}}>
+        <div style={{position:"absolute",top:10,left:10,background:"rgba(123,106,212,0.92)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:600,padding:"3px 10px",borderRadius:20,letterSpacing:"0.06em",textTransform:"uppercase"}}>
           {isMkal ? "MKAL" : "General"}
         </div>
       </div>
@@ -897,8 +897,8 @@ const CollectionsSection = ({tier, isAnonymous, onOpenCollection, onCreateCollec
           padding: isMobile ? 20 : "28px 32px", cursor: "pointer",
           display: "flex", alignItems: "center", gap: isMobile ? 16 : 24,
           transition: "transform 0.15s ease, box-shadow 0.15s ease",
-        }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(155,126,200,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
-          <div style={{width: isMobile?52:64, height: isMobile?52:64, borderRadius:"50%", background:"linear-gradient(135deg, rgba(155,126,200,0.18), rgba(155,126,200,0.08))", display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+        }} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(123,106,212,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
+          <div style={{width: isMobile?52:64, height: isMobile?52:64, borderRadius:"50%", background:"linear-gradient(135deg, rgba(123,106,212,0.18), rgba(123,106,212,0.08))", display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
             <LockIcon size={isMobile?24:28} color={ACCENT} />
           </div>
           <div style={{flex:1, minWidth:0}}>
@@ -908,7 +908,7 @@ const CollectionsSection = ({tier, isAnonymous, onOpenCollection, onCreateCollec
               background: ACCENT, color: "#fff", border: "none", borderRadius: 14,
               padding: isMobile ? "10px 20px" : "11px 24px", fontSize: 13, fontWeight: 600,
               cursor: "pointer", fontFamily: INTER,
-              boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
+              boxShadow:"0 4px 16px rgba(123,106,212,0.3)",
             }}>See plans</button>
           </div>
         </div>
@@ -936,7 +936,7 @@ const CollectionsSection = ({tier, isAnonymous, onOpenCollection, onCreateCollec
           <button onClick={onCreateCollection} style={{
             background: ACCENT, color: "#fff", border: "none", borderRadius: 14,
             padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer",
-            fontFamily: INTER, boxShadow: "0 4px 16px rgba(155,126,200,0.3)",
+            fontFamily: INTER, boxShadow: "0 4px 16px rgba(123,106,212,0.3)",
           }}>Create a Collection</button>
         </div>
       ) : (
@@ -1089,8 +1089,8 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
               <div>{!isPro&&<div style={{fontSize:12,color:MUTED,fontWeight:500,fontFamily:INTER}}>{tier.userCount} of {TIER_CONFIG.free.patternCap} free slots used{tier.userCount===0?" · add your first":tier.atCap?" · upgrade for unlimited":""}</div>}</div>
               <div style={{display:"flex",gap:4}}>
-                <button onClick={()=>setViewMode("grid")} style={{background:viewMode==="grid"?PILL_BG:"transparent",border:`1px solid ${viewMode==="grid"?"#EDE4F7":"transparent"}`,borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:12,color:MUTED,lineHeight:1}}>▦</button>
-                <button onClick={()=>setViewMode("list")} style={{background:viewMode==="list"?PILL_BG:"transparent",border:`1px solid ${viewMode==="list"?"#EDE4F7":"transparent"}`,borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:12,color:MUTED,lineHeight:1}}>☰</button>
+                <button onClick={()=>setViewMode("grid")} style={{background:viewMode==="grid"?PILL_BG:"transparent",border:`1px solid ${viewMode==="grid"?"#ECE6F8":"transparent"}`,borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:12,color:MUTED,lineHeight:1}}>▦</button>
+                <button onClick={()=>setViewMode("list")} style={{background:viewMode==="list"?PILL_BG:"transparent",border:`1px solid ${viewMode==="list"?"#ECE6F8":"transparent"}`,borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:12,color:MUTED,lineHeight:1}}>☰</button>
               </div>
             </div>
             {/* Empty-state prompt moved out of the library grid — it now
@@ -1153,7 +1153,7 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
         // Library-grid delete confirmation. Glass card + #C0544A button —
         // matches the style guide and the in-detail-view confirmation.
         <div onClick={() => setDeleteTargetCollection(null)} style={{ position: "fixed", inset: 0, zIndex: 600, display: "flex", alignItems: "center", justifyContent: "center", padding: 20, background: "rgba(28,23,20,0.55)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)", fontFamily: INTER }}>
-          <div onClick={e => e.stopPropagation()} className="fu" style={{ background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur, border: GLASS.border, borderRadius: GLASS.radius, boxShadow: "0 20px 60px rgba(45,58,124,0.28)", padding: 24, width: "100%", maxWidth: 380 }}>
+          <div onClick={e => e.stopPropagation()} className="fu" style={{ background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur, border: GLASS.border, borderRadius: GLASS.radius, boxShadow: "0 20px 60px rgba(90,66,160,0.28)", padding: 24, width: "100%", maxWidth: 380 }}>
             <div style={{ fontFamily: PF, fontSize: 18, fontWeight: 700, color: INK, marginBottom: 8 }}>Delete this collection?</div>
             <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.55, marginBottom: 20 }}>This permanently deletes the collection and all of its clues. This can't be undone.</div>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>

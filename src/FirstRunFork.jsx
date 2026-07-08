@@ -7,14 +7,14 @@ import { useState } from "react";
 // the same client-side extraction as an upload, and enqueues a real import
 // job — the floating ImportPill walks the real worker phases from there.
 // One hardcoded starter (the STARTER constant in App.jsx) — no table reads.
-// Styling follows the guide: lavender, navy, Playfair headings, glass cards.
+// Styling follows Design System 2b: lavender, ink, Fredoka headings.
 
-const LAV = "#9B7EC8";
-const NAVY = "#2D3A7C";
-const INK = "#2D2D4E";
-const MUTED = "#6B6B8A";
-const PF = "'Playfair Display',Georgia,serif";
-const INTER = "Inter,sans-serif";
+const LAV = "#7B6AD4";
+const NAVY = "#2E2748";
+const INK = "#2E2748";
+const MUTED = "#726A92";
+const PF = "'Fredoka',Georgia,serif";
+const INTER = "Nunito,sans-serif";
 
 const GLASS = {
   background: "rgba(255,255,255,0.82)",
@@ -22,7 +22,7 @@ const GLASS = {
   WebkitBackdropFilter: "blur(16px)",
   border: "1px solid rgba(255,255,255,0.6)",
   borderRadius: 20,
-  boxShadow: "0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(155,126,200,0.13)",
+  boxShadow: "0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)",
 };
 
 const ForkCard = ({ title, body, cta, onClick, primary }) => {
@@ -42,8 +42,8 @@ const ForkCard = ({ title, body, cta, onClick, primary }) => {
         gap: 10,
         transition: "transform .16s ease, box-shadow .16s ease, border-color .16s ease",
         transform: hover ? "translateY(-3px)" : "none",
-        boxShadow: hover ? "0 12px 36px rgba(155,126,200,0.22)" : GLASS.boxShadow,
-        borderColor: hover ? "rgba(155,126,200,0.55)" : GLASS.border,
+        boxShadow: hover ? "0 12px 36px rgba(123,106,212,0.22)" : GLASS.boxShadow,
+        borderColor: hover ? "rgba(123,106,212,0.55)" : GLASS.border,
         minHeight: 188,
       }}
     >
@@ -64,9 +64,9 @@ const StarterTile = ({ starter, busy, onPick }) => {
       disabled={busy}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ ...GLASS, padding: 0, overflow: "hidden", cursor: busy ? "default" : "pointer", textAlign: "left", display: "flex", flexDirection: "column", transition: "transform .16s ease, box-shadow .16s ease", transform: hover && !busy ? "translateY(-3px)" : "none", boxShadow: hover && !busy ? "0 12px 36px rgba(155,126,200,0.22)" : GLASS.boxShadow, opacity: busy ? 0.7 : 1 }}
+      style={{ ...GLASS, padding: 0, overflow: "hidden", cursor: busy ? "default" : "pointer", textAlign: "left", display: "flex", flexDirection: "column", transition: "transform .16s ease, box-shadow .16s ease", transform: hover && !busy ? "translateY(-3px)" : "none", boxShadow: hover && !busy ? "0 12px 36px rgba(123,106,212,0.22)" : GLASS.boxShadow, opacity: busy ? 0.7 : 1 }}
     >
-      <div style={{ height: 200, background: "linear-gradient(135deg,#EDE4F7 0%,#F5F0FA 100%)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+      <div style={{ height: 200, background: "linear-gradient(135deg,#ECE6F8 0%,#F5F0FA 100%)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
         {cover
           ? <img src={cover} alt={title} style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
           : <span style={{ fontFamily: PF, fontSize: 40, color: LAV, opacity: 0.5 }}>{(title || "?")[0]}</span>}

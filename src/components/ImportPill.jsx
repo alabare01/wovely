@@ -27,9 +27,9 @@ const SESSION_KEY = "wovely_active_import_job";
 const PROMINENT_DURATION_MS = 5000;
 
 const PROMINENT_STYLE = {
-  background: "linear-gradient(135deg, rgba(155,126,200,0.95), rgba(216,234,216,0.95))",
+  background: "linear-gradient(135deg, rgba(123,106,212,0.95), rgba(216,234,216,0.95))",
   border: `1px solid ${T.terra}`,
-  boxShadow: `0 8px 32px rgba(155,126,200,0.35)`,
+  boxShadow: `0 8px 32px rgba(123,106,212,0.35)`,
 };
 
 const SETTLED_STYLE = {
@@ -37,7 +37,7 @@ const SETTLED_STYLE = {
   backdropFilter: "blur(16px)",
   WebkitBackdropFilter: "blur(16px)",
   border: "1px solid rgba(255,255,255,0.45)",
-  boxShadow: "0 4px 24px rgba(45,58,124,0.08)",
+  boxShadow: "0 4px 24px rgba(90,66,160,0.08)",
 };
 
 export const setActiveImportJob = (jobId) => {

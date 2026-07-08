@@ -177,7 +177,7 @@ const CoverImagePicker = ({pattern, onConfirm, onClose, pdfThumbUrl, CAT_IMG, AL
         </div>
         {/* Confirm button */}
         <div style={{padding:"12px 20px 20px",flexShrink:0,borderTop:`1px solid ${T.border}`}}>
-          <button onClick={()=>{if(selected)onConfirm(selected);}} disabled={!selected} style={{width:"100%",background:selected?T.terra:"#ccc",color:"#fff",border:"none",borderRadius:12,padding:"14px",fontSize:15,fontWeight:600,cursor:selected?"pointer":"not-allowed",opacity:selected?1:.6,boxShadow:selected?"0 4px 16px rgba(155,126,200,.3)":"none"}}>Use this image</button>
+          <button onClick={()=>{if(selected)onConfirm(selected);}} disabled={!selected} style={{width:"100%",background:selected?T.terra:"#ccc",color:"#fff",border:"none",borderRadius:12,padding:"14px",fontSize:15,fontWeight:600,cursor:selected?"pointer":"not-allowed",opacity:selected?1:.6,boxShadow:selected?"0 4px 16px rgba(123,106,212,.3)":"none"}}>Use this image</button>
         </div>
       </div>
     </div>
@@ -187,7 +187,7 @@ const CoverImagePicker = ({pattern, onConfirm, onClose, pdfThumbUrl, CAT_IMG, AL
 const DeleteConfirmModal = ({pattern,isPro,onCancel,onDelete,onPark,onGoPro}) => (
   <div style={{position:"fixed",inset:0,zIndex:600,display:"flex",alignItems:"center",justifyContent:"center",padding:24,fontFamily:T.sans}}>
     <div onClick={onCancel} style={{position:"absolute",inset:0,background:"rgba(0,0,0,.4)"}}/>
-    <div className="fu" style={{position:"relative",zIndex:1,width:"100%",maxWidth:380,background:T.modal,borderRadius:20,padding:"32px 28px",boxShadow:"0 16px 48px rgba(155,126,200,.18)"}}>
+    <div className="fu" style={{position:"relative",zIndex:1,width:"100%",maxWidth:380,background:T.modal,borderRadius:20,padding:"32px 28px",boxShadow:"0 16px 48px rgba(123,106,212,.18)"}}>
       <div style={{fontFamily:T.serif,fontSize:18,fontWeight:700,color:T.ink,marginBottom:8}}>Delete this pattern?</div>
       <div style={{fontSize:13,color:T.ink3,lineHeight:1.6,marginBottom:20}}>{isPro?"This pattern will be permanently removed.":"This pattern will be removed from your library. It will still count toward your pattern limit."}</div>
       {!isPro&&<>
@@ -368,13 +368,13 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
       // through the signup-required path of the upgrade modal.
       if (classifyPending && sourceFileUrl) {
         return (
-          <div style={{ background: "rgba(255,255,255,0.82)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid #EDE4F7", padding: "12px 16px", position: "relative" }}>
+          <div style={{ background: "rgba(255,255,255,0.82)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid #ECE6F8", padding: "12px 16px", position: "relative" }}>
             <div style={{ display: "flex", gap: 10, overflowX: "hidden", filter: "blur(1.5px)", opacity: 0.7 }}>
               {Array.from({ length: 3 }).map((_, i) => (
                 <div key={i} style={{
                   flexShrink: 0, height: 120, width: 92, borderRadius: 12,
-                  border: "1px solid #EDE4F7",
-                  background: "linear-gradient(135deg, #EDE4F7, #F8F6FF)",
+                  border: "1px solid #ECE6F8",
+                  background: "linear-gradient(135deg, #ECE6F8, #F5F2FF)",
                 }}/>
               ))}
             </div>
@@ -384,12 +384,12 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
               background: "rgba(248,246,255,0.55)",
               backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
             }}>
-              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#2D2D4E", fontWeight: 600 }}>
+              <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#2E2748", fontWeight: 600 }}>
                 Bev is gathering this pattern's charts…
               </div>
               <button onClick={onShowUpgrade} style={{
                 background: "transparent", border: "none", padding: 0, cursor: "pointer",
-                fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 700, color: "#9B7EC8",
+                fontFamily: "Nunito, sans-serif", fontSize: 12, fontWeight: 700, color: "#7B6AD4",
               }}>{isAnonymous ? "Create a free account" : "See plans"}</button>
             </div>
           </div>
@@ -400,13 +400,13 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
     const placeholderCount = Math.min(lockedCount, 5);
     const charts = (lockedCount === 1) ? "1 chart" : `${lockedCount} charts`;
     return (
-      <div style={{ background: "rgba(255,255,255,0.82)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid #EDE4F7", padding: "12px 16px", position: "relative" }}>
+      <div style={{ background: "rgba(255,255,255,0.82)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "1px solid #ECE6F8", padding: "12px 16px", position: "relative" }}>
         <div style={{ display: "flex", gap: 10, overflowX: "hidden", filter: "blur(1.5px)", opacity: 0.7 }}>
           {Array.from({ length: placeholderCount }).map((_, i) => (
             <div key={i} style={{
               flexShrink: 0, height: 120, width: 92, borderRadius: 12,
-              border: "1px solid #EDE4F7",
-              background: "linear-gradient(135deg, #EDE4F7, #F8F6FF)",
+              border: "1px solid #ECE6F8",
+              background: "linear-gradient(135deg, #ECE6F8, #F5F2FF)",
             }}/>
           ))}
         </div>
@@ -416,12 +416,12 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
           background: "rgba(248,246,255,0.55)",
           backdropFilter: "blur(2px)", WebkitBackdropFilter: "blur(2px)",
         }}>
-          <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: "#2D2D4E", fontWeight: 600 }}>
+          <div style={{ fontFamily: "Nunito, sans-serif", fontSize: 13, color: "#2E2748", fontWeight: 600 }}>
             Bev found {charts} in this pattern
           </div>
           <button onClick={onShowUpgrade} style={{
             background: "transparent", border: "none", padding: 0, cursor: "pointer",
-            fontFamily: "Inter, sans-serif", fontSize: 12, fontWeight: 700, color: "#9B7EC8",
+            fontFamily: "Nunito, sans-serif", fontSize: 12, fontWeight: 700, color: "#7B6AD4",
           }}>See plans</button>
         </div>
       </div>
@@ -487,7 +487,7 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
   return (
     <>
       {renderNote && (
-        <div style={{ background: "#FFF7F6", borderBottom: "1px solid #EDE4F7", padding: "6px 16px", fontFamily: "Inter, sans-serif", fontSize: 11, color: "#C0544A" }}>
+        <div style={{ background: "#FFF7F6", borderBottom: "1px solid #ECE6F8", padding: "6px 16px", fontFamily: "Nunito, sans-serif", fontSize: 11, color: "#C0544A" }}>
           {renderNote}
         </div>
       )}
@@ -745,7 +745,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
           <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} pinnedImageId={pinnedImageId} onTogglePin={onTogglePin} activeTab={tab} scopedPartName={hubScoped?hubSectionTitle:null} isMultiPart={isMultiPart} />
           <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
             {[["materials","Materials"],["rows","Instructions"],["notes","Notes"]].map(([key,label])=>(
-              <button key={key} onClick={()=>setTab(key)} style={{flex:1,padding:"13px 0",border:"none",background:"transparent",color:tab===key?T.terra:T.ink3,fontWeight:tab===key?600:400,fontSize:13,cursor:"pointer",borderBottom:"2px solid "+(tab===key?T.terra:"transparent"),transition:"color .15s"}}>{label}</button>
+              <button key={key} onClick={()=>setTab(key)} style={{flex:1,padding:"15px 0",border:"none",background:"transparent",color:tab===key?T.accent:T.muted,fontWeight:tab===key?800:700,fontSize:15,cursor:"pointer",borderBottom:"3px solid "+(tab===key?T.accent:"transparent"),marginBottom:-1,transition:"color .15s"}}>{label}</button>
             ))}
           </div>
         </div>
@@ -757,8 +757,8 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
           // TieredUpgradeModal at the parent.
           <div style={{
             margin: "12px 0 18px",
-            background: "rgba(155,126,200,0.10)",
-            border: "1px solid rgba(155,126,200,0.32)",
+            background: "rgba(123,106,212,0.10)",
+            border: "1px solid rgba(123,106,212,0.32)",
             borderRadius: 14,
             padding: "12px 14px",
             display: "flex",
@@ -868,7 +868,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             {hubScoped&&<div style={{fontFamily:T.serif,fontSize:16,color:T.ink,marginBottom:8}}>My Notes</div>}
             {editing?<textarea value={draft.notes} onChange={e=>setDraft({...draft,notes:e.target.value})} style={{width:"100%",minHeight:140,border:`1.5px solid ${T.border}`,borderRadius:12,padding:14,fontSize:14,lineHeight:1.75,resize:"vertical",outline:"none",color:T.ink,background:T.linen}} onFocus={e=>e.target.style.borderColor=T.terra} onBlur={e=>e.target.style.borderColor=T.border}/>
             :p.notes?<p style={{fontFamily:T.serif,fontStyle:"italic",fontSize:15,color:T.ink2,lineHeight:1.9,paddingTop:4,whiteSpace:"pre-wrap"}}>{p.notes}</p>
-            :<div role="button" tabIndex={0} onClick={()=>{setDraft({...p});setEditing(true);}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setDraft({...p});setEditing(true);}}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(155,126,200,0.08)";e.currentTarget.style.borderColor=T.terra;}} onMouseLeave={e=>{e.currentTarget.style.background=T.linen;e.currentTarget.style.borderColor=T.border;}} aria-label="Add your first note" style={{background:T.linen,border:`1.5px dashed ${T.border}`,borderRadius:12,padding:"20px 16px",cursor:"pointer",textAlign:"center",transition:"background .15s, border-color .15s",outline:"none"}}>
+            :<div role="button" tabIndex={0} onClick={()=>{setDraft({...p});setEditing(true);}} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setDraft({...p});setEditing(true);}}} onMouseEnter={e=>{e.currentTarget.style.background="rgba(123,106,212,0.08)";e.currentTarget.style.borderColor=T.terra;}} onMouseLeave={e=>{e.currentTarget.style.background=T.linen;e.currentTarget.style.borderColor=T.border;}} aria-label="Add your first note" style={{background:T.linen,border:`1.5px dashed ${T.border}`,borderRadius:12,padding:"20px 16px",cursor:"pointer",textAlign:"center",transition:"background .15s, border-color .15s",outline:"none"}}>
               <div style={{fontFamily:T.serif,fontStyle:"italic",fontSize:15,color:T.ink2,lineHeight:1.5}}>No notes yet.</div>
               <div style={{fontSize:12,color:T.ink3,marginTop:6}}>Tap to add your first note</div>
             </div>}
@@ -895,17 +895,17 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
           backdropFilter:"blur(16px)",
           WebkitBackdropFilter:"blur(16px)",
           borderTop:"1px solid rgba(255,255,255,0.45)",
-          boxShadow:"0 -4px 24px rgba(45,58,124,0.12)",
+          boxShadow:"0 -4px 24px rgba(90,66,160,0.12)",
           padding: isDesktop ? "20px 24px" : "16px 16px",
-          fontFamily:"Inter,sans-serif",
+          fontFamily:"Nunito,sans-serif",
           textAlign:"center",
         }}>
           <div style={{maxWidth:600,margin:"0 auto"}}>
             <div style={{
-              fontFamily:"'Playfair Display', Georgia, serif",
+              fontFamily:"'Fredoka', Georgia, serif",
               fontSize: isDesktop ? 20 : 16,
               fontWeight:700,
-              color:"#2D3A7C",
+              color:T.ink,
               lineHeight:1.25,
               marginBottom:6,
             }}>
@@ -913,7 +913,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             </div>
             <div style={{
               fontSize: isDesktop ? 14 : 13,
-              color:"#6B6B8A",
+              color:"#726A92",
               lineHeight:1.55,
               marginBottom:14,
             }}>
@@ -922,7 +922,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             <button
               onClick={()=>onSignUp&&onSignUp()}
               style={{
-                background:"#9B7EC8",
+                background:"#7B6AD4",
                 color:"#fff",
                 border:"none",
                 borderRadius:12,
@@ -930,17 +930,17 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
                 fontSize:14,
                 fontWeight:600,
                 cursor:"pointer",
-                boxShadow:"0 4px 16px rgba(155,126,200,0.3)",
+                boxShadow:"0 4px 16px rgba(123,106,212,0.3)",
                 width: isDesktop ? "auto" : "100%",
                 minWidth: isDesktop ? 220 : undefined,
                 marginBottom:10,
               }}
             >Create Free Account</button>
-            <div style={{fontSize:13,color:"#6B6B8A"}}>
+            <div style={{fontSize:13,color:"#726A92"}}>
               Already have an account?{" "}
               <span
                 onClick={()=>onSignUp&&onSignUp()}
-                style={{color:"#9B7EC8",cursor:"pointer",fontWeight:600}}
+                style={{color:"#7B6AD4",cursor:"pointer",fontWeight:600}}
               >Sign in</span>
             </div>
           </div>
@@ -953,10 +953,10 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
 const ReadyToBuildPrompt = ({pattern,onStartBuilding,onViewDetails,onDismiss}) => (
   <div style={{position:"fixed",inset:0,zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:24,fontFamily:T.sans}}>
     <div onClick={onDismiss} style={{position:"absolute",inset:0,background:"rgba(0,0,0,.35)"}}/>
-    <div className="fu" style={{position:"relative",zIndex:1,width:"100%",maxWidth:360,background:T.modal,borderRadius:20,padding:"32px 28px",textAlign:"center",boxShadow:"0 16px 48px rgba(155,126,200,.18)"}}>
+    <div className="fu" style={{position:"relative",zIndex:1,width:"100%",maxWidth:360,background:T.modal,borderRadius:20,padding:"32px 28px",textAlign:"center",boxShadow:"0 16px 48px rgba(123,106,212,.18)"}}>
       <div style={{fontFamily:T.serif,fontSize:18,fontWeight:700,color:T.ink,marginBottom:6}}>Ready to start building?</div>
       <div style={{fontSize:13,color:T.ink3,marginBottom:20,lineHeight:1.5}}>{pattern?.title}</div>
-      <button onClick={onStartBuilding} style={{width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:12,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)",marginBottom:8}}>Start Building</button>
+      <button onClick={onStartBuilding} style={{width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:12,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",marginBottom:8}}>Start Building</button>
       <button onClick={onViewDetails} style={{width:"100%",background:T.linen,color:T.ink2,border:`1px solid ${T.border}`,borderRadius:12,padding:"12px",fontSize:13,fontWeight:500,cursor:"pointer"}}>View Details</button>
     </div>
   </div>
@@ -967,11 +967,11 @@ const PatternCreatedOverlay = ({pattern,onStartBuilding,onGoToHive}) => {
   return (
     <div style={{position:"fixed",inset:0,zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:24,fontFamily:T.sans}}>
       <div style={{position:"absolute",inset:0,background:"rgba(0,0,0,.4)",backdropFilter:"blur(8px)"}}/>
-      <div className="fu" style={{position:"relative",zIndex:1,width:"100%",maxWidth:420,background:T.modal,borderRadius:24,padding:"48px 40px",textAlign:"center",boxShadow:"0 20px 60px rgba(155,126,200,.2)"}}>
+      <div className="fu" style={{position:"relative",zIndex:1,width:"100%",maxWidth:420,background:T.modal,borderRadius:24,padding:"48px 40px",textAlign:"center",boxShadow:"0 20px 60px rgba(123,106,212,.2)"}}>
         <div style={{width:64,height:64,borderRadius:"50%",background:T.sageLt,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px",fontSize:28}}>✓</div>
         <div style={{fontFamily:T.serif,fontSize:24,fontWeight:700,color:T.ink,marginBottom:8}}>Your pattern is ready to build</div>
         <div style={{fontFamily:T.serif,fontSize:18,color:T.terra,marginBottom:28}}>{pattern?.title||"Untitled Pattern"}</div>
-        <button onClick={onStartBuilding} style={{width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:14,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(155,126,200,.3)",marginBottom:10}}>Start Building</button>
+        <button onClick={onStartBuilding} style={{width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:14,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",marginBottom:10}}>Start Building</button>
         <button onClick={onGoToHive} style={{width:"100%",background:T.linen,color:T.ink2,border:`1px solid ${T.border}`,borderRadius:14,padding:"14px",fontSize:14,fontWeight:500,cursor:"pointer"}}>Go to My Wovely</button>
       </div>
     </div>

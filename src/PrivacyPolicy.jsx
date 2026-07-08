@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-const S = { page:{maxWidth:800,margin:"0 auto",padding:"40px 24px 80px",fontFamily:"Inter,sans-serif",color:"#595959",fontSize:14,lineHeight:1.8},title:{fontFamily:"'Playfair Display',Georgia,serif",fontSize:28,fontWeight:700,color:"#2D3A7C",marginBottom:6},sub:{fontSize:13,color:"#6B6B8A",marginBottom:32},h2:{fontSize:16,fontWeight:600,color:"#2D2D4E",margin:"28px 0 8px"},p:{margin:"0 0 14px"},back:{background:"none",border:"none",color:"#9B7EC8",cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:24,display:"inline-flex",alignItems:"center",gap:4} };
+const S = { page:{maxWidth:800,margin:"0 auto",padding:"40px 24px 80px",fontFamily:"Nunito,sans-serif",color:"#595959",fontSize:14,lineHeight:1.8},title:{fontFamily:"'Fredoka',Georgia,serif",fontSize:28,fontWeight:700,color:"#2E2748",marginBottom:6},sub:{fontSize:13,color:"#726A92",marginBottom:32},h2:{fontSize:16,fontWeight:600,color:"#2E2748",margin:"28px 0 8px"},p:{margin:"0 0 14px"},back:{background:"none",border:"none",color:"#7B6AD4",cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:24,display:"inline-flex",alignItems:"center",gap:4} };
 
 export default function PrivacyPolicy() {
   const navigate = useNavigate();

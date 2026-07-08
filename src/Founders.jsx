@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./supabase.js";
 
 // ─── CONSTANTS ──────────────────────────────────────────────────────────────
-const PF = "'Playfair Display',Georgia,serif";
-const INTER = "Inter,sans-serif";
-const NAVY = "#2D3A7C";
-const ACCENT = "#9B7EC8";
+const PF = "'Fredoka',Georgia,serif";
+const INTER = "Nunito,sans-serif";
+const NAVY = "#2E2748";
+const ACCENT = "#7B6AD4";
 const MUTED = "#9B87B8";
-const BG = "#FAF8F5";
+const BG = "#FBF9FF";
 
 const USERS = [
   { id: "6e1a02d9-c210-4bc4-968e-dde3435565d1", email: "alabare@gmail.com", joined: "2026-03-24", is_pro: true },
@@ -59,18 +59,18 @@ const getStatus = (patternCount, lastActive, email) => {
 const tierBadge = (u) => {
   if (!u.is_pro) return { label: "Free", bg: "#F1EFE8", color: "#5F5E5A" };
   if (u.trialExpires) return { label: "Trial", bg: "#FAEEDA", color: "#854F0B" };
-  return { label: "Pro", bg: "#EDE4F7", color: "#6B3FA0" };
+  return { label: "Pro", bg: "#ECE6F8", color: "#6B3FA0" };
 };
 
 // ─── CARD / SECTION STYLES ──────────────────────────────────────────────────
-const card = { background: "#fff", borderRadius: 16, border: "1px solid #EDE4F7", padding: 20 };
+const card = { background: "#fff", borderRadius: 16, border: "1px solid #ECE6F8", padding: 20 };
 const secHead = { fontFamily: PF, fontSize: 18, fontWeight: 700, color: NAVY, marginBottom: 12 };
 const badge = (bg, color) => ({ display: "inline-block", background: bg, color, borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 600 });
 
 // ─── BAR ROW ────────────────────────────────────────────────────────────────
 const BarRow = ({ label, value, max }) => (
   <div style={{ display: "flex", alignItems: "center", padding: "9px 0", borderBottom: "1px solid #F8F5FF" }}>
-    <div style={{ width: 150, fontSize: 12, color: "#2D2D4E", fontFamily: INTER, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flexShrink: 0 }}>{label}</div>
+    <div style={{ width: 150, fontSize: 12, color: "#2E2748", fontFamily: INTER, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flexShrink: 0 }}>{label}</div>
     <div style={{ flex: 1, margin: "0 14px", height: 5, background: "#F0EAF9", borderRadius: 3, overflow: "hidden" }}>
       <div style={{ width: max > 0 ? (value / max * 100) + "%" : "0%", height: "100%", background: ACCENT, borderRadius: 3 }} />
     </div>
@@ -134,7 +134,7 @@ export default function Founders() {
   if (loading) return (
     <div style={{ minHeight: "100vh", background: BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
       <style>{`@keyframes bspin { to { transform: rotate(360deg) } }`}</style>
-      <img src="/bev_neutral.png" alt="Bev" style={{ width: 80, height: 80, borderRadius: "50%", background: "#fff", padding: 6, objectFit: "contain", boxShadow: "0 4px 20px rgba(155,126,200,0.2)", animation: "bspin 1.5s linear infinite" }} />
+      <img src="/bev_neutral.png" alt="Bev" style={{ width: 80, height: 80, borderRadius: "50%", background: "#fff", padding: 6, objectFit: "contain", boxShadow: "0 4px 20px rgba(123,106,212,0.2)", animation: "bspin 1.5s linear infinite" }} />
       <div style={{ fontFamily: PF, fontStyle: "italic", fontSize: 20, color: ACCENT }}>Loading your numbers...</div>
     </div>
   );
@@ -153,7 +153,7 @@ export default function Founders() {
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(155,126,200,0.3)", borderRadius: 20, padding: "4px 12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(123,106,212,0.3)", borderRadius: 20, padding: "4px 12px" }}>
             <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#34D399", animation: "pulse 2s ease infinite" }} />
             <span style={{ fontSize: 11, color: "#fff", fontWeight: 500 }}>Live data</span>
           </div>
@@ -182,11 +182,11 @@ export default function Founders() {
         </div>
 
         {/* ── BEV INSIGHT ── */}
-        <div style={{ background: "#EDE4F7", borderRadius: 16, border: "1px solid #D4C5ED", padding: "18px 20px", display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 8px rgba(155,126,200,0.15)" }}>
+        <div style={{ background: "#ECE6F8", borderRadius: 16, border: "1px solid #D4C5ED", padding: "18px 20px", display: "flex", alignItems: "center", gap: 14 }}>
+          <div style={{ width: 44, height: 44, borderRadius: "50%", background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 2px 8px rgba(123,106,212,0.15)" }}>
             <img src="/bev_neutral.png" alt="Bev" style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover" }} />
           </div>
-          <div style={{ fontSize: 13, color: "#2D2D4E", lineHeight: 1.6 }}>{bevText}</div>
+          <div style={{ fontSize: 13, color: "#2E2748", lineHeight: 1.6 }}>{bevText}</div>
         </div>
 
         {/* ── USER TABLE ── */}
@@ -203,11 +203,11 @@ export default function Founders() {
                 const tb = tierBadge(u);
                 return (
                   <tr key={u.id}>
-                    <td style={{ padding: "10px 8px 10px 0", fontSize: 12, color: "#2D2D4E", fontWeight: 500, borderBottom: "1px solid #F8F5FF" }}>{u.email}</td>
+                    <td style={{ padding: "10px 8px 10px 0", fontSize: 12, color: "#2E2748", fontWeight: 500, borderBottom: "1px solid #F8F5FF" }}>{u.email}</td>
                     <td style={{ padding: "10px 8px 10px 0", fontSize: 12, color: MUTED, borderBottom: "1px solid #F8F5FF" }}>{u.joined}</td>
                     <td style={{ padding: "10px 8px 10px 0", borderBottom: "1px solid #F8F5FF" }}><span style={badge(tb.bg, tb.color)}>{tb.label}</span></td>
-                    <td style={{ padding: "10px 8px 10px 0", fontSize: 12, color: "#2D2D4E", fontWeight: 600, borderBottom: "1px solid #F8F5FF" }}>{u.patternCount}</td>
-                    <td style={{ padding: "10px 8px 10px 0", fontSize: 12, color: "#2D2D4E", fontWeight: 600, borderBottom: "1px solid #F8F5FF" }}>{u.stitchCount}</td>
+                    <td style={{ padding: "10px 8px 10px 0", fontSize: 12, color: "#2E2748", fontWeight: 600, borderBottom: "1px solid #F8F5FF" }}>{u.patternCount}</td>
+                    <td style={{ padding: "10px 8px 10px 0", fontSize: 12, color: "#2E2748", fontWeight: 600, borderBottom: "1px solid #F8F5FF" }}>{u.stitchCount}</td>
                     <td style={{ padding: "10px 8px 10px 0", fontSize: 12, color: MUTED, borderBottom: "1px solid #F8F5FF" }}>{u.lastActive ? new Date(u.lastActive).toLocaleDateString() : "—"}</td>
                     <td style={{ padding: "10px 8px 10px 0", borderBottom: "1px solid #F8F5FF" }}><span style={badge(u.status.bg, u.status.color)}>{u.status.label}</span></td>
                   </tr>
@@ -267,7 +267,7 @@ export default function Founders() {
             <div style={secHead}>User Locations (30d)</div>
             {data.locations.length > 0 ? data.locations.map((r, i) => (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid #F8F5FF", fontSize: 12 }}>
-                <span style={{ color: "#2D2D4E" }}>{r[0] || "Unknown"}, {r[1] || ""}</span>
+                <span style={{ color: "#2E2748" }}>{r[0] || "Unknown"}, {r[1] || ""}</span>
                 <span style={{ fontWeight: 600, color: ACCENT }}>{r[2]}</span>
               </div>
             )) : <div style={{ color: MUTED, fontSize: 13 }}>No data</div>}
@@ -289,7 +289,7 @@ export default function Founders() {
             return m ? (parseInt(m[1]) / 1000).toFixed(1) + "s" : "—";
           };
           const providerColor = (p) => {
-            if (p.startsWith("Claude")) return "#5B9B6B";
+            if (p.startsWith("Claude")) return "#1E8A63";
             if (p === "All failed" || p === "Failed") return "#C0544A";
             return ACCENT;
           };
@@ -308,7 +308,7 @@ export default function Founders() {
               <div style={{ fontSize: 12, color: MUTED, marginBottom: 16 }}>
                 <span style={{ color: ACCENT, fontWeight: 600 }}>Gemini: {geminiCount}</span>
                 {" · "}
-                <span style={{ color: "#5B9B6B", fontWeight: 600 }}>Claude saves: {claudeCount}</span>
+                <span style={{ color: "#1E8A63", fontWeight: 600 }}>Claude saves: {claudeCount}</span>
                 {" · "}
                 <span style={{ color: "#C0544A", fontWeight: 600 }}>Failed: {failedCount}</span>
               </div>
@@ -322,9 +322,9 @@ export default function Founders() {
                   <tbody>
                     {rows.map((r, i) => (
                       <tr key={i}>
-                        <td style={{ padding: "8px 8px 8px 0", fontSize: 12, color: "#2D2D4E", borderBottom: "1px solid #F8F5FF", whiteSpace: "nowrap" }}>{r.time}</td>
+                        <td style={{ padding: "8px 8px 8px 0", fontSize: 12, color: "#2E2748", borderBottom: "1px solid #F8F5FF", whiteSpace: "nowrap" }}>{r.time}</td>
                         <td style={{ padding: "8px 8px 8px 0", fontSize: 12, fontWeight: 600, color: providerColor(r.provider), borderBottom: "1px solid #F8F5FF" }}>{r.provider}</td>
-                        <td style={{ padding: "8px 8px 8px 0", fontSize: 12, color: "#2D2D4E", borderBottom: "1px solid #F8F5FF" }}>{r.duration}</td>
+                        <td style={{ padding: "8px 8px 8px 0", fontSize: 12, color: "#2E2748", borderBottom: "1px solid #F8F5FF" }}>{r.duration}</td>
                         <td style={{ padding: "8px 8px 8px 0", fontSize: 12, borderBottom: "1px solid #F8F5FF" }}>{r.status === 200 ? "✅" : "❌"}</td>
                       </tr>
                     ))}
@@ -337,7 +337,7 @@ export default function Founders() {
 
         {/* ── FOOTER ── */}
         <div style={{ textAlign: "center", padding: 20 }}>
-          <div style={{ display: "inline-flex", width: 32, height: 32, borderRadius: "50%", background: "#fff", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(155,126,200,0.12)", marginBottom: 8 }}>
+          <div style={{ display: "inline-flex", width: 32, height: 32, borderRadius: "50%", background: "#fff", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 8px rgba(123,106,212,0.12)", marginBottom: 8 }}>
             <img src="/bev_neutral.png" alt="Bev" style={{ width: 24, height: 24, borderRadius: "50%", objectFit: "cover" }} />
           </div>
           <div style={{ fontSize: 11, color: MUTED }}>Wovely · Founder Dashboard · {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</div>
