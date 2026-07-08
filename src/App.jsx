@@ -778,74 +778,79 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
 };
 
 
+// ── Design System 2b nav icons (woven line style from Wovely App 2b.dc.html) ──
+// Stroke SVGs replace the old emoji so the sidebar reads as one crafted system.
+const NAV_ICON = {
+  collection:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="7.3"/><path d="M9 5.4c3 3.6 3 9.6 0 13.2"/><path d="M15 5.4c-3 3.6-3 9.6 0 13.2"/><path d="M5.3 9.6c4 1.9 9.4 1.9 13.4 0"/><path d="M5.3 14.4c4-1.9 9.4-1.9 13.4 0"/></svg>),
+  browse:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>),
+  stash:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12c0-2.3 3.1-3.6 7-3.6s7 1.3 7 3.6-3.1 3.6-7 3.6-7-1.3-7-3.6z"/><rect x="9.8" y="7.8" width="4.4" height="8.4" rx="1.4"/></svg>),
+  calculator:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5.5 19.5L15.4 9.6"/><path d="M15.4 9.6c1-1.3 2.8-1.5 3.6-.4.8 1.1-.1 2.6-1.7 2.8"/><path d="M10 15l1.6-1.1"/></svg>),
+  "stitch-check":(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2"/></svg>),
+  shopping:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 6h14l-1.4 8.4a2 2 0 01-2 1.6H8.4a2 2 0 01-2-1.6z"/><circle cx="9" cy="20" r="1.2"/><circle cx="16" cy="20" r="1.2"/></svg>),
+  profile:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2"/></svg>),
+  sparkle:(<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4.2l1.5 4.3 4.3 1.5-4.3 1.5L12 15.8l-1.5-4.3L6.2 10l4.3-1.5z"/></svg>),
+};
+// Plum yarn-cord decoration down the sidebar's right edge (2b sidebar treatment).
+const CORD_PLUM = "https://res.cloudinary.com/dmaupzhcx/image/upload/e_background_removal/c_crop,g_center,h_0.9,w_1.0/e_trim/v1782959427/website-assets/yarn-cord-plum.png";
+const SidebarCord = () => (
+  <div style={{position:"absolute",top:0,left:"calc(100% - 9px)",width:17,height:"100%",pointerEvents:"none",zIndex:6,overflow:"hidden",display:"flex",flexDirection:"column",filter:"drop-shadow(3px 2px 3px rgba(50,36,100,.45)) drop-shadow(6px 4px 8px rgba(50,36,100,.22))"}}>
+    {Array.from({length:14}).map((_,i)=><img key={i} src={CORD_PLUM} alt="" style={{width:"100%",display:"block",flex:"none",transform:i%2?"scaleY(-1)":"none"}}/>)}
+  </div>
+);
+
 const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,onSignOut,onUpgrade,onOpenAuthWall,userPatterns=[],allPatterns=[]}) => {
   const starterC=DEFAULT_STARTERS.length;const addedC=userPatterns.filter(p=>!p.isStarter&&p.status!=="deleted"&&p.status!=="parked").length;
-  const wipCount=allPatterns.filter(p=>!p.isStarter&&(p.status==="in_progress"||p.started)).filter(p=>pct(p)<100).length;
   // For anonymous users, surface Pro items without the padlock/"Pro feature" visual — the gate fires
   // on click. Showing the lock pre-gate suggests "sign up and you still can't have this" which kills conversion.
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Craft feature");
   // Collections is no longer a sibling destination — it lives inside My Wovely
   // as a section below the pattern grid. The tier gating and lock teaser are
   // handled there. Plans modal remains the marketing surface for guests.
-  const ITEMS=[{key:"collection",label:"My Wovely",sub:starterC+" starter"+(starterC!==1?"s":"")+" · "+addedC+" added",icon:"🧶"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated",icon:"🛒"}];
-  const planLabel = isPro ? "My plan" : "See plans";
-  // Anonymous users get the same subtitle as Free — the modal explains the
-  // signup-before-Stripe step itself. Mismatched copy ("Sign up to compare
-  // plans") was killing the click intent before the modal could open.
-  const planSub = isPro ? `You're on ${tierLabel(tier)}` : "Compare Free and Craft";
-  // Always open the upgrade modal. The modal is the single source of truth
-  // for plan comparison; the AuthWall used to be wedged in front of it for
-  // guests, which hid the comparison before they ever saw it.
-  const handlePlansClick = () => { onUpgrade(); };
+  const ITEMS=[{key:"collection",label:"My Wovely",sub:"Your Craft Room"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns"},{key:"stash",label:"Stash & Notions",sub:"Yarn, hooks & shopping"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs"}];
+  const planT = isPro ? `Wovely ${tierLabel(tier)}` : "Free plan";
+  const planS = isPro ? "Every feature active" : `${addedC} of ${TIER_CONFIG.free.patternCap} patterns`;
+  const navBg = (active) => active ? "rgba(255,255,255,0.18)" : "transparent";
+  const Row = ({onClick,icon,label,sub,active,locked,badge,dim}) => (
+    <div className="nav-item" onClick={onClick} style={{display:"flex",alignItems:"center",gap:13,padding:"11px 12px",borderRadius:14,background:navBg(active),cursor:"pointer",transition:"background .15s",opacity:dim?.55:1,position:"relative"}}>
+      <div style={{width:26,height:26,flex:"none",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",opacity:.94}}>{icon}</div>
+      <div style={{flex:1}}><div style={{fontWeight:800,fontSize:15,color:"#fff",lineHeight:1.1}}>{label}</div><div style={{fontWeight:700,fontSize:11.5,color:"rgba(255,255,255,0.66)",marginTop:1}}>{sub}</div></div>
+      {locked&&<span style={{fontSize:12,color:"rgba(255,255,255,0.65)"}}>🔒</span>}
+      {badge&&<span style={{background:"rgba(255,255,255,0.22)",color:"#fff",fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:99}}>{badge}</span>}
+    </div>
+  );
   return (
-    <div style={{width:260,background:"#7B6AD4",height:"100vh",position:"sticky",top:0,display:"flex",flexDirection:"column",flexShrink:0}}>
-      <div onClick={()=>onNavigate("collection")} style={{display:"flex",flexDirection:"column",alignItems:"center",padding:"24px 16px 20px",gap:8,cursor:"pointer",transition:"opacity .15s"}} onMouseEnter={e=>e.currentTarget.style.opacity=".85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
-        <div style={{width:72,height:72,borderRadius:"50%",background:"rgba(255,255,255,0.95)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 16px rgba(0,0,0,0.15)",marginBottom:4}}><img src="/bev_neutral.png" alt="Bev" style={{width:58,height:58,borderRadius:"50%",objectFit:"cover"}}/></div>
-        <span style={{fontFamily:"'Fredoka',serif",fontSize:22,fontWeight:700,color:"#fff",letterSpacing:"-0.01em",lineHeight:1}}>Wovely</span>
-        <span style={{fontFamily:"Nunito,sans-serif",fontSize:11,color:"rgba(255,255,255,0.55)",letterSpacing:"0.04em",lineHeight:1}}>Your crochet space</span>
+    <div style={{width:274,flex:"none",background:"linear-gradient(180deg,#8474DA 0%,#6E5AC8 100%)",color:"#fff",height:"100vh",position:"sticky",top:0,display:"flex",flexDirection:"column",padding:"26px 24px 26px 20px",overflowY:"auto"}}>
+      <SidebarCord/>
+      <div onClick={()=>onNavigate("collection")} style={{display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center",gap:8,marginBottom:22,cursor:"pointer",transition:"opacity .15s"}} onMouseEnter={e=>e.currentTarget.style.opacity=".85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
+        <img src="/bev.png" alt="Bev" style={{width:78,height:78,borderRadius:"50%",border:"3px solid rgba(255,255,255,.55)",background:"#EFE9FB"}}/>
+        <div style={{fontFamily:T.disp,fontWeight:600,fontSize:27,lineHeight:1}}>Wovely</div>
+        <div style={{fontSize:12.5,color:"rgba(255,255,255,.72)",fontWeight:700}}>Your crochet space</div>
       </div>
-      <div style={{padding:"0 16px 8px"}}><button onClick={onAddPattern} style={{width:"100%",background:"rgba(255,255,255,.2)",color:"#fff",border:"none",borderRadius:9999,padding:"12px",fontSize:14,fontWeight:600,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8,transition:"background .15s"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(255,255,255,.3)"} onMouseLeave={e=>e.currentTarget.style.background="rgba(255,255,255,.2)"}><span style={{fontSize:18}}>+</span> Add Pattern</button></div>
-      <div style={{flex:1,overflowY:"auto",padding:"8px 0"}}>
-        {ITEMS.map(item=>{const active=view===item.key;const locked=item.proOnly&&!isPro&&!isAnonymous;const dis=!!item.disabled;return(
-          <div key={item.key} className="nav-item" onClick={()=>{if(dis)return;if(locked){onUpgrade();return;}onNavigate(item.key);}} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 20px",background:active&&!dis?"rgba(255,255,255,0.25)":"transparent",cursor:dis?"not-allowed":"pointer",transition:"background .12s",opacity:dis?.4:locked?.55:1}}>
-            <span style={{fontSize:18,width:24,textAlign:"center"}}>{item.icon}</span>
-            <div style={{flex:1}}><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{item.label}</div><div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>{item.sub}</div></div>
-            {dis&&<span style={{background:"rgba(255,255,255,.2)",borderRadius:99,padding:"2px 8px",fontSize:9,fontWeight:700,color:"rgba(255,255,255,.8)"}}>Soon</span>}
-            {locked&&!dis&&<span style={{fontSize:12,color:"rgba(255,255,255,0.65)"}}>🔒</span>}
-            {active&&!locked&&!dis&&<div style={{width:6,height:6,borderRadius:99,background:"#fff"}}/>}
-          </div>
+      <button onClick={onAddPattern} style={{width:"100%",border:0,borderRadius:16,padding:15,background:"rgba(255,255,255,.94)",color:T.accentD,fontFamily:T.body,fontWeight:800,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:9,boxShadow:"0 10px 22px -12px rgba(0,0,0,.4)"}}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>Add Pattern
+      </button>
+      <div style={{display:"flex",flexDirection:"column",gap:3,marginTop:22}}>
+        {ITEMS.map(item=>{const active=view===item.key;const locked=item.proOnly&&!isPro&&!isAnonymous;return(
+          <Row key={item.key} icon={NAV_ICON[item.key]} label={item.label} sub={item.sub} active={active} locked={locked} dim={locked} onClick={()=>{if(locked){onUpgrade();return;}onNavigate(item.key);}}/>
         );})}
+        <Row icon={NAV_ICON.sparkle} label={isPro?"My plan":"See plans"} sub={isPro?`You're on ${tierLabel(tier)}`:"Compare Free and Craft"} badge={!isPro&&!isAnonymous?"New":null} onClick={onUpgrade}/>
+        <Row icon={NAV_ICON.profile} label="Profile & Settings" sub={isAnonymous?"Sign in to save":"Your corner"} active={view==="profile"} onClick={()=>onNavigate("profile")}/>
       </div>
-      <div style={{padding:"0 0 8px"}}>
-        {/* Plans — always-visible entry to TieredUpgradeModal. Free + anonymous
-            see "See plans" with the sparkle; paid users see "My plan" with
-            their tier. Click opens the modal directly (it's not a route). */}
-        <div className="nav-item" onClick={handlePlansClick} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 20px",cursor:"pointer",transition:"background .12s"}}>
-          <span style={{fontSize:18,width:24,textAlign:"center"}}>✨</span>
-          <div style={{flex:1}}>
-            <div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{planLabel}</div>
-            <div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>{planSub}</div>
-          </div>
-          {!isPro&&!isAnonymous&&<span style={{background:"rgba(255,255,255,0.22)",color:"#fff",fontSize:10,fontWeight:700,padding:"2px 8px",borderRadius:99}}>New</span>}
+      <div style={{marginTop:"auto",paddingTop:20,display:"flex",flexDirection:"column",gap:12}}>
+        <div style={{background:"rgba(255,255,255,.13)",borderRadius:16,padding:"14px 15px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10}}>
+          <div><div style={{fontWeight:800,fontSize:14,color:"#fff"}}>{planT}</div><div style={{fontWeight:700,fontSize:11.5,color:"rgba(255,255,255,.66)"}}>{planS}</div></div>
+          {isPro
+            ? <span style={{display:"inline-flex",alignItems:"center",gap:5,background:"linear-gradient(120deg,#FFD98A,#F5B93E)",color:"#5A3E0E",fontWeight:800,fontSize:11,letterSpacing:".07em",textTransform:"uppercase",padding:"5px 11px",borderRadius:999}}>Craft</span>
+            : <button onClick={onUpgrade} style={{border:0,borderRadius:11,padding:"9px 14px",background:T.sun,color:"#5A3E0E",fontFamily:T.body,fontWeight:800,fontSize:13,cursor:"pointer",whiteSpace:"nowrap"}}>Upgrade</button>}
         </div>
-        {(()=>{const active=view==="profile";return(
-          <div className="nav-item" onClick={()=>onNavigate("profile")} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 20px",background:active?"rgba(255,255,255,0.25)":"transparent",cursor:"pointer",transition:"background .12s"}}>
-            <span style={{fontSize:18,width:24,textAlign:"center"}}>👤</span>
-            <div style={{flex:1}}><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>Profile & Settings</div><div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>{isAnonymous?"Sign in to save":"Your account"}</div></div>
-            {active&&<div style={{width:6,height:6,borderRadius:99,background:"#fff"}}/>}
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          {isAnonymous&&<button onClick={onOpenAuthWall} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:12,padding:"9px",fontSize:12.5,color:"#fff",cursor:"pointer",fontWeight:800}}>Create account</button>}
+          {onSignOut&&<button onClick={onSignOut} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:12,padding:"9px",fontSize:12.5,color:"#fff",cursor:"pointer",fontWeight:800}}>Sign out</button>}
+          <div style={{textAlign:"center",fontSize:11,fontWeight:700}}>
+            <span onClick={()=>onNavigate("privacy")} style={{color:"rgba(255,255,255,.55)",cursor:"pointer"}}>Privacy</span>
+            <span style={{margin:"0 6px",color:"rgba(255,255,255,.3)"}}>|</span>
+            <span onClick={()=>onNavigate("terms")} style={{color:"rgba(255,255,255,.55)",cursor:"pointer"}}>Terms</span>
           </div>
-        );})()}
-      </div>
-      <div style={{padding:"0 16px 24px"}}>
-        {/* The bottom upgrade/manage card was removed — "See plans" in the
-            nav list above is now the single entry point to the upgrade
-            modal for every user state. */}
-        {isAnonymous&&<button onClick={onOpenAuthWall} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:9999,padding:"8px",fontSize:12,color:"#fff",cursor:"pointer",fontWeight:500}}>Create account</button>}
-        {onSignOut&&<button onClick={onSignOut} style={{width:"100%",background:"rgba(255,255,255,.15)",border:"none",borderRadius:9999,padding:"8px",fontSize:12,color:"#fff",cursor:"pointer",fontWeight:500,marginTop:isAnonymous?8:0}}>Sign out</button>}
-        <div style={{textAlign:"center",marginTop:12,fontSize:11}}>
-          <span onClick={()=>onNavigate("privacy")} style={{color:"rgba(255,255,255,.5)",cursor:"pointer"}}>Privacy</span>
-          <span style={{margin:"0 6px",color:"rgba(255,255,255,.3)"}}>|</span>
-          <span onClick={()=>onNavigate("terms")} style={{color:"rgba(255,255,255,.5)",cursor:"pointer"}}>Terms</span>
         </div>
       </div>
     </div>
@@ -3442,7 +3447,7 @@ export default function Wovely() {
   const TITLE_MAP={collection:null,wip:"On the Hook",browse:"Find Patterns",stash:"Stash & Notions",calculator:"The Workbench",shopping:"Supply Run",profile:"Profile & Settings",privacy:"Privacy Policy",terms:"Terms of Service"};
 
   if(isDesktop) return (
-    <div style={{display:"flex",minHeight:"100vh",width:"100%",background:"transparent",fontFamily:T.sans,position:"relative"}}>
+    <div style={{display:"flex",minHeight:"100vh",width:"100%",background:`${T.crosshatch},${T.bg}`,fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
@@ -3467,12 +3472,14 @@ export default function Wovely() {
       <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e?.currentTarget?.getBoundingClientRect();if(r)setMenuAnchor({top:r.bottom+8,left:r.left});setAddMenuOpen(true);}} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall} userPatterns={userPatterns} allPatterns={allPatterns}/>
       <div ref={mainScrollRef} style={{flex:1,minWidth:0,overflowY:"auto",display:"flex",flexDirection:"column",background:"transparent"}}>
         <WelcomeBanner visible={showWelcomeBanner}/>
-        <div style={{background:"#FFFFFF",borderBottom:"1px solid #ECE6F8",padding:"0 32px",height:64,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0}}>
-          <div onClick={isAdam?handleLogoTap:undefined} style={{fontFamily:T.serif,fontSize:28,fontWeight:700,color:T.ink,cursor:isAdam?"pointer":"default"}}>{TITLE_MAP[view]!==null?TITLE_MAP[view]:""}</div>
-          <div style={{display:"flex",alignItems:"center",gap:12,position:"relative"}}>
+        <div style={{padding:"0 40px",height:68,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0,background:"rgba(251,249,255,.86)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
+          <div onClick={isAdam?handleLogoTap:undefined} style={{fontFamily:T.disp,fontSize:26,fontWeight:600,color:T.ink,cursor:isAdam?"pointer":"default"}}>{TITLE_MAP[view]!==null?TITLE_MAP[view]:""}</div>
+          <div style={{display:"flex",alignItems:"center",gap:14,position:"relative"}}>
             <FeedbackWidget user={supabaseAuth.getUser()}/>
-            {isPro&&<div style={{background:T.terraLt,borderRadius:9999,padding:"4px 10px",fontSize:11,fontWeight:600,color:T.terra}}>✨ {tierLabel(tier)}</div>}
-            <button onClick={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e.currentTarget.getBoundingClientRect();setMenuAnchor({top:r.bottom+8,left:r.right-220});setAddMenuOpen(true);}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:9999,padding:"10px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:18}}>+</span> Add Pattern</button>
+            {isPro&&<div style={{fontWeight:800,fontSize:13,color:T.muted,background:"#fff",border:`1px solid ${T.line}`,padding:"9px 15px",borderRadius:999,display:"flex",alignItems:"center",gap:7}}><span style={{color:T.accent}}>✦</span> {tierLabel(tier)}</div>}
+            <button onClick={(e)=>{if(tierGate.atCap){setShowPaywall(true);return;}if(addMenuOpen){setAddMenuOpen(false);setMenuAnchor(null);return;}const r=e.currentTarget.getBoundingClientRect();setMenuAnchor({top:r.bottom+8,left:r.right-220});setAddMenuOpen(true);}} style={{background:T.accent,color:"#fff",border:0,borderRadius:13,padding:"11px 20px",fontSize:14,fontWeight:800,fontFamily:T.body,cursor:"pointer",boxShadow:`0 12px 24px -12px ${T.accent}`,display:"flex",alignItems:"center",gap:8}}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg> Add Pattern
+            </button>
           </div>
         </div>
         <div style={{flex:1,padding:"0 32px",minHeight:"100vh"}}>
@@ -3496,7 +3503,7 @@ export default function Wovely() {
   );
 
   return (
-    <div style={{fontFamily:T.sans,background:"transparent",minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
+    <div style={{fontFamily:T.sans,background:`${T.crosshatch},${T.bg}`,minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
@@ -3518,12 +3525,12 @@ export default function Wovely() {
       {readyPromptPattern&&<ReadyToBuildPrompt pattern={readyPromptPattern} onStartBuilding={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);startAndOpenPattern(p);}} onViewDetails={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);setSelected(p);navigateToView("detail",p._supabaseId||p.id);}} onDismiss={()=>setReadyPromptPattern(null)}/>}
       {deleteTarget&&<DeleteConfirmModal pattern={deleteTarget} isPro={isPro} onCancel={()=>setDeleteTarget(null)} onDelete={confirmDelete} onPark={parkInsteadOfDelete} onGoPro={()=>{setDeleteTarget(null);setShowProModal(true);}}/>}
       {showWelcomeBanner&&<WelcomeBanner onDismiss={()=>setShowWelcomeBanner(false)}/>}
-      <div style={{background:"#FFFFFF",borderBottom:"1px solid #ECE6F8",padding:"0 18px",height:56,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0}}>
-        <button onClick={()=>setNavOpen(true)} style={{background:"none",border:"none",cursor:"pointer",padding:"8px 8px 8px 0",display:"flex",flexDirection:"column",gap:5}}><div style={{width:22,height:1.5,background:T.ink,borderRadius:99}}/><div style={{width:15,height:1.5,background:T.ink,borderRadius:99}}/><div style={{width:22,height:1.5,background:T.ink,borderRadius:99}}/></button>
-        <div onClick={isAdam?handleLogoTap:undefined} style={{fontFamily:T.serif,fontSize:20,fontWeight:700,color:T.ink,cursor:isAdam?"pointer":"default"}}>{TITLE_MAP[view]!==null?TITLE_MAP[view]:""}</div>
+      <div style={{padding:"0 18px",height:60,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0,background:"rgba(251,249,255,.9)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
+        <button onClick={()=>setNavOpen(true)} aria-label="Menu" style={{background:"none",border:"none",cursor:"pointer",padding:"8px 8px 8px 0",display:"flex",flexDirection:"column",gap:5}}><div style={{width:22,height:2,background:T.ink,borderRadius:99}}/><div style={{width:15,height:2,background:T.ink,borderRadius:99}}/><div style={{width:22,height:2,background:T.ink,borderRadius:99}}/></button>
+        <div onClick={isAdam?handleLogoTap:undefined} style={{fontFamily:T.disp,fontSize:20,fontWeight:600,color:T.ink,cursor:isAdam?"pointer":"default"}}>{TITLE_MAP[view]!==null?TITLE_MAP[view]:""}</div>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <FeedbackWidget user={supabaseAuth.getUser()}/>
-          <button onClick={()=>{if(tierGate.atCap){triggerAtCap();return;}setAddMenuOpen(v=>!v);}} style={{background:T.terra,border:"none",borderRadius:9999,width:34,height:34,cursor:"pointer",color:"#fff",fontSize:20,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(123,106,212,.4)"}}>+</button>
+          <button onClick={()=>{if(tierGate.atCap){triggerAtCap();return;}setAddMenuOpen(v=>!v);}} aria-label="Add pattern" style={{background:T.accent,border:"none",borderRadius:"50%",width:36,height:36,cursor:"pointer",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 8px 18px -6px ${T.accent}`}}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
         </div>
       </div>
       {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Nunito,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}
