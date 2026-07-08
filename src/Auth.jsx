@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { T } from "./theme.jsx";
 import { supabaseAuth } from "./supabase.js";
 
@@ -22,7 +22,7 @@ const LANDING_CSS = `
 .wv-land .pagecord{position:fixed;top:0;left:0;height:100vh;width:26px;z-index:40;pointer-events:none;display:flex;flex-direction:column;filter:drop-shadow(3px 2px 3px rgba(90,58,10,.5)) drop-shadow(6px 5px 8px rgba(90,58,10,.28))}
 .wv-land .pagecord img{width:22px;height:auto;display:block}
 .wv-land .pagecord img.fl{transform:scaleY(-1)}
-.wv-land .top{display:flex;align-items:center;gap:26px;padding:16px 54px;position:sticky;top:0;background:rgba(251,249,255,.88);backdrop-filter:blur(10px);z-index:30}
+.wv-land .top{display:flex;align-items:center;gap:26px;padding:16px 54px;position:sticky;top:0;background:rgba(251,249,255,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);z-index:30}
 .wv-land .logo{display:flex;align-items:center;gap:11px;font-family:var(--disp);font-weight:600;font-size:24px;cursor:pointer}
 .wv-land .logo img{width:44px;height:44px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 6px 14px -6px rgba(90,66,160,.5)}
 .wv-land .logo b{color:var(--accent);font-weight:700}
@@ -48,7 +48,7 @@ const LANDING_CSS = `
 .wv-land .heroviz{position:relative}
 .wv-land .vizcard{border-radius:26px;overflow:hidden;border:1px solid var(--line);box-shadow:0 40px 80px -40px rgba(46,39,72,.55);position:relative;height:330px;margin-left:52px}
 .wv-land .coverfill{position:relative;overflow:hidden;background:#EDE7F7}
-.wv-land .cf-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(22px) saturate(1.15);transform:scale(1.22)}
+.wv-land .cf-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(22px) saturate(1.15);transform:scale(1.22) translateZ(0)}
 .wv-land .cf-img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;z-index:1}
 .wv-land .vizbev{position:absolute;bottom:-24px;left:-30px;width:245px;filter:drop-shadow(0 18px 26px rgba(90,66,160,.45));z-index:3}
 .wv-land .vizbadge{position:absolute;top:16px;left:16px;z-index:3;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.95);border-radius:999px;padding:9px 15px;font-weight:800;font-size:13px;color:#1E8A63;box-shadow:0 10px 22px -12px rgba(46,39,72,.5)}
@@ -124,6 +124,11 @@ const LANDING_CSS = `
 @media (max-width:1024px){.wv-land .hero{grid-template-columns:1fr;padding:34px 40px 10px;gap:64px}.wv-land .heroviz{order:0}.wv-land .stats{grid-template-columns:1fr 1fr}.wv-land .heroviz{max-width:560px}.wv-land .top{padding:16px 40px}.wv-land .sect{padding:54px 40px 0}.wv-land .craftin{grid-template-columns:1fr;padding:36px}.wv-land .endin{flex-direction:column;text-align:center;padding:44px 36px}.wv-land .end-s{margin-left:auto;margin-right:auto}.wv-land .pagecord{display:none}}
 @media (max-width:640px){.wv-land .h1{font-size:36px}.wv-land .pcard.hot{order:-1}.wv-land .stats{grid-template-columns:1fr}.wv-land .vizbev{width:180px;left:-14px}.wv-land .vizcard{margin-left:30px;height:280px}.wv-land .statfoot{flex-direction:column;text-align:center}.wv-land .howimg{height:180px}.wv-land .uline{white-space:normal;background-size:100% 9px;padding-bottom:10px}.wv-land .hero{padding:34px 22px 6px;gap:30px}.wv-land .top{padding:14px 18px;gap:12px}.wv-land .tlink.hidem{display:none}.wv-land .sect{padding:44px 22px 0}.wv-land .how{grid-template-columns:1fr;gap:20px}.wv-land .plans{grid-template-columns:1fr}.wv-land .craftband,.wv-land .endband{padding-left:22px;padding-right:22px}.wv-land .craftlist{grid-template-columns:1fr}.wv-land .foot{padding:0 22px 36px}.wv-land .vizcard{height:300px}}
 #__ph_survey_widget, div[class*="PostHog"], div[id*="posthog"], .__ph_toolbar { display: none !important; }
+/* The app shell's fixed background photo (body::before/::after in index.css)
+   stays intact for the logged-in app — but the landing is an opaque surface,
+   and on iOS the photo bleeds through during overscroll / URL-bar resize.
+   Hidden only while the landing is mounted (class toggled in Auth). */
+body.wv-landing-active::before, body.wv-landing-active::after { display: none; }
 `;
 
 /* Checkmark used in chips, craft list and plan lists */
@@ -132,10 +137,12 @@ const Check = ({ size = 14, sw = 3 }) => (
 );
 
 /* Blurred-cover image fill (mockup .coverfill — the host element carries the
-   sizing class, exactly like the mockup's `class="vizcard coverfill"`) */
-const CoverFill = ({ src, alt = "", className = "", children }) => (
+   sizing class, exactly like the mockup's `class="vizcard coverfill"`).
+   bgSrc feeds the blurred backdrop a tiny thumbnail — blur(22px) erases all
+   detail anyway, and full-size sources decoded twice froze mobile GPUs. */
+const CoverFill = ({ src, bgSrc, alt = "", className = "", children }) => (
   <div className={`${className} coverfill`}>
-    <div className="cf-bg" style={{ backgroundImage: `url('${src}')` }} />
+    <div className="cf-bg" style={{ backgroundImage: `url('${bgSrc || src}')` }} />
     <img className="cf-img" src={src} alt={alt} />
     {children}
   </div>
@@ -152,7 +159,7 @@ const PageCord = () => (
 const TopNav = ({ onLanding, onSignIn, onStartFree, showLinks }) => (
   <div className="top">
     <div className="logo" onClick={onLanding}>
-      <img src="/bev.png" alt="Bev" />
+      <img src="/bev-sm.png" alt="Bev" />
       <span>Wove<b>ly</b></span>
     </div>
     <div className="tlinks">
@@ -173,7 +180,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
     <div className="hero">
       <div className="heroviz">
         <img className="vizbev" src="/bev-hero.png" alt="Bev, your Wovely guide" />
-        <CoverFill src="/mommy_fiora.png" alt="Two crocheted dragons — a real Wovely maker's project" className="vizcard">
+        <CoverFill src="/landing-dragons.jpg" bgSrc="/landing-dragons-blur.jpg" alt="Two crocheted dragons — a real Wovely maker's project" className="vizcard">
           <div className="vizbadge">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z" /><path d="M9 12l2 2 4-4" /></svg>
             BevCheck · 99.7% certified
@@ -228,7 +235,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
         </div>
       </div>
       <div className="statfoot">
-        <img src="/bev.png" alt="Bev" />
+        <img src="/bev-sm.png" alt="Bev" />
         <div>That's the job Bev took: the organizing, the counting, the checking — even the supply math. <b>Every found hour goes where it belongs: on your hook.</b></div>
       </div>
     </div>
@@ -240,7 +247,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
       <div className="how">
         <div className="howc">
           <div className="hown">Step 1</div>
-          <CoverFill src="/manatee_hero.png" className="howimg" />
+          <CoverFill src="/landing-manatee.jpg" bgSrc="/landing-manatee-blur.jpg" className="howimg" />
           <div className="howbody">
             <div className="howic">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 3.5H7.5A1.5 1.5 0 006 5v14a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0018 19V8z" /><path d="M13.5 3.5V8H18" /></svg>
@@ -500,6 +507,14 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
   // mockup (annualDefault: true). Values come from Pricing Canon (locked):
   // $6.99/mo · $54.99/yr ($4.58/mo, "2 months free").
   const [annual, setAnnual] = useState(true);
+
+  // Hide the app shell's fixed background photo while the landing is up
+  // (see body.wv-landing-active rule in LANDING_CSS). Restored on unmount so
+  // the logged-in shell keeps its background exactly as before.
+  useEffect(() => {
+    document.body.classList.add("wv-landing-active");
+    return () => document.body.classList.remove("wv-landing-active");
+  }, []);
 
   const toTop = () => { try { window.scrollTo(0, 0); } catch {} };
   const goLanding = () => { setScreen("landing"); toTop(); };
