@@ -67,8 +67,12 @@ const PatternCard = ({p,onClick,onPark,onUnpark,onDelete,onCoverChange,onRename,
   const cardPhoto=p.cover_image_url||(PILL.includes(p.photo)?catFallbackPhoto(p.cat):p.photo)||catFallbackPhoto(p.cat);
   const isPlaceholder=!p.cover_image_url&&PILL.includes(p.photo);
   const hasImage = !!cardPhoto && !isPlaceholder;
+  // 2b card (Wovely App 2b.dc.html .pcard): solid white panel on the woven
+  // canvas, hairline line border, layered lavender shadow, generous radius.
+  const CARD_SHADOW = "0 16px 34px -22px rgba(90,66,160,0.4)";
+  const CARD_SHADOW_HOVER = "0 26px 46px -22px rgba(90,66,160,0.5)";
   return (
-    <div className="card fu" onClick={onClick} style={{background:GLASS.bg,backdropFilter:GLASS.blur,WebkitBackdropFilter:GLASS.blur,borderRadius:GLASS.radius,overflow:"hidden",border:GLASS.border,cursor:"pointer",animationDelay:delay+"s",position:"relative",boxShadow:GLASS.shadow,transition:"transform 0.15s ease, box-shadow 0.15s ease"}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 32px rgba(123,106,212,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=GLASS.shadow;}}>
+    <div className="fu" onClick={onClick} style={{background:"#fff",borderRadius:22,overflow:"hidden",border:"1px solid #ECE6F8",cursor:"pointer",animationDelay:delay+"s",position:"relative",boxShadow:CARD_SHADOW,transition:"transform .16s ease, box-shadow .16s ease"}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow=CARD_SHADOW_HOVER;}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=CARD_SHADOW;}}>
       {renaming&&<RenameModal pattern={p} onCancel={()=>setRenaming(false)} onSave={newTitle=>{setRenaming(false);onRename&&onRename(p,newTitle);}}/>}
       {(onPark||onDelete)&&<div style={{position:"absolute",top:8,right:8,zIndex:5}}>
         <button onClick={e=>{e.stopPropagation();setMenuOpen(!menuOpen);}} style={{background:"rgba(0,0,0,.45)",backdropFilter:"blur(4px)",border:"none",borderRadius:99,width:28,height:28,cursor:"pointer",color:"#fff",fontSize:16,display:"flex",alignItems:"center",justifyContent:"center",lineHeight:1}}>⋮</button>
@@ -82,9 +86,12 @@ const PatternCard = ({p,onClick,onPark,onUnpark,onDelete,onCoverChange,onRename,
           <div onClick={()=>{setMenuOpen(false);onDelete&&onDelete(p);}} style={{padding:"10px 14px",fontSize:13,color:"#C2564A",cursor:"pointer"}} onMouseEnter={e=>e.currentTarget.style.background="rgba(237,228,247,0.4)"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>Delete pattern</div>
         </div>}
       </div>}
-      <div style={{position:"relative",height:200,overflow:"hidden",borderRadius:`${GLASS.radius}px ${GLASS.radius}px 0 0`,background:"linear-gradient(135deg, #ECE6F8 0%, #F5F0FA 100%)"}}>
+      <div style={{position:"relative",height:172,overflow:"hidden",background:"#EDE7F7"}}>
         {hasImage
-          ? <Photo src={cardPhoto} alt={p.title} style={{width:"100%",height:"100%",objectFit:"contain",objectPosition:"center",display:"block"}}/>
+          ? <>
+              <div style={{position:"absolute",inset:0,backgroundImage:`url('${cardPhoto}')`,backgroundSize:"cover",backgroundPosition:"center",filter:"blur(22px) saturate(1.15)",transform:"scale(1.22)"}}/>
+              <Photo src={cardPhoto} alt={p.title} style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain",objectPosition:"center",display:"block",zIndex:1}}/>
+            </>
           : <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
               <span style={{fontFamily:PF,fontSize:36,color:ACCENT,opacity:0.5}}>{(p.title||"?")[0]}</span>
             </div>
@@ -92,17 +99,18 @@ const PatternCard = ({p,onClick,onPark,onUnpark,onDelete,onCoverChange,onRename,
         {isParked?<div style={{position:"absolute",top:10,left:10,background:"rgba(92,79,68,.8)",backdropFilter:"blur(4px)",color:"#fff",fontSize:9,fontWeight:600,padding:"3px 8px",borderRadius:99}}>Parked</div>
         :p.isStarter?<div style={{position:"absolute",top:10,left:10,background:"rgba(184,144,44,.9)",backdropFilter:"blur(4px)",color:"#fff",fontSize:9,fontWeight:600,padding:"3px 8px",borderRadius:99}}>Free Starter</div>
         :done===100?<div style={{position:"absolute",top:10,right:10,background:T.sage,color:"#fff",fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:99,letterSpacing:".07em"}}>DONE</div>
-        :done>0&&done<100?<><div style={{position:"absolute",top:10,right:10,background:"rgba(28,23,20,.65)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:600,padding:"3px 8px",borderRadius:99}}>{done}%</div><div style={{position:"absolute",bottom:0,left:0,right:0}}><Bar val={done} color="rgba(255,255,255,.8)" h={3} bg="transparent"/></div></>
+        :done>0&&done<100?<div style={{position:"absolute",top:10,right:10,background:"rgba(46,39,72,.7)",backdropFilter:"blur(4px)",color:"#fff",fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:99}}>{done}%</div>
         :null}
         {!isParked&&!p.isStarter&&done===0&&!p.started&&p.rows&&p.rows.length>0&&<div style={{position:"absolute",top:10,right:10,background:"rgba(92,122,94,.85)",backdropFilter:"blur(4px)",color:"#fff",fontSize:9,fontWeight:600,padding:"3px 8px",borderRadius:99}}>Ready to build</div>}
         {!p.isStarter&&p.snapConfidence&&<div style={{position:"absolute",top:10,left:10,background:"rgba(123,106,212,.85)",backdropFilter:"blur(4px)",color:"#fff",fontSize:9,fontWeight:700,padding:"3px 8px",borderRadius:99}}>✨ {p.snapConfidence}%</div>}
         {isPlaceholder&&onCoverChange&&<button onClick={e=>{e.stopPropagation();onCoverChange(p);}} style={{position:"absolute",bottom:10,left:"50%",transform:"translateX(-50%)",background:"rgba(255,255,255,.15)",backdropFilter:"blur(4px)",border:`1.5px solid ${T.terra}`,borderRadius:10,padding:"6px 14px",fontSize:11,fontWeight:600,color:"#fff",cursor:"pointer",whiteSpace:"nowrap"}}>Set cover image</button>}
       </div>
-      <div style={{padding:"14px 16px 16px"}}>
-        {p.cat&&p.cat.toLowerCase()!=="uncategorized"&&<div style={{fontFamily:INTER,fontSize:10,fontWeight:600,color:ACCENT,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:4}}>{p.cat}</div>}
-        <div style={{fontFamily:PF,fontSize:15,fontWeight:600,color:NAVY,lineHeight:1.3,margin:"0 0 6px",overflow:"hidden",textOverflow:"ellipsis",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",whiteSpace:"normal"}}>{p.title}</div>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><Stars val={p.rating} ro/><span style={{fontFamily:INTER,fontSize:11,color:"#9B87B8"}}>{p.source}</span></div>
-        {p.isStarter&&<div style={{fontSize:12,color:MUTED,opacity:.6,marginTop:6,fontStyle:"italic"}}>A gift from Wovely — yours to keep</div>}
+      <div style={{padding:"17px 18px 20px"}}>
+        {p.cat&&p.cat.toLowerCase()!=="uncategorized"&&<div style={{fontFamily:INTER,fontSize:10,fontWeight:800,color:ACCENT,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:5}}>{p.cat}</div>}
+        <div style={{fontFamily:PF,fontSize:20,fontWeight:600,color:NAVY,lineHeight:1.1,margin:"0 0 6px",overflow:"hidden",textOverflow:"ellipsis",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",whiteSpace:"normal"}}>{p.title}</div>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><Stars val={p.rating} ro/><span style={{fontFamily:INTER,fontSize:12,fontWeight:700,color:MUTED}}>{p.source}</span></div>
+        {done>0&&<div style={{height:9,borderRadius:999,background:"#ECE6F8",marginTop:13,overflow:"hidden"}}><span style={{display:"block",height:"100%",width:`${done}%`,borderRadius:999,background:"linear-gradient(90deg,#7B6AD4,#C98BE0)"}}/></div>}
+        {p.isStarter&&<div style={{fontSize:12,color:MUTED,opacity:.6,marginTop:8,fontStyle:"italic"}}>A gift from Wovely — yours to keep</div>}
       </div>
     </div>
   );
@@ -1014,10 +1022,14 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
   return (
     <div style={{ minHeight: "100vh", background: "transparent" }}>
       <div style={{ maxWidth: 1280, margin: "0 auto", padding: isMobile ? "16px 16px 160px" : "24px 32px 80px", boxSizing: "border-box", width: "100%" }}>
-        {/* Greeting — full width on every layout. */}
-        <p style={{ fontFamily: PF, fontStyle: "italic", fontSize: 16, color: "#9B87B8", marginBottom: 20, marginTop: 4 }}>
-          Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}, here's your space.
-        </p>
+        {/* Greeting — 2b Craft Room header (Wovely App 2b.dc.html). */}
+        <div style={{ marginBottom: 22, marginTop: 4 }}>
+          <div style={{ fontWeight: 800, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: ACCENT }}>The Craft Room</div>
+          <div style={{ fontFamily: PF, fontWeight: 600, fontSize: isMobile ? 30 : 38, letterSpacing: "-.01em", color: NAVY, marginTop: 4, lineHeight: 1.05 }}>
+            Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}
+          </div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: MUTED, marginTop: 3 }}>Everything you're making, in one cosy place.</div>
+        </div>
 
         <BevCorner patterns={visible} isMobile={isMobile} isPro={isPro} />
 
