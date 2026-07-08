@@ -2028,6 +2028,22 @@ export default function Wovely() {
   // refresh/nav within the tab keeps them in the app shell instead of bouncing to the landing.
   const [anonymousMode,setAnonymousMode]=useState(()=>{try{return sessionStorage.getItem("wovely_anonymous_mode")==="1";}catch{return false;}});
   const enterAnonymousMode=useCallback(()=>{try{sessionStorage.setItem("wovely_anonymous_mode","1");}catch{}setAnonymousMode(true);try{posthog.capture("anonymous_mode_entered");}catch{}},[]);
+
+  // Landing "Try free" fork stashes the picked path (wovely_first_run_intent)
+  // before entering guest mode — honor it once the shell is up so the user
+  // lands directly in the flow they tapped instead of re-choosing. Lives up
+  // here with the other hooks: it must run on every render (the component has
+  // conditional early returns further down).
+  useEffect(() => {
+    if (!anonymousMode) return;
+    let intent = null;
+    try { intent = sessionStorage.getItem("wovely_first_run_intent"); sessionStorage.removeItem("wovely_first_run_intent"); } catch {}
+    if (intent === "starter") { setStarterError(false); setFirstRunMode("gallery"); }
+    else if (intent === "import") {
+      setMenuAnchor({ top: 96, left: Math.max(12, window.innerWidth / 2 - 110) });
+      setAddMenuOpen(true);
+    }
+  }, [anonymousMode]);
   // AuthWallModal global state — the gateAction helper (below) routes anonymous users here
   // before any Pro paywall. Critical invariant: never show the Pro paywall to an unauthed user.
   const [authWallOpen,setAuthWallOpen]=useState(false);

@@ -18,10 +18,10 @@ const waitForSession = async () => {
 };
 
 const INPUT_STYLE = {
-  width: "100%", height: 41, padding: "0 14px", background: "#F5F2FF",
-  border: "1px solid #ECE6F8", borderRadius: 10, fontSize: 13,
-  color: "#2E2748", outline: "none", boxSizing: "border-box",
-  fontFamily: "Nunito,sans-serif",
+  width: "100%", padding: "14px 16px", background: "#fff",
+  border: "1.5px solid #ECE6F8", borderRadius: 14, fontSize: 15,
+  fontWeight: 700, color: "#2E2748", outline: "none", boxSizing: "border-box",
+  fontFamily: "'Nunito',-apple-system,sans-serif",
 };
 
 const AuthWallModal = ({
@@ -115,9 +115,10 @@ const AuthWallModal = ({
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          position: "relative", width: "100%", maxWidth: 420,
-          background: "#FFFFFF", borderRadius: 16, padding: 32,
-          boxShadow: "0 20px 60px rgba(90,66,160,0.18)",
+          position: "relative", width: "100%", maxWidth: 440,
+          background: "#FFFFFF", border: "1px solid #ECE6F8", borderRadius: 28,
+          padding: "36px 34px",
+          boxShadow: "0 40px 80px -40px rgba(46,39,72,0.45)",
           boxSizing: "border-box",
         }}
       >
@@ -134,26 +135,26 @@ const AuthWallModal = ({
           }}
         >×</button>
 
-        <div style={{ textAlign: "center", marginBottom: 16 }}>
+        <div style={{ textAlign: "center", marginBottom: 4 }}>
           <img
-            src="/bev_neutral.png"
+            src="/bev-hero.png"
             alt="Bev"
-            style={{ width: 80, height: 80, objectFit: "contain", margin: "0 auto", display: "block" }}
+            style={{ width: 84, objectFit: "contain", margin: "0 auto", display: "block", filter: "drop-shadow(0 12px 18px rgba(90,66,160,.35))" }}
           />
         </div>
 
         <div style={{
-          fontFamily: "'Fredoka', Georgia, serif",
-          fontSize: 24, fontWeight: 700, color: "#2E2748",
-          textAlign: "center", marginBottom: 6, lineHeight: 1.25,
+          fontFamily: "'Fredoka','Segoe UI',sans-serif",
+          fontSize: 25, fontWeight: 600, color: "#2E2748",
+          textAlign: "center", marginBottom: 6, lineHeight: 1.25, marginTop: 10,
         }}>
           {mode === "signup" ? title : "Welcome back"}
         </div>
         <div style={{
-          fontFamily: "Nunito,sans-serif", fontSize: 14, color: "#726A92",
+          fontFamily: "'Nunito',-apple-system,sans-serif", fontSize: 14, fontWeight: 700, color: "#726A92",
           textAlign: "center", marginBottom: 20, lineHeight: 1.5,
         }}>
-          {mode === "signup" ? subtitle : "Sign in to continue."}
+          {mode === "signup" ? subtitle : "Bev kept everything right where you left it."}
         </div>
 
         {isAnonymous && mode === "signin" && (
@@ -216,22 +217,23 @@ const AuthWallModal = ({
           onClick={handleSubmit}
           disabled={loading}
           style={{
-            width: "100%", height: 43, marginTop: 14,
+            width: "100%", padding: 15, marginTop: 14,
             background: "#7B6AD4", color: "#fff",
-            border: "none", borderRadius: 10,
-            fontSize: 14, fontWeight: 600, fontFamily: "Nunito,sans-serif",
+            border: "none", borderRadius: 14,
+            fontSize: 15, fontWeight: 800, fontFamily: "'Nunito',-apple-system,sans-serif",
+            boxShadow: "0 16px 30px -14px #7B6AD4",
             cursor: loading ? "default" : "pointer",
             opacity: loading ? 0.6 : 1,
           }}
         >{submitLabel}</button>
 
-        <div style={{ textAlign: "center", marginTop: 14, fontSize: 12.5 }}>
+        <div style={{ textAlign: "center", marginTop: 16, fontSize: 12.5, fontWeight: 700, fontFamily: "'Nunito',-apple-system,sans-serif" }}>
           {mode === "signup" ? (
             <>
               <span style={{ color: "#726A92" }}>Already have an account? </span>
               <span
                 onClick={() => { setMode("signin"); setError(null); setPass(""); setConfirmPass(""); }}
-                style={{ color: "#7B6AD4", cursor: "pointer", fontWeight: 600 }}
+                style={{ color: "#7B6AD4", cursor: "pointer", fontWeight: 800 }}
               >Sign in</span>
             </>
           ) : (
@@ -239,7 +241,7 @@ const AuthWallModal = ({
               <span style={{ color: "#726A92" }}>New to Wovely? </span>
               <span
                 onClick={() => { setMode("signup"); setError(null); setPass(""); setConfirmPass(""); }}
-                style={{ color: "#7B6AD4", cursor: "pointer", fontWeight: 600 }}
+                style={{ color: "#7B6AD4", cursor: "pointer", fontWeight: 800 }}
               >Create account</span>
             </>
           )}

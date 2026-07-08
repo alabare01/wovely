@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { T } from "./theme.jsx";
+
 import { supabaseAuth } from "./supabase.js";
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -128,8 +128,41 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 .wv-land .foot{display:flex;align-items:center;gap:22px;max-width:1160px;margin:0 auto;padding:0 54px 44px;font-weight:700;font-size:13px;color:var(--muted);flex-wrap:wrap}
 .wv-land .foot a{color:var(--muted);text-decoration:none;font-weight:800}
 .wv-land .authwrap{min-height:calc(100vh - 90px);display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.wv-land .authcard{background:#fff;border:1px solid var(--line);border-radius:28px;padding:40px 42px;width:440px;max-width:100%;box-shadow:0 40px 80px -40px rgba(46,39,72,.45);text-align:center}
+.wv-land .authcard.pulse{animation:wvcardpulse .45s ease}
+@keyframes wvcardpulse{0%{transform:scale(1)}35%{transform:scale(1.03)}100%{transform:scale(1)}}
+.wv-land .authcard img.bevimg{width:92px;filter:drop-shadow(0 12px 18px rgba(90,66,160,.35))}
+.wv-land .auth-h{font-family:var(--disp);font-weight:600;font-size:28px;margin-top:14px}
+.wv-land .auth-s{font-weight:700;font-size:14px;color:var(--muted);margin-top:6px;line-height:1.5}
+.wv-land .gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1.5px solid var(--line);border-radius:14px;padding:14px;background:#fff;font-family:var(--body);font-weight:800;font-size:15px;color:var(--ink);cursor:pointer;margin-top:24px}
+.wv-land .orrow{display:flex;align-items:center;gap:12px;margin:18px 0;color:var(--muted);font-weight:800;font-size:12px}
+.wv-land .orrow:before,.wv-land .orrow:after{content:"";flex:1;border-top:1.5px dashed var(--line)}
+.wv-land .fin{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;font-family:var(--body);font-weight:700;font-size:15px;color:var(--ink);background:#fff;outline:none;margin-top:10px;box-sizing:border-box}
+.wv-land .fin:focus{border-color:var(--accent)}
+.wv-land .authbtn{width:100%;margin-top:16px}
+.wv-land .authmicro{font-weight:700;font-size:12.5px;color:var(--muted);margin-top:16px;line-height:1.5}
+.wv-land .authmicro b{color:var(--mint)}
+.wv-land .authlink{font-weight:800;color:var(--accent);cursor:pointer;text-decoration:none}
+.wv-land .autherr{background:#F2EEFB;color:#C2564A;border-radius:12px;padding:10px 14px;font-size:13px;font-weight:700;margin-top:12px;text-align:left}
+.wv-land .forkrow{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}
+.wv-land .fork{text-decoration:none;color:inherit;display:flex;flex-direction:column;border:1.5px solid var(--line);border-radius:20px;padding:20px;background:#fff;cursor:pointer;text-align:left;transition:.15s;font-family:var(--body);box-shadow:0 12px 26px -22px rgba(90,66,160,.35)}
+.wv-land .fork:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 16px 30px -20px rgba(90,66,160,.5)}
+.wv-land .fork.gold{background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#F2C744,#E9A83C 45%,#F6E7C9) border-box;border:2px solid transparent}
+.wv-land .fork.gold:hover{box-shadow:0 16px 30px -18px rgba(200,150,40,.6)}
+.wv-land .forkcov{aspect-ratio:2.35/1;border-radius:13px;overflow:hidden;margin-bottom:15px;position:relative}
+.wv-land .covbg{background-size:cover;background-position:center}
+.wv-land .impviz{aspect-ratio:2.35/1;border-radius:13px;background:#F3EEFB;border:1.5px dashed #CBBBEE;position:relative;overflow:hidden;margin-bottom:15px}
+.wv-land .imppage{position:absolute;left:12%;top:9%;width:27%;border-radius:6px;box-shadow:0 12px 24px -10px rgba(60,40,110,.4);transform:rotate(-5deg);z-index:2}
+.wv-land .impback{position:absolute;left:35%;top:15%;width:26%;aspect-ratio:3/4;background:#fff;border:1px solid var(--line);border-radius:6px;transform:rotate(5deg);box-shadow:0 10px 20px -12px rgba(60,40,110,.3)}
+.wv-land .impgo{position:absolute;right:9%;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 20px -8px rgba(90,66,160,.55);z-index:3}
+.wv-land .fork-t{font-family:var(--disp);font-weight:600;font-size:18px;display:flex;align-items:center;gap:8px}
+.wv-land .fork-s{font-weight:700;font-size:12.5px;color:var(--muted);margin-top:7px;line-height:1.5}
+.wv-land .fork-p{font-weight:800;font-size:13px;color:var(--accent);margin-top:auto;padding-top:14px}
+.wv-land .fork.gold .fork-p{color:#B07B1E}
+.wv-land .minipat{display:flex;align-items:center;gap:10px;margin-top:13px;background:var(--bg);border-radius:11px;padding:8px 10px;font-weight:700;font-size:12px;color:var(--muted);line-height:1.4;text-align:left}
+.wv-land .minipat img{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0}
 @media (max-width:1024px){.wv-land .hero{grid-template-columns:1fr;padding:34px 40px 10px;gap:64px}.wv-land .heroviz{order:0}.wv-land .stats{grid-template-columns:1fr 1fr}.wv-land .heroviz{max-width:560px}.wv-land .top{padding:16px 40px}.wv-land .sect{padding:54px 40px 0}.wv-land .craftin{grid-template-columns:1fr;padding:36px}.wv-land .endin{flex-direction:column;text-align:center;padding:44px 36px}.wv-land .end-s{margin-left:auto;margin-right:auto}.wv-land .pagecord{display:none}}
-@media (max-width:640px){.wv-land .h1{font-size:36px}.wv-land .pcard.hot{order:-1}.wv-land .stats{grid-template-columns:1fr}.wv-land .vizbev{width:180px;left:-14px}.wv-land .vizcard{margin-left:30px;height:280px}.wv-land .statfoot{flex-direction:column;text-align:center}.wv-land .howimg{height:180px}.wv-land .uline{white-space:normal;background-size:100% 9px;padding-bottom:10px}.wv-land .hero{padding:34px 22px 6px;gap:30px}.wv-land .top{padding:14px 18px;gap:12px}.wv-land .tlink.hidem{display:none}.wv-land .sect{padding:44px 22px 0}.wv-land .how{grid-template-columns:1fr;gap:20px}.wv-land .plans{grid-template-columns:1fr}.wv-land .craftband,.wv-land .endband{padding-left:22px;padding-right:22px}.wv-land .craftlist{grid-template-columns:1fr}.wv-land .foot{padding:0 22px 36px}.wv-land .vizcard{height:300px}}
+@media (max-width:640px){.wv-land .forkrow{grid-template-columns:1fr}.wv-land .authcard{padding:32px 24px}.wv-land .h1{font-size:36px}.wv-land .pcard.hot{order:-1}.wv-land .stats{grid-template-columns:1fr}.wv-land .vizbev{width:180px;left:-14px}.wv-land .vizcard{margin-left:30px;height:280px}.wv-land .statfoot{flex-direction:column;text-align:center}.wv-land .howimg{height:180px}.wv-land .uline{white-space:normal;background-size:100% 9px;padding-bottom:10px}.wv-land .hero{padding:34px 22px 6px;gap:30px}.wv-land .top{padding:14px 18px;gap:12px}.wv-land .tlink.hidem{display:none}.wv-land .sect{padding:44px 22px 0}.wv-land .how{grid-template-columns:1fr;gap:20px}.wv-land .plans{grid-template-columns:1fr}.wv-land .craftband,.wv-land .endband{padding-left:22px;padding-right:22px}.wv-land .craftlist{grid-template-columns:1fr}.wv-land .foot{padding:0 22px 36px}.wv-land .vizcard{height:300px}}
 #__ph_survey_widget, div[class*="PostHog"], div[id*="posthog"], .__ph_toolbar { display: none !important; }
 /* iOS Safari only (-webkit-touch-callout is iOS-specific): live filter layers
    break the tile compositor on real devices — sections stop painting mid-
@@ -386,138 +419,154 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
   </>
 );
 
-/* ── Auth form — existing working auth plumbing (visual rebuild lands with
-     the auth-screens surface; keep logic identical) ── */
-const AuthForm = ({ onEnter, onEnterAsNew, onTryAnonymous, initialMode = "signup" }) => {
+/* ── Google G mark (mockup gbtn) ── */
+const GoogleG = () => (
+  <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h5.9a5 5 0 01-2.2 3.3v2.8h3.6c2.1-1.9 3.3-4.8 3.3-8.2z" /><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.6l-3.6-2.8c-1 .7-2.3 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.9A11 11 0 0012 23z" /><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 010-4.4V6.9H2.1a11 11 0 000 10.2z" /><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7L19.4 4A11 11 0 002.1 6.9l3.7 2.9c.9-2.6 3.3-4.4 6.2-4.4z" /></svg>
+);
+
+const ArrowIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h13M13 6.5l5.5 5.5-5.5 5.5" /></svg>
+);
+
+/* ── Import-your-own / start-with-ours fork cards (mockup .forkrow) — shared
+     by the Try screen; the same real handlers back both cards. ── */
+const GuestForkRow = ({ onImport, onStarter }) => (
+  <div className="forkrow">
+    <button className="fork" onClick={onImport}>
+      <div className="impviz">
+        <div className="impback" />
+        <img className="imppage" src="/import-sample.png" alt="A pattern PDF ready to import" />
+        <div className="impgo"><ArrowIcon /></div>
+      </div>
+      <div className="fork-t">Import your own</div>
+      <div className="fork-s">A PDF, photos of a paper pattern, or a link — Bev reads it, checks every stitch count, and sets it up to track.</div>
+      <div className="fork-p">Import a pattern →</div>
+    </button>
+    <button className="fork" onClick={onStarter}>
+      <div className="forkcov covbg" role="img" aria-label="Button the Mushroom starter pattern" style={{ backgroundImage: "url('/cover-mushroom-photo.png')" }} />
+      <div className="fork-t">Start with ours</div>
+      <div className="fork-s">Button the Mushroom — a friendly little toadstool to learn the round on. A Wovely original, on the house.</div>
+      <div className="fork-p">Start this one →</div>
+    </button>
+  </div>
+);
+
+/* ── Try screen (mockup "Try free") — zero-barrier guest entry ── */
+const TryScreen = ({ onImport, onStarter, onSignIn }) => (
+  <div className="authwrap">
+    <div className="authcard" style={{ width: 640 }}>
+      <img className="bevimg" src="/bev-hero.png" alt="Bev" />
+      <div className="auth-h">Let's get your first pattern going</div>
+      <div className="auth-s">No account, no card — pick a way in and you're stitching in two minutes.</div>
+      <GuestForkRow onImport={onImport} onStarter={onStarter} />
+      <div className="authmicro">Sign up whenever you like — everything you make carries over. Already have an account? <a className="authlink" onClick={onSignIn}>Sign in</a></div>
+    </div>
+  </div>
+);
+
+/* ── Signup / signin card (mockup "Sign up") — same Supabase plumbing as
+     before: signUp/signIn/signInWithOAuth. Successful signup hands control
+     to onSignedUp (fork screen or straight into pending-upgrade checkout). ── */
+const AuthCard = ({ mode, onSwitchMode, onSignedIn, onSignedUp, pulseKey }) => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
-  const [confirmPass, setConfirmPass] = useState("");
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
-  const [isSignIn, setIsSignIn] = useState(initialMode === "signin");
+  const isSignIn = mode === "signin";
 
-  const handleSignup = async () => {
+  const submit = async () => {
     setAuthError(null);
     if (!email.trim() || !pass) { setAuthError("Please fill in all fields."); return; }
-    if (pass !== confirmPass) { setAuthError("Passwords don't match."); return; }
+    if (!isSignIn && pass.length < 6) { setAuthError("Password must be at least 6 characters."); return; }
     setLoading(true);
     try {
-      const { data, error } = await supabaseAuth.signUp(email.trim(), pass);
-      if (error) { setAuthError(error.msg || error.error_description || error.message || "Sign-up failed."); setLoading(false); return; }
-      onEnterAsNew();
+      if (isSignIn) {
+        const { error } = await supabaseAuth.signIn(email.trim(), pass);
+        if (error) { setAuthError(error.error_description || error.msg || error.message || "Invalid email or password."); setLoading(false); return; }
+        onSignedIn();
+      } else {
+        const { error } = await supabaseAuth.signUp(email.trim(), pass);
+        if (error) { setAuthError(error.msg || error.error_description || error.message || "Sign-up failed."); setLoading(false); return; }
+        onSignedUp();
+      }
     } catch { setAuthError("Network error — please try again."); }
     setLoading(false);
   };
 
-  const handleSignin = async () => {
-    setAuthError(null);
-    if (!email.trim() || !pass) { setAuthError("Please fill in all fields."); return; }
-    setLoading(true);
-    try {
-      const { error } = await supabaseAuth.signIn(email.trim(), pass);
-      if (error) { setAuthError(error.error_description || error.msg || error.message || "Invalid email or password."); setLoading(false); return; }
-      onEnter();
-    } catch { setAuthError("Network error — please try again."); }
-    setLoading(false);
-  };
-
-  const onKey = e => {
-    if (e.key === "Enter" && !loading) {
-      isSignIn ? handleSignin() : handleSignup();
-    }
-  };
+  const onKey = e => { if (e.key === "Enter" && !loading) submit(); };
 
   return (
-    <div style={{
-      padding: 40, maxWidth: 440, width: "100%", boxSizing: "border-box",
-      background: "#fff", border: `1px solid ${T.line}`, borderRadius: 28,
-      boxShadow: "0 40px 80px -40px rgba(46,39,72,.45)",
-    }}>
-      {/* Mode toggle */}
-      <div style={{ display: "flex", gap: 0, marginBottom: 28, borderRadius: 12, padding: 4, background: T.soft }}>
-        {[["Sign up", false], ["Sign in", true]].map(([label, mode]) => (
-          <button key={label} onClick={() => { setIsSignIn(mode); setAuthError(null); }} style={{
-            flex: 1, padding: "10px 16px", background: isSignIn === mode ? "#fff" : "transparent",
-            border: "none", borderRadius: 10, fontSize: 14, fontWeight: 700,
-            color: isSignIn === mode ? T.ink : T.muted, cursor: "pointer", fontFamily: T.body,
-            boxShadow: isSignIn === mode ? "0 1px 3px rgba(46,39,72,0.08)" : "none",
-          }}>{label}</button>
-        ))}
-      </div>
-
-      <div style={{ marginBottom: 20 }}>
-        <h1 style={{ fontFamily: T.disp, fontSize: 26, fontWeight: 600, color: T.ink, margin: "0 0 8px", lineHeight: 1.2 }}>
-          {isSignIn ? "Welcome back" : "Let's get you set up"}
-        </h1>
-        <p style={{ fontFamily: T.body, fontSize: 14, color: T.muted, lineHeight: 1.5, margin: 0, fontWeight: 700 }}>
-          {isSignIn ? "Bev kept everything right where you left it." : <>Bev's ready when you are. Free means free — <b style={{ color: T.mint }}>5 patterns, no card.</b></>}
-        </p>
-      </div>
-
-      <button
-        onClick={() => supabaseAuth.signInWithOAuth("google")}
-        style={{
-          width: "100%", padding: 14, background: "#fff", border: `1.5px solid ${T.line}`,
-          borderRadius: 14, fontSize: 15, fontWeight: 800, color: T.ink, cursor: "pointer",
-          fontFamily: T.body, display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-        }}
-      >
-        <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h5.9a5 5 0 01-2.2 3.3v2.8h3.6c2.1-1.9 3.3-4.8 3.3-8.2z" /><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.6l-3.6-2.8c-1 .7-2.3 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.9A11 11 0 0012 23z" /><path fill="#FBBC05" d="M5.8 14.2a6.6 6.6 0 010-4.4V6.9H2.1a11 11 0 000 10.2z" /><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7L19.4 4A11 11 0 002.1 6.9l3.7 2.9c.9-2.6 3.3-4.4 6.2-4.4z" /></svg>
-        Continue with Google
-      </button>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px 0", color: T.muted, fontWeight: 800, fontSize: 12 }}>
-        <div style={{ flex: 1, borderTop: `1.5px dashed ${T.line}` }} />or with email<div style={{ flex: 1, borderTop: `1.5px dashed ${T.line}` }} />
-      </div>
-
-      <div onKeyDown={onKey}>
-        {[
-          { v: email, set: setEmail, ph: "you@example.com", type: "email" },
-          { v: pass, set: setPass, ph: isSignIn ? "Password" : "Choose a password", type: "password" },
-          ...(!isSignIn ? [{ v: confirmPass, set: setConfirmPass, ph: "Confirm password", type: "password" }] : []),
-        ].map((f, i) => (
-          <input key={i} value={f.v} onChange={e => f.set(e.target.value)} placeholder={f.ph} type={f.type}
-            style={{
-              width: "100%", border: `1.5px solid ${T.line}`, borderRadius: 14, padding: "14px 16px",
-              fontFamily: T.body, fontWeight: 700, fontSize: 15, color: T.ink, background: "#fff",
-              outline: "none", marginTop: 10, boxSizing: "border-box",
-            }}
-            onFocus={e => e.target.style.borderColor = T.accent}
-            onBlur={e => e.target.style.borderColor = T.line}
-          />
-        ))}
-
-        {authError && (
-          <div style={{ background: T.soft, color: T.error, padding: "10px 14px", borderRadius: 12, fontSize: 13, marginTop: 12, fontFamily: T.body, fontWeight: 700 }}>
-            {authError}
-          </div>
-        )}
-
-        <button onClick={isSignIn ? handleSignin : handleSignup} disabled={loading} style={{
-          width: "100%", marginTop: 16, border: 0, borderRadius: 14, padding: 15,
-          background: T.accent, color: "#fff", fontFamily: T.body, fontWeight: 800, fontSize: 15,
-          cursor: "pointer", opacity: loading ? 0.6 : 1, boxShadow: `0 16px 30px -14px ${T.accent}`,
-        }}>
-          {loading ? "Please wait..." : (isSignIn ? "Sign me in" : "Create my account")}
-        </button>
-      </div>
-
-      {onTryAnonymous && !isSignIn && (
-        <div style={{ marginTop: 16, textAlign: "center", fontSize: 12.5, color: T.muted, fontFamily: T.body, fontWeight: 700, lineHeight: 1.5 }}>
-          Just looking? <a onClick={onTryAnonymous} style={{ fontWeight: 800, color: T.accent, cursor: "pointer" }}>Try Wovely without an account</a>
+    <div className="authwrap">
+      <div className={`authcard${pulseKey ? " pulse" : ""}`} key={pulseKey}>
+        <img className="bevimg" src="/bev-hero.png" alt="Bev" />
+        <div className="auth-h">{isSignIn ? "Welcome back" : "Let's get you set up"}</div>
+        <div className="auth-s">{isSignIn ? "Bev kept everything right where you left it." : <>Bev's ready when you are. Free means free — <b>5 patterns, no card.</b></>}</div>
+        <button className="gbtn" onClick={() => supabaseAuth.signInWithOAuth("google")}><GoogleG />Continue with Google</button>
+        <div className="orrow">or with email</div>
+        <div onKeyDown={onKey}>
+          <input className="fin" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" type="email" autoComplete="email" />
+          <input className="fin" value={pass} onChange={e => setPass(e.target.value)} placeholder={isSignIn ? "Password" : "Choose a password"} type="password" autoComplete={isSignIn ? "current-password" : "new-password"} />
+          {authError && <div className="autherr">{authError}</div>}
+          <button className="cta authbtn" onClick={submit} disabled={loading} style={loading ? { opacity: 0.6 } : undefined}>
+            {loading ? "Please wait..." : (isSignIn ? "Sign me in" : "Create my account")}
+          </button>
         </div>
-      )}
-      <div style={{ marginTop: 10, textAlign: "center", fontSize: 12.5, color: T.muted, fontFamily: T.body, fontWeight: 700, lineHeight: 1.5 }}>
-        By continuing you agree to our <a href="/terms" style={{ color: T.accent, fontWeight: 800, textDecoration: "none" }}>Terms</a> &amp; <a href="/privacy" style={{ color: T.accent, fontWeight: 800, textDecoration: "none" }}>Privacy</a>.
+        <div className="authmicro">
+          {isSignIn ? "New here? " : "Already have an account? "}
+          <a className="authlink" onClick={onSwitchMode}>{isSignIn ? "Create an account" : "Sign in"}</a>
+          {" · By continuing you agree to our "}
+          <a className="authlink" href="/terms">Terms</a>{" & "}<a className="authlink" href="/privacy">Privacy</a>.
+        </div>
       </div>
     </div>
   );
 };
 
-/* ── Main Auth component: landing ⇄ auth screens ── */
+/* ── Choose-path screen (mockup "Choose path") — shown right after email
+     signup. Free continues into the shell; Craft stashes the pending-upgrade
+     intent so App.jsx's post-signup auto-checkout opens Stripe. ── */
+const ForkScreen = ({ annual, onFree, onCraft }) => (
+  <div className="authwrap">
+    <div className="authcard" style={{ width: 560 }}>
+      <img src="/bev-sm.png" alt="Bev" style={{ width: 72, borderRadius: "50%" }} />
+      <div className="auth-h">Welcome in! How do you want to start?</div>
+      <div className="auth-s">Either way, your first pattern is two minutes from now.</div>
+      <div className="forkrow">
+        <button className="fork" onClick={onFree}>
+          <div className="fork-t">Start free</div>
+          <div className="fork-s">5 patterns, full row tracking, BevCheck on every import. No card, no clock.</div>
+          <div className="minipat">
+            <img src="/cover-mushroom-photo.png" alt="Button the Mushroom starter" />
+            <span>Includes Button the Mushroom — our free original, on the house</span>
+          </div>
+          <div className="fork-p">Continue free →</div>
+        </button>
+        <button className="fork gold" onClick={onCraft}>
+          <div className="fork-t">Go Craft <span className="craftbadge">✦</span></div>
+          <div className="fork-s">Unlimited patterns, Advanced imports, Collections, the Vault, 24/7 support.</div>
+          <div className="fork-p">${annual ? "4.58" : "6.99"}/mo · cancel anytime →</div>
+        </button>
+      </div>
+      <div className="authmicro">Not sure? Start free — Craft is one tap away whenever a pattern needs it.</div>
+    </div>
+  </div>
+);
+
+/* ── Main Auth component: landing ⇄ try ⇄ auth ⇄ fork screens ── */
 const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
-  const [screen, setScreen] = useState("landing"); // 'landing' | 'auth'
-  const [authMode, setAuthMode] = useState("signup");
+  // Initial screen honors the mockup's hash deep-links (#try, #signup,
+  // #signin) so marketing can link straight to an entry point.
+  // Exact-match only — Supabase auth callbacks also use the hash
+  // (#access_token=...&type=signup), which must never hijack the screen.
+  const [screen, setScreen] = useState(() => {
+    const h = (typeof location !== "undefined" && location.hash) || "";
+    if (h === "#try") return "try";
+    if (h === "#signup" || h === "#signin") return "auth";
+    return "landing";
+  }); // 'landing' | 'try' | 'auth' | 'fork'
+  const [authMode, setAuthMode] = useState(() =>
+    (typeof location !== "undefined" && location.hash === "#signin") ? "signin" : "signup");
+  const [pulseKey, setPulseKey] = useState(0);
 
   // Pricing cadence for the landing toggle. Annual is the default per the
   // mockup (annualDefault: true). Values come from Pricing Canon (locked):
@@ -538,17 +587,40 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
 
   const toTop = () => { try { window.scrollTo(0, 0); } catch {} };
   const goLanding = () => { setScreen("landing"); toTop(); };
-  const goAuth = (mode) => { setAuthMode(mode); setScreen("auth"); toTop(); };
+  const goTry = () => { setScreen("try"); toTop(); };
+  const goAuth = (mode) => {
+    // Re-clicking "Sign in"/"Start free" while already on the auth card pulses
+    // it (mockup behavior) instead of appearing dead.
+    if (screen === "auth" && mode === authMode) { setPulseKey(k => k + 1); return; }
+    setAuthMode(mode); setScreen("auth"); setPulseKey(k => k + 1); toTop();
+  };
 
-  // "Go Craft" from the landing: stash the picked tier + cadence exactly like
-  // TieredUpgradeModal does, so App.jsx's post-signup auto-checkout fires the
-  // real Stripe flow after the account exists.
-  const goCraft = () => {
+  const stashPendingCraft = () => {
     try {
       sessionStorage.setItem("wovely_pending_upgrade_tier", "craft");
       sessionStorage.setItem("wovely_pending_upgrade_cadence", annual ? "annual" : "monthly");
     } catch {}
-    goAuth("signup");
+  };
+
+  // "Go Craft" from the landing: stash the picked tier + cadence exactly like
+  // TieredUpgradeModal does, so App.jsx's post-signup auto-checkout fires the
+  // real Stripe flow after the account exists.
+  const goCraft = () => { stashPendingCraft(); goAuth("signup"); };
+
+  // Try-screen forks: enter the real guest mode with the picked path stashed —
+  // App.jsx reads wovely_first_run_intent and opens the matching first-run UI.
+  const tryFork = (intent) => {
+    try { sessionStorage.setItem("wovely_first_run_intent", intent); } catch {}
+    onTryAnonymous();
+  };
+
+  // Email signup success: if a Craft pick is already stashed, go straight in
+  // (auto-checkout fires); otherwise offer the mockup's free/Craft fork.
+  const handleSignedUp = () => {
+    let pending = null;
+    try { pending = sessionStorage.getItem("wovely_pending_upgrade_tier"); } catch {}
+    if (pending) { onEnterAsNew(); return; }
+    setScreen("fork"); toTop();
   };
 
   return (
@@ -558,15 +630,30 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
       <TopNav
         onLanding={goLanding}
         onSignIn={() => goAuth("signin")}
-        onStartFree={onTryAnonymous}
+        onStartFree={goTry}
         showLinks={screen === "landing"}
       />
-      {screen === "landing" ? (
-        <Landing annual={annual} setAnnual={setAnnual} onStartFree={onTryAnonymous} onGoCraft={goCraft} />
-      ) : (
-        <div className="authwrap">
-          <AuthForm key={authMode} initialMode={authMode} onEnter={onEnter} onEnterAsNew={onEnterAsNew} onTryAnonymous={onTryAnonymous} />
-        </div>
+      {screen === "landing" && (
+        <Landing annual={annual} setAnnual={setAnnual} onStartFree={goTry} onGoCraft={goCraft} />
+      )}
+      {screen === "try" && (
+        <TryScreen onImport={() => tryFork("import")} onStarter={() => tryFork("starter")} onSignIn={() => goAuth("signin")} />
+      )}
+      {screen === "auth" && (
+        <AuthCard
+          mode={authMode}
+          pulseKey={pulseKey}
+          onSwitchMode={() => { setAuthMode(m => (m === "signin" ? "signup" : "signin")); setPulseKey(k => k + 1); }}
+          onSignedIn={onEnter}
+          onSignedUp={handleSignedUp}
+        />
+      )}
+      {screen === "fork" && (
+        <ForkScreen
+          annual={annual}
+          onFree={onEnterAsNew}
+          onCraft={() => { stashPendingCraft(); onEnterAsNew(); }}
+        />
       )}
     </div>
   );
