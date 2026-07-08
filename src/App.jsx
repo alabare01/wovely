@@ -127,7 +127,7 @@ const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 // Collections (and future Craft-only features) on top of Free.
 const TIER_CONFIG = {
   free:  { patternCap: 5,   priceLabel: "Free" },
-  craft: { patternCap: 100, priceMonthly: 6.99, priceAnnual: 59.99, priceLabelMonthly: "$6.99/mo", priceLabelAnnual: "$59.99/yr" },
+  craft: { patternCap: 100, priceMonthly: 6.99, priceAnnual: 54.99, priceLabelMonthly: "$6.99/mo", priceLabelAnnual: "$54.99/yr" },
 };
 
 // useTier returns gating info for the active session. Pass the user's tier

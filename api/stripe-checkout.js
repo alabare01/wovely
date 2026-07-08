@@ -4,7 +4,7 @@
 // Env vars (required for the tier-aware flow):
 //   STRIPE_SECRET_KEY            — Stripe API key
 //   STRIPE_CRAFT_PRICE_ID        — recurring price for the $6.99/mo Craft tier
-//   STRIPE_CRAFT_ANNUAL_PRICE_ID — recurring price for the $59.99/yr Craft tier
+//   STRIPE_CRAFT_ANNUAL_PRICE_ID — recurring price for the $54.99/yr Craft tier (canon)
 //
 // If a tier's price ID isn't configured we 500 with a clear message
 // rather than silently creating an ad-hoc line item — tier shipping
