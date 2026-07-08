@@ -31,7 +31,7 @@ const CARD = {
   transition: "transform .15s, border-color .15s, box-shadow .15s",
 };
 
-const ForkShell = ({ onClick, gold, children, disabled }) => {
+const ForkShell = ({ onClick, children, disabled }) => {
   const [hover, setHover] = useState(false);
   return (
     <button
@@ -41,15 +41,9 @@ const ForkShell = ({ onClick, gold, children, disabled }) => {
       onMouseLeave={() => setHover(false)}
       style={{
         ...CARD,
-        ...(gold ? {
-          background: "linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#F2C744,#E9A83C 45%,#F6E7C9) border-box",
-          border: "2px solid transparent",
-        } : {}),
         transform: hover && !disabled ? "translateY(-2px)" : "none",
-        borderColor: !gold && hover && !disabled ? LAV : undefined,
-        boxShadow: hover && !disabled
-          ? (gold ? "0 16px 30px -18px rgba(200,150,40,.6)" : "0 16px 30px -20px rgba(90,66,160,.5)")
-          : CARD.boxShadow,
+        borderColor: hover && !disabled ? LAV : undefined,
+        boxShadow: hover && !disabled ? "0 16px 30px -20px rgba(90,66,160,.5)" : CARD.boxShadow,
         opacity: disabled ? 0.7 : 1,
       }}
     >{children}</button>

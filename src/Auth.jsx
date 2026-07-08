@@ -470,9 +470,16 @@ const TryScreen = ({ onImport, onStarter, onSignIn }) => (
 const AuthCard = ({ mode, onSwitchMode, onSignedIn, onSignedUp, pulseKey }) => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState(null);
   const isSignIn = mode === "signin";
+
+  // AuthCard is not remounted when the parent flips signin<->signup (only the
+  // inner div's key changes for the pulse), so clear any stale error/state on
+  // mode change — otherwise a signup validation error lingers on the sign-in
+  // form, which has different rules.
+  useEffect(() => { setAuthError(null); setShowPass(false); }, [mode]);
 
   const submit = async () => {
     setAuthError(null);
@@ -505,7 +512,13 @@ const AuthCard = ({ mode, onSwitchMode, onSignedIn, onSignedUp, pulseKey }) => {
         <div className="orrow">or with email</div>
         <div onKeyDown={onKey}>
           <input className="fin" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" type="email" autoComplete="email" />
-          <input className="fin" value={pass} onChange={e => setPass(e.target.value)} placeholder={isSignIn ? "Password" : "Choose a password"} type="password" autoComplete={isSignIn ? "current-password" : "new-password"} />
+          {/* Show-password toggle: signup has no confirm field (mockup is
+              email + one password), so let users verify what they typed and
+              avoid locking themselves out of a brand-new account with a typo. */}
+          <div style={{ position: "relative" }}>
+            <input className="fin" value={pass} onChange={e => setPass(e.target.value)} placeholder={isSignIn ? "Password" : "Choose a password"} type={showPass ? "text" : "password"} autoComplete={isSignIn ? "current-password" : "new-password"} style={{ paddingRight: 60 }} />
+            <button type="button" onClick={() => setShowPass(v => !v)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: 0, color: "var(--muted)", fontFamily: "var(--body)", fontWeight: 800, fontSize: 12.5, cursor: "pointer", padding: 4 }}>{showPass ? "Hide" : "Show"}</button>
+          </div>
           {authError && <div className="autherr">{authError}</div>}
           <button className="cta authbtn" onClick={submit} disabled={loading} style={loading ? { opacity: 0.6 } : undefined}>
             {loading ? "Please wait..." : (isSignIn ? "Sign me in" : "Create my account")}
