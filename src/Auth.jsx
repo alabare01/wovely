@@ -17,7 +17,14 @@ import { supabaseAuth } from "./supabase.js";
 const CORD_IMG = "https://res.cloudinary.com/dmaupzhcx/image/upload/e_background_removal/c_crop,g_center,h_0.9,w_1.0/e_trim/v1782961067/website-assets/yarn-cord-gold-frayed.png";
 
 const LANDING_CSS = `
-.wv-land{--bg:#FBF9FF;--panel:#fff;--ink:#2E2748;--muted:#726A92;--accent:#7B6AD4;--accentD:#6E5AC8;--line:#ECE6F8;--coral:#FF8A73;--sun:#FFC24B;--mint:#5EC9AE;--disp:'Fredoka',sans-serif;--body:'Nunito',sans-serif;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--body);position:relative;background-image:repeating-linear-gradient(45deg,rgba(123,106,212,.03) 0 1.5px,transparent 1.5px 9px)}
+/* index.css puts height:100% + overflow-x hidden/clip on html/body as the
+   app shell's horizontal-overflow guard. On iOS Safari that combination
+   turns BODY into the scroll container, which breaks position:sticky and
+   stops tiles painting mid-scroll (t1/t4 device bisect, 2026-07-07). Relax
+   the root rules only while the landing is mounted — the landing carries
+   its own overflow-x guard below — and restore them on unmount. */
+html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visible; }
+.wv-land{--bg:#FBF9FF;--panel:#fff;--ink:#2E2748;--muted:#726A92;--accent:#7B6AD4;--accentD:#6E5AC8;--line:#ECE6F8;--coral:#FF8A73;--sun:#FFC24B;--mint:#5EC9AE;--disp:'Fredoka',sans-serif;--body:'Nunito',sans-serif;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--body);position:relative;background-image:repeating-linear-gradient(45deg,rgba(123,106,212,.03) 0 1.5px,transparent 1.5px 9px);overflow-x:hidden;overflow-x:clip}
 .wv-land *{box-sizing:border-box}
 .wv-land .pagecord{position:fixed;top:0;left:0;height:100vh;width:26px;z-index:40;pointer-events:none;display:flex;flex-direction:column;filter:drop-shadow(3px 2px 3px rgba(90,58,10,.5)) drop-shadow(6px 5px 8px rgba(90,58,10,.28))}
 .wv-land .pagecord img{width:22px;height:auto;display:block}
@@ -522,7 +529,11 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
   // the logged-in shell keeps its background exactly as before.
   useEffect(() => {
     document.body.classList.add("wv-landing-active");
-    return () => document.body.classList.remove("wv-landing-active");
+    document.documentElement.classList.add("wv-landing-active");
+    return () => {
+      document.body.classList.remove("wv-landing-active");
+      document.documentElement.classList.remove("wv-landing-active");
+    };
   }, []);
 
   const toTop = () => { try { window.scrollTo(0, 0); } catch {} };
