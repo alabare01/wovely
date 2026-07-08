@@ -124,6 +124,15 @@ const LANDING_CSS = `
 @media (max-width:1024px){.wv-land .hero{grid-template-columns:1fr;padding:34px 40px 10px;gap:64px}.wv-land .heroviz{order:0}.wv-land .stats{grid-template-columns:1fr 1fr}.wv-land .heroviz{max-width:560px}.wv-land .top{padding:16px 40px}.wv-land .sect{padding:54px 40px 0}.wv-land .craftin{grid-template-columns:1fr;padding:36px}.wv-land .endin{flex-direction:column;text-align:center;padding:44px 36px}.wv-land .end-s{margin-left:auto;margin-right:auto}.wv-land .pagecord{display:none}}
 @media (max-width:640px){.wv-land .h1{font-size:36px}.wv-land .pcard.hot{order:-1}.wv-land .stats{grid-template-columns:1fr}.wv-land .vizbev{width:180px;left:-14px}.wv-land .vizcard{margin-left:30px;height:280px}.wv-land .statfoot{flex-direction:column;text-align:center}.wv-land .howimg{height:180px}.wv-land .uline{white-space:normal;background-size:100% 9px;padding-bottom:10px}.wv-land .hero{padding:34px 22px 6px;gap:30px}.wv-land .top{padding:14px 18px;gap:12px}.wv-land .tlink.hidem{display:none}.wv-land .sect{padding:44px 22px 0}.wv-land .how{grid-template-columns:1fr;gap:20px}.wv-land .plans{grid-template-columns:1fr}.wv-land .craftband,.wv-land .endband{padding-left:22px;padding-right:22px}.wv-land .craftlist{grid-template-columns:1fr}.wv-land .foot{padding:0 22px 36px}.wv-land .vizcard{height:300px}}
 #__ph_survey_widget, div[class*="PostHog"], div[id*="posthog"], .__ph_toolbar { display: none !important; }
+/* iOS Safari only (-webkit-touch-callout is iOS-specific): live filter layers
+   break the tile compositor on real devices — sections stop painting mid-
+   scroll and the page goes blank. Swap the sticky bar's backdrop blur for a
+   near-opaque fill and drop the cf-bg runtime blur (its 32px thumbnail
+   sources upscale soft anyway). Desktop keeps the exact mockup treatment. */
+@supports (-webkit-touch-callout: none) {
+  .wv-land .top{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(251,249,255,.97)}
+  .wv-land .cf-bg{filter:saturate(1.15)}
+}
 /* The app shell's fixed background photo (body::before/::after in index.css)
    stays intact for the logged-in app — but the landing is an opaque surface,
    and on iOS the photo bleeds through during overscroll / URL-bar resize.
