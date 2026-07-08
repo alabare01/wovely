@@ -1612,15 +1612,15 @@ const MasterDocView = () => {
           <p style={{fontSize:15,color:T.ink3,lineHeight:1.6,maxWidth:480,margin:"0 auto"}}>Every stitch of progress, documented. Follow along as we build the crochet companion you deserve.</p>
         </div>
         {/* Coming Soon card */}
-        <div style={{background:"linear-gradient(135deg, #2D2235 0%, #1C1724 100%)",borderRadius:20,padding:isDesktop?"32px 36px":"24px 22px",marginBottom:40,border:"1px solid rgba(139,107,174,.25)",boxShadow:"0 8px 32px rgba(44,34,53,.25)"}}>
+        <div style={{background:"linear-gradient(135deg, #2E2748 0%, #231D3A 100%)",borderRadius:20,padding:isDesktop?"32px 36px":"24px 22px",marginBottom:40,border:"1px solid rgba(123,106,212,.25)",boxShadow:"0 8px 32px rgba(46,39,72,.25)"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:18}}>
-            <div style={{background:"rgba(139,107,174,.2)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:700,color:"#C4AAE0",letterSpacing:".06em",textTransform:"uppercase"}}>Coming Soon</div>
+            <div style={{background:"rgba(123,106,212,.2)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:700,color:"#CFC4F2",letterSpacing:".06em",textTransform:"uppercase"}}>Coming Soon</div>
             <div style={{fontSize:11,color:"rgba(255,255,255,.35)"}}>On the roadmap</div>
           </div>
           <div style={{display:"grid",gridTemplateColumns:isDesktop?"1fr 1fr":"1fr",gap:10}}>
             {COMING_SOON.map((item,i) => (
               <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 14px",background:"rgba(255,255,255,.04)",borderRadius:12,border:"1px solid rgba(255,255,255,.06)"}}>
-                <span style={{color:"#8B6BAE",fontSize:14,marginTop:1,flexShrink:0}}>◇</span>
+                <span style={{color:"#7B6AD4",fontSize:14,marginTop:1,flexShrink:0}}>◇</span>
                 <span style={{fontSize:13,color:"rgba(255,255,255,.8)",lineHeight:1.5}}>{item}</span>
               </div>
             ))}
@@ -1635,7 +1635,7 @@ const MasterDocView = () => {
                 {entry.major && <div style={{width:8,height:8,borderRadius:99,background:"#fff"}}/>}
               </div>
               <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,overflow:"hidden",boxShadow:entry.major?"0 4px 24px rgba(123,106,212,.1)":T.shadow}}>
-                <div style={{padding:isDesktop?"22px 28px 18px":"18px 20px 14px",borderBottom:`1px solid ${T.border}`,background:entry.major?"linear-gradient(135deg, #FAF0EC 0%, "+T.card+" 100%)":T.card}}>
+                <div style={{padding:isDesktop?"22px 28px 18px":"18px 20px 14px",borderBottom:`1px solid ${T.border}`,background:entry.major?"linear-gradient(135deg, #F2EEFB 0%, "+T.card+" 100%)":T.card}}>
                   <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
                     <span style={{fontFamily:"'Nunito', monospace",fontSize:isDesktop?22:18,fontWeight:700,color:T.ink,letterSpacing:"-0.02em"}}>{entry.version}</span>
                     {entry.major && <span style={{fontSize:16}} title="Major release">🧶</span>}
@@ -1809,7 +1809,7 @@ const CAT_COLORS = {
   "New": T.terra,
   "Improved": T.sage,
   "Fixed": T.gold,
-  "Coming Soon": "#8B6BAE",
+  "Coming Soon": "#7B6AD4",
 };
 
 const ChangelogPage = () => {
@@ -1851,15 +1851,15 @@ const ChangelogPage = () => {
         </div>
 
         {/* Coming Soon card */}
-        <div style={{background:"linear-gradient(135deg, #2D2235 0%, #1C1724 100%)",borderRadius:20,padding:isDesktop?"32px 36px":"24px 22px",marginBottom:40,border:"1px solid rgba(139,107,174,.25)",boxShadow:"0 8px 32px rgba(44,34,53,.25)"}}>
+        <div style={{background:"linear-gradient(135deg, #2E2748 0%, #231D3A 100%)",borderRadius:20,padding:isDesktop?"32px 36px":"24px 22px",marginBottom:40,border:"1px solid rgba(123,106,212,.25)",boxShadow:"0 8px 32px rgba(46,39,72,.25)"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:18}}>
-            <div style={{background:"rgba(139,107,174,.2)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:700,color:"#C4AAE0",letterSpacing:".06em",textTransform:"uppercase"}}>Coming Soon</div>
+            <div style={{background:"rgba(123,106,212,.2)",borderRadius:8,padding:"5px 12px",fontSize:11,fontWeight:700,color:"#CFC4F2",letterSpacing:".06em",textTransform:"uppercase"}}>Coming Soon</div>
             <div style={{fontSize:11,color:"rgba(255,255,255,.35)"}}>On the roadmap</div>
           </div>
           <div style={{display:"grid",gridTemplateColumns:isDesktop?"1fr 1fr":"1fr",gap:10}}>
             {COMING_SOON.map((item,i) => (
               <div key={i} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 14px",background:"rgba(255,255,255,.04)",borderRadius:12,border:"1px solid rgba(255,255,255,.06)"}}>
-                <span style={{color:"#8B6BAE",fontSize:14,marginTop:1,flexShrink:0}}>◇</span>
+                <span style={{color:"#7B6AD4",fontSize:14,marginTop:1,flexShrink:0}}>◇</span>
                 <span style={{fontSize:13,color:"rgba(255,255,255,.8)",lineHeight:1.5}}>{item}</span>
               </div>
             ))}
@@ -1881,7 +1881,7 @@ const ChangelogPage = () => {
               {/* Version card */}
               <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:18,overflow:"hidden",boxShadow:entry.major?"0 4px 24px rgba(123,106,212,.1)":T.shadow}}>
                 {/* Version header */}
-                <div style={{padding:isDesktop?"22px 28px 18px":"18px 20px 14px",borderBottom:`1px solid ${T.border}`,background:entry.major?"linear-gradient(135deg, #FAF0EC 0%, "+T.card+" 100%)":T.card}}>
+                <div style={{padding:isDesktop?"22px 28px 18px":"18px 20px 14px",borderBottom:`1px solid ${T.border}`,background:entry.major?"linear-gradient(135deg, #F2EEFB 0%, "+T.card+" 100%)":T.card}}>
                   <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
                     <span style={{fontFamily:"'Nunito', monospace",fontSize:isDesktop?22:18,fontWeight:700,color:T.ink,letterSpacing:"-0.02em"}}>{entry.version}</span>
                     {entry.major && <span style={{fontSize:16}} title="Major release">🧶</span>}
@@ -2643,7 +2643,7 @@ export default function Wovely() {
     // Once in anon mode, they can browse the entire shell. Non-root paths always fall through
     // so deep links like /pattern/:id work for signed-out users too.
     if(location.pathname==="/"&&!anonymousMode){
-      return <><CSS/><Auth onEnter={handleSignIn} onEnterAsNew={handleNewSignup} onTryAnonymous={enterAnonymousMode}/><LegalFooter/></>;
+      return <><CSS/><Auth onEnter={handleSignIn} onEnterAsNew={handleNewSignup} onTryAnonymous={enterAnonymousMode}/></>;
     }
   }
   // Unknown routes redirect to /
