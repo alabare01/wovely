@@ -1149,7 +1149,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
         <div style={{display:"flex",alignItems:"center",gap:isDesktop?22:14,background:"#fff",border:`1px solid ${T.line}`,borderRadius:24,padding:isDesktop?"26px 30px":"20px 18px",marginTop:22,boxShadow:T.shadowLg}}>
           <div style={{width:92,height:92,borderRadius:"50%",border:"3px solid #DCD0F7",background:T.soft,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.disp,fontWeight:600,fontSize:36,color:T.accent}}>{initials}</div>
           <div style={{minWidth:0}}>
-            <div style={{fontFamily:T.disp,fontWeight:600,fontSize:28,color:T.ink,lineHeight:1.1}}>{displayName||"Your corner"}</div>
+            <div style={{fontFamily:T.disp,fontWeight:600,fontSize:28,color:T.ink,lineHeight:1.1}}>{displayName||"Wovely maker"}</div>
             <div style={{fontWeight:700,fontSize:14,color:T.muted,marginTop:3}}>{sinceYear?`Making since ${sinceYear} · ${planLabel} plan`:`${planLabel} plan`}</div>
           </div>
           {isPro
