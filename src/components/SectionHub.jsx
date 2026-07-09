@@ -16,13 +16,12 @@ const LAV_BG = "#F3EEFA";
 
 const cleanName = (text) => (text || "").replace(/──/g, "").trim() || "Section";
 
+// 2b .part card — solid white panel on the woven canvas (Wovely App 2b.dc.html).
 const GLASS = {
-  background: "rgba(255,255,255,0.82)",
-  backdropFilter: "blur(16px)",
-  WebkitBackdropFilter: "blur(16px)",
-  border: "1px solid rgba(255,255,255,0.45)",
-  borderRadius: 16,
-  boxShadow: "0 4px 24px rgba(90,66,160,0.08)",
+  background: "#FFFFFF",
+  border: "1px solid #ECE6F8",
+  borderRadius: 18,
+  boxShadow: "0 16px 34px -24px rgba(90,66,160,0.4)",
 };
 
 const splitSections = (rows) => {
@@ -82,7 +81,7 @@ const SectionHub = ({ rows, onSelect, Bar }) => {
             <button
               key={key}
               onClick={() => onSelect(sec.header?.id ?? null)}
-              style={{ ...GLASS, padding: "14px 16px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8, borderLeft: `3px solid ${LAV}` }}
+              style={{ ...GLASS, padding: "20px", textAlign: "left", cursor: "pointer", display: "flex", flexDirection: "column", gap: 8 }}
             >
               <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
                 <div style={{ width: 30, height: 30, borderRadius: 9, flexShrink: 0, background: LAV_BG, color: LAV, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: T.serif, fontSize: 15, fontWeight: 700 }}>

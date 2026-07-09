@@ -1215,7 +1215,7 @@ const BrowseSitesView = ({onImportUrl}) => {
     <div style={{padding:isDesktop?"24px 24px 80px":"16px 20px 100px",maxWidth:960,margin:"0 auto",background:"transparent"}}>
       {/* Section 1 — URL Import */}
       <div style={{background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,border:"1px solid rgba(255,255,255,0.6)",padding:isDesktop?"32px":"24px 20px",marginBottom:32,boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)",maxWidth:700}}>
-        <div style={{fontFamily:"'Fredoka',Georgia,serif",fontSize:20,fontWeight:700,color:"#2E2748",marginBottom:8,borderLeft:"3px solid #7B6AD4",paddingLeft:10}}>Import a Pattern</div>
+        <div style={{fontFamily:"'Fredoka',Georgia,serif",fontSize:20,fontWeight:700,color:"#2E2748",marginBottom:8}}>Import a Pattern</div>
         <div style={{fontSize:14,color:"#726A92",lineHeight:1.7,marginBottom:20}}>Find a pattern on any crochet site, copy the URL from your browser, and paste it below to import it directly into Wovely.</div>
         <div style={{display:"flex",gap:10,flexDirection:isMobile?"column":"row"}}>
           <div style={{flex:1,display:"flex",alignItems:"center",background:T.linen,border:`1.5px solid ${T.border}`,borderRadius:12,padding:"12px 16px",gap:10}}>
@@ -1229,7 +1229,7 @@ const BrowseSitesView = ({onImportUrl}) => {
 
       {/* Section 2 — Partner Sites Grid */}
       <div style={{marginBottom:32}}>
-        <div style={{fontFamily:"'Fredoka',Georgia,serif",fontSize:18,fontWeight:700,color:"#2E2748",marginBottom:6,borderLeft:"3px solid #7B6AD4",paddingLeft:10}}>Browse Partner Sites</div>
+        <div style={{fontFamily:"'Fredoka',Georgia,serif",fontSize:18,fontWeight:700,color:"#2E2748",marginBottom:6}}>Browse Partner Sites</div>
         <div style={{fontSize:14,color:"#726A92",lineHeight:1.7,marginBottom:20}}>Open any site below to browse their patterns. When you find one you love, copy the URL and paste it above.</div>
         <div style={{display:"grid",gridTemplateColumns:isDesktop?"repeat(3,1fr)":isTablet?"repeat(2,1fr)":"1fr",gap:16}}>
           {SITES.map(s=>(
