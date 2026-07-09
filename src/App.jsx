@@ -3697,7 +3697,9 @@ export default function Wovely() {
         {view==="terms"&&<TermsOfService/>}
         {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:18}}><StitchResultPage/></div>}
       </div>
-      {!addOpen&&!imageImportOpen&&!addMenuOpen&&<button onClick={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} style={{position:"fixed",right:0,top:"50%",transform:"translateY(-50%)",zIndex:40,display:"flex",alignItems:"center",justifyContent:"center",writingMode:"vertical-rl",textOrientation:"mixed",background:"#7B6AD4",color:"#fff",fontFamily:"'Nunito',sans-serif",fontSize:13,fontWeight:600,letterSpacing:"0.05em",padding:"16px 10px",borderRadius:"12px 0 0 12px",cursor:"pointer",boxShadow:"-3px 0 16px rgba(123,106,212,0.25)",userSelect:"none",border:"none",outline:"none"}}>+ Add Pattern</button>}
+      {/* Vertical Add Pattern side-tab removed on mobile (2b responsive spec
+          hides .addtab ≤1024px) — it collided with the FeedbackWidget heart
+          and duplicated the round + button in the mobile header. */}
     </div>
   );
 }

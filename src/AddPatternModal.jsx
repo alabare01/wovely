@@ -1595,29 +1595,40 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
   const hasRecoverableData=reviewActiveTick||bevCheckActiveTick;
   const requestDismiss=()=>{if(hasRecoverableData){setDiscardConfirmOpen(true);}else{dismiss();}};
   const handleSave=(p)=>{onSave(p);dismiss();};
+  // 2b .impcard method cards (Wovely App 2b.dc.html import screen) — woven
+  // SVG icons in soft-lavender squares, replacing the old emoji tiles.
+  const IMP_ICON={
+    manual:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 19.5l1-4L16.7 4.3a2 2 0 012.8 0l.2.2a2 2 0 010 2.8L8.5 18.5z"/><path d="M14.5 6.5l3 3"/></svg>,
+    url:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13.5a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1.2 1.2"/><path d="M14 10.5a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1.2-1.2"/></svg>,
+    pdf:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 3.5H7A1.5 1.5 0 005.5 5v14A1.5 1.5 0 007 20.5h10a1.5 1.5 0 001.5-1.5V8.5z"/><path d="M13.5 3.5v5h5"/><path d="M9 13h6M9 16.5h6"/></svg>,
+    browser:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.2-3.6-8.5s1.2-6.2 3.6-8.5z"/></svg>,
+  };
   const METHODS=[
-    {key:"manual",icon:"✏️",label:"Manual Entry",sub:"Type it in yourself"},
-    {key:"url",icon:"🔗",label:"Smart Import",sub:"Paste any pattern link"},
-    {key:"pdf",icon:"📄",label:"PDF / Document",sub:"Upload & extract"},
-    {key:"browser",icon:"🌐",label:"Browse Sites",sub:"AllFreeCrochet, Drops & more"},
-    {key:"snap",icon:"✨",label:"Snap & Stitch",sub:"Photograph any finished object — 3 free scans/mo"},
+    {key:"manual",label:"Write it yourself",sub:"Type it in yourself"},
+    {key:"url",label:"Paste a link",sub:"Paste any pattern link"},
+    {key:"pdf",label:"Upload a file",sub:"Upload & extract"},
+    {key:"browser",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more"},
   ];
   const MethodList=()=>(
     <>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
-        {METHODS.filter(m=>m.key!=="snap").map(m=>(
-          <div key={m.key} onClick={()=>setMethod(m.key)} style={{background:T.card,border:`1.5px solid ${T.border}`,borderRadius:16,padding:20,cursor:"pointer",transition:"all .15s",boxShadow:T.shadow}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(123,106,212,.12)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow=T.shadow;}}>
-            <div style={{fontSize:32,marginBottom:10}}>{m.icon}</div>
-            <div style={{fontSize:15,fontWeight:600,color:T.ink,marginBottom:4}}>{m.label==="Manual Entry"?"Write it yourself":m.label==="Smart Import"?"Paste a link":m.label==="PDF / Document"?"Upload a file":"Explore free patterns"}</div>
-            <div style={{fontSize:12,color:T.ink3,lineHeight:1.5}}>{m.sub}</div>
+        {METHODS.map(m=>(
+          <div key={m.key} onClick={()=>setMethod(m.key)} style={{display:"flex",flexDirection:"column",gap:12,background:"#fff",border:`1.5px solid ${T.line}`,borderRadius:18,padding:"18px 18px 19px",cursor:"pointer",transition:"all .15s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=T.accent;e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 16px 30px -20px rgba(90,66,160,.5)";}} onMouseLeave={e=>{e.currentTarget.style.borderColor=T.line;e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+            <div style={{width:44,height:44,borderRadius:13,background:T.soft,color:T.accent,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{IMP_ICON[m.key]}</div>
+            <div>
+              <div style={{fontFamily:T.disp,fontWeight:600,fontSize:16,color:T.ink,marginBottom:3,lineHeight:1.15}}>{m.label}</div>
+              <div style={{fontSize:12.5,fontWeight:700,color:T.muted,lineHeight:1.45}}>{m.sub}</div>
+            </div>
           </div>
         ))}
       </div>
-      <div style={{background:"linear-gradient(135deg,#7B6AD4 0%,#8B3A2C 100%)",borderRadius:16,padding:20,cursor:"not-allowed",position:"relative",overflow:"hidden",opacity:.4}}>
-        <div style={{position:"absolute",top:10,right:12,background:"rgba(255,255,255,.25)",borderRadius:99,padding:"3px 10px",fontSize:10,fontWeight:700,color:"#fff"}}>Soon</div>
-        <div style={{fontSize:32,marginBottom:8}}>✨</div>
-        <div style={{fontSize:17,fontWeight:700,color:"#fff",marginBottom:4}}>Snap & Stitch — Point. Click. Stitch.</div>
-        <div style={{fontSize:13,color:"rgba(255,255,255,.85)",lineHeight:1.5}}>Photograph any finished object. Get the complete pattern instantly.</div>
+      <div style={{background:`linear-gradient(135deg,${T.accent},${T.pink})`,borderRadius:18,padding:20,cursor:"not-allowed",position:"relative",overflow:"hidden",opacity:.45}}>
+        <div style={{position:"absolute",top:10,right:12,background:"rgba(255,255,255,.25)",borderRadius:99,padding:"3px 10px",fontSize:10,fontWeight:800,color:"#fff"}}>Soon</div>
+        <div style={{width:44,height:44,borderRadius:13,background:"rgba(255,255,255,.2)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:10}}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 8.5A1.5 1.5 0 016 7h2l1.4-2h5.2L16 7h2a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0118 19H6a1.5 1.5 0 01-1.5-1.5z"/><circle cx="12" cy="13" r="3.4"/></svg>
+        </div>
+        <div style={{fontFamily:T.disp,fontWeight:600,fontSize:17,color:"#fff",marginBottom:4}}>Snap & Stitch — Point. Click. Stitch.</div>
+        <div style={{fontSize:13,fontWeight:700,color:"rgba(255,255,255,.85)",lineHeight:1.5}}>Photograph any finished object. Get the complete pattern instantly.</div>
       </div>
     </>
   );
