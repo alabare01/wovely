@@ -4,6 +4,7 @@ import { PILL } from "./constants.js";
 import { buildRowsFromComponents } from "./AddPatternModal.jsx";
 import { CHECK_ICON } from "./StitchCheck.jsx";
 import BevGauge, { deriveState, sentenceCase, checkTier } from "./components/BevGauge.jsx";
+import ScanGauge, { ProcSteps } from "./components/ScanGauge.jsx";
 import { getSession } from "./supabase.js";
 import { setActiveImportJob } from "./components/ImportPill.jsx";
 import { useImportJobPolling } from "./hooks/useImportJobPolling.js";
@@ -423,26 +424,37 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
     </div>
   );
 
-  // ── LOADING SCREEN ──
-  const loadingContent = (
-    <div style={{ padding: "48px 20px 36px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 0, position: "relative" }}>
-      {/* X removed in S1.5.3 — backdrop click or route nav dismisses. */}
-      <style>{`@keyframes spinLoaderVision{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes fadeInMsgV{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
-      <div style={{position:"relative",width:60,height:60,marginBottom:24}}>
-        <div style={{position:"absolute",inset:0,borderRadius:"50%",border:"4px solid transparent",borderTopColor:"#7B6AD4",animation:"spinLoaderVision 1s linear infinite"}}/>
-        <img src="/bev_neutral.png" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:40,height:40,objectFit:"contain"}} alt="Bev"/>
+  // ── LOADING SCREEN ── 2b .proc treatment (Wovely App 2b.dc.html): bobbing
+  // Bev + live BevCheck gauge + 4-step list, matching the PDF import path.
+  // Steps ride the real worker phase; the gauge resolves to the real
+  // BevCheck score when validation_report lands.
+  const loadingContent = (() => {
+    const PHASE_STEP = { reading: 0, extracting: 1, validating: 2, finalizing: 3 };
+    const activeStep = polling.currentPhase != null ? (PHASE_STEP[polling.currentPhase] ?? 0) : 1;
+    const gaugeScore = typeof validationReport?.score === "number" ? validationReport.score : null;
+    const gaugePhase = validationReport ? "done" : (bevCheckFailed ? "idle" : (activeStep >= 2 ? "checking" : "idle"));
+    const gaugeNote = validationReport
+      ? (gaugeScore != null ? "Stitch counts verified, row by row" : "Bev finished her once-over")
+      : bevCheckFailed ? "Bev got tangled on the check — she'll retry after import"
+      : activeStep >= 2 ? "Checking every row's stitch counts…" : "Warming up the needle…";
+    return (
+      <div style={{ padding: "18px 20px 28px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
+        {/* X removed in S1.5.3 — backdrop click or route nav dismisses. */}
+        <style>{`@keyframes bevbobV{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}@keyframes fadeInMsgV{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
+        <img src="/bev-hero.png" alt="Bev reading your photos" style={{ width: 96, filter: "drop-shadow(0 12px 18px rgba(90,66,160,.32))", animation: "bevbobV 2.2s ease-in-out infinite" }} />
+        <div style={{ fontFamily: "'Fredoka','Segoe UI',sans-serif", fontSize: 26, fontWeight: 600, color: "#2E2748", marginTop: 18, lineHeight: 1.15 }}>
+          Bev's reading your photos…
+        </div>
+        <div key={loadingMsg} style={{ fontWeight: 700, fontSize: 14.5, fontFamily: "Nunito,sans-serif", color: "#726A92", marginTop: 6, animation: "fadeInMsgV .4s ease both" }}>
+          {loadingMsg}
+        </div>
+        <div style={{ width: "100%", maxWidth: 390, marginTop: 22, display: "flex", justifyContent: "center" }}>
+          <ScanGauge phase={gaugePhase} score={gaugeScore} state={validationReport ? deriveState(validationReport) : null} note={gaugeNote} />
+        </div>
+        <ProcSteps steps={["Reading the source", "Finding parts, rows & materials", "BevCheck — validating accuracy", "Tucking the original into your Vault"]} activeStep={activeStep} />
       </div>
-      <div style={{ fontFamily: "'Fredoka',serif", fontSize: 20, fontWeight: 600, color: "#2E2748", marginBottom: 8, lineHeight: 1.4 }}>
-        Extracting your pattern
-      </div>
-      <div key={loadingMsg} style={{
-        fontSize: 13, fontFamily: "Nunito,sans-serif", fontWeight: 400, color: "#7B6AD4",
-        marginTop: 8, animation: "fadeInMsgV .4s ease both",
-      }}>
-        {loadingMsg}
-      </div>
-    </div>
-  );
+    );
+  })();
 
   // ── ERROR SCREEN ──
   const errorContent = (

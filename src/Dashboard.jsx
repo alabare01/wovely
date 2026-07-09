@@ -269,28 +269,33 @@ const BevCorner = ({ patterns, isMobile, isPro }) => {
     return () => clearInterval(timer);
   }, [msgIndex]);
 
+  // 2b .bevcorner (Wovely App 2b.dc.html): solid white panel card with the
+  // "Bev's corner" eyebrow label. The mockup frames this as the left column
+  // of a 2-col craftrow (right column = Noticeboard, Phase 2) — until the
+  // Noticeboard ships, Bev's corner holds the full craftrow width.
   return (
     <div style={{
       gridColumn: "1 / -1",
-      display: "flex", alignItems: "flex-start", gap: 12, width: "100%",
+      display: "flex", alignItems: "flex-start", gap: 16, width: "100%",
       // box-sizing:border-box — there is no global border-box reset, so
-      // width:100% + 24px horizontal padding would otherwise overflow the
-      // column by 48px and (with overflow:hidden) clip the typewriter text
+      // width:100% + 22px horizontal padding would otherwise overflow the
+      // column by 44px and (with overflow:hidden) clip the typewriter text
       // at the right edge ("What ar…"). border-box folds the padding in.
       boxSizing: "border-box",
-      padding: "20px 24px", overflow: "hidden",
-      background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur,
-      borderRadius: GLASS.radius, border: GLASS.border, boxShadow: GLASS.shadow,
+      padding: "20px 22px", overflow: "hidden",
+      background: "#FFFFFF", border: "1px solid #ECE6F8",
+      borderRadius: 22, boxShadow: T.shadowLg,
       marginBottom: 24,
     }}>
       <img src="/bev_neutral.png" alt="Bev" style={{
-        width: isMobile ? 68 : 88, height: "auto", flexShrink: 0,
-        filter: "drop-shadow(0 6px 20px rgba(123,106,212,0.4))",
+        width: 56, height: 56, flexShrink: 0, borderRadius: "50%",
+        border: "3px solid #EFE9FB", background: "#F2EEFB", objectFit: "cover",
       }} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontFamily: INTER, fontSize: 15, color: INK, lineHeight: 1.6, margin: 0, whiteSpace: "pre-wrap", wordBreak: "break-word", minHeight: "1.6em" }}>
+        <div style={{ fontFamily: INTER, fontWeight: 800, fontSize: 11.5, letterSpacing: ".09em", textTransform: "uppercase", color: ACCENT }}>Bev's corner</div>
+        <p style={{ fontFamily: PF, fontWeight: 500, fontSize: 18, color: INK, lineHeight: 1.45, margin: "6px 0 0", whiteSpace: "pre-wrap", wordBreak: "break-word", minHeight: isMobile ? 56 : 78 }}>
           {displayText}
-          {isTyping && <span style={{ display: "inline-block", width: 2, height: "1em", background: ACCENT, marginLeft: 1, verticalAlign: "middle" }} />}
+          <span style={{ display: "inline-block", width: 2, height: "1em", background: ACCENT, marginLeft: 2, verticalAlign: -2, animation: "bcblink 1s steps(1) infinite", opacity: isTyping ? 1 : undefined }} />
         </p>
       </div>
     </div>
@@ -959,7 +964,7 @@ const CollectionsSection = ({tier, isAnonymous, onOpenCollection, onCreateCollec
 };
 
 // ─── MAIN COLLECTION VIEW ───────────────────────────────────────────────────
-const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearch,openDetail,onAddPattern,isPro,tier,setView,isAnonymous,onOpenCollection,onCreateCollection,onStartCollectionImport,onOpenUpgrade,onCollectionDeletedLocal,onPark,onUnpark,onDelete,onCoverChange,onRename,pct,catFallbackPhoto,Photo,Bar,Stars,CATS,TIER_CONFIG}) => {
+const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearch,openDetail,onAddPattern,isPro,tier,setView,isAnonymous,onOpenCollection,onCreateCollection,onStartCollectionImport,onOpenUpgrade,onCollectionDeletedLocal,onPark,onUnpark,onDelete,onCoverChange,onRename,pct,catFallbackPhoto,Photo,Bar,Stars,CATS,TIER_CONFIG,firstName}) => {
   const{isDesktop,isMobile}=useBreakpoint();
   const allPatterns = [...userPatterns,...starterPatterns];
   // Patterns that belong to a collection (clue-of-MKAL etc.) are surfaced
@@ -1026,12 +1031,26 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
         <div style={{ marginBottom: 22, marginTop: 4 }}>
           <div style={{ fontWeight: 800, fontSize: 12, letterSpacing: ".12em", textTransform: "uppercase", color: ACCENT }}>The Craft Room</div>
           <div style={{ fontFamily: PF, fontWeight: 600, fontSize: isMobile ? 30 : 38, letterSpacing: "-.01em", color: NAVY, marginTop: 4, lineHeight: 1.05 }}>
-            Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}
+            Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}{firstName ? `, ${firstName}` : ""}
           </div>
           <div style={{ fontWeight: 700, fontSize: 15, color: MUTED, marginTop: 3 }}>Everything you're making, in one cosy place.</div>
         </div>
 
         <BevCorner patterns={visible} isMobile={isMobile} isPro={isPro} />
+
+        {/* 2b .limitbar (Wovely App 2b.dc.html): at the free cap, a Bev
+            banner card with an Upgrade CTA — not a one-line whisper. Uses
+            the real slot-count gate (tier.atCap) and the real paywall. */}
+        {!isPro && !isAnonymous && tier.atCap && (
+          <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 14 : 18, flexWrap: isMobile ? "wrap" : "nowrap", background: "linear-gradient(100deg,#F1EBFF,#FBEEF0)", border: "1px solid #ECE6F8", borderRadius: 22, padding: "18px 22px", margin: "0 0 24px", boxSizing: "border-box" }}>
+            <img src="/bev_neutral.png" alt="Bev" style={{ width: 56, height: 56, borderRadius: "50%", flexShrink: 0, border: "3px solid #fff", background: "#F2EEFB", objectFit: "cover", boxShadow: "0 8px 18px -8px rgba(90,66,160,.5)" }} />
+            <div style={{ minWidth: 0, flex: "1 1 200px" }}>
+              <div style={{ fontFamily: PF, fontWeight: 600, fontSize: 19, color: INK }}>You've filled all {TIER_CONFIG.free.patternCap} free patterns</div>
+              <div style={{ fontFamily: INTER, fontWeight: 700, fontSize: 14, color: MUTED, marginTop: 1 }}>Starters never count — and Craft gives you room for 100.</div>
+            </div>
+            <button onClick={onOpenUpgrade} style={{ marginLeft: isMobile ? 0 : "auto", border: 0, borderRadius: 13, padding: "13px 22px", background: ACCENT, color: "#fff", fontFamily: INTER, fontWeight: 800, fontSize: 15, cursor: "pointer", whiteSpace: "nowrap", boxShadow: `0 12px 24px -12px ${ACCENT}` }}>Upgrade to Craft</button>
+          </div>
+        )}
 
         {/* "On the Hook" section header sits above the grid so both
             columns align at their card top edges, not at the header
@@ -1099,7 +1118,7 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
               {CATS.map(c=><button key={c} onClick={()=>setCat(c)} style={{background:cat===c?ACCENT:PILL_BG,color:cat===c?"#fff":ACCENT,border:"none",borderRadius:20,padding:"4px 12px",fontSize:11,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",transition:"all .15s",flexShrink:0,textTransform:"uppercase",letterSpacing:".05em",fontFamily:INTER}}>{c}</button>)}
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <div>{!isPro&&<div style={{fontSize:12,color:MUTED,fontWeight:500,fontFamily:INTER}}>{tier.userCount} of {TIER_CONFIG.free.patternCap} free slots used{tier.userCount===0?" · add your first":tier.atCap?" · upgrade for unlimited":""}</div>}</div>
+              <div>{!isPro&&<div style={{fontSize:12,color:MUTED,fontWeight:500,fontFamily:INTER}}>{tier.userCount} of {TIER_CONFIG.free.patternCap} free slots used{tier.userCount===0?" · add your first":tier.atCap?" · upgrade for more room":""}</div>}</div>
               <div style={{display:"flex",gap:4}}>
                 <button onClick={()=>setViewMode("grid")} style={{background:viewMode==="grid"?PILL_BG:"transparent",border:`1px solid ${viewMode==="grid"?"#ECE6F8":"transparent"}`,borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:12,color:MUTED,lineHeight:1}}>▦</button>
                 <button onClick={()=>setViewMode("list")} style={{background:viewMode==="list"?PILL_BG:"transparent",border:`1px solid ${viewMode==="list"?"#ECE6F8":"transparent"}`,borderRadius:6,padding:"4px 6px",cursor:"pointer",fontSize:12,color:MUTED,lineHeight:1}}>☰</button>

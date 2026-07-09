@@ -340,7 +340,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
           <button className="cta gold" style={{ marginTop: 22 }} onClick={onGoCraft}>Try Craft</button>
         </div>
         <div className="craftlist">
-          <div className="craftit"><Check size={15} />Unlimited pattern storage</div>
+          <div className="craftit"><Check size={15} />A large pattern library — room for 100 makes</div>
           <div className="craftit"><Check size={15} />Advanced imports — multi-file, charts &amp; schematics</div>
           <div className="craftit"><Check size={15} />Collections for MCALs &amp; MKALs, clue calendar included</div>
           <div className="craftit"><Check size={15} />The Vault — every original, backed up</div>
@@ -386,7 +386,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
           </div>
           <div className="pbill">{annual ? "$54.99 billed yearly — 2 months free" : "billed monthly — switch to annual to save 34%"}</div>
           <ul className="plist">
-            <li><Check size={16} sw={2.6} />Everything in Free, unlimited patterns</li>
+            <li><Check size={16} sw={2.6} />Everything in Free, plus a large pattern library</li>
             <li><Check size={16} sw={2.6} />Advanced imports + Collections (MCAL/MKAL)</li>
             <li><Check size={16} sw={2.6} />Vault, calculators &amp; 24/7 human support</li>
           </ul>
@@ -556,7 +556,7 @@ const ForkScreen = ({ annual, onFree, onCraft }) => (
         </button>
         <button className="fork gold" onClick={onCraft}>
           <div className="fork-t">Go Craft <span className="craftbadge">✦</span></div>
-          <div className="fork-s">Unlimited patterns, Advanced imports, Collections, the Vault, 24/7 support.</div>
+          <div className="fork-s">A large pattern library, Advanced imports, Collections, the Vault, 24/7 support.</div>
           <div className="fork-p">${annual ? "4.58" : "6.99"}/mo · cancel anytime →</div>
         </button>
       </div>

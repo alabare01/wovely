@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { T } from "./theme.jsx";
 import { isReferenceChip } from "./utils/docType.js";
 
@@ -112,6 +112,15 @@ const RowManager = ({
   const [rowEditing,setRowEditing]=useState(null);
   const [newRow,setNewRow]=useState("");
   const [noteSaved,setNoteSaved]=useState(false);
+  // 2b focus mode (Wovely App 2b.dc.html .focuswrap) — full-screen counter
+  // over the same row data. Pure presentation state.
+  const [focusOn,setFocusOn]=useState(false);
+  useEffect(()=>{
+    if(!focusOn)return;
+    const prev=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    return()=>{document.body.style.overflow=prev;};
+  },[focusOn]);
 
   const prevDone=useRef(pct({...p,rows:p.rows}));
   const currentRowIdx=rows.findIndex(r=>!r.done&&!r.isHeader);
@@ -145,6 +154,30 @@ const RowManager = ({
     return true;
   };
   const findSection=(globalIdx)=>{for(let si=0;si<linearSections.length;si++){if(linearSections[si].rows.some(r=>r._gi===globalIdx))return si;}return -1;};
+
+  // ── 2b central counter (NOW card + focus mode) ──
+  // The "active part" the counter drives: the scoped part when a part is
+  // open (focusHeaderId), otherwise the first part with an unfinished round.
+  // inc/dec reuse toggle() so persistence, milestones, section locking and
+  // cascade-uncheck all behave exactly as a tap on the row itself.
+  const activeSecIdx=useMemo(()=>{
+    if(focusHeaderId){const i=linearSections.findIndex(s=>s.header?.id===focusHeaderId);if(i>=0)return i;}
+    const i=linearSections.findIndex(s=>s.rows.some(r=>!r.done&&!r.isNoteOnly));
+    return i>=0?i:Math.max(0,linearSections.length-1);
+  },[linearSections,focusHeaderId]);
+  const activeSec=linearSections[activeSecIdx]||{header:null,rows:[]};
+  const activeCountable=activeSec.rows.filter(r=>!r.isNoteOnly);
+  const activeDone=activeCountable.filter(r=>r.done).length;
+  const activeTotal=activeCountable.length;
+  const activeRemaining=activeCountable.filter(r=>!r.done);
+  const activeCurRow=activeRemaining[0]||null;
+  const activeNextRow=activeRemaining[1]||null;
+  const activePct=activeTotal?Math.round(activeDone/activeTotal*100):0;
+  const activePartNo=activeSec.header?linearSections.filter(s=>s.header).findIndex(s=>s.header.id===activeSec.header.id)+1:null;
+  const activePartName=activeSec.header?activeSec.header.text.replace(/──/g,"").trim():(p.title||"Your rounds");
+  const incRow=()=>{if(activeCurRow)toggle(activeCurRow.id);};
+  const decRow=()=>{const last=[...activeSec.rows].reverse().find(r=>r.done);if(last)toggle(last.id);};
+  const showCounter=!isAnonymous&&activeTotal>0;
 
   const handleDotTap=(globalIdx,dotIdx)=>{
     const row=rows[globalIdx];if(!row)return;
@@ -219,8 +252,64 @@ const RowManager = ({
   const addRow=()=>{if(!newRow.trim())return;const next=[...rows,{id:Date.now(),text:newRow.trim(),done:false,note:""}];setRows(next);onSave({...p,rows:next});setNewRow("");};
   const updateNote=(id,note)=>{const next=rows.map(r=>r.id===id?{...r,note}:r);setRows(next);onSave({...p,rows:next});setNoteSaved(true);setTimeout(()=>setNoteSaved(false),2000);};
 
+  // Shared 2b counter cluster (nowcard + focuswrap both use it)
+  const CounterCluster=({big})=>(
+    <div style={{display:"flex",alignItems:"center",gap:big?34:16}}>
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5}}>
+        <button onClick={decRow} disabled={activeDone===0} aria-label="Undo last round" style={{width:56,height:56,borderRadius:"50%",border:0,cursor:activeDone?"pointer":"default",display:"flex",alignItems:"center",justifyContent:"center",background:T.surface,color:T.terra,opacity:activeDone?1:.45}}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M6 12h12"/></svg>
+        </button>
+        <div style={{fontWeight:800,fontSize:10.5,letterSpacing:".05em",textTransform:"uppercase",color:T.ink3}}>Undo</div>
+      </div>
+      {!big&&<div style={{fontFamily:T.serif,fontWeight:600,fontSize:52,minWidth:80,textAlign:"center",lineHeight:1,color:T.ink}}>{activeDone}<small style={{fontFamily:T.sans,fontWeight:800,fontSize:18,color:T.ink3}}>/{activeTotal}</small></div>}
+      <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5}}>
+        <button onClick={incRow} disabled={!activeCurRow} aria-label="Mark round done" style={{width:big?76:56,height:big?76:56,borderRadius:"50%",border:0,cursor:activeCurRow?"pointer":"default",display:"flex",alignItems:"center",justifyContent:"center",background:T.terra,color:"#fff",boxShadow:`0 12px 24px -10px ${T.terra}`,opacity:activeCurRow?1:.45}}>
+          <svg width={big?30:24} height={big?30:24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <div style={{fontWeight:800,fontSize:10.5,letterSpacing:".05em",textTransform:"uppercase",color:T.ink3}}>Round done</div>
+      </div>
+    </div>
+  );
+  const focusLabel=`Round ${Math.min(activeDone+1,activeTotal)} of ${activeTotal}`;
+  const partLabel=activePartNo?`Part ${activePartNo} — ${activePartName}`:activePartName;
   return (
     <>
+      {/* ── 2b NOW card — central counter over the same row data ── */}
+      {showCounter&&(
+        <div style={{display:"flex",flexWrap:"wrap",alignItems:"center",gap:"18px 24px",background:"#fff",border:`1px solid ${T.border}`,borderRadius:24,padding:"22px 26px",margin:"4px 0 18px",boxShadow:"0 16px 34px -24px rgba(90,66,160,.4)"}}>
+          <div style={{flex:"1 1 260px",minWidth:0}}>
+            <div style={{fontWeight:800,fontSize:12,letterSpacing:".12em",textTransform:"uppercase",color:T.terra}}>{activeCurRow?`Now working · ${focusLabel}`:"Part complete"}</div>
+            <div style={{fontFamily:T.serif,fontWeight:600,fontSize:24,color:T.ink,marginTop:3,lineHeight:1.15}}>{partLabel}</div>
+            <div style={{fontWeight:700,fontSize:14,color:T.ink3,marginTop:2,maxWidth:420,lineHeight:1.5}}>Tap ＋ for each finished round — or tick rows in the list below. Same counter, always in step.</div>
+            <div style={{fontFamily:T.serif,fontWeight:600,fontSize:15,color:T.terra,background:T.surface,padding:"6px 14px",borderRadius:999,marginTop:10,display:"inline-block"}}>{activePct}% complete · Bev saved your spot</div>
+          </div>
+          <CounterCluster/>
+        </div>
+      )}
+      {showCounter&&(
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,margin:"0 0 14px"}}>
+          <div style={{fontWeight:700,fontSize:13,color:T.ink3,lineHeight:1.5}}>Tap the round you just finished — the counter follows along. Finished rounds fade out.</div>
+          <button onClick={()=>setFocusOn(true)} style={{display:"inline-flex",alignItems:"center",gap:8,border:`1.5px solid ${T.border}`,borderRadius:12,background:"#fff",padding:"10px 16px",fontFamily:T.sans,fontWeight:800,fontSize:13.5,color:T.terra,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H4.5A1.5 1.5 0 003 4.5V8M16 3h3.5A1.5 1.5 0 0121 4.5V8M8 21H4.5A1.5 1.5 0 013 19.5V16M16 21h3.5a1.5 1.5 0 001.5-1.5V16"/></svg>
+            Focus mode
+          </button>
+        </div>
+      )}
+      {/* ── 2b full-screen focus mode ── */}
+      {focusOn&&showCounter&&(
+        <div style={{position:"fixed",inset:0,zIndex:500,background:"#FBF9FF",backgroundImage:"repeating-linear-gradient(45deg,rgba(123,106,212,.035) 0 1.5px,transparent 1.5px 9px)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",padding:28}}>
+          <button onClick={()=>setFocusOn(false)} aria-label="Exit focus mode" style={{position:"absolute",top:22,right:24,width:44,height:44,borderRadius:"50%",border:`1.5px solid ${T.border}`,background:"#fff",color:T.ink3,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg>
+          </button>
+          <div style={{fontWeight:800,fontSize:13,letterSpacing:".14em",textTransform:"uppercase",color:T.terra}}>{partLabel} · {activeCurRow?focusLabel:"complete"}</div>
+          <div style={{fontFamily:T.serif,fontWeight:600,fontSize:"clamp(28px,4.6vw,48px)",lineHeight:1.15,maxWidth:720,marginTop:18,color:T.ink}}>{activeCurRow?activeCurRow.text:`All ${activeTotal} rounds done 🎉`}</div>
+          <div style={{width:"min(420px,80vw)",height:10,borderRadius:999,background:T.border,marginTop:30,overflow:"hidden"}}>
+            <span style={{display:"block",height:"100%",borderRadius:999,width:`${activePct}%`,background:`linear-gradient(90deg,${T.terra},${T.pink})`,transition:"width .3s"}}/>
+          </div>
+          <div style={{marginTop:34}}><CounterCluster big/></div>
+          <div style={{fontWeight:700,fontSize:14.5,color:T.ink3,marginTop:26,maxWidth:560}}>Next: <b style={{color:T.ink}}>{activeNextRow?activeNextRow.text:activeCurRow?"last round of this part":"take a bow"}</b></div>
+        </div>
+      )}
       {/* Pattern Notes — designer's read-only preamble. Reads pattern_notes
           only (post-migration 007 split); notes is the user's journal and
           belongs to My Notes, not here. No fallback between the two. */}
@@ -282,41 +371,41 @@ const RowManager = ({
               {sec.header.makeCount>1&&<div style={{background:T.gold,color:"#fff",borderRadius:99,padding:"2px 8px",fontSize:10,fontWeight:700}}>×{sec.header.makeCount}</div>}
               {secTotal>0&&<div style={{width:60}}><Bar val={secDone/secTotal*100} color={secComplete?T.sage:T.terra} h={3}/></div>}
             </button>}
-            {(open||!sec.header||focusHeaderId)&&<div style={{border:sec.header&&!focusHeaderId?`1px solid ${T.border}`:"none",borderTop:"none",borderRadius:sec.header&&!focusHeaderId?"0 0 10px 10px":0,overflow:"hidden",position:"relative"}}>
-              {hasBody&&<div style={{padding:"12px 14px",fontSize:13,color:T.ink2,lineHeight:1.7,whiteSpace:"pre-wrap",borderBottom:secTotal>0?`1px solid ${T.border}`:"none"}}>{sec.header.body}</div>}
-              {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;return(
-        <div key={r.id} id={`row-${i + 1}`} data-row={i + 1} style={{borderBottom:`1px solid ${focusHeaderId?"rgba(237,228,247,0.55)":T.border}`,background:flagStatus==="fail"?"rgba(192,84,74,0.08)":flagStatus==="warning"?"rgba(201,168,76,0.08)":r.isAction&&!rowLocked?"rgba(184,144,44,.06)":"transparent",borderLeft:flagStatus==="fail"?"3px solid #C0544A":flagStatus==="warning"?"3px solid #C9A84C":"none"}}>
-          <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:13,alignItems:"center",cursor:isAnonymous||rowLocked?"default":"pointer",background:isCurrent&&!rowLocked&&!isAnonymous?"rgba(123,106,212,.04)":"transparent",padding:focusHeaderId?"17px 14px":"14px 14px",margin:"0 -8px",opacity:rowLocked?.45:1,transition:"opacity .15s"}}>
-            <button type="button" className={!r.done&&isCurrent&&!rowLocked&&!isAnonymous?"wovely-current-ring":undefined} aria-label={r.done?"Mark row incomplete":"Mark row complete"} disabled={isAnonymous||rowLocked} onClick={e=>{e.stopPropagation();if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{position:"relative",overflow:"visible",width:18,height:18,borderRadius:99,flexShrink:0,padding:0,background:r.done?T.terra:rowLocked?"#E8E4DF":T.surface,border:"1.5px solid "+(r.done?T.terra:isCurrent&&!rowLocked&&!isAnonymous?T.terra:rowLocked?"#D5D0CA":T.border),display:"flex",alignItems:"center",justifyContent:"center",transition:"all .2s",cursor:isAnonymous||rowLocked?"default":"pointer",boxShadow:r.done?"0 2px 8px rgba(123,106,212,.3)":isCurrent&&!rowLocked&&!isAnonymous?"0 0 0 3px rgba(123,106,212,.15)":"none"}}>
+            {(open||!sec.header||focusHeaderId)&&<div style={{display:"flex",flexDirection:"column",gap:10,padding:sec.header&&!focusHeaderId?"10px 0 2px":0,position:"relative"}}>
+              {hasBody&&<div style={{padding:"12px 14px",fontSize:13,color:T.ink2,lineHeight:1.7,whiteSpace:"pre-wrap",background:"#fff",border:`1px solid ${T.border}`,borderRadius:14}}>{sec.header.body}</div>}
+              {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;const isCur=isCurrent&&!rowLocked&&!isAnonymous;return(
+        // 2b .step card — same toggle/lock/flag/dots logic, card presentation.
+        // Done rounds fade (.step.done opacity .55); BevCheck flags keep their
+        // coral/amber left border + tinted fill (.ffail/.fwarn).
+        <div key={r.id} id={`row-${i + 1}`} data-row={i + 1} style={{background:flagStatus==="fail"?"#FFF6F4":flagStatus==="warning"?"#FFFBF2":"#fff",border:`1px solid ${isCur?T.terra:T.border}`,borderLeft:flagStatus==="fail"?"4px solid #FF8A73":flagStatus==="warning"?"4px solid #F5B93E":undefined,borderRadius:14,boxShadow:isCur?`0 10px 22px -16px ${T.terra}`:"none",opacity:r.done?.55:rowLocked?.45:1,transition:"opacity .15s, border-color .15s"}}>
+          <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:14,alignItems:"center",cursor:isAnonymous||rowLocked?"default":"pointer",padding:"14px 18px"}}>
+            <button type="button" aria-label={r.done?"Mark row incomplete":"Mark row complete"} disabled={isAnonymous||rowLocked} onClick={e=>{e.stopPropagation();if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{position:"relative",overflow:"visible",width:30,height:30,borderRadius:9,flexShrink:0,padding:0,border:"none",background:r.done?T.sage:isCur?T.terra:T.surface,color:r.done||isCur?"#fff":T.terra,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.sans,fontWeight:800,fontSize:14,transition:"all .2s",cursor:isAnonymous||rowLocked?"default":"pointer"}}>
               <span aria-hidden="true" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:44,height:44}}/>
-              {!r.done&&isCurrent&&!rowLocked&&!isAnonymous&&<span aria-hidden="true" className="wovely-current-halo" style={{position:"absolute",top:0,left:0,right:0,bottom:0,margin:"auto",width:18,height:18,boxSizing:"border-box",borderRadius:99,border:`1.5px solid ${T.terra}`,opacity:0,pointerEvents:"none"}}/>}
-              {r.done&&<span style={{color:"#fff",fontSize:9,fontWeight:700,lineHeight:1}}>✓</span>}
+              {r.done?"✓":i+1}
             </button>
             <div style={{flex:1,minWidth:0}}>
-              {isCurrent&&!rowLocked&&!isAnonymous&&<div style={{fontSize:10,color:T.terra,fontWeight:600,letterSpacing:".06em",marginBottom:2}}>CURRENT ROW</div>}
-              {(!isCurrent||isAnonymous)&&r.isAction&&!rowLocked&&<div style={{fontSize:10,color:T.gold,fontWeight:600,letterSpacing:".06em",marginBottom:2}}>ACTION</div>}
-              {(!isCurrent||isAnonymous)&&!r.isAction&&!rowLocked&&<div style={{fontSize:10,color:flagStatus==="fail"?"#C0544A":flagStatus==="warning"?"#C9A84C":T.ink3,letterSpacing:".06em",marginBottom:2}}>{flagStatus==="fail"?"✗ ":flagStatus==="warning"?"⚠ ":""}ROW {i+1}</div>}
-              {rowLocked&&<div style={{fontSize:10,color:T.ink3,letterSpacing:".06em",marginBottom:2}}>ROW {i+1}</div>}
+              {r.isAction&&!rowLocked&&<div style={{fontSize:10,color:T.gold,fontWeight:600,letterSpacing:".06em",marginBottom:2}}>ACTION</div>}
               {rowEditing?.id===r.id
                 ?<div style={{display:"flex",gap:6,alignItems:"center"}} onClick={e=>e.stopPropagation()}>
                   <input autoFocus value={rowEditing.text} onChange={e=>setRowEditing({...rowEditing,text:e.target.value})} onKeyDown={e=>{if(e.key==="Enter")saveRowText(r.id,rowEditing.text);if(e.key==="Escape")setRowEditing(null);}} style={{flex:1,padding:"6px 10px",background:T.linen,border:`1.5px solid ${T.terra}`,borderRadius:8,fontSize:13,color:T.ink,outline:"none",lineHeight:1.5}}/>
                   <button onClick={()=>saveRowText(r.id,rowEditing.text)} style={{background:T.sage,border:"none",borderRadius:6,padding:"5px 8px",color:"#fff",fontSize:12,cursor:"pointer",fontWeight:700}}>✓</button>
                   <button onClick={()=>setRowEditing(null)} style={{background:"none",border:`1px solid ${T.border}`,borderRadius:6,padding:"5px 8px",color:T.ink3,fontSize:12,cursor:"pointer"}}>✕</button>
                 </div>
-                :<div style={{fontSize:14,lineHeight:1.6,color:r.done?T.ink3:rowLocked?"#B8B2AA":T.ink,textDecoration:r.done?"line-through":"none"}}>{r.text}</div>}
+                :<div style={{fontSize:14.5,fontWeight:700,lineHeight:1.6,color:r.done?T.ink3:rowLocked?"#B8B2AA":T.ink}}>{r.text}</div>}
             </div>
+            {flagStatus&&<div style={{marginLeft:"auto",fontWeight:800,fontSize:11,color:flagStatus==="fail"?"#C2564A":"#B07B1E",flexShrink:0,maxWidth:112,textAlign:"right"}}>{flagStatus==="fail"?"✗ check this row":"⚠ heads up"}</div>}
             {!isAnonymous&&!rowLocked&&rowEditing?.id!==r.id&&<div style={{display:"flex",gap:2,flexShrink:0}}>
               <button onClick={e=>{e.stopPropagation();setRowEditing({id:r.id,text:r.text});setNoteEdit(null);}} style={{background:"none",border:"none",fontSize:13,cursor:"pointer",padding:"4px",color:T.ink3,opacity:.5}} title="Edit row">✏️</button>
               <button onClick={e=>{e.stopPropagation();setNoteEdit(noteEdit===r.id?null:r.id);}} style={{background:"none",border:"none",fontSize:14,cursor:"pointer",padding:"4px"}}><span style={{color:r.note?T.terra:T.ink3,opacity:r.note?1:.5}}>📝</span></button>
             </div>}
           </div>
-          {!isAnonymous&&!r.done&&!rowLocked&&((r.repeat_brackets||[]).some(b=>b.count>1)||r.repeat_done)&&<div style={{padding:"0 8px 10px 47px"}}><SubCounter row={r} globalIdx={globalIdx} onDotTap={handleDotTap} onRepeatDone={handleRepeatDone}/></div>}
-          {r.note&&noteEdit!==r.id&&!rowLocked&&<div onClick={e=>{e.stopPropagation();setNoteEdit(r.id);}} style={{padding:"0 8px 10px 47px",fontSize:12,color:T.ink3,lineHeight:1.5,cursor:"pointer"}}><span style={{fontSize:11}}>📌</span> <span style={{fontStyle:"italic"}}>{r.note}</span></div>}
-          {newAbbr.length>0&&!rowLocked&&<div style={{padding:"0 8px 10px 47px"}} onClick={e=>e.stopPropagation()}>
-            <div style={{fontFamily:T.sans,fontSize:11,color:T.ink3,marginBottom:6}}>Tap a stitch for a video tutorial</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{newAbbr.map(a=><button key={a.raw} type="button" onClick={e=>{e.stopPropagation();window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(a.full + " crochet tutorial"),"_blank","noopener,noreferrer");}} onMouseEnter={e=>{e.currentTarget.style.background=T.border;}} onMouseLeave={e=>{e.currentTarget.style.background=T.surface;}} style={{display:"inline-flex",alignItems:"center",gap:5,background:T.surface,color:T.navy,border:`1px solid ${T.border}`,borderRadius:20,padding:"4px 10px",fontFamily:T.sans,fontSize:11,fontWeight:600,cursor:"pointer",whiteSpace:"nowrap",transition:"background .15s"}}><svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true" style={{flexShrink:0,display:"block"}}><path d="M3 2.2 L10 6 L3 9.8 Z" fill={T.terra}/></svg>{a.raw}</button>)}</div>
+          {!isAnonymous&&!r.done&&!rowLocked&&((r.repeat_brackets||[]).some(b=>b.count>1)||r.repeat_done)&&<div style={{padding:"0 18px 12px 62px"}}><SubCounter row={r} globalIdx={globalIdx} onDotTap={handleDotTap} onRepeatDone={handleRepeatDone}/></div>}
+          {r.note&&noteEdit!==r.id&&!rowLocked&&<div onClick={e=>{e.stopPropagation();setNoteEdit(r.id);}} style={{padding:"0 18px 12px 62px",fontSize:12,color:T.ink3,lineHeight:1.5,cursor:"pointer"}}><span style={{fontSize:11}}>📌</span> <span style={{fontStyle:"italic"}}>{r.note}</span></div>}
+          {newAbbr.length>0&&!rowLocked&&<div style={{padding:"0 18px 12px 62px"}} onClick={e=>e.stopPropagation()}>
+            <div style={{fontFamily:T.sans,fontSize:11,color:T.ink3,marginBottom:6}}>New stitch — tap for a video</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{newAbbr.map(a=><button key={a.raw} type="button" onClick={e=>{e.stopPropagation();window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(a.full + " crochet tutorial"),"_blank","noopener,noreferrer");}} onMouseEnter={e=>{e.currentTarget.style.background="#E7DFF8";}} onMouseLeave={e=>{e.currentTarget.style.background=T.surface;}} style={{display:"inline-flex",alignItems:"center",gap:5,background:T.surface,color:T.terra,border:"none",borderRadius:999,padding:"5px 10px",fontFamily:T.sans,fontSize:11.5,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap",transition:"background .15s"}}><svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true" style={{flexShrink:0,display:"block"}}><path d="M3 2.2 L10 6 L3 9.8 Z" fill={T.terra}/></svg>{a.raw}</button>)}</div>
           </div>}
-          {noteEdit===r.id&&!rowLocked&&<div style={{padding:"0 8px 12px 47px",display:"flex",alignItems:"center",gap:8}}><input value={r.note} onChange={e=>updateNote(r.id,e.target.value)} placeholder="Add a note for this row…" style={{flex:1,padding:"9px 12px",background:T.linen,border:`1.5px solid ${T.terra}`,borderRadius:9,fontSize:13,color:T.ink,outline:"none"}}/>{noteSaved&&<span style={{fontSize:11,color:T.sage,fontWeight:600,flexShrink:0}}>Note saved</span>}</div>}
+          {noteEdit===r.id&&!rowLocked&&<div style={{padding:"0 18px 14px 62px",display:"flex",alignItems:"center",gap:8}}><input value={r.note} onChange={e=>updateNote(r.id,e.target.value)} placeholder="Add a note for this row…" style={{flex:1,padding:"9px 12px",background:T.linen,border:`1.5px solid ${T.terra}`,borderRadius:9,fontSize:13,color:T.ink,outline:"none"}}/>{noteSaved&&<span style={{fontSize:11,color:T.sage,fontWeight:600,flexShrink:0}}>Note saved</span>}</div>}
         </div>
       );})}
               {isAnonymous && hiddenRowCount > 0 && (

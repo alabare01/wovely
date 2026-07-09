@@ -169,6 +169,7 @@ const CSS = () => (
     @keyframes progressShimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
     @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.15);opacity:.7} }
     @keyframes confidencePop { 0%{transform:scale(0.8);opacity:0} 60%{transform:scale(1.05)} 100%{transform:scale(1);opacity:1} }
+    @keyframes bcblink { 50%{opacity:0} }
     .fu { animation:fadeUp .4s ease both; }
     .su { animation:slideUp .35s cubic-bezier(.22,.68,0,1.05) both; }
     .nav-open  { animation:slideInLeft  .3s cubic-bezier(.22,.68,0,1.05) both; }
@@ -694,7 +695,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
                   <div style={{position:"absolute",top:12,right:12,background:T.linen,color:T.ink2,fontSize:10,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",padding:"3px 10px",borderRadius:99}}>Current Plan</div>
                 )}
                 {isRecommended && !isCurrent && (
-                  <div style={{position:"absolute",top:12,right:12,background:T.terra,color:"#fff",fontSize:10,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",padding:"3px 10px",borderRadius:99}}>Recommended</div>
+                  <div style={{position:"absolute",top:12,right:12,background:T.terra,color:"#fff",fontSize:10,fontWeight:700,letterSpacing:"0.06em",textTransform:"uppercase",padding:"3px 10px",borderRadius:99}}>Most popular</div>
                 )}
                 <div>
                   <div style={{fontFamily:T.serif,fontSize:22,fontWeight:700,color:T.ink,lineHeight:1.1,marginBottom:4}}>{def.name}</div>
@@ -993,7 +994,24 @@ const MultiSectionAnnouncePrompt = ({ count, isCraft, onGo, onSeeCraft }) => (
 // through TieredUpgradeModal above. Callers pass `reason='paywall'` for
 // the cap-hit framing or `reason='general'` for the generic CTA.
 
-const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHome}) => {
+// Day-streak tracker for "Your corner". Device-local (localStorage) and real
+// going forward — counts consecutive days the app was opened on THIS device.
+// Local date (not UTC) so a Jacksonville midnight doesn't split a day.
+const STREAK_KEY = "wovely_day_streak";
+const localDay = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const bumpDayStreak = () => {
+  try {
+    const today = localDay(new Date());
+    const raw = JSON.parse(localStorage.getItem(STREAK_KEY) || "null");
+    if (raw?.last === today) return raw.count || 1;
+    const yesterday = localDay(new Date(Date.now() - 86400000));
+    const count = raw?.last === yesterday ? (raw.count || 0) + 1 : 1;
+    localStorage.setItem(STREAK_KEY, JSON.stringify({ last: today, count }));
+    return count;
+  } catch { return 0; }
+};
+
+const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHome,patterns=[]}) => {
   const profileNav=useNavigate();
   const [username,setUsername]=useState(""),[displayName,setDisplayName]=useState(""),[bio,setBio]=useState("");
   const [socialInstagram,setSocialInstagram]=useState(""),[socialPinterest,setSocialPinterest]=useState(""),[socialRavelry,setSocialRavelry]=useState("");
@@ -1001,11 +1019,42 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
   const [saveBtnText,setSaveBtnText]=useState("Save Profile");
   const [welcomeDismissed,setWelcomeDismissed]=useState(()=>localStorage.getItem("yh_welcome_dismissed")==="true");
   const [curPass,setCurPass]=useState(""),[newPass,setNewPass]=useState(""),[passSaving,setPassSaving]=useState(false),[passMsg,setPassMsg]=useState(null);
+  // "Your corner" (2b) is the default face of /profile; the working settings
+  // form lives one tab over, fully intact.
+  const [profileTab,setProfileTab]=useState("corner");
+  const [shareState,setShareState]=useState(null); // null | "copied"
   const{isDesktop}=useBreakpoint();
   const user = supabaseAuth.getUser();
   const session = getSession();
 
   const profilePct = Math.round((displayName.trim()?33:0)+(username.trim()?33:0)+(bio.trim()?34:0));
+
+  // ── "Your corner" stats — real computed values only (no invented numbers).
+  // Starters excluded from pattern counts per DEFAULT_STARTERS rule.
+  const activePats=(patterns||[]).filter(p=>p.status!=="deleted");
+  const realPats=activePats.filter(p=>!p.isStarter);
+  const rowsCounted=realPats.reduce((s,p)=>s+((p.rows||[]).filter(r=>!r.isHeader&&!r.isNoteOnly&&r.done).length),0);
+  const finishedMakes=realPats.filter(p=>{const c=(p.rows||[]).filter(r=>!r.isHeader&&!r.isNoteOnly);return c.length>0&&c.every(r=>r.done);}).length;
+  const bevPassed=realPats.filter(p=>{
+    const vr=p.validation_report;
+    if(!vr||vr.error||vr.skipped)return false;
+    const st=vr.state||vr.overall;
+    if(st==="pass"||st==="valid")return true;
+    if(typeof vr.score==="number")return vr.score>=80;
+    return Array.isArray(vr.flaggedRows)?vr.flaggedRows.length===0:false;
+  }).length;
+  const dayStreak=bumpDayStreak();
+  const sinceYear=user?.created_at?new Date(user.created_at).getFullYear():null;
+  const goalYear=new Date().getFullYear();
+  const GOAL_TARGET=12;
+  const handleShareWovely=async()=>{
+    const url="https://wovely.app";
+    try{
+      if(navigator.share){await navigator.share({title:"Wovely",text:"Bev keeps my crochet patterns and row counts in one cosy place.",url});return;}
+      await navigator.clipboard.writeText(url);
+      setShareState("copied");setTimeout(()=>setShareState(null),2000);
+    }catch{}
+  };
 
   useEffect(()=>{
     if (!user || profileLoaded) return;
@@ -1066,10 +1115,112 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
   const DIVIDER = <div style={{height:16}}/>;
   const Msg = ({msg}) => msg ? <div style={{background:msg.type==="ok"?"rgba(92,122,94,.1)":T.terraLt,borderRadius:12,padding:"10px 14px",fontSize:12,color:msg.type==="ok"?T.sage:T.terra,lineHeight:1.5,marginBottom:8}}>{msg.text}</div> : null;
 
+  // 2b achievement defs ("Stitches earned") — earned/locked off real signals
+  // only. Locked = honest not-yet, never a fake badge.
+  const ACHIEVEMENTS=[
+    {t:"First Stitch",s:"Imported a pattern",earned:realPats.length>=1,icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2.5 2.3"><circle cx="12" cy="12" r="7.3"/><path d="M9 5.4c3 3.6 3 9.6 0 13.2"/><path d="M15 5.4c-3 3.6-3 9.6 0 13.2"/></svg>},
+    {t:"Finisher",s:"First finished make",earned:finishedMakes>=1,icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.4 12.4l2.4 2.4 4.6-5"/></svg>},
+    {t:"Five in a Row",s:"5-day streak",earned:dayStreak>=5,icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2.5 2.3"><rect x="4.5" y="5.5" width="15" height="14.5" rx="2.5"/><path d="M4.5 10h15M8.5 3.5v3M15.5 3.5v3" style={{strokeDasharray:"none"}}/><path d="M8 14l2.6 2.6 5-5.4" style={{strokeDasharray:"none"}}/></svg>},
+    {t:"Century Club",s:"100 rows counted",earned:rowsCounted>=100,icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2.5 2.3"><path d="M4 19V9M10 19V5M16 19v-8M22 19H2"/></svg>},
+    {t:"Frog Free",s:"10 BevChecks passed",earned:bevPassed>=10,icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2.5 2.3"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2" style={{strokeDasharray:"none"}}/></svg>},
+    {t:"Deep Stash",s:"20 patterns stored",earned:realPats.length>=20,icon:<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="2.5 2.3"><path d="M5 12c0-2.3 3.1-3.6 7-3.6s7 1.3 7 3.6-3.1 3.6-7 3.6-7-1.3-7-3.6z"/><rect x="9.8" y="7.8" width="4.4" height="8.4" rx="1.4" style={{strokeDasharray:"none"}}/></svg>},
+  ];
+  const planLabel=isPro?tierLabel(tier):"Free";
+  const initials=((displayName||username||user?.email||"W").trim().charAt(0)||"W").toUpperCase();
+  const GOAL_CARD={background:"#fff",border:`1px solid ${T.line}`,borderRadius:16,padding:"16px 18px",marginTop:14};
+  const PACTION={display:"inline-flex",alignItems:"center",gap:8,background:"#fff",border:`1px solid ${T.line}`,borderRadius:12,padding:"10px 15px",fontFamily:T.body,fontWeight:800,fontSize:13.5,color:T.ink,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0};
+
   return (
-    <div style={{padding:isDesktop?"24px 0 80px":"16px 18px 100px",maxWidth:560}}>
+    <div style={{padding:isDesktop?"24px 0 80px":"16px 18px 100px",maxWidth:760,fontFamily:T.body}}>
       <button onClick={onGoHome} style={{background:"none",border:"none",color:T.ink3,cursor:"pointer",fontSize:13,fontWeight:500,padding:0,marginBottom:16,display:"flex",alignItems:"center",gap:4}}>← My Wovely</button>
 
+      {/* ── 2b "Your corner" header (Wovely App 2b.dc.html Profile screen) ── */}
+      <div style={{fontFamily:T.disp,fontWeight:600,fontSize:isDesktop?38:30,letterSpacing:"-.01em",color:T.ink,lineHeight:1.05}}>Your corner</div>
+      <div style={{fontWeight:700,fontSize:15,color:T.muted,marginTop:2}}>Everything you've made, earned and saved.</div>
+
+      <div style={{display:"flex",gap:6,borderBottom:`1px solid ${T.line}`,margin:"20px 0 0"}}>
+        {[["corner","Your corner"],["settings","Settings"]].map(([k,l])=>(
+          <button key={k} onClick={()=>setProfileTab(k)} style={{padding:"12px 18px",border:"none",background:"transparent",fontFamily:T.body,fontWeight:800,fontSize:15,color:profileTab===k?T.accent:T.muted,cursor:"pointer",borderBottom:"3px solid "+(profileTab===k?T.accent:"transparent"),marginBottom:-1,transition:"color .15s"}}>{l}</button>
+        ))}
+      </div>
+
+      {profileTab==="corner"&&(<>
+        {/* profhead — avatar hero */}
+        <div style={{display:"flex",alignItems:"center",gap:isDesktop?22:14,background:"#fff",border:`1px solid ${T.line}`,borderRadius:24,padding:isDesktop?"26px 30px":"20px 18px",marginTop:22,boxShadow:T.shadowLg}}>
+          <div style={{width:92,height:92,borderRadius:"50%",border:"3px solid #DCD0F7",background:T.soft,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.disp,fontWeight:600,fontSize:36,color:T.accent}}>{initials}</div>
+          <div style={{minWidth:0}}>
+            <div style={{fontFamily:T.disp,fontWeight:600,fontSize:28,color:T.ink,lineHeight:1.1}}>{displayName||"Your corner"}</div>
+            <div style={{fontWeight:700,fontSize:14,color:T.muted,marginTop:3}}>{sinceYear?`Making since ${sinceYear} · ${planLabel} plan`:`${planLabel} plan`}</div>
+          </div>
+          {isPro
+            ?<span style={{marginLeft:"auto",display:"inline-flex",alignItems:"center",gap:5,background:"linear-gradient(120deg,#FFD98A,#F5B93E)",color:"#5A3E0E",fontWeight:800,fontSize:11,letterSpacing:".07em",textTransform:"uppercase",padding:"5px 11px",borderRadius:999,boxShadow:"0 6px 14px -6px rgba(200,150,40,.6)",flexShrink:0}}>✦ {planLabel}</span>
+            :<button onClick={onOpenProModal} style={{marginLeft:"auto",border:0,borderRadius:11,padding:"9px 14px",background:T.sun,color:"#5A3E0E",fontFamily:T.body,fontWeight:800,fontSize:13,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Upgrade</button>}
+        </div>
+
+        {/* profstats — 4 real-data tiles */}
+        <div style={{display:isDesktop?"flex":"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"18px 0 0"}}>
+          {[[realPats.length,realPats.length===1?"Pattern":"Patterns"],[rowsCounted,"Rows counted"],[finishedMakes,finishedMakes===1?"Finished make":"Finished makes"],[dayStreak,"Day streak"]].map(([n,l])=>(
+            <div key={l} style={{flex:1,background:"#fff",border:`1px solid ${T.line}`,borderRadius:16,padding:16,textAlign:"center"}}>
+              <b style={{fontFamily:T.disp,fontWeight:600,fontSize:26,display:"block",color:T.accent}}>{n}</b>
+              <span style={{fontWeight:800,fontSize:12,color:T.muted}}>{l}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* goalcard — yearly finished-makes goal, real progress */}
+        <div style={GOAL_CARD}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
+            <div>
+              <div style={{fontWeight:800,fontSize:13,color:T.ink}}>{goalYear} goal — {GOAL_TARGET} finished makes</div>
+              <div style={{fontWeight:700,fontSize:11.5,color:T.muted,marginTop:2}}>{finishedMakes>=GOAL_TARGET?"Goal met — Bev is beside herself":`${finishedMakes} down, ${GOAL_TARGET-finishedMakes} to go — Bev believes in you`}</div>
+            </div>
+          </div>
+          <div style={{height:9,borderRadius:999,background:T.line,marginTop:12,overflow:"hidden"}}>
+            <span style={{display:"block",height:"100%",borderRadius:999,width:`${Math.min(100,Math.round(finishedMakes/GOAL_TARGET*100))}%`,background:`linear-gradient(90deg,${T.accent},${T.pink})`}}/>
+          </div>
+        </div>
+
+        {/* share card — honest version of the mockup referral card (the
+            give-a-month referral mechanic isn't built yet; no false promise) */}
+        <div style={GOAL_CARD}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+            <div style={{minWidth:0,flex:"1 1 220px"}}>
+              <div style={{fontWeight:800,fontSize:13,color:T.ink}}>Share Wovely with a maker friend</div>
+              <div style={{fontWeight:700,fontSize:11.5,color:T.muted,marginTop:2}}>Know someone who'd love Bev? Send them a link.</div>
+            </div>
+            <button onClick={handleShareWovely} style={PACTION}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={T.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 13v6h14v-6"/></svg>
+              {shareState==="copied"?"Link copied!":"Share Wovely"}
+            </button>
+          </div>
+        </div>
+
+        {/* Stitches earned — achievements grid, real earned/locked states */}
+        <div style={{fontWeight:800,fontSize:11.5,letterSpacing:".09em",textTransform:"uppercase",color:T.muted,margin:"28px 0 7px"}}>Stitches earned</div>
+        <div style={{display:"grid",gridTemplateColumns:isDesktop?"repeat(3,1fr)":"repeat(2,1fr)",gap:12}}>
+          {ACHIEVEMENTS.map(a=>(
+            <div key={a.t} style={{background:"#fff",border:`1px solid ${T.line}`,borderRadius:16,padding:"16px 12px",textAlign:"center",opacity:a.earned?1:.5,filter:a.earned?"none":"grayscale(.55)"}}>
+              <div style={{width:46,height:46,borderRadius:14,background:T.soft,display:"flex",alignItems:"center",justifyContent:"center",color:T.accent,margin:"0 auto"}}>{a.icon}</div>
+              <div style={{fontFamily:T.disp,fontWeight:600,fontSize:14.5,color:T.ink,marginTop:10}}>{a.t}</div>
+              <div style={{fontWeight:700,fontSize:11.5,color:T.muted,marginTop:2}}>{a.s}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick settings rows — real destinations only */}
+        <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:18}}>
+          <div onClick={onOpenProModal} style={{display:"flex",alignItems:"center",gap:13,background:"#fff",border:`1px solid ${T.line}`,borderRadius:14,padding:"15px 18px",fontWeight:800,fontSize:14.5,color:T.ink,cursor:"pointer"}}>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={T.accent} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4.2l1.5 4.3 4.3 1.5-4.3 1.5L12 15.8l-1.5-4.3L6.2 10l4.3-1.5z"/></svg>
+            Manage plan<span style={{marginLeft:"auto",color:T.muted,fontWeight:700,fontSize:13}}>{isPro?`Wovely ${planLabel}`:"See what Craft includes"}</span>
+          </div>
+          <div onClick={()=>setProfileTab("settings")} style={{display:"flex",alignItems:"center",gap:13,background:"#fff",border:`1px solid ${T.line}`,borderRadius:14,padding:"15px 18px",fontWeight:800,fontSize:14.5,color:T.ink,cursor:"pointer"}}>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={T.accent} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2"/></svg>
+            Profile &amp; account settings<span style={{marginLeft:"auto",color:T.muted,fontWeight:700,fontSize:13}}>Name, bio, password</span>
+          </div>
+        </div>
+      </>)}
+
+      {profileTab==="settings"&&(<div style={{maxWidth:560,marginTop:22}}>
       {!welcomeDismissed&&(
         <div style={{borderRadius:16,overflow:"hidden",marginBottom:20,position:"relative",height:220}}>
           <img src="https://res.cloudinary.com/dmaupzhcx/image/upload/c_fill,w_1200,h_440,g_center/v1774116735/yarnhive_bg_v2.jpg" alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:"center"}}/>
@@ -1187,6 +1338,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
         <span style={{margin:"0 8px",opacity:.5}}>|</span>
         <span onClick={()=>profileNav("/terms")} style={{color:"#726A92",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Terms of Service</span>
       </div>
+      </div>)}
     </div>
   );
 };
@@ -1956,6 +2108,11 @@ export default function Wovely() {
   // mapped to a tier change. Used by the sign-out + onboarding-back paths.
   const setIsPro=(p)=>setTier(p?TIER_CRAFT:TIER_FREE);
   const [authChecked,setAuthChecked]=useState(false);
+  // First name for the Craft Room greeting ("Good morning, Adam" — 2b
+  // mockup). Sourced from the boot-time user_profiles fetch below;
+  // first_name preferred, display_name's first word as fallback.
+  const [greetName,setGreetName]=useState("");
+  const applyGreetName=(row)=>{const n=(row?.first_name||"").trim()||((row?.display_name||"").trim().split(/\s+/)[0]||"");if(n)setGreetName(n);};
   const [userPatterns,setUserPatterns]=useState([]);
   const [patternsFetched,setPatternsFetched]=useState(false);
   const [starterPatterns,setStarterPatterns]=useState(()=>makeStarterPatterns());
@@ -2305,7 +2462,7 @@ export default function Wovely() {
             try {
               const uid = (() => { try { const p=JSON.parse(atob(ns.access_token.split(".")[1])); return p.sub; } catch { return null; } })();
               if (uid) {
-                const pr = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${uid}&select=has_completed_onboarding,tier,is_pro`, {
+                const pr = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${uid}&select=has_completed_onboarding,tier,is_pro,first_name,display_name`, {
                   headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${ns.access_token}`},
                 });
                 if (pr.ok) {
@@ -2316,6 +2473,7 @@ export default function Wovely() {
                     const nextTier = rows[0].tier || tierFromLegacyIsPro(rows[0].is_pro === true);
                     console.log("[Wovely] tier from DB:", rows[0].tier, "is_pro:", rows[0].is_pro, "→ tier:", nextTier);
                     setTier(nextTier);
+                    applyGreetName(rows[0]);
                   } else {
                     console.warn("[Wovely] Profile fetch returned empty array — no user_profiles row for uid:", uid);
                   }
@@ -2578,13 +2736,14 @@ export default function Wovely() {
       try {
         const uid = (() => { try { const p=JSON.parse(atob(s.access_token.split(".")[1])); return p.sub; } catch { return null; } })();
         if (uid) {
-          const pr = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${uid}&select=tier,is_pro,has_completed_onboarding`, {
+          const pr = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${uid}&select=tier,is_pro,has_completed_onboarding,first_name,display_name`, {
             headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${s.access_token}`},
           });
           if (pr.ok) {
             const rows = await pr.json();
             if (rows[0]) {
               setTier(rows[0].tier || tierFromLegacyIsPro(rows[0].is_pro === true));
+              applyGreetName(rows[0]);
             }
           }
         }
@@ -3483,7 +3642,7 @@ export default function Wovely() {
           </div>
         </div>
         <div style={{flex:1,padding:"0 32px",minHeight:"100vh"}}>
-          {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>)}
+          {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG} firstName={greetName}/>)}
           {view==="wip"&&<div style={{padding:"24px 0 80px"}}><button onClick={()=>navigateToView("collection")} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Back</button>{inProgress.length===0?<div style={{textAlign:"center",padding:"80px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:20,fontWeight:600,color:"#2E2748",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#726A92",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
           {view==="detail"&&selected&&<div style={{margin:"0 -40px"}}><Detail key={selected._supabaseId||selected.id} p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selected?.collection_id ?? null)} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>{setPaywallRecommend(requiredTier('collections'));setShowProModal(true);}} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/></div>}
           {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
@@ -3491,7 +3650,7 @@ export default function Wovely() {
           {view==="calculator"&&<div style={{paddingTop:24}}><Calculators/></div>}
           {view==="stitch-check"&&<div style={{paddingTop:24}}><StitchCheck gateAction={gateAction}/></div>}
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
-          {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
+          {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
           {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
           {view==="privacy"&&<PrivacyPolicy/>}
@@ -3535,7 +3694,7 @@ export default function Wovely() {
       </div>
       {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Nunito,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}
       <div ref={mainScrollRef} style={{flex:1,overflowX:"hidden",overflowY:"auto",paddingBottom:100,minHeight:"100vh"}}>
-        {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG}/>)}
+        {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG} firstName={greetName}/>)}
         {view==="wip"&&<div style={{padding:"16px 18px 80px"}}>{inProgress.length===0?<div style={{textAlign:"center",padding:"60px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:"#2E2748",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#726A92",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
         {view==="detail"&&selected&&<Detail key={selected._supabaseId||selected.id} p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selected?.collection_id ?? null)} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>{setPaywallRecommend(requiredTier('collections'));setShowProModal(true);}} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/>}
         {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
@@ -3543,7 +3702,7 @@ export default function Wovely() {
         {view==="calculator"&&<div style={{paddingTop:18}}><Calculators/></div>}
         {view==="stitch-check"&&<div style={{paddingTop:18}}><StitchCheck gateAction={gateAction}/></div>}
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
-        {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
+        {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
         {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
         {view==="privacy"&&<PrivacyPolicy/>}

@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { T, useBreakpoint } from "./theme.jsx";
+import ScanGauge, { ProcSteps } from "./components/ScanGauge.jsx";
 import posthog from "posthog-js";
 import BevGauge, { deriveState, sentenceCase, checkTier } from "./components/BevGauge.jsx";
 
@@ -237,15 +238,23 @@ const StitchCheck = ({ onNavigateToRow, gateAction } = {}) => {
         </div>
       )}
 
-      {loading && (
-        <div style={{ ...CARD, textAlign: "center", padding: "48px 24px" }}>
-          <div style={{ fontSize: 40, marginBottom: 16 }}>{"\uD83D\uDEE1\uFE0F"}</div>
-          <div style={{ fontFamily: T.serif, fontSize: 18, color: T.ink, marginBottom: 12 }}>{phase}</div>
-          <div style={{ height: 6, background: T.terraLt, borderRadius: 9999, overflow: "hidden", margin: "0 auto", maxWidth: 300 }}>
-            <div className="progress-bar-fill" style={{ height: "100%", width: progress + "%", borderRadius: 9999, transition: "width .3s ease" }} />
+      {loading && (() => {
+        // 2b .proc treatment \u2014 bobbing Bev + step list + live gauge, same
+        // family as the import paths. Steps ride the real phase string.
+        const activeStep = /extract|prepar/i.test(phase) ? 0 : /running/i.test(phase) ? 1 : 2;
+        return (
+          <div style={{ ...CARD, textAlign: "center", padding: "28px 24px 32px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <style>{`@keyframes bevbobSC{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}`}</style>
+            <img src="/bev-hero.png" alt="Bev checking your pattern" style={{ width: 96, filter: "drop-shadow(0 12px 18px rgba(90,66,160,.32))", animation: "bevbobSC 2.2s ease-in-out infinite" }} />
+            <div style={{ fontFamily: "'Fredoka','Segoe UI',sans-serif", fontSize: 26, fontWeight: 600, color: "#2E2748", marginTop: 18, lineHeight: 1.15 }}>{phase}</div>
+            <div style={{ fontWeight: 700, fontSize: 14.5, fontFamily: "Nunito,sans-serif", color: "#726A92", marginTop: 6 }}>Bev checks the math so your hook doesn't have to.</div>
+            <div style={{ width: "100%", maxWidth: 390, marginTop: 22, display: "flex", justifyContent: "center" }}>
+              <ScanGauge phase={activeStep >= 1 ? "checking" : "idle"} note={activeStep >= 1 ? "Checking every row's stitch counts\u2026" : "Warming up the needle\u2026"} />
+            </div>
+            <ProcSteps steps={["Reading your pattern", "BevCheck \u2014 validating accuracy", "Reading the results"]} activeStep={activeStep} />
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {!loading && !mode && (
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>

@@ -4,6 +4,7 @@ import { PILL } from "./constants.js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseAuth, getSession } from "./supabase.js";
 import { CHECK_ICON, extractFirstRowNumber } from "./StitchCheck.jsx";
 import BevGauge, { deriveState, sentenceCase, checkTier } from "./components/BevGauge.jsx";
+import ScanGauge, { ProcSteps } from "./components/ScanGauge.jsx";
 import { setActiveImportJob } from "./components/ImportPill.jsx";
 import { useImportJobPolling } from "./hooks/useImportJobPolling.js";
 import { PHASE_COPY_POOLS, REASSURANCE_LINE, pickPhaseCopy } from "./utils/importPhaseCopy.js";
@@ -1287,40 +1288,33 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
           : `${polling.totalElapsed}s`)
       : null;
     // 2b "Bev's reading your pattern" screen (Wovely App 2b.dc.html #importing):
-    // bobbing Bev, a scanning BevCheck gauge, and a 4-step progress list whose
-    // dot states are driven by the real import `stage`.
+    // bobbing Bev, the live BevCheck gauge (ScanGauge), and a 4-step progress
+    // list. Steps ride the REAL worker phase when the queue is driving
+    // (polling.currentPhase), falling back to the local stage on the legacy
+    // synchronous path. Gauge resolves to the real BevCheck score the moment
+    // validation_report lands — never an invented number.
+    const PHASE_STEP = { reading:0, extracting:1, validating:2, finalizing:3 };
     const STEP_STAGE = { uploading:0, extracting:1, building:2 };
-    const activeStep = STEP_STAGE[stage] ?? 0;
+    const activeStep = (pollingJobId && polling.currentPhase != null)
+      ? (PHASE_STEP[polling.currentPhase] ?? 0)
+      : (STEP_STAGE[stage] ?? 0);
     const STEPS = ["Reading the source","Finding parts, rows & materials","BevCheck — validating accuracy","Tucking the original into your Vault"];
+    const gaugeScore = typeof validationReport?.score === "number" ? validationReport.score : null;
+    const gaugePhase = validationReport ? "done" : (bevCheckFailed ? "idle" : (activeStep >= 2 ? "checking" : "idle"));
+    const gaugeNote = validationReport
+      ? (gaugeScore != null ? "Stitch counts verified, row by row" : "Bev finished her once-over")
+      : bevCheckFailed ? "Bev got tangled on the check — she'll retry after import"
+      : activeStep >= 2 ? "Checking every row's stitch counts…" : "Warming up the needle…";
     return (
     <div style={{padding:"18px 20px 28px",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center",maxWidth:480,margin:"0 auto",position:"relative"}}>
-      <style>{`@keyframes bevbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}@keyframes gscan2{0%,100%{transform:rotate(-52deg)}45%{transform:rotate(48deg)}60%{transform:rotate(30deg)}75%{transform:rotate(52deg)}}@keyframes pulseDot{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}@keyframes fadeInMsg{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
+      <style>{`@keyframes bevbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}@keyframes fadeInMsg{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <img src="/bev-hero.png" alt="Bev reading your pattern" style={{width:96,filter:"drop-shadow(0 12px 18px rgba(90,66,160,.32))",animation:"bevbob 2.2s ease-in-out infinite"}}/>
       <div key={loadingInfo.headline} style={{fontFamily:"'Fredoka','Segoe UI',sans-serif",fontSize:26,fontWeight:600,color:"#2E2748",marginTop:18,lineHeight:1.15,animation:"fadeInMsg .4s ease both"}}>Bev's reading your pattern…</div>
       <div style={{fontWeight:700,fontSize:14.5,color:"#726A92",marginTop:6}}>{elapsedLabel ? `Under a minute — we'll keep your place. · ${elapsedLabel}` : "Under a minute — we'll keep your place."}</div>
-      {/* Scanning BevCheck gauge */}
-      <div style={{width:"100%",maxWidth:390,marginTop:22,background:"#fff",border:"1px solid #ECE6F8",borderRadius:18,padding:"16px 17px 15px",textAlign:"center",boxShadow:"0 20px 44px -30px rgba(90,66,160,.5)"}}>
-        <div style={{fontWeight:800,fontSize:12,letterSpacing:".1em",textTransform:"uppercase",color:"#726A92"}}>BevCheck accuracy</div>
-        <div style={{width:200,height:106,margin:"12px auto 0",position:"relative"}}>
-          <svg width="200" height="106" viewBox="0 0 200 106" fill="none">
-            <path d="M18 100a82 82 0 01164 0" stroke="#ECE6F8" strokeWidth="9" strokeLinecap="round" strokeDasharray="3 5"/>
-          </svg>
-          <div style={{position:"absolute",left:98,bottom:2,width:4,height:80,background:"#2E2748",borderRadius:99,transformOrigin:"50% 100%",animation:"gscan2 1.5s ease-in-out infinite"}}>
-            <div style={{position:"absolute",left:"50%",bottom:-8,transform:"translateX(-50%)",width:16,height:16,borderRadius:"50%",background:"#2E2748"}}/>
-          </div>
-        </div>
-        <div style={{fontFamily:"'Fredoka','Segoe UI',sans-serif",fontWeight:600,fontSize:30,marginTop:4,color:"#726A92"}}>· · ·</div>
-        <div style={{fontWeight:700,fontSize:12.5,color:"#726A92",marginTop:4}}>Checking every row's stitch counts…</div>
+      <div style={{width:"100%",maxWidth:390,marginTop:22,display:"flex",justifyContent:"center"}}>
+        <ScanGauge phase={gaugePhase} score={gaugeScore} state={validationReport?deriveState(validationReport):null} note={gaugeNote}/>
       </div>
-      {/* Step list */}
-      <div style={{display:"flex",flexDirection:"column",gap:11,marginTop:20,width:"100%",maxWidth:390,textAlign:"left"}}>
-        {STEPS.map((label,i)=>{const done=i<activeStep;const act=i===activeStep;return(
-          <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:"#fff",border:`1px solid ${act?"#7B6AD4":"#ECE6F8"}`,borderRadius:14,padding:"13px 16px",fontWeight:800,fontSize:14,color:done||act?"#2E2748":"#726A92"}}>
-            <div style={{width:26,height:26,borderRadius:"50%",background:done?"#5EC9AE":act?"#7B6AD4":"#F2EEFB",color:done||act?"#fff":"#7B6AD4",display:"flex",alignItems:"center",justifyContent:"center",flex:"none",fontSize:13,fontWeight:800,animation:act?"pulseDot 1.1s ease-in-out infinite":"none"}}>{done?"✓":i+1}</div>
-            {label}
-          </div>
-        );})}
-      </div>
+      <ProcSteps steps={STEPS} activeStep={activeStep}/>
     </div>
   );
   }
