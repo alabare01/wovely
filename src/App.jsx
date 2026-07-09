@@ -1017,7 +1017,6 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
   const [socialInstagram,setSocialInstagram]=useState(""),[socialPinterest,setSocialPinterest]=useState(""),[socialRavelry,setSocialRavelry]=useState("");
   const [profileSaving,setProfileSaving]=useState(false),[profileMsg,setProfileMsg]=useState(null),[profileLoaded,setProfileLoaded]=useState(false);
   const [saveBtnText,setSaveBtnText]=useState("Save Profile");
-  const [welcomeDismissed,setWelcomeDismissed]=useState(()=>localStorage.getItem("yh_welcome_dismissed")==="true");
   const [curPass,setCurPass]=useState(""),[newPass,setNewPass]=useState(""),[passSaving,setPassSaving]=useState(false),[passMsg,setPassMsg]=useState(null);
   // "Your corner" (2b) is the default face of /profile; the working settings
   // form lives one tab over, fully intact.
@@ -1109,9 +1108,11 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
     setPassSaving(false);
   };
 
-  const SECTION = {background:T.card,borderRadius:16,padding:isDesktop?"28px 32px":"24px 20px",boxShadow:T.shadowLg};
-  const SC_LABEL = {fontSize:10,fontVariant:"small-caps",color:T.ink3,textTransform:"lowercase",letterSpacing:".14em",fontWeight:500};
-  const SECTION_TITLE = {fontFamily:T.serif,fontSize:18,fontWeight:700,color:T.ink,marginBottom:20};
+  // 2b card treatment for the settings sections (solid white panel, hairline
+  // border, layered lavender shadow) + 2b eyebrow labels.
+  const SECTION = {background:"#fff",border:`1px solid ${T.line}`,borderRadius:22,padding:isDesktop?"26px 30px":"22px 18px",boxShadow:T.shadowLg};
+  const SC_LABEL = {fontSize:11,fontWeight:700,color:T.muted,textTransform:"uppercase",letterSpacing:".05em",fontFamily:T.body};
+  const SECTION_TITLE = {fontFamily:T.disp,fontSize:20,fontWeight:600,color:T.ink,marginBottom:20};
   const DIVIDER = <div style={{height:16}}/>;
   const Msg = ({msg}) => msg ? <div style={{background:msg.type==="ok"?"rgba(92,122,94,.1)":T.terraLt,borderRadius:12,padding:"10px 14px",fontSize:12,color:msg.type==="ok"?T.sage:T.terra,lineHeight:1.5,marginBottom:8}}>{msg.text}</div> : null;
 
@@ -1221,54 +1222,41 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
       </>)}
 
       {profileTab==="settings"&&(<div style={{maxWidth:560,marginTop:22}}>
-      {!welcomeDismissed&&(
-        <div style={{borderRadius:16,overflow:"hidden",marginBottom:20,position:"relative",height:220}}>
-          <img src="https://res.cloudinary.com/dmaupzhcx/image/upload/c_fill,w_1200,h_440,g_center/v1774116735/yarnhive_bg_v2.jpg" alt="" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover",objectPosition:"center"}}/>
-          <div style={{position:"absolute",inset:0,background:"linear-gradient(to right, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.15) 60%, rgba(0,0,0,0.05) 100%)"}}/>
-          <button onClick={()=>{setWelcomeDismissed(true);localStorage.setItem("yh_welcome_dismissed","true");}} style={{position:"absolute",top:12,right:16,background:"transparent",border:"none",color:"#fff",fontSize:20,cursor:"pointer",lineHeight:1,zIndex:2}}>×</button>
-          <div style={{position:"relative",zIndex:1,height:"100%",display:"flex",flexDirection:"column",justifyContent:"center",paddingLeft:32}}>
-            <div style={{fontFamily:T.serif,fontSize:32,fontWeight:700,color:"#fff",marginBottom:8,lineHeight:1.2}}>Welcome to Wovely. 🧶</div>
-            <div style={{fontSize:15,color:"rgba(255,255,255,0.88)",marginBottom:20}}>Your collection is ready. Time to make something.</div>
-            <div><button onClick={()=>{setWelcomeDismissed(true);localStorage.setItem("yh_welcome_dismissed","true");onGoHome();}} style={{background:"#7B6AD4",color:"#fff",border:"none",borderRadius:10,padding:"12px 24px",fontSize:15,fontWeight:600,cursor:"pointer"}}>Go to My Wovely →</button></div>
-          </div>
-        </div>
-      )}
-
-      {/* Profile completion bar */}
+      {/* Profile completion bar — 2b treatment (accent fill, mint at 100%) */}
       <div style={{marginBottom:20}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-          <div style={{fontSize:11,color:T.ink3,fontWeight:500}}>Profile completion</div>
-          <div style={{fontSize:11,color:profilePct===100?T.sage:T.terra,fontWeight:600}}>{profilePct}%</div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:7}}>
+          <div style={SC_LABEL}>Profile completion</div>
+          <div style={{fontSize:12,color:profilePct===100?T.mint:T.accent,fontWeight:800}}>{profilePct}%</div>
         </div>
-        <div style={{height:4,background:T.linen,borderRadius:99,overflow:"hidden"}}>
-          <div style={{height:"100%",width:profilePct+"%",background:profilePct===100?T.sage:T.terra,borderRadius:99,transition:"width .3s ease"}}/>
+        <div style={{height:6,background:T.line,borderRadius:99,overflow:"hidden"}}>
+          <div style={{height:"100%",width:profilePct+"%",background:profilePct===100?T.mint:`linear-gradient(90deg,${T.accent},${T.pink})`,borderRadius:99,transition:"width .3s ease"}}/>
         </div>
       </div>
 
       <div style={SECTION}>
         <div style={SECTION_TITLE}>Your Profile</div>
         <div style={{textAlign:"center",marginBottom:24}}>
-          <div style={{width:100,height:100,borderRadius:"50%",background:T.linen,display:"inline-flex",alignItems:"center",justifyContent:"center",fontSize:34,fontWeight:700,color:T.terra,border:`3px solid ${T.terra}`,boxShadow:"0 0 0 6px rgba(123,106,212,.1)"}}>{(displayName||"Y").charAt(0).toUpperCase()}{(username||"H").charAt(0).toUpperCase()}</div>
-          <div style={{fontSize:16,fontWeight:600,color:T.ink,marginTop:12}}>{displayName||"Your Name"}</div>
-          <div style={{fontSize:13,color:T.ink3,marginTop:2}}>{username?"@"+username:"Set your username"}</div>
+          <div style={{width:92,height:92,borderRadius:"50%",background:T.soft,display:"inline-flex",alignItems:"center",justifyContent:"center",fontFamily:T.disp,fontSize:34,fontWeight:600,color:T.accent,border:"3px solid #DCD0F7"}}>{(displayName||username||"W").trim().charAt(0).toUpperCase()}</div>
+          <div style={{fontFamily:T.disp,fontSize:17,fontWeight:600,color:T.ink,marginTop:12}}>{displayName||"Your Name"}</div>
+          <div style={{fontSize:13,fontWeight:700,color:T.muted,marginTop:2}}>{username?"@"+username:"Set your username"}</div>
         </div>
         <Field label="Display name" placeholder="e.g. Sarah" value={displayName} onChange={e=>setDisplayName(e.target.value)}/>
         <div style={{marginBottom:14}}>
-          <div style={{fontSize:10,fontVariant:"small-caps",color:T.ink3,textTransform:"lowercase",letterSpacing:".14em",marginBottom:6,fontWeight:500}}>username</div>
+          <div style={{...SC_LABEL,marginBottom:6}}>Username</div>
           <div style={{position:"relative"}}>
-            <span style={{position:"absolute",left:0,top:"50%",transform:"translateY(-50%)",color:T.ink3,fontSize:15,pointerEvents:"none"}}>@</span>
-            <input value={username} onChange={e=>setUsername(e.target.value)} placeholder="yourhandle" style={{width:"100%",padding:"13px 16px 13px 18px",background:"transparent",border:"none",borderBottom:`1.5px solid ${T.border}`,borderRadius:0,color:T.ink,fontSize:15,outline:"none",transition:"border-color .2s"}} onFocus={e=>e.target.style.borderBottomColor=T.terra} onBlur={e=>e.target.style.borderBottomColor=T.border}/>
+            <span style={{position:"absolute",left:16,top:"50%",transform:"translateY(-50%)",color:T.muted,fontSize:15,fontWeight:700,pointerEvents:"none"}}>@</span>
+            <input value={username} onChange={e=>setUsername(e.target.value)} placeholder="yourhandle" style={{width:"100%",padding:"13px 16px 13px 34px",background:"#fff",border:`1.5px solid ${T.line}`,borderRadius:14,color:T.ink,fontSize:15,fontFamily:T.body,fontWeight:600,outline:"none",transition:"border-color .2s"}} onFocus={e=>e.target.style.borderColor=T.accent} onBlur={e=>e.target.style.borderColor=T.line}/>
           </div>
         </div>
         <Field label="Bio" placeholder="Tell us about your craft..." value={bio} onChange={e=>setBio(e.target.value)} rows={3}/>
-        <div style={{borderTop:`1px solid ${T.border}`,paddingTop:20,marginTop:12}}>
-          <div style={{fontSize:10,fontVariant:"small-caps",color:T.ink3,textTransform:"lowercase",letterSpacing:".14em",fontWeight:500,marginBottom:14}}>social connections</div>
+        <div style={{borderTop:`1px solid ${T.line}`,paddingTop:20,marginTop:12}}>
+          <div style={{...SC_LABEL,marginBottom:14}}>Social connections</div>
           <Field label="Instagram handle" placeholder="@yourhandle" value={socialInstagram} onChange={e=>setSocialInstagram(e.target.value)}/>
           <Field label="Pinterest handle" placeholder="@yourhandle" value={socialPinterest} onChange={e=>setSocialPinterest(e.target.value)}/>
           <Field label="Ravelry username" placeholder="yourhandle" value={socialRavelry} onChange={e=>setSocialRavelry(e.target.value)}/>
         </div>
         <Msg msg={profileMsg}/>
-        <button onClick={()=>gateAction?.({ intent: "profile_edit", title: "Create a free account to save your profile", subtitle: "Your name, handle, and socials stay with you across devices." }, handleProfileSave)} disabled={profileSaving} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"12px 28px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",opacity:profileSaving?.6:1}}>{profileSaving?"Saving…":saveBtnText}</button>
+        <button onClick={()=>gateAction?.({ intent: "profile_edit", title: "Create a free account to save your profile", subtitle: "Your name, handle, and socials stay with you across devices." }, handleProfileSave)} disabled={profileSaving} style={{background:T.accent,color:"#fff",border:"none",borderRadius:13,padding:"12px 26px",fontSize:14,fontWeight:800,fontFamily:T.body,cursor:"pointer",boxShadow:`0 12px 24px -12px ${T.accent}`,opacity:profileSaving?.6:1}}>{profileSaving?"Saving…":saveBtnText}</button>
       </div>
 
       {DIVIDER}
@@ -1276,15 +1264,15 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
       <div style={SECTION}>
         <div style={SECTION_TITLE}>Account</div>
         <div style={{marginBottom:14}}>
-          <div style={{fontSize:10,fontVariant:"small-caps",color:T.ink3,textTransform:"lowercase",letterSpacing:".14em",marginBottom:6,fontWeight:500}}>email</div>
-          <div style={{padding:"13px 0",borderBottom:`1.5px solid ${T.border}`,color:T.ink2,fontSize:15}}>{user?.email||"—"}</div>
+          <div style={{...SC_LABEL,marginBottom:6}}>Email</div>
+          <div style={{padding:"13px 16px",background:T.soft,borderRadius:14,color:T.ink2,fontSize:15,fontWeight:600}}>{user?.email||"—"}</div>
         </div>
-        <div style={{borderTop:`1px solid ${T.border}`,paddingTop:20}}>
-          <div style={{fontSize:10,fontVariant:"small-caps",color:T.ink3,textTransform:"lowercase",letterSpacing:".14em",fontWeight:500,marginBottom:14}}>change password</div>
+        <div style={{borderTop:`1px solid ${T.line}`,paddingTop:20}}>
+          <div style={{...SC_LABEL,marginBottom:14}}>Change password</div>
           <Field label="Current password" placeholder="••••••••" value={curPass} onChange={e=>setCurPass(e.target.value)} type="password"/>
           <Field label="New password" placeholder="••••••••" value={newPass} onChange={e=>setNewPass(e.target.value)} type="password"/>
           <Msg msg={passMsg}/>
-          <button onClick={()=>gateAction?.({ intent: "change_password", title: "Create a free account first", subtitle: "Sign up to set a password." }, handleChangePassword)} disabled={passSaving} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"10px 24px",fontSize:13,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",opacity:passSaving?.6:1}}>{passSaving?"Saving…":"Update Password"}</button>
+          <button onClick={()=>gateAction?.({ intent: "change_password", title: "Create a free account first", subtitle: "Sign up to set a password." }, handleChangePassword)} disabled={passSaving} style={{background:T.accent,color:"#fff",border:"none",borderRadius:13,padding:"11px 22px",fontSize:13,fontWeight:800,fontFamily:T.body,cursor:"pointer",boxShadow:`0 12px 24px -12px ${T.accent}`,opacity:passSaving?.6:1}}>{passSaving?"Saving…":"Update Password"}</button>
         </div>
       </div>
 
@@ -1318,18 +1306,18 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
         <div style={SECTION_TITLE}>Plan &amp; Billing</div>
         <div onClick={onOpenProModal} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"4px 0"}}>
           <div>
-            <div style={{fontSize:14,color:T.ink}}>{isPro ? `Wovely ${tierLabel(tier)}` : 'Free plan'}</div>
-            <div style={{...SC_LABEL,marginTop:4}}>{isPro ? 'Tap to manage or compare plans' : 'See what Craft includes'}</div>
+            <div style={{fontSize:14.5,fontWeight:800,color:T.ink}}>{isPro ? `Wovely ${tierLabel(tier)}` : 'Free plan'}</div>
+            <div style={{fontSize:12,fontWeight:700,color:T.muted,marginTop:3}}>{isPro ? 'Tap to manage or compare plans' : 'See what Craft includes'}</div>
           </div>
-          <div style={{fontSize:13,fontWeight:600,color:T.terra,whiteSpace:"nowrap"}}>{isPro ? 'Manage plan ›' : 'See plans ›'}</div>
+          <div style={{fontSize:13,fontWeight:800,color:T.accent,whiteSpace:"nowrap"}}>{isPro ? 'Manage plan ›' : 'See plans ›'}</div>
         </div>
       </div>
 
       <div style={SECTION}>
         <div style={SECTION_TITLE}>Preferences</div>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <div><div style={{fontSize:14,color:T.ink2}}>Dark mode</div><div style={{...SC_LABEL,marginTop:4}}>coming soon</div></div>
-          <div style={{width:44,height:26,borderRadius:13,background:T.linen,opacity:.5,position:"relative",cursor:"not-allowed"}}><div style={{width:22,height:22,borderRadius:11,background:"#fff",position:"absolute",top:2,left:2,boxShadow:"0 1px 3px rgba(0,0,0,.15)"}}/></div>
+          <div><div style={{fontSize:14.5,fontWeight:800,color:T.ink}}>Dark mode</div><div style={{fontSize:12,fontWeight:700,color:T.muted,marginTop:3}}>coming soon</div></div>
+          <div style={{width:44,height:26,borderRadius:13,background:T.soft,opacity:.6,position:"relative",cursor:"not-allowed"}}><div style={{width:22,height:22,borderRadius:11,background:"#fff",position:"absolute",top:2,left:2,boxShadow:"0 1px 3px rgba(0,0,0,.15)"}}/></div>
         </div>
       </div>
 
@@ -3611,7 +3599,7 @@ export default function Wovely() {
       <WhatsNewModal/>
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
-      {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
+      {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       {showFairUseWall&&<FairUseWall cap={TIER_CONFIG.craft.patternCap} onClose={()=>setShowFairUseWall(false)}/>}
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>{setShowProModal(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
@@ -3667,7 +3655,7 @@ export default function Wovely() {
       <WhatsNewModal/>
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
-      {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);localStorage.removeItem("yh_welcome_dismissed");navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
+      {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
       <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall}/>
