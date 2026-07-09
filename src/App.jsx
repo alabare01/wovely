@@ -791,11 +791,13 @@ const NAV_ICON = {
   profile:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2"/></svg>),
   sparkle:(<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4.2l1.5 4.3 4.3 1.5-4.3 1.5L12 15.8l-1.5-4.3L6.2 10l4.3-1.5z"/></svg>),
 };
-// Plum yarn-cord decoration down the sidebar's right edge (2b sidebar treatment).
-const CORD_PLUM = "https://res.cloudinary.com/dmaupzhcx/image/upload/e_background_removal/c_crop,g_center,h_0.9,w_1.0/e_trim/v1782959427/website-assets/yarn-cord-plum.png";
+// Gold yarn-cord decoration down the sidebar's right edge. The 2b mockup's
+// cord defaults to GOLD (cordColor ?? 'gold') and the cord is a sanctioned
+// gold surface per the gold-is-scarce rule — same asset as the landing edge.
+const CORD_GOLD = "https://res.cloudinary.com/dmaupzhcx/image/upload/e_background_removal/c_crop,g_center,h_0.9,w_1.0/e_trim/v1782961067/website-assets/yarn-cord-gold-frayed.png";
 const SidebarCord = () => (
-  <div style={{position:"absolute",top:0,left:"calc(100% - 9px)",width:17,height:"100%",pointerEvents:"none",zIndex:6,overflow:"hidden",display:"flex",flexDirection:"column",filter:"drop-shadow(3px 2px 3px rgba(50,36,100,.45)) drop-shadow(6px 4px 8px rgba(50,36,100,.22))"}}>
-    {Array.from({length:14}).map((_,i)=><img key={i} src={CORD_PLUM} alt="" style={{width:"100%",display:"block",flex:"none",transform:i%2?"scaleY(-1)":"none"}}/>)}
+  <div style={{position:"absolute",top:0,left:"calc(100% - 9px)",width:17,height:"100%",pointerEvents:"none",zIndex:6,overflow:"hidden",display:"flex",flexDirection:"column",filter:"drop-shadow(3px 2px 3px rgba(90,58,10,.55)) drop-shadow(6px 4px 8px rgba(90,58,10,.3))"}}>
+    {Array.from({length:14}).map((_,i)=><img key={i} src={CORD_GOLD} alt="" style={{width:"100%",display:"block",flex:"none",transform:i%2?"scaleY(-1)":"none"}}/>)}
   </div>
 );
 
@@ -865,7 +867,10 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
   if(!open) return null;
   // See SidebarNav for rationale: hide pre-gate padlocks from anonymous users to not kill conversion motivation.
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Craft feature");
-  const ITEMS=[{key:"collection",label:"My Wovely",sub:count+" patterns",icon:"🧶"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns",icon:"🌐"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn",icon:"🎀"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more",icon:"🧮"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,icon:"🛡️",proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs",icon:"🛒"}];
+  // Same 2b woven SVG icons as the desktop sidebar (NAV_ICON) — the drawer
+  // had drifted on old emoji.
+  const ITEMS=[{key:"collection",label:"My Wovely",sub:count+" patterns"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs"}];
+  const drawerIcon=(node)=><span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",opacity:.94,flexShrink:0}}>{node}</span>;
   const planLabel = isPro ? "My plan" : "See plans";
   // Same rationale as SidebarNav: the modal is the single source of truth
   // for plan comparison, including for anonymous users. The modal itself
@@ -883,7 +888,7 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
         <div style={{flex:1,overflowY:"auto"}}>
           {ITEMS.map(item=>{const active=view===item.key;const locked=item.proOnly&&!isPro&&!isAnonymous;const dis=!!item.disabled;return(
             <div key={item.key} className="nav-item" onClick={()=>{if(dis)return;if(locked){onUpgrade();dismiss();return;}go(item.key);}} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 20px",background:active&&!dis?"rgba(255,255,255,0.25)":"transparent",cursor:dis?"not-allowed":"pointer",transition:"background .12s",opacity:dis?.4:locked?.55:1}}>
-              <span style={{fontSize:20,width:26,textAlign:"center"}}>{item.icon}</span>
+              {drawerIcon(NAV_ICON[item.key])}
               <div style={{flex:1}}><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{item.label}</div><div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>{item.sub}</div></div>
               {dis&&<span style={{background:"rgba(255,255,255,.2)",borderRadius:99,padding:"2px 8px",fontSize:9,fontWeight:700,color:"rgba(255,255,255,.8)"}}>Soon</span>}
               {locked&&!dis&&<span style={{fontSize:12,color:"rgba(255,255,255,0.65)"}}>🔒</span>}
@@ -894,7 +899,7 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
           <div style={{height:1,background:"rgba(255,255,255,0.15)",margin:"8px 16px"}} />
           {/* Plans — always-visible entry to TieredUpgradeModal */}
           <div className="nav-item" onClick={handlePlansClick} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 20px",cursor:"pointer",transition:"background .12s"}}>
-            <span style={{fontSize:20,width:26,textAlign:"center"}}>✨</span>
+            {drawerIcon(NAV_ICON.sparkle)}
             <div style={{flex:1}}>
               <div style={{fontSize:14,fontWeight:600,color:"#fff"}}>{planLabel}</div>
               <div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>{planSub}</div>
@@ -904,7 +909,7 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
           {/* Profile & Settings — inline nav row */}
           {(()=>{const active=view==="profile";return(
             <div className="nav-item" onClick={()=>go("profile")} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 20px",background:active?"rgba(255,255,255,0.25)":"transparent",cursor:"pointer",transition:"background .12s"}}>
-              <span style={{fontSize:20,width:26,textAlign:"center"}}>👤</span>
+              {drawerIcon(NAV_ICON.profile)}
               <div style={{flex:1}}>
                 <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{fontSize:14,fontWeight:600,color:"#fff"}}>Profile & Settings</div>{isPro&&<span style={{background:"rgba(123,106,212,0.6)",color:"#fff",fontSize:10,fontWeight:700,padding:"1px 6px",borderRadius:4}}>{tierLabel(tier).toUpperCase()}</span>}</div>
                 {isAnonymous&&<div style={{fontSize:11,color:"rgba(255,255,255,0.65)",marginTop:1}}>Sign in to save</div>}
@@ -914,11 +919,11 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
           );})()}
           {/* Sign in / Sign out — inline nav row, de-emphasized */}
           {isAnonymous&&<div className="nav-item" onClick={()=>{onOpenAuthWall&&onOpenAuthWall();dismiss();}} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 20px",cursor:"pointer",transition:"background .12s"}}>
-            <span style={{fontSize:20,width:26,textAlign:"center"}}>🔑</span>
+            {drawerIcon(<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="14" r="4.2"/><path d="M11 11L19.5 2.5M15.5 6.5l3 3M18 4l2 2"/></svg>)}
             <div style={{fontSize:14,fontWeight:600,color:"#fff"}}>Create account</div>
           </div>}
           {onSignOut&&<div className="nav-item" onClick={()=>{onSignOut();dismiss();}} style={{display:"flex",alignItems:"center",gap:13,padding:"12px 20px",cursor:"pointer",transition:"background .12s"}}>
-            <span style={{fontSize:20,width:26,textAlign:"center"}}>👋</span>
+            {drawerIcon(<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M9 4.5H6.5A1.5 1.5 0 005 6v12a1.5 1.5 0 001.5 1.5H9M15 8.5l4 3.5-4 3.5M19 12H9.5"/></svg>)}
             <div style={{fontSize:14,fontWeight:500,color:"rgba(255,255,255,0.7)"}}>Sign out</div>
           </div>}
           {/* Privacy | Terms */}
@@ -3652,6 +3657,11 @@ export default function Wovely() {
   return (
     <div style={{fontFamily:T.sans,background:`${T.crosshatch},${T.bg}`,minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
+      {/* Gold yarn-cord down the left edge — the brand thread from the
+          landing/sidebar, slimmed for mobile. Fixed + pointer-events:none. */}
+      <div aria-hidden="true" style={{position:"fixed",top:0,left:0,width:12,height:"100vh",pointerEvents:"none",zIndex:15,overflow:"hidden",display:"flex",flexDirection:"column",filter:"drop-shadow(2px 2px 3px rgba(90,58,10,.5))"}}>
+        {Array.from({length:14}).map((_,i)=><img key={i} src={CORD_GOLD} alt="" style={{width:"100%",display:"block",flex:"none",transform:i%2?"scaleY(-1)":"none"}}/>)}
+      </div>
       <WhatsNewModal/>
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}

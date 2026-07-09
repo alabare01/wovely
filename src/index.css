@@ -48,10 +48,10 @@ body::before {
      exactly viewport-wide on both Chrome and Safari. */
   width: 100%;
   height: 100vh;
-  background-image: url('/wovely_landing_bg_v1.png');
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  /* 2b canvas — solid cool lavender-white. The old landing photo used to sit
+     here under a translucent wash and ghosted through ("background image
+     shadowing"), worst on mobile where the wash was thinner. */
+  background: var(--bg);
   z-index: -1;
 }
 
@@ -62,28 +62,10 @@ body::after {
   left: 0;
   width: 100%;
   height: 100vh;
-  /* 2b canvas: cool lavender-white wash + woven crosshatch over the photo */
-  background:
-    var(--crosshatch),
-    linear-gradient(
-      160deg,
-      rgba(251,249,255,0.88) 0%,
-      rgba(244,239,251,0.85) 100%
-    );
+  /* Woven 45° crosshatch texture over the solid canvas */
+  background: var(--crosshatch);
   z-index: -1;
   pointer-events: none;
-}
-
-@media (max-width: 768px) {
-  body::after {
-    background:
-      var(--crosshatch),
-      linear-gradient(
-        160deg,
-        rgba(251,249,255,0.80) 0%,
-        rgba(244,239,251,0.77) 100%
-      );
-  }
 }
 
 #root {
