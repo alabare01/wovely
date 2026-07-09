@@ -165,7 +165,8 @@ export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) 
 
   const containerStyle = {
     position: "fixed",
-    bottom: isMobile ? `calc(16px + env(safe-area-inset-bottom, 0px))` : `${desktopBottom}px`,
+    // Mobile: clear the fixed 68px bottom nav (2b mobile shell)
+    bottom: isMobile ? `calc(84px + env(safe-area-inset-bottom, 0px))` : `${desktopBottom}px`,
     right: isMobile ? `${mobileRight}px` : `${desktopRight}px`,
     width: baseWidth,
     zIndex: 50,

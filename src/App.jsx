@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { initErrorReporter, setErrorReporterUser } from './utils/errorReporter.js';
 import { useNavigate, useLocation, useParams, Routes, Route, Navigate } from "react-router-dom";
 import posthog from "posthog-js";
@@ -1016,7 +1016,7 @@ const bumpDayStreak = () => {
   } catch { return 0; }
 };
 
-const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHome,patterns=[]}) => {
+const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHome,patterns=[],isAnonymous=false,onSignOut,onCreateAccount}) => {
   const profileNav=useNavigate();
   const [username,setUsername]=useState(""),[displayName,setDisplayName]=useState(""),[bio,setBio]=useState("");
   const [socialInstagram,setSocialInstagram]=useState(""),[socialPinterest,setSocialPinterest]=useState(""),[socialRavelry,setSocialRavelry]=useState("");
@@ -1223,6 +1223,20 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={T.accent} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2"/></svg>
             Profile &amp; account settings<span style={{marginLeft:"auto",color:T.muted,fontWeight:700,fontSize:13}}>Name, bio, password</span>
           </div>
+          {/* Account entries — the mobile shell has no drawer, so these live
+              here (mockup setlist has the coral Log out row). */}
+          {isAnonymous&&onCreateAccount&&(
+            <div onClick={onCreateAccount} style={{display:"flex",alignItems:"center",gap:13,background:"#fff",border:`1px solid ${T.line}`,borderRadius:14,padding:"15px 18px",fontWeight:800,fontSize:14.5,color:T.ink,cursor:"pointer"}}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={T.accent} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="14" r="4.2"/><path d="M11 11L19.5 2.5M15.5 6.5l3 3M18 4l2 2"/></svg>
+              Create account<span style={{marginLeft:"auto",color:T.muted,fontWeight:700,fontSize:13}}>Save your work everywhere</span>
+            </div>
+          )}
+          {!isAnonymous&&authed&&onSignOut&&(
+            <div onClick={onSignOut} style={{display:"flex",alignItems:"center",gap:13,background:"#fff",border:`1px solid ${T.line}`,borderRadius:14,padding:"15px 18px",fontWeight:800,fontSize:14.5,color:T.coral,cursor:"pointer"}}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M9 4.5H6.5A1.5 1.5 0 005 6v12a1.5 1.5 0 001.5 1.5H9M15 8.5l4 3.5-4 3.5M19 12H9.5"/></svg>
+              Log out
+            </div>
+          )}
         </div>
       </>)}
 
@@ -3643,7 +3657,7 @@ export default function Wovely() {
           {view==="calculator"&&<div style={{paddingTop:24}}><Calculators/></div>}
           {view==="stitch-check"&&<div style={{paddingTop:24}}><StitchCheck gateAction={gateAction}/></div>}
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
-          {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
+          {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
           {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
           {view==="privacy"&&<PrivacyPolicy/>}
@@ -3657,18 +3671,14 @@ export default function Wovely() {
   return (
     <div style={{fontFamily:T.sans,background:`${T.crosshatch},${T.bg}`,minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
-      {/* Gold yarn-cord down the left edge — the brand thread from the
-          landing/sidebar, slimmed for mobile. Fixed + pointer-events:none. */}
-      <div aria-hidden="true" style={{position:"fixed",top:0,left:0,width:12,height:"100vh",pointerEvents:"none",zIndex:15,overflow:"hidden",display:"flex",flexDirection:"column",filter:"drop-shadow(2px 2px 3px rgba(90,58,10,.5))"}}>
-        {Array.from({length:14}).map((_,i)=><img key={i} src={CORD_GOLD} alt="" style={{width:"100%",display:"block",flex:"none",transform:i%2?"scaleY(-1)":"none"}}/>)}
-      </div>
       <WhatsNewModal/>
       <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
-      <NavPanel open={navOpen} onClose={()=>setNavOpen(false)} view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall}/>
+      {/* Hamburger drawer (NavPanel) retired — the 2b mobile shell navigates
+          via the fixed bottom nav below, per Wovely App 2b.dc.html ≤640px. */}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       {showFairUseWall&&<FairUseWall cap={TIER_CONFIG.craft.patternCap} onClose={()=>setShowFairUseWall(false)}/>}
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>{setShowProModal(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
@@ -3682,16 +3692,24 @@ export default function Wovely() {
       {readyPromptPattern&&<ReadyToBuildPrompt pattern={readyPromptPattern} onStartBuilding={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);startAndOpenPattern(p);}} onViewDetails={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);setSelected(p);navigateToView("detail",p._supabaseId||p.id);}} onDismiss={()=>setReadyPromptPattern(null)}/>}
       {deleteTarget&&<DeleteConfirmModal pattern={deleteTarget} isPro={isPro} onCancel={()=>setDeleteTarget(null)} onDelete={confirmDelete} onPark={parkInsteadOfDelete} onGoPro={()=>{setDeleteTarget(null);setShowProModal(true);}}/>}
       {showWelcomeBanner&&<WelcomeBanner onDismiss={()=>setShowWelcomeBanner(false)}/>}
+      {/* 2b mobile topbar (Wovely App 2b.dc.html ≤640px): brand moves up here
+          (.tbbrand), profile becomes the round .tbprof button — nav lives in
+          the fixed bottom bar, so no hamburger. */}
       <div style={{padding:"0 18px",height:60,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0,background:"rgba(251,249,255,.9)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
-        <button onClick={()=>setNavOpen(true)} aria-label="Menu" style={{background:"none",border:"none",cursor:"pointer",padding:"8px 8px 8px 0",display:"flex",flexDirection:"column",gap:5}}><div style={{width:22,height:2,background:T.ink,borderRadius:99}}/><div style={{width:15,height:2,background:T.ink,borderRadius:99}}/><div style={{width:22,height:2,background:T.ink,borderRadius:99}}/></button>
-        <div onClick={isAdam?handleLogoTap:undefined} style={{fontFamily:T.disp,fontSize:20,fontWeight:600,color:T.ink,cursor:isAdam?"pointer":"default"}}>{TITLE_MAP[view]!==null?TITLE_MAP[view]:""}</div>
+        <div onClick={()=>{if(isAdam)handleLogoTap();navigateToView("collection");}} style={{display:"flex",alignItems:"center",gap:9,cursor:"pointer"}}>
+          <img src="/bev_neutral.png" alt="Bev" style={{width:34,height:34,borderRadius:"50%",border:"2px solid #DCD0F7",background:T.soft,objectFit:"cover"}}/>
+          <span style={{fontFamily:T.disp,fontSize:20,fontWeight:600,color:T.ink,lineHeight:1}}>Wovely</span>
+        </div>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <FeedbackWidget user={supabaseAuth.getUser()}/>
           <button onClick={()=>{if(tierGate.atCap){triggerAtCap();return;}setAddMenuOpen(v=>!v);}} aria-label="Add pattern" style={{background:T.accent,border:"none",borderRadius:"50%",width:36,height:36,cursor:"pointer",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 8px 18px -6px ${T.accent}`}}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          <button onClick={()=>navigateToView("profile")} aria-label="Profile & Settings" style={{width:36,height:36,borderRadius:"50%",background:"#fff",border:`1px solid ${T.line}`,color:T.accent,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,padding:0}}>
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2"/></svg>
+          </button>
         </div>
       </div>
       {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Nunito,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}
-      <div ref={mainScrollRef} style={{flex:1,overflowX:"hidden",overflowY:"auto",paddingBottom:100,minHeight:"100vh"}}>
+      <div ref={mainScrollRef} style={{flex:1,overflowX:"hidden",overflowY:"auto",paddingBottom:"calc(110px + env(safe-area-inset-bottom, 0px))",minHeight:"100vh"}}>
         {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>{if(tierGate.atCap){setShowPaywall(true);return;}setAddMenuOpen(v=>!v);}} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG} firstName={greetName}/>)}
         {view==="wip"&&<div style={{padding:"16px 18px 80px"}}>{inProgress.length===0?<div style={{textAlign:"center",padding:"60px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:"#2E2748",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#726A92",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
         {view==="detail"&&selected&&<Detail key={selected._supabaseId||selected.id} p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selected?.collection_id ?? null)} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>{setPaywallRecommend(requiredTier('collections'));setShowProModal(true);}} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/>}
@@ -3700,16 +3718,51 @@ export default function Wovely() {
         {view==="calculator"&&<div style={{paddingTop:18}}><Calculators/></div>}
         {view==="stitch-check"&&<div style={{paddingTop:18}}><StitchCheck gateAction={gateAction}/></div>}
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
-        {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
+        {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
         {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
         {view==="privacy"&&<PrivacyPolicy/>}
         {view==="terms"&&<TermsOfService/>}
         {location.pathname.startsWith("/stitch/")&&<div style={{paddingTop:18}}><StitchResultPage/></div>}
       </div>
-      {/* Vertical Add Pattern side-tab removed on mobile (2b responsive spec
-          hides .addtab ≤1024px) — it collided with the FeedbackWidget heart
-          and duplicated the round + button in the mobile header. */}
+      {/* ── 2b mobile bottom nav (Wovely App 2b.dc.html ≤640px .side) ──
+          The sidebar becomes a fixed 68px gradient bar: icon + tiny label
+          per item, active gets the soft white pill. Profile lives in the
+          topbar (.tbprof), so it's not a tab. z-30 sits under modals (400+),
+          ImportPill (50) and focus mode (500). */}
+      {(()=>{
+        const TABS=[
+          {key:"collection",tm:"Wovely"},
+          {key:"browse",tm:"Find"},
+          {key:"stash",tm:"Stash"},
+          {key:"calculator",tm:"Workbench"},
+          {key:"stitch-check",tm:"BevCheck",proOnly:true},
+          {key:"shopping",tm:"Supplies"},
+        ];
+        return (
+          <>
+            {/* Gold yarn cord, rotated to run along the bar's top edge (mockup
+                .yarncord mobile treatment) */}
+            <div aria-hidden="true" style={{position:"fixed",left:0,top:"calc(100vh - 58px - env(safe-area-inset-bottom, 0px))",width:17,height:"100vw",transformOrigin:"top left",transform:"rotate(-90deg)",zIndex:31,pointerEvents:"none",overflow:"hidden",display:"flex",flexDirection:"column",filter:"drop-shadow(3px 2px 3px rgba(90,58,10,.55))"}}>
+              {Array.from({length:14}).map((_,i)=><img key={i} src={CORD_GOLD} alt="" style={{width:"100%",display:"block",flex:"none",transform:i%2?"scaleY(-1)":"none"}}/>)}
+            </div>
+            <nav style={{position:"fixed",left:0,right:0,bottom:0,height:"calc(68px + env(safe-area-inset-bottom, 0px))",paddingBottom:"env(safe-area-inset-bottom, 0px)",background:"linear-gradient(180deg,#8474DA 0%,#6E5AC8 100%)",display:"flex",alignItems:"center",padding:"6px 8px",boxSizing:"border-box",zIndex:30,boxShadow:"0 -10px 26px -12px rgba(46,28,104,.5)"}}>
+              <div style={{display:"flex",flex:1,justifyContent:"space-between",gap:2,padding:"0 2px",maxWidth:isTablet?680:430,margin:"0 auto"}}>
+                {TABS.map(t=>{
+                  const active=view===t.key;
+                  const locked=t.proOnly&&!isPro&&!(!authed||isAnonymous);
+                  return (
+                    <button key={t.key} onClick={()=>{if(locked){setShowProModal(true);return;}navigateToView(t.key);}} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,padding:"8px 2px",borderRadius:12,border:"none",background:active?"rgba(255,255,255,.18)":"transparent",cursor:"pointer",opacity:locked?.6:1,transition:"background .15s"}}>
+                      <span style={{width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",opacity:.94}}>{React.cloneElement(NAV_ICON[t.key],{width:20,height:20})}</span>
+                      <span style={{fontFamily:T.body,fontWeight:800,fontSize:9.5,lineHeight:1,color:"#fff",whiteSpace:"nowrap"}}>{t.tm}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </nav>
+          </>
+        );
+      })()}
     </div>
   );
 }
