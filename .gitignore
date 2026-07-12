@@ -26,3 +26,6 @@ npm-debug.log*
 .claude/*
 !.claude/commands/
 .env*
+
+# local screenshot/visual-verify artifacts
+_shots/

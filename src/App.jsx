@@ -795,9 +795,10 @@ const NAV_ICON = {
 // gold surface per the gold-is-scarce rule — same asset as the landing edge.
 const CORD_GOLD = "https://res.cloudinary.com/dmaupzhcx/image/upload/e_background_removal/c_crop,g_center,h_0.9,w_1.0/e_trim/v1782961067/website-assets/yarn-cord-gold-frayed.png";
 const SidebarCord = () => (
-  <div style={{position:"absolute",top:0,left:"calc(100% - 9px)",width:17,height:"100%",pointerEvents:"none",zIndex:6,overflow:"hidden",display:"flex",flexDirection:"column",filter:"drop-shadow(3px 2px 3px rgba(90,58,10,.55)) drop-shadow(6px 4px 8px rgba(90,58,10,.3))"}}>
-    {Array.from({length:14}).map((_,i)=><img key={i} src={CORD_GOLD} alt="" style={{width:"100%",display:"block",flex:"none",transform:i%2?"scaleY(-1)":"none"}}/>)}
-  </div>
+  // Single full-height repeating background instead of 14 stacked <img> tiles.
+  // The stack seamed/gapped when the tiles did not sum to the exact column
+  // height; a repeat-y background always covers the full height with no seam.
+  <div style={{position:"absolute",top:0,left:"calc(100% - 9px)",width:17,height:"100%",pointerEvents:"none",zIndex:6,backgroundImage:`url(${CORD_GOLD})`,backgroundRepeat:"repeat-y",backgroundSize:"100% auto",backgroundPosition:"top center",filter:"drop-shadow(3px 2px 3px rgba(90,58,10,.55)) drop-shadow(6px 4px 8px rgba(90,58,10,.3))"}}/>
 );
 
 const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,onSignOut,onUpgrade,onOpenAuthWall,userPatterns=[],allPatterns=[]}) => {
