@@ -6,18 +6,18 @@ Last migrated from master doc API: 2026-04-16
 
 ---
 
-# WOVELY MASTER DOC v94
+# WOVELY MASTER DOC v95
 
 ## CURRENT PRODUCTION STATE
-Live on wovely.app — Session 52 shipped. DKIM authentication live and verified. Gmail inbox delivery confirmed with DKIM PASS in headers. Supabase upgraded to Pro tier with spend cap enabled. WEBHOOK_SECRET still pending.
+Live on wovely.app — Session 53 shipped. Claude Design system for Wovely created and published with Danielle's direct input on semantic palette and BevCheck gauge redesign. WEBHOOK_SECRET still pending. Production code unchanged this session.
 
 ## FIRST THING NEXT SESSION
-1. Set WEBHOOK_SECRET in Vercel + verify Stripe signatures in webhook handler — FINANCIAL INTEGRITY GAP
-2. CORS audit on all serverless functions
-3. RLS full table audit
-4. Background functions + queue system build (see spec below)
+1. Set WEBHOOK_SECRET in Vercel + verify Stripe signatures in webhook handler — FINANCIAL INTEGRITY GAP (carried over from S53)
+2. CORS audit on all serverless functions (carried over from S53)
+3. RLS full table audit (carried over from S53)
+4. Background functions + queue system build — UI can now leverage the Claude Design system for mockups
 
-## SESSION 53 PRIORITY ORDER
+## SESSION 54 PRIORITY ORDER
 1. WEBHOOK_SECRET + Stripe signature verification (security — financial integrity)
 2. CORS audit — all serverless functions
 3. RLS full table audit
@@ -60,12 +60,30 @@ Wovely findings mapped:
 - Supabase upgraded from Free to Pro tier with spend cap enabled
 - Trial retention email sent to turttlesong@yahoo.com ahead of May 3 expiry
 
+## WHAT SHIPPED SESSION 53
+- Claude Design system for Wovely created and published (v1.0)
+- Source of truth connected: github.com/alabare01/wovely repo + style guide + bev_neutral.png
+- All cards reviewed and approved: Core palette, Typography, Semantic/Stitch Check, Forbidden colors, Spacing, Components, Bev components, Voice examples
+- BevCheck gauge redesigned with Danielle's direct input: zone-anchored labels, score below arc, glass treatment, Bev integrated into arc interior, band-colored needle
+- Semantic palette updated from sage/gold/rust to pastel direction per Danielle: dusty teal #A4C2C3 (Pass), soft buttercup #E2D985 (Heads-Up), dusty rose #CEA0A4 (Issues)
+- All production code unchanged — Claude Design outputs are reference/mockup layer only
+- Fonts flagged as "substitute rendering" in Claude Design — need licensed WOFF2 upload later
+- Claude Design account lives under adam@terrainnovations.com — flagged for future migration to adam@wovely.app at natural breakpoint
+
 ## KEY LEARNINGS SESSION 49
 - Gemini 2.5 Flash 503s were free tier problem, not model problem — paid tier held up clean
 - Vision path (avgText/page <1200) uses Gemini. Text path (>1200) uses Haiku chunking. These are separate pipelines.
 - Client timeout fires before server finishes on large chunked jobs — client needs better waiting UX
 - Supabase API calls are unlimited on all plans — upgrading Supabase is about uptime/reliability not rate limits
 - Vercel Pro already active — background functions available, just need to be built
+
+## KEY LEARNINGS SESSION 53
+- Claude Design handoff bundle workflow is the real unlock — mockup → Danielle feedback → Code, not mockup → Code → Danielle feedback
+- Danielle's design instinct in the loop DURING design (not after) collapses iteration cycles dramatically
+- Internal shorthand ("AI-first infrastructure") must not leak into brand positioning inputs — "AI" is a banned word in all user-facing surfaces and brand descriptions
+- Pastel semantic palette (washed, cool-toned, sidewalk-chalk) feels more Wovely than saturated traffic-light colors
+- Design decisions get anchored by the first visible output — future system-level changes (like surface color) should be made against live site on Danielle's phone, not against Claude Design preview renders
+- Claude.ai chat + Claude Code + Claude Design form a parallel-segmented stack when set up properly: one design system per product, one project per product, one workspace per product
 
 ## BACKGROUND FUNCTIONS + QUEUE SYSTEM SPEC (build Session 50+)
 Problem: Large PDFs (87+ pages, text path) take 150s+ of Haiku chunking. Client times out. User sees failure even when server succeeds.
@@ -143,6 +161,16 @@ RLS REQUIRED FROM DAY ONE on collections and collection_patterns tables.
 - [NEEDS DISCUSSION] No warning when user refreshes during import
 - [NEEDS DISCUSSION] Stash + button should add yarn not upload pattern
 - [NEEDS DISCUSSION] Color palette — Danielle finds pure white cold
+- [APPROVED S53 — mockup only] BevCheck gauge redesign — pastel palette, zone-anchored labels, score below arc, glass instrument treatment. Approved in Claude Design. Production build pending.
+- [NEEDS DISCUSSION] Wovely surface color — Danielle flagged the lavender canvas in Claude Design preview. Decision deferred: evaluate on live site on her phone before any style guide change.
+
+## SESSION 53 INSIGHT — BEVCHECK METER COLOR LOGIC
+Surfaced during Claude Design setup. Production BevCheck gauge currently renders lavender regardless of result band — aesthetically pleasant but semantically inert. Redesigned gauge (approved in Claude Design) uses pastel semantic palette per result:
+- 80%+ PASS → dusty teal #A4C2C3
+- 60-79% HEADS-UP → soft buttercup #E2D985
+- <60% ISSUES → dusty rose #CEA0A4
+Zone-anchored labels (PASS left, HEADS UP top, ISSUES right) outside the arc. Score (large navy) below arc. Glass instrument treatment. Bev integrated into arc interior, needle on foreground layer. Dynamic "Bev spotted {count} {thing/things}" copy template.
+Status: APPROVED by Danielle in Claude Design on 4/18/26. NOT YET BUILT in production code. Build task queued for Session 54 or later depending on priority order.
 
 ## ACTIVE USERS (9)
 danielle2673@me.com — Pro — 17 patterns — Active (north star)
@@ -169,7 +197,7 @@ Vercel: prj_SZYwLGH5V7kCZYryr4MSy3US3bfz / team_mRQaDsQzhF6HFGU5Ka7hi5OM — PRO
 Stripe: acct_1TDQ1WGbX5hxxc0T (LIVE) $8.99/mo Pro
 Cloudinary: dmaupzhcx
 PostHog: Project 363175 — 157 unique visitors since Jan 1 2026
-Current session: 53
+Current session: 54
 
 ## EMAIL STACK
 Google Workspace: adam@wovely.app, support@wovely.app
@@ -219,6 +247,8 @@ FeedbackWidget: 60, Add Pattern tab: 40, Mobile header: 20, Tooltips: 100, Modal
 9. Create bev_happy.png, bev_warning.png, bev_concerned.png
 10. Get Danielle written feedback on BevCheck full report UI
 11. Delete feature/turttlesong-shoutout: git push origin --delete feature/turttlesong-shoutout
+12. Migrate Claude account from adam@terrainnovations.com to adam@wovely.app at a natural breakpoint (requires cancel + rebuild, estimated 2-4 hours, not urgent)
+13. Upload licensed Playfair Display + Inter WOFF2 files to Claude Design to resolve "substitute web fonts" warning
 
 ## TECHNICAL GOTCHAS
 supabaseAuth.getUser() is SYNCHRONOUS — never await
@@ -299,7 +329,7 @@ Master doc status:
 
 ## CLAUDE RULES
 Fetch master doc first, no exceptions
-Next session = 53
+Next session = 54
 Danielle feedback overrides everything
 ONE complete Claude Code prompt per task
 Never push direct to main
