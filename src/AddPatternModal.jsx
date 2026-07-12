@@ -1548,7 +1548,7 @@ const BrowserImport = ({onSave,Btn,Photo}) => {
   );
 };
 
-const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,initialMethod,initialUrl,initialExtracted,initialCoverUrl,initialFileUrl,initialValidationReport,initialPollingJobId,isCollectionImport=false,initialIsStarter=false}) => {
+const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,onPhotoImport,initialMethod,initialUrl,initialExtracted,initialCoverUrl,initialFileUrl,initialValidationReport,initialPollingJobId,isCollectionImport=false,initialIsStarter=false}) => {
   // initialExtracted (from ImportPill queue completion) is wrapped into pdfHandoff
   // so PDFUploadForm lands directly on its review stage. initialCoverUrl is the
   // Cloudinary URL the client rendered & uploaded during the original upload
@@ -1566,6 +1566,10 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
     : null;
   const initialHandoff = initialExtracted ? { extracted: initialExtracted, pdfText: "", fileInfo: initialFileInfo, coverUrl: initialCoverUrl || null } : null;
   const [method,setMethod]=useState((initialExtracted||initialPollingJobId)?"pdf":(initialMethod||null)),[closing,setClosing]=useState(false);
+  // Inline "Or paste a link" row in the 2b Add-a-pattern hub. Held on the
+  // parent (not inside the hub JSX) so the field keeps focus across renders
+  // and its value flows straight into URLImportForm when Import is tapped.
+  const [hubUrl,setHubUrl]=useState(initialUrl||"");
   const [pdfHandoff,setPdfHandoff]=useState(initialHandoff);
   const extractingRef=useRef(false);
   const bevCheckActiveRef=useRef(false);
@@ -1595,40 +1599,82 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
   const hasRecoverableData=reviewActiveTick||bevCheckActiveTick;
   const requestDismiss=()=>{if(hasRecoverableData){setDiscardConfirmOpen(true);}else{dismiss();}};
   const handleSave=(p)=>{onSave(p);dismiss();};
-  // 2b .impcard method cards (Wovely App 2b.dc.html import screen) — woven
-  // SVG icons in soft-lavender squares, replacing the old emoji tiles.
-  const IMP_ICON={
-    manual:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 19.5l1-4L16.7 4.3a2 2 0 012.8 0l.2.2a2 2 0 010 2.8L8.5 18.5z"/><path d="M14.5 6.5l3 3"/></svg>,
-    url:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13.5a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1.2 1.2"/><path d="M14 10.5a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1.2-1.2"/></svg>,
-    pdf:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 3.5H7A1.5 1.5 0 005.5 5v14A1.5 1.5 0 007 20.5h10a1.5 1.5 0 001.5-1.5V8.5z"/><path d="M13.5 3.5v5h5"/><path d="M9 13h6M9 16.5h6"/></svg>,
-    browser:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.2-3.6-8.5s1.2-6.2 3.6-8.5z"/></svg>,
-  };
+  // METHODS is the header lookup only (secondary label shown once a method is
+  // picked). The hub's card copy lives in HUB_CARDS below.
   const METHODS=[
-    {key:"manual",label:"Write it yourself",sub:"Type it in yourself"},
-    {key:"url",label:"Paste a link",sub:"Paste any pattern link"},
-    {key:"pdf",label:"Upload a file",sub:"Upload & extract"},
-    {key:"browser",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more"},
+    {key:"manual",label:"Type or paste text"},
+    {key:"url",label:"Paste a link"},
+    {key:"pdf",label:"Upload a PDF"},
+    {key:"browser",label:"Explore free patterns"},
   ];
-  const MethodList=()=>(
+  // 2b "Add a pattern" hub — four method cards + inline URL row + Craft
+  // imports, matching Wovely App 2b.dc.html. Woven SVG icons in soft-lavender
+  // squares; gold reserved for the Craft (premium) section only.
+  const HUB_CARDS=[
+    {key:"pdf",title:"Upload a PDF",sub:"Bought or downloaded patterns",onClick:()=>setMethod("pdf"),
+      icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 3.5H7.5A1.5 1.5 0 006 5v14a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0018 19V8z"/><path d="M13.5 3.5V8H18"/></svg>},
+    {key:"photo",title:"Photos of a paper pattern",sub:"Snap the pages, Bev does the rest",onClick:()=>{if(onPhotoImport)onPhotoImport();},
+      icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="8.5" cy="10" r="1.6"/><path d="M3 16l5-4 4 3 3-2 6 5"/></svg>},
+    {key:"url",title:"Ravelry link",sub:"Bring your queue over",onClick:()=>setMethod("url"),
+      icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="7.3"/><path d="M4.7 12h14.6M12 4.7c-4 4-4 10.6 0 14.6M12 4.7c4 4 4 10.6 0 14.6"/></svg>},
+    {key:"manual",title:"Type or paste text",sub:"Your own notes and WIPs",onClick:()=>setMethod("manual"),
+      icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 20l4-1 10-10-3-3L5 16z"/><path d="M13.5 6.5l3 3"/></svg>},
+  ];
+  const CRAFT_TILES=[
+    {key:"advanced",title:"Advanced import",sub:"Multi-file patterns read together: PDF, charts and schematics as one. Stitch charts parsed row by row, with Bev's deeper pass for long, complex designs.",
+      icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l8 4.5-8 4.5-8-4.5z"/><path d="M4 12l8 4.5 8-4.5"/><path d="M4 16.5L12 21l8-4.5"/></svg>},
+    {key:"collections",title:"Collections: MCAL & MKAL",sub:"Mystery alongs, handled: every clue lands on schedule, Bev stitches them into one growing pattern, and reminders keep you on pace with the group.",
+      icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><rect x="4.5" y="5.5" width="15" height="14.5" rx="2.5"/><path d="M4.5 10h15M8.5 3.5v3M15.5 3.5v3"/></svg>},
+  ];
+  const openCraft=()=>{if(onUpgrade){dismiss();onUpgrade();}};
+  const methodList=(
     <>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:12}}>
-        {METHODS.map(m=>(
-          <div key={m.key} onClick={()=>setMethod(m.key)} style={{display:"flex",flexDirection:"column",gap:12,background:"#fff",border:`1.5px solid ${T.line}`,borderRadius:18,padding:"18px 18px 19px",cursor:"pointer",transition:"all .15s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=T.accent;e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 16px 30px -20px rgba(90,66,160,.5)";}} onMouseLeave={e=>{e.currentTarget.style.borderColor=T.line;e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
-            <div style={{width:44,height:44,borderRadius:13,background:T.soft,color:T.accent,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{IMP_ICON[m.key]}</div>
-            <div>
-              <div style={{fontFamily:T.disp,fontWeight:600,fontSize:16,color:T.ink,marginBottom:3,lineHeight:1.15}}>{m.label}</div>
-              <div style={{fontSize:12.5,fontWeight:700,color:T.muted,lineHeight:1.45}}>{m.sub}</div>
+      <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:20}}>
+        <img src="/bev.png" alt="Bev" style={{width:56,height:56,borderRadius:"50%",border:"3px solid #fff",boxShadow:"0 8px 18px -8px rgba(90,66,160,.5)",background:T.soft,flexShrink:0}}/>
+        <div>
+          <div style={{fontFamily:T.disp,fontWeight:600,fontSize:23,color:T.ink,lineHeight:1.1,letterSpacing:"-.01em"}}>Add a pattern</div>
+          <div style={{fontWeight:700,fontSize:12.5,color:T.muted,marginTop:3,lineHeight:1.45}}>Hand it to Bev any way you like. She'll read it, check it, and set it up for you.</div>
+        </div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+        {HUB_CARDS.map(c=>(
+          <button key={c.key} onClick={c.onClick} style={{display:"flex",alignItems:"center",gap:13,background:"#fff",border:`1.5px solid ${T.line}`,borderRadius:18,padding:"16px",cursor:"pointer",textAlign:"left",font:"inherit",transition:"all .15s"}} onMouseEnter={e=>{e.currentTarget.style.borderColor=T.accent;e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow="0 16px 30px -20px rgba(90,66,160,.5)";}} onMouseLeave={e=>{e.currentTarget.style.borderColor=T.line;e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+            <div style={{width:44,height:44,borderRadius:13,background:T.soft,color:T.accent,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{c.icon}</div>
+            <div style={{minWidth:0}}>
+              <div style={{fontFamily:T.disp,fontWeight:600,fontSize:15,color:T.ink,lineHeight:1.15}}>{c.title}</div>
+              <div style={{fontSize:11.5,fontWeight:700,color:T.muted,marginTop:2,lineHeight:1.4}}>{c.sub}</div>
             </div>
-          </div>
+          </button>
         ))}
       </div>
-      <div style={{background:`linear-gradient(135deg,${T.accent},${T.pink})`,borderRadius:18,padding:20,cursor:"not-allowed",position:"relative",overflow:"hidden",opacity:.45}}>
-        <div style={{position:"absolute",top:10,right:12,background:"rgba(255,255,255,.25)",borderRadius:99,padding:"3px 10px",fontSize:10,fontWeight:800,color:"#fff"}}>Soon</div>
-        <div style={{width:44,height:44,borderRadius:13,background:"rgba(255,255,255,.2)",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:10}}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 8.5A1.5 1.5 0 016 7h2l1.4-2h5.2L16 7h2a1.5 1.5 0 011.5 1.5v9A1.5 1.5 0 0118 19H6a1.5 1.5 0 01-1.5-1.5z"/><circle cx="12" cy="13" r="3.4"/></svg>
+      <div style={{fontWeight:800,fontSize:11,letterSpacing:".09em",textTransform:"uppercase",color:T.muted,margin:"18px 0 7px"}}>Or paste a link</div>
+      <div style={{display:"flex",gap:10}}>
+        <input value={hubUrl} onChange={e=>setHubUrl(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&hubUrl.trim())setMethod("url");}} placeholder="https://yourfavoritedesigner.com/honey-bee-pattern" style={{flex:1,minWidth:0,border:`1.5px solid ${T.line}`,borderRadius:14,padding:"13px 15px",fontFamily:T.body,fontWeight:700,fontSize:14,color:T.ink,background:"#fff",outline:"none"}} onFocus={e=>e.target.style.borderColor=T.accent} onBlur={e=>e.target.style.borderColor=T.line}/>
+        <button onClick={()=>{if(hubUrl.trim())setMethod("url");}} style={{border:0,borderRadius:14,padding:"0 22px",background:T.accent,color:"#fff",fontFamily:T.body,fontWeight:800,fontSize:14,cursor:"pointer",boxShadow:`0 12px 24px -12px ${T.accent}`,flexShrink:0}}>Import</button>
+      </div>
+      <div style={{marginTop:28}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
+          <img src="/bev.png" alt="Bev" style={{width:38,height:38,borderRadius:"50%",border:"2.5px solid #fff",boxShadow:"0 6px 14px -6px rgba(90,66,160,.5)",background:T.soft,flexShrink:0}}/>
+          <div style={{fontFamily:T.disp,fontWeight:600,fontSize:18,color:T.ink}}>Bev's Craft imports</div>
+          <div style={{display:"inline-flex",alignItems:"center",gap:5,background:"linear-gradient(120deg,#FFD98A,#F5B93E)",color:"#5A3E0E",fontWeight:800,fontSize:10,letterSpacing:".07em",textTransform:"uppercase",padding:"4px 10px",borderRadius:999,boxShadow:"0 6px 14px -6px rgba(200,150,40,.6)"}}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4.2l1.5 4.3 4.3 1.5-4.3 1.5L12 15.8l-1.5-4.3L6.2 10l4.3-1.5z"/></svg>Craft
+          </div>
         </div>
-        <div style={{fontFamily:T.disp,fontWeight:600,fontSize:17,color:"#fff",marginBottom:4}}>Snap & Stitch — Point. Click. Stitch.</div>
-        <div style={{fontSize:13,fontWeight:700,color:"rgba(255,255,255,.85)",lineHeight:1.5}}>Photograph any finished object. Get the complete pattern instantly.</div>
+        <div style={{fontWeight:700,fontSize:12.5,color:T.muted,margin:"8px 0 12px",lineHeight:1.5}}>"This is where I do my best work." For the patterns that need more than a quick read.</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+          {CRAFT_TILES.map(t=>(
+            <button key={t.key} onClick={openCraft} style={{background:"#fff",border:"2px solid #F0CE6A",borderRadius:18,padding:16,cursor:"pointer",textAlign:"left",font:"inherit",transition:"all .16s"}} onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-3px)";e.currentTarget.style.boxShadow="0 20px 38px -20px rgba(200,150,40,.55)";}} onMouseLeave={e=>{e.currentTarget.style.transform="none";e.currentTarget.style.boxShadow="none";}}>
+              <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{width:40,height:40,borderRadius:12,background:"#FFF3D6",color:"#B07B1E",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{t.icon}</div>
+                <div style={{fontFamily:T.disp,fontWeight:600,fontSize:15,color:T.ink,lineHeight:1.15}}>{t.title}</div>
+              </div>
+              <div style={{fontWeight:700,fontSize:12,color:T.muted,marginTop:9,lineHeight:1.5}}>{t.sub}</div>
+              <div style={{display:"flex",alignItems:"center",gap:6,marginTop:11,fontWeight:800,fontSize:12,color:"#B07B1E"}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5.5" y="11" width="13" height="8.5" rx="2"/><path d="M8.2 11V8.4a3.8 3.8 0 017.6 0V11"/></svg>Unlocks with Craft
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
     </>
   );
@@ -1653,7 +1699,7 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
   const deskHeader = (
     <div style={{flexShrink:0,padding:"16px 24px 0"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-        {method?<button onClick={()=>{setPdfHandoff(null);setMethod(null);}} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:14,fontWeight:600,padding:0}}>← Back</button>:<div style={{fontFamily:T.serif,fontSize:22,color:T.ink}}>What are you adding to your Wovely?</div>}
+        {method?<button onClick={()=>{setPdfHandoff(null);setMethod(null);}} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:14,fontWeight:600,padding:0}}>← Back</button>:<div/>}
       </div>
       {method&&<div style={{fontSize:12,color:T.ink3,marginBottom:14,fontWeight:500}}>{METHODS.find(m=>m.key===method)?.icon} {METHODS.find(m=>m.key===method)?.label}</div>}
     </div>
@@ -1662,7 +1708,7 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
     <div style={{flexShrink:0,padding:"16px 22px 0"}}>
       <div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 18px"}}/>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-        {method?<button onClick={()=>{setPdfHandoff(null);setMethod(null);}} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:14,fontWeight:600,padding:0}}>← Back</button>:<div style={{fontFamily:T.serif,fontSize:22,color:T.ink}}>Add Pattern</div>}
+        {method?<button onClick={()=>{setPdfHandoff(null);setMethod(null);}} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:14,fontWeight:600,padding:0}}>← Back</button>:<div/>}
       </div>
       {method&&<div style={{fontSize:12,color:T.ink3,marginBottom:12,fontWeight:500}}>{METHODS.find(m=>m.key===method)?.icon} {METHODS.find(m=>m.key===method)?.label}</div>}
     </div>
@@ -1675,9 +1721,9 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
   // ── CONTENT (single instance, never remounts) ──
   const content = (
     <div style={{flex:1,overflowY:"auto",padding:pad}}>
-      {!method&&<MethodList/>}
+      {!method&&methodList}
       {method==="manual"&&<ManualEntryForm onSave={handleSave} Btn={Btn}/>}
-      {method==="url"&&<URLImportForm onSave={handleSave} Btn={Btn} Photo={Photo} initialUrl={initialUrl} onExtractionStart={()=>{extractingRef.current=true;}} onExtractionEnd={()=>{extractingRef.current=false;}} onBevCheckActive={(v)=>{bevCheckActiveRef.current=v;setBevCheckActiveTick(v);}} onReviewActive={(v)=>{reviewActiveRef.current=v;setReviewActiveTick(v);}} onPdfHandoff={(handoffData)=>{setPdfHandoff(handoffData);setMethod('pdf');}}/>}
+      {method==="url"&&<URLImportForm onSave={handleSave} Btn={Btn} Photo={Photo} initialUrl={hubUrl||initialUrl} onExtractionStart={()=>{extractingRef.current=true;}} onExtractionEnd={()=>{extractingRef.current=false;}} onBevCheckActive={(v)=>{bevCheckActiveRef.current=v;setBevCheckActiveTick(v);}} onReviewActive={(v)=>{reviewActiveRef.current=v;setReviewActiveTick(v);}} onPdfHandoff={(handoffData)=>{setPdfHandoff(handoffData);setMethod('pdf');}}/>}
       {method==="pdf"&&<PDFUploadForm onSave={handleSave} onClose={dismiss} Btn={Btn} isPro={isPro} onUpgrade={()=>{if(onUpgrade){dismiss();onUpgrade();}}} onExtractionStart={()=>{extractingRef.current=true;}} onExtractionEnd={()=>{extractingRef.current=false;}} onBevCheckActive={(v)=>{bevCheckActiveRef.current=v;setBevCheckActiveTick(v);}} onReviewActive={(v)=>{reviewActiveRef.current=v;setReviewActiveTick(v);}} initialExtracted={pdfHandoff} initialValidationReport={initialValidationReport} initialPollingJobId={initialPollingJobId} isCollectionImport={isCollectionImport} isStarterImport={initialIsStarter}/>}
       {method==="browser"&&<BrowserImport onSave={handleSave} Btn={Btn} Photo={Photo}/>}
       {method==="snap"&&<HiveVisionForm onSave={handleSave} Btn={Btn} Bar={Bar} WireframeViewer={WireframeViewer}/>}

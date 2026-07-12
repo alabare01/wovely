@@ -10,7 +10,11 @@
 import { TIER_FREE, TIER_PRO, TIER_CRAFT } from './tierUtils.js';
 
 export const FEATURE_GATES = {
-  unlimitedPatterns: [TIER_CRAFT],
+  // Craft is a 100-pattern fair-use tier, NOT truly unlimited. The real cap is
+  // enforced via TIER_CONFIG.craft.patternCap (100) + FairUseWall. Keep this
+  // empty so no tier is ever flagged "unlimited" and a future edit can't
+  // silently uncap Craft by wiring canAccessUnlimitedPatterns to enforcement.
+  unlimitedPatterns: [],
   bevCheck:          [TIER_CRAFT],
   chunkedImport:     [TIER_CRAFT],
   collections:       [TIER_CRAFT],

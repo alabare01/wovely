@@ -179,7 +179,7 @@ const StitchResultPage = () => {
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.6)" }}>Free on Wovely</div>
           </div>
         </div>
-        <a href="/stitch-vision" style={{ background: "#7B6AD4", color: "#fff", borderRadius: 99, padding: "10px 20px", fontSize: 13, fontWeight: 600, textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap" }}>Try it free →</a>
+        <a href="/" style={{ background: "#7B6AD4", color: "#fff", borderRadius: 99, padding: "10px 20px", fontSize: 13, fontWeight: 600, textDecoration: "none", flexShrink: 0, whiteSpace: "nowrap" }}>Try it free →</a>
       </div>
     </div>
   );

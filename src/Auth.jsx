@@ -1,6 +1,21 @@
 import { useState, useEffect } from "react";
 
-import { supabaseAuth } from "./supabase.js";
+import { supabaseAuth, getSession } from "./supabase.js";
+
+// Mirror AuthWallModal's guard: after signUp, confirm a real session actually
+// landed before entering the app shell. Without this, a failed session setup
+// (Supabase email-confirmation ON, or a slow-device localStorage race) drops
+// the user into an authed-but-tokenless shell with no error shown.
+const waitForSession = async () => {
+  const delays = [0, 200, 400];
+  for (const delay of delays) {
+    if (delay) await new Promise(r => setTimeout(r, delay));
+    const user = supabaseAuth.getUser();
+    const session = getSession();
+    if (user && session?.access_token) return user;
+  }
+  return null;
+};
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Landing page — faithful port of design/Wovely Landing.dc.html (Design
@@ -411,7 +426,6 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
     {/* ── Footer ── */}
     <div className="foot">
       <span>© 2026 Wovely</span>
-      <a href="/founders">Founders</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="mailto:bev@wovely.app">Talk to us</a>
@@ -494,6 +508,8 @@ const AuthCard = ({ mode, onSwitchMode, onSignedIn, onSignedUp, pulseKey }) => {
       } else {
         const { error } = await supabaseAuth.signUp(email.trim(), pass);
         if (error) { setAuthError(error.msg || error.error_description || error.message || "Sign-up failed."); setLoading(false); return; }
+        const user = await waitForSession();
+        if (!user) { setAuthError("Account created, but sign-in didn't finish. Please sign in with your email and password."); setLoading(false); return; }
         onSignedUp();
       }
     } catch { setAuthError("Network error — please try again."); }
