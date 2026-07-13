@@ -799,7 +799,7 @@ const SidebarCord = () => (
   // Single full-height repeating background instead of 14 stacked <img> tiles.
   // The stack seamed/gapped when the tiles did not sum to the exact column
   // height; a repeat-y background always covers the full height with no seam.
-  <div style={{position:"absolute",top:0,left:"calc(100% - 9px)",width:17,height:"100%",pointerEvents:"none",zIndex:6,backgroundImage:`url(${CORD_GOLD})`,backgroundRepeat:"repeat-y",backgroundSize:"100% auto",backgroundPosition:"top center",filter:"drop-shadow(3px 2px 3px rgba(90,58,10,.55)) drop-shadow(6px 4px 8px rgba(90,58,10,.3))"}}/>
+  <div style={{position:"absolute",top:0,left:"calc(100% - 9px)",width:17,height:"100%",pointerEvents:"none",zIndex:6,backgroundImage:`url(${CORD_GOLD})`,backgroundRepeat:"repeat-y",backgroundSize:"100% auto",backgroundPosition:"top center",filter:"drop-shadow(3px 2px 3px rgba(90,58,10,.55)) drop-shadow(6px 4px 8px rgba(90,58,10,.3))",WebkitMaskImage:"linear-gradient(to bottom, #000 calc(100% - 58px), rgba(0,0,0,0.35) calc(100% - 26px), transparent 100%)",maskImage:"linear-gradient(to bottom, #000 calc(100% - 58px), rgba(0,0,0,0.35) calc(100% - 26px), transparent 100%)"}}/>
 );
 
 const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,onSignOut,onUpgrade,onOpenAuthWall,userPatterns=[],allPatterns=[]}) => {

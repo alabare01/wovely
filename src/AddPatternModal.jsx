@@ -270,9 +270,9 @@ Be thorough — extract every component, every round, every material. Ensure the
   };
 
   // Attempt 1: full structured prompt
-  console.log("[Wovely] Sending Gemini request, parts:", body.contents[0].parts.length, "model: gemini-1.5-flash");
+  console.log("[Wovely] Sending Gemini request, parts:", body.contents[0].parts.length, "model: gemini-2.5-flash");
   try {
-    const res = await geminiCall("gemini-1.5-flash", body);
+    const res = await geminiCall("gemini-2.5-flash", body);
     const parsed = await parseGeminiResponse(res);
     console.log("[Wovely] Extraction successful:", parsed.title, "—", (parsed.components||[]).length, "components");
     return parsed;
@@ -293,7 +293,7 @@ Extract every row/round as its own entry. Keep instruction text exactly as writt
     generationConfig: { temperature: 0.1, maxOutputTokens: 32768 }
   };
   try {
-    const res2 = await geminiCall("gemini-1.5-flash", simpleBody);
+    const res2 = await geminiCall("gemini-2.5-flash", simpleBody);
     const parsed2 = await parseGeminiResponse(res2);
     console.log("[Wovely] Simplified extraction successful:", parsed2.title);
     return parsed2;
@@ -352,7 +352,7 @@ CRITICAL RULES: Identify EVERY distinct visible part. Use real part names for ro
 const callGeminiVision = async (base64Image) => {
   const mediaType=base64Image.split(";")[0].split(":")[1]||"image/jpeg";
   const imageData=base64Image.split(",")[1];
-  const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key="+GEMINI_API_KEY,{
+  const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+GEMINI_API_KEY,{
     method:"POST", headers:{"Content-Type":"application/json"},
     body:JSON.stringify({contents:[{parts:[{text:GEMINI_PROMPT},{inline_data:{mime_type:mediaType,data:imageData}}]}],generationConfig:{temperature:0.1,maxOutputTokens:8192}})
   });
