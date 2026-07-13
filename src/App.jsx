@@ -26,6 +26,7 @@ import TermsOfService from "./TermsOfService.jsx";
 import FeedbackWidget from "./FeedbackWidget.jsx";
 import BevChat from "./BevChat.jsx";
 import YarnCircle from "./YarnCircle.jsx";
+import VaultReveal from "./VaultReveal.jsx";
 import WhatsNewModal, { triggerWhatsNew, useWovelySuperTap } from "./WhatsNewModal.jsx";
 import UpgradeNudge from "./components/UpgradeNudge.jsx";
 import {
@@ -2150,6 +2151,7 @@ export default function Wovely() {
   const [readyPromptPattern,setReadyPromptPattern]=useState(null);
   const [deleteTarget,setDeleteTarget]=useState(null);
   const [upgradeToast,setUpgradeToast]=useState(null);
+  const [showVault,setShowVault]=useState(()=>{try{return typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('vaultdemo')==='1';}catch{return false;}});
   // When a Craft-only capability (multi-section/MKAL hub, collections) opens the
   // upgrade modal, the tier to recommend. null → modal's default Free→Pro step-up.
   const [paywallRecommend,setPaywallRecommend]=useState(null);
@@ -2524,7 +2526,7 @@ export default function Wovely() {
     window.history.replaceState({},"",window.location.pathname);
     if(upgradeStatus==="success"){
       posthog.capture("upgrade_completed");
-      setUpgradeToast("success");
+      setShowVault(true); // Free→Craft vault-door reveal celebration (replaces the plain toast)
       // Re-fetch profile to pick up is_pro=true from webhook
       const s=getSession();
       if(s?.access_token){
@@ -3625,6 +3627,7 @@ export default function Wovely() {
       {showFairUseWall&&<FairUseWall cap={TIER_CONFIG.craft.patternCap} onClose={()=>setShowFairUseWall(false)}/>}
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>{setShowProModal(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       <BevChat open={chatOpen} onClose={()=>setChatOpen(false)} onPaywall={()=>{setChatOpen(false);setShowProModal(true);}} onCircle={()=>setChatOpen(false)}/>
+      <VaultReveal open={showVault} onDone={()=>setShowVault(false)}/>
       {collectionSuggestion && <CollectionSuggestionPrompt pattern={collectionSuggestion.pattern} meta={collectionSuggestion.meta} onYes={handleAcceptCollectionSuggestion} onNo={()=>setCollectionSuggestion(null)} />}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} onPhotoImport={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);openImageImport();}} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id} initialIsStarter={(pendingExtractedHandoff?.fileType==='pdf'&&!!pendingExtractedHandoff?.isStarter)||(pendingResumeJobId?.fileType==='pdf'&&isStarterJobId(pendingResumeJobId.jobId))}/>}
       {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
@@ -3687,6 +3690,7 @@ export default function Wovely() {
       {showFairUseWall&&<FairUseWall cap={TIER_CONFIG.craft.patternCap} onClose={()=>setShowFairUseWall(false)}/>}
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>{setShowProModal(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       <BevChat open={chatOpen} onClose={()=>setChatOpen(false)} onPaywall={()=>{setChatOpen(false);setShowProModal(true);}} onCircle={()=>setChatOpen(false)}/>
+      <VaultReveal open={showVault} onDone={()=>setShowVault(false)}/>
       {collectionSuggestion && <CollectionSuggestionPrompt pattern={collectionSuggestion.pattern} meta={collectionSuggestion.meta} onYes={handleAcceptCollectionSuggestion} onNo={()=>setCollectionSuggestion(null)} />}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} onPhotoImport={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);openImageImport();}} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id} initialIsStarter={(pendingExtractedHandoff?.fileType==='pdf'&&!!pendingExtractedHandoff?.isStarter)||(pendingResumeJobId?.fileType==='pdf'&&isStarterJobId(pendingResumeJobId.jobId))}/>}
       {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
