@@ -25,6 +25,7 @@ import PrivacyPolicy from "./PrivacyPolicy.jsx";
 import TermsOfService from "./TermsOfService.jsx";
 import FeedbackWidget from "./FeedbackWidget.jsx";
 import BevChat from "./BevChat.jsx";
+import YarnCircle from "./YarnCircle.jsx";
 import WhatsNewModal, { triggerWhatsNew, useWovelySuperTap } from "./WhatsNewModal.jsx";
 import UpgradeNudge from "./components/UpgradeNudge.jsx";
 import {
@@ -86,8 +87,8 @@ import { markImagesPending } from "./utils/patternImages.js";
 // My Wovely (Dashboard) and the only Collections-specific route is the
 // deep-link detail at /collections/:id. /collections falls back to / so
 // older bookmarks land on My Wovely instead of a dead route.
-const VIEW_TO_PATH = {collection:"/",detail:"/",wip:"/builds",browse:"/browse",stash:"/stash",calculator:"/tools","stitch-check":"/stitch-check",shopping:"/shopping",profile:"/profile"};
-const PATH_TO_VIEW = {"/":"collection","/hive":"collection","/builds":"wip","/browse":"browse","/stash":"stash","/tools":"calculator","/stitch-check":"stitch-check","/shopping":"shopping","/profile":"profile","/hive-vision":"hive-vision","/privacy":"privacy","/terms":"terms"};
+const VIEW_TO_PATH = {collection:"/",detail:"/",wip:"/builds",browse:"/browse",stash:"/stash",calculator:"/tools","stitch-check":"/stitch-check",shopping:"/shopping",profile:"/profile",community:"/circle"};
+const PATH_TO_VIEW = {"/":"collection","/hive":"collection","/builds":"wip","/browse":"browse","/stash":"stash","/tools":"calculator","/stitch-check":"stitch-check","/shopping":"shopping","/profile":"profile","/circle":"community","/hive-vision":"hive-vision","/privacy":"privacy","/terms":"terms"};
 const viewFromPath = (pathname) => {
   if(pathname.startsWith("/pattern/")) return "detail";
   if(pathname.startsWith("/hive/")) return "detail";
@@ -789,6 +790,7 @@ const NAV_ICON = {
   "stitch-check":(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2"/></svg>),
   shopping:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M5 6h14l-1.4 8.4a2 2 0 01-2 1.6H8.4a2 2 0 01-2-1.6z"/><circle cx="9" cy="20" r="1.2"/><circle cx="16" cy="20" r="1.2"/></svg>),
   profile:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2"/></svg>),
+  community:(<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20.3l-1.4-1.3C5.4 14.3 2.5 11.6 2.5 8.4 2.5 6 4.4 4.2 6.7 4.2c1.3 0 2.6.6 3.3 1.6.7-1 2-1.6 3.3-1.6 2.3 0 4.2 1.8 4.2 4.2 0 3.2-2.9 5.9-8.1 10.6z"/></svg>),
   sparkle:(<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 4.2l1.5 4.3 4.3 1.5-4.3 1.5L12 15.8l-1.5-4.3L6.2 10l4.3-1.5z"/></svg>),
 };
 // Gold yarn-cord decoration down the sidebar's right edge. The 2b mockup's
@@ -810,7 +812,7 @@ const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,o
   // Collections is no longer a sibling destination — it lives inside My Wovely
   // as a section below the pattern grid. The tier gating and lock teaser are
   // handled there. Plans modal remains the marketing surface for guests.
-  const ITEMS=[{key:"collection",label:"My Wovely",sub:"Your Craft Room"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns"},{key:"stash",label:"Stash & Notions",sub:"Yarn, hooks & shopping"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs"}];
+  const ITEMS=[{key:"collection",label:"My Wovely",sub:"Your Craft Room"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns"},{key:"stash",label:"Stash & Notions",sub:"Yarn, hooks & shopping"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs"},{key:"community",label:"Yarn Circle",sub:"Finished makes, shared"}];
   const planT = isPro ? `Wovely ${tierLabel(tier)}` : "Free plan";
   const planS = isPro ? "Every feature active" : `${addedC} of ${TIER_CONFIG.free.patternCap} patterns`;
   const navBg = (active) => active ? "rgba(255,255,255,0.18)" : "transparent";
@@ -870,7 +872,7 @@ const NavPanel = ({open,onClose,view,onNavigate,count,isPro,tier,isAnonymous,onS
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Craft feature");
   // Same 2b woven SVG icons as the desktop sidebar (NAV_ICON) — the drawer
   // had drifted on old emoji.
-  const ITEMS=[{key:"collection",label:"My Wovely",sub:count+" patterns"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs"}];
+  const ITEMS=[{key:"collection",label:"My Wovely",sub:count+" patterns"},{key:"browse",label:"Find Patterns",sub:"Find & browse patterns"},{key:"stash",label:"Stash & Notions",sub:"Manage your yarn"},{key:"calculator",label:"The Workbench",sub:"Gauge, yardage & more"},{key:"stitch-check",label:"BevCheck",sub:bevCheckSub,proOnly:true},{key:"shopping",label:"Supply Run",sub:"Auto-generated needs"},{key:"community",label:"Yarn Circle",sub:"Finished makes, shared"}];
   const drawerIcon=(node)=><span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",opacity:.94,flexShrink:0}}>{node}</span>;
   const planLabel = isPro ? "My plan" : "See plans";
   // Same rationale as SidebarNav: the modal is the single source of truth
@@ -2836,7 +2838,7 @@ export default function Wovely() {
   // Unknown routes redirect to /
   // /collections (bare) is kept in knownPaths so old bookmarks don't 404 —
   // viewFromPath maps it to "collection" so the user lands on My Wovely.
-  const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/hive-vision","/master-doc","/privacy","/terms","/collections"];
+  const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/circle","/hive-vision","/master-doc","/privacy","/terms","/collections"];
   if(!knownPaths.some(p=>location.pathname===p||location.pathname.startsWith("/pattern/")||location.pathname.startsWith("/hive/")||location.pathname.startsWith("/collections/"))) return <Navigate to="/" replace/>;
   const detailOnSave=u=>{
     const withTimestamp={...u,updated_at:new Date().toISOString()};
@@ -3610,7 +3612,7 @@ export default function Wovely() {
     }
   };
   const inProgress=allPatterns.filter(p=>{const v=pct(p);return !p.isStarter&&p.status!=="deleted"&&p.status!=="parked"&&((p.status==="in_progress"&&v<100)||(p.started&&v<100)||(v>0&&v<100));});
-  const TITLE_MAP={collection:null,wip:"On the Hook",browse:"Find Patterns",stash:"Stash & Notions",calculator:"The Workbench",shopping:"Supply Run",profile:"Profile & Settings",privacy:"Privacy Policy",terms:"Terms of Service"};
+  const TITLE_MAP={collection:null,wip:"On the Hook",browse:"Find Patterns",stash:"Stash & Notions",calculator:"The Workbench",shopping:"Supply Run",profile:"Profile & Settings",community:null,privacy:"Privacy Policy",terms:"Terms of Service"};
 
   if(isDesktop) return (
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:`${T.crosshatch},${T.bg}`,fontFamily:T.sans,position:"relative"}}>
@@ -3658,6 +3660,7 @@ export default function Wovely() {
           {view==="calculator"&&<div style={{paddingTop:24}}><Calculators/></div>}
           {view==="stitch-check"&&<div style={{paddingTop:24}}><StitchCheck gateAction={gateAction}/></div>}
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
+          {view==="community"&&<div style={{paddingTop:24}}><YarnCircle isDesktop={isDesktop} isTablet={isTablet} authed={authed} isAnonymous={!authed||isAnonymous} demo={typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('circledemo')==='1'} onShare={()=>openAddModal()} onOpenPattern={(pid)=>navigate("/pattern/"+encodeURIComponent(pid))} onSignIn={openNavAuthWall}/></div>}
           {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
           {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
@@ -3720,6 +3723,7 @@ export default function Wovely() {
         {view==="calculator"&&<div style={{paddingTop:18}}><Calculators/></div>}
         {view==="stitch-check"&&<div style={{paddingTop:18}}><StitchCheck gateAction={gateAction}/></div>}
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
+        {view==="community"&&<div style={{paddingTop:18}}><YarnCircle isDesktop={isDesktop} isTablet={isTablet} authed={authed} isAnonymous={!authed||isAnonymous} demo={typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('circledemo')==='1'} onShare={()=>openAddModal()} onOpenPattern={(pid)=>navigate("/pattern/"+encodeURIComponent(pid))} onSignIn={openNavAuthWall}/></div>}
         {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
         {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
@@ -3740,6 +3744,7 @@ export default function Wovely() {
           {key:"calculator",tm:"Workbench"},
           {key:"stitch-check",tm:"BevCheck",proOnly:true},
           {key:"shopping",tm:"Supplies"},
+          {key:"community",tm:"Circle"},
         ];
         return (
           <>
