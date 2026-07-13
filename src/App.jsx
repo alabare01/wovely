@@ -823,7 +823,7 @@ const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,o
     </div>
   );
   return (
-    <div style={{width:274,flex:"none",background:"linear-gradient(180deg,#8474DA 0%,#6E5AC8 100%)",color:"#fff",height:"100vh",position:"sticky",top:0,display:"flex",flexDirection:"column",padding:"26px 24px 26px 20px",overflowY:"auto"}}>
+    <div className="wv-noscroll" style={{width:274,flex:"none",background:"linear-gradient(180deg,#8474DA 0%,#6E5AC8 100%)",color:"#fff",height:"100vh",position:"sticky",top:0,display:"flex",flexDirection:"column",padding:"26px 24px 26px 20px",overflowY:"auto",scrollbarWidth:"none"}}>
       <SidebarCord/>
       <div onClick={()=>onNavigate("collection")} style={{display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center",gap:8,marginBottom:22,cursor:"pointer",transition:"opacity .15s"}} onMouseEnter={e=>e.currentTarget.style.opacity=".85"} onMouseLeave={e=>e.currentTarget.style.opacity="1"}>
         <img src="/bev.png" alt="Bev" style={{width:78,height:78,borderRadius:"50%",border:"3px solid rgba(255,255,255,.55)",background:"#EFE9FB"}}/>

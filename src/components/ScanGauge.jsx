@@ -63,7 +63,7 @@ const ScanGauge = ({ phase = "checking", score = null, state = null, note }) => 
           <text x="14" y="94" fontFamily="Nunito,sans-serif" fontSize="10" fontWeight="800" fill="#726A92">0</text>
           <text x="172" y="94" fontFamily="Nunito,sans-serif" fontSize="10" fontWeight="800" fill="#726A92">100</text>
         </svg>
-        <div style={{ position: "absolute", left: 98, bottom: 2, width: 4, height: 80, background: "#2E2748", borderRadius: 99, transformOrigin: "50% 100%", transform: "rotate(-86deg)", "--gA": `${angle}deg`, animation: needleAnim, transition: "transform .9s cubic-bezier(.3,1.5,.4,1)" }}>
+        <div style={{ position: "absolute", left: 98, bottom: 2, width: 4, height: 80, background: "#2E2748", borderRadius: 99, transformOrigin: "50% 100%", transform: "rotate(-86deg)", "--gA": `${angle}deg`, animation: needleAnim, willChange: "transform" }}>
           <div style={{ position: "absolute", left: "50%", bottom: -8, transform: "translateX(-50%)", width: 16, height: 16, borderRadius: "50%", background: "#2E2748", boxShadow: "0 3px 7px -2px rgba(46,39,72,.55)" }} />
           <div style={{ position: "absolute", left: "50%", bottom: -3, transform: "translateX(-50%)", width: 6, height: 6, borderRadius: "50%", background: "#fff", zIndex: 2 }} />
         </div>

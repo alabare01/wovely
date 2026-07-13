@@ -103,3 +103,8 @@ body::after {
   .wovely-current-ring { animation: none; opacity: 1; border-width: 2.5px !important; }
   .wovely-current-halo { animation: none; opacity: 0; }
 }
+
+/* Sidebar: hide the scrollbar so the yarn cord runs clean down the edge.
+   The scrollbar was rendering right over/beside the cord, making it look broken. */
+.wv-noscroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
+.wv-noscroll { -ms-overflow-style: none; scrollbar-width: none; }
