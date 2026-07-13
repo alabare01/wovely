@@ -126,6 +126,13 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 .wv-land .plist{list-style:none;padding:0;margin:20px 0 0;display:flex;flex-direction:column;gap:11px}
 .wv-land .plist li{display:flex;gap:10px;align-items:flex-start;font-weight:700;font-size:14px;line-height:1.4}
 .wv-land .plist svg{flex:none;margin-top:2px;color:var(--accent)}
+.wv-land .pricepromise{display:flex;align-items:center;gap:13px;justify-content:center;max-width:600px;margin:30px auto 0;background:#fff;border:1px solid var(--line);border-radius:20px;padding:14px 20px;box-shadow:0 12px 26px -20px rgba(90,66,160,.55)}
+.wv-land .pricepromise img{width:46px;height:46px;border-radius:50%;flex:none;border:2.5px solid #fff;box-shadow:0 6px 14px -6px rgba(90,66,160,.5);background:#EFE9FB;object-fit:cover}
+.wv-land .pricepromise div{font-weight:700;font-size:13.5px;color:var(--muted);line-height:1.45}
+.wv-land .pricepromise b{color:var(--ink);font-weight:800}
+.wv-land .trustrow{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:16px auto 0;max-width:760px}
+.wv-land .tchip{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-weight:800;font-size:12.5px;color:var(--muted)}
+.wv-land .tchip svg{color:var(--coral);flex:none}
 .wv-land .spacer{flex:1}
 .wv-land .pbtn{margin-top:24px;border:0;border-radius:14px;padding:15px;background:var(--accent);color:#fff;font-family:var(--body);font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 16px 30px -14px var(--accent)}
 .wv-land .pbtn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);box-shadow:none}
@@ -408,6 +415,16 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
           <div className="spacer" />
           <button className="pbtn" onClick={onGoCraft}>Go Craft</button>
         </div>
+      </div>
+      <div className="pricepromise">
+        <img src="/bev-sm.png" alt="Bev" />
+        <div><b>Bev's promise:</b> no surprises. Cancel anytime, and everything you made stays yours.</div>
+      </div>
+      <div className="trustrow">
+        <div className="tchip"><Check size={15} sw={2.8} />Cancel anytime</div>
+        <div className="tchip"><Check size={15} sw={2.8} />Secure checkout</div>
+        <div className="tchip"><Check size={15} sw={2.8} />Real human support, 24/7</div>
+        <div className="tchip"><Check size={15} sw={2.8} />Made with makers</div>
       </div>
     </div>
 
