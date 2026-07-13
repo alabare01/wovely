@@ -16,6 +16,7 @@ const STATE_LABEL = { pass: "Looks good", warning: "Heads up", issues: "Issues f
 const STATE_ANGLE = { pass: 52, warning: 0, issues: -52 };
 
 export const scanGaugeKeyframes = `
+@keyframes wvGidle{0%,100%{transform:rotate(-86deg)}50%{transform:rotate(-72deg)}}
 @keyframes wvGscan{0%,100%{transform:rotate(-58deg)}45%{transform:rotate(48deg)}60%{transform:rotate(30deg)}75%{transform:rotate(52deg)}}
 @keyframes wvGsettle{0%{transform:rotate(-58deg)}55%{transform:rotate(calc(var(--gA,85deg) + 6deg))}75%{transform:rotate(calc(var(--gA,85deg) - 5deg))}100%{transform:rotate(var(--gA,85deg))}}
 @keyframes wvGstamp{to{transform:rotate(-8deg) scale(1);opacity:1}}
@@ -45,7 +46,8 @@ const ScanGauge = ({ phase = "checking", score = null, state = null, note }) => 
     : { border: "#FF8A73", text: "#C2564A" };
   const needleAnim = phase === "checking"
     ? "wvGscan 1.5s ease-in-out infinite"
-    : done ? "wvGsettle 1.15s cubic-bezier(.3,1.4,.4,1) forwards" : "none";
+    : done ? "wvGsettle 1.15s cubic-bezier(.3,1.4,.4,1) forwards"
+    : "wvGidle 2.4s ease-in-out infinite";
 
   return (
     <div style={{ width: "100%", maxWidth: 390, background: "#fff", border: "1px solid #ECE6F8", borderRadius: 18, padding: "16px 17px 15px", textAlign: "center", position: "relative", boxShadow: "0 20px 44px -30px rgba(90,66,160,.5)" }}>
