@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet"><style>
+/* ─────────────────────────────────────────────────────────────
+   Wovely — Yarn Circle FEED view (design 2b)
+   Merge-gate reference for the community feed + Noticeboard.
+   All tokens/classes ported verbatim from "Wovely App 2b.dc.html".
+   New surfaces: two-column feed+rail layout, pattern link chip,
+   comment affordance, and the Bev-led empty state.
+   ───────────────────────────────────────────────────────────── */
+*{box-sizing:border-box}
+:root{--bg:#FBF9FF;--panel:#FFFFFF;--ink:#2E2748;--muted:#726A92;--accent:#7B6AD4;--accentD:#6E5AC8;--line:#ECE6F8;--soft:#F2EEFB;--coral:#FF8A73;--sun:#FFC24B;--mint:#5EC9AE;--sky:#6FB7F0;--pink:#C98BE0;--disp:'Fredoka',sans-serif;--body:'Nunito',sans-serif}
+body{margin:0}
+svg{display:block}
+image-slot,.slot{display:block}
+
+/* — App shell (ported) — */
+.app{display:flex;min-height:820px;background:repeating-linear-gradient(45deg,rgba(123,106,212,.03) 0 2px,transparent 2px 12px),repeating-linear-gradient(-45deg,rgba(123,106,212,.03) 0 2px,transparent 2px 12px),var(--bg);color:var(--ink);font-family:var(--body);position:relative;overflow:hidden}
+.side{width:274px;flex:none;background:linear-gradient(180deg,#8474DA 0%,#6E5AC8 100%);color:#fff;display:flex;flex-direction:column;padding:26px 24px 26px 20px;position:relative}
+.yarncord{position:absolute;top:0;left:257px;width:17px;height:100%;pointer-events:none;z-index:6;filter:drop-shadow(3px 2px 3px rgba(50,36,100,.45)) drop-shadow(6px 4px 8px rgba(50,36,100,.22))}.yarncord img{width:100%;display:block}
+.brand{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;margin-bottom:22px;cursor:pointer}
+.brand img{width:78px;height:78px;border-radius:50%;border:3px solid rgba(255,255,255,.55);background:#EFE9FB}
+.bname{font-family:var(--disp);font-weight:600;font-size:27px;line-height:1}
+.btag{font-size:12.5px;color:rgba(255,255,255,.72);font-weight:700}
+.addbtn{width:100%;border:0;border-radius:16px;padding:15px;background:rgba(255,255,255,.94);color:var(--accentD);font-family:var(--body);font-weight:800;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 22px -12px rgba(0,0,0,.4)}
+.nav{display:flex;flex-direction:column;gap:3px;margin-top:22px}
+.navitem{display:flex;gap:13px;align-items:center;padding:11px 12px;border-radius:14px;cursor:pointer;transition:.15s;position:relative}
+.navitem:hover{background:rgba(255,255,255,.1)}
+.navitem.on{background:rgba(255,255,255,.18)}
+.ni-ic{width:26px;height:26px;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;opacity:.94}
+.wico{stroke-dasharray:2.5 2.3}
+.ni-t{font-weight:800;font-size:15px;color:#fff;line-height:1.1}
+.ni-s{font-weight:700;font-size:11.5px;color:rgba(255,255,255,.66)}
+.side-foot{margin-top:auto;padding-top:20px;display:flex;flex-direction:column;gap:12px}
+.plan{background:rgba(255,255,255,.13);border-radius:16px;padding:14px 15px;display:flex;align-items:center;justify-content:space-between}
+.plan .pl-t{font-weight:800;font-size:14px;color:#fff}
+.plan .pl-s{font-weight:700;font-size:11.5px;color:rgba(255,255,255,.66)}
+.upbtn{border:0;border-radius:11px;padding:9px 14px;background:var(--sun);color:#5A3E0E;font-family:var(--body);font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:20px 40px;position:sticky;top:0;background:rgba(251,249,255,.86);backdrop-filter:blur(8px);z-index:5}
+.tlink{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:var(--accent);cursor:pointer}
+.tadd{border:0;border-radius:13px;padding:11px 20px;background:var(--accent);color:#fff;font-family:var(--body);font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;box-shadow:0 12px 24px -12px var(--accent)}
+.content{padding:8px 40px 48px;max-width:1180px;width:100%}
+.pagetitle{font-family:var(--disp);font-weight:600;font-size:38px;letter-spacing:-.01em}
+.pagesub{font-weight:700;font-size:15px;color:var(--muted);margin-top:2px;max-width:560px}
+
+/* — Two-column: feed (left) + Noticeboard rail (right) — */
+.circlegrid{display:grid;grid-template-columns:minmax(0,680px) 320px;gap:28px;align-items:start;margin-top:22px}
+.feedcol{min-width:0}
+.rail{position:sticky;top:84px;display:flex;flex-direction:column;gap:18px}
+
+/* — Compose / share entry (ported .sharebar) — */
+.sharebar{display:flex;align-items:center;gap:16px;background:linear-gradient(100deg,#F1EBFF,#FBEEF0);border:1px solid var(--line);border-radius:22px;padding:16px 20px;flex-wrap:wrap}
+.sharebar>img{width:56px;height:56px;border-radius:50%;flex:none;border:3px solid #fff;box-shadow:0 8px 18px -8px rgba(90,66,160,.5)}
+.share-t{font-family:var(--disp);font-weight:600;font-size:18px}
+.share-s{font-weight:700;font-size:13px;color:var(--muted);margin-top:1px}
+.sharecta{margin-left:auto;border:0;border-radius:13px;padding:12px 20px;background:var(--accent);color:#fff;font-family:var(--body);font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap;box-shadow:0 12px 24px -12px var(--accent);display:inline-flex;align-items:center;gap:8px}
+
+/* — Weekly theme (ported .challenge) — */
+.challenge{display:flex;align-items:center;gap:16px;background:linear-gradient(100deg,#F1EBFF,#EAF7F1);border:1px solid var(--line);border-radius:22px;padding:16px 20px;margin-top:16px;flex-wrap:wrap}
+.challenge>img{width:52px;height:52px;border-radius:50%;flex:none;border:3px solid #fff;box-shadow:0 8px 18px -8px rgba(90,66,160,.5)}
+.challenge .f1{flex:1;min-width:180px}
+.chal-t{font-family:var(--disp);font-weight:600;font-size:17px}
+.chal-s{font-weight:700;font-size:12.5px;color:var(--muted);margin-top:2px}
+
+/* — Post card (ported .fpost + additions) — */
+.fpost{background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;margin-top:18px;box-shadow:0 16px 34px -24px rgba(90,66,160,.4)}
+.fp-head{display:flex;align-items:center;gap:12px;padding:15px 18px}
+.fp-av{width:42px;height:42px;border-radius:50%;color:#fff;font-family:var(--disp);font-weight:600;font-size:18px;display:flex;align-items:center;justify-content:center;flex:none}
+.avme{background:var(--accent)}
+.fp-n{font-weight:800;font-size:14.5px}
+.fp-s{font-weight:700;font-size:12px;color:var(--muted);margin-top:1px}
+.pickbadge{margin-left:auto;display:inline-flex;align-items:center;gap:7px;background:#F2EEFB;color:var(--accentD);font-weight:800;font-size:12px;padding:6px 12px 6px 7px;border-radius:999px;flex:none}
+.pickbadge img{width:22px;height:22px;border-radius:50%}
+.fp-img{height:330px;background-size:cover;background-position:center;background-color:#EDE7F7}
+.fp-body{padding:15px 18px 17px}
+.fp-cap{font-weight:600;font-size:15px;line-height:1.55}
+.fp-cap b{font-weight:800}
+/* NEW — pattern link chip: the pattern this make was crocheted from */
+.fp-patchip{display:inline-flex;align-items:center;gap:8px;margin-top:11px;background:#F2EEFB;border:1px solid #E2D8F7;border-radius:999px;padding:7px 14px 7px 8px;font-weight:800;font-size:12.5px;color:var(--accentD);cursor:pointer;transition:.15s;text-decoration:none}
+.fp-patchip:hover{border-color:var(--accent);box-shadow:0 8px 18px -12px var(--accent)}
+.fp-patchip .pc-ic{width:26px;height:26px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--accent);flex:none}
+.fp-patchip .pc-lab{font-weight:700;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fp-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:11px}
+.fp-chip{display:inline-flex;align-items:center;gap:6px;background:#F5F2FC;border-radius:999px;padding:6px 12px;font-weight:800;font-size:12px;color:var(--muted)}
+.fp-actions{display:flex;align-items:center;gap:9px;margin-top:14px;padding-top:13px;border-top:1px solid var(--line)}
+.lovebtn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:999px;background:#fff;padding:9px 16px;font-family:var(--body);font-weight:800;font-size:13.5px;color:var(--ink);cursor:pointer;transition:.15s}
+.lovebtn:hover{border-color:var(--coral)}
+.lovebtn.on{background:#FFF1EE;border-color:#FFD3C9;color:#C2564A}
+.lovebtn.on svg{fill:var(--coral)}
+/* NEW — comment affordance */
+.combtn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:999px;background:#fff;padding:9px 16px;font-family:var(--body);font-weight:800;font-size:13.5px;color:var(--muted);cursor:pointer;transition:.15s}
+.combtn:hover{border-color:var(--accent);color:var(--accent)}
+.hookbtn{display:inline-flex;align-items:center;gap:7px;border:1.5px solid #D8CCF2;border-radius:999px;background:#F8F5FF;padding:9px 15px;font-family:var(--body);font-weight:800;font-size:13px;color:var(--accentD);cursor:pointer;transition:.15s;margin-left:auto}
+.hookbtn:hover{border-color:var(--accent)}
+/* NEW — comment thread + inline composer (revealed under a post) */
+.fp-comments{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.cmt{display:flex;gap:10px;align-items:flex-start}
+.cmt-av{width:30px;height:30px;border-radius:50%;color:#fff;font-family:var(--disp);font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;flex:none}
+.cmt-bub{background:#F5F2FC;border-radius:14px;padding:9px 13px}
+.cmt-n{font-weight:800;font-size:12.5px}
+.cmt-x{font-weight:600;font-size:13.5px;color:var(--ink);line-height:1.45;margin-top:1px}
+.cmt-x b{color:var(--accentD)}
+.cmt-more{font-weight:800;font-size:12.5px;color:var(--accent);cursor:pointer;margin-left:40px}
+.cmt-compose{display:flex;gap:10px;align-items:center;margin-top:2px}
+.cmt-compose .cmt-av{background:var(--accent)}
+.cmt-input{flex:1;border:1.5px solid var(--line);border-radius:999px;background:#FBFAFF;padding:10px 16px;font-family:var(--body);font-weight:600;font-size:13.5px;color:var(--muted)}
+.cmt-send{border:0;border-radius:50%;width:38px;height:38px;flex:none;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 20px -12px var(--accent)}
+
+/* — Right rail: Noticeboard (ported .board) — */
+.rvlabel{font-weight:800;font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0}
+.board{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px 20px 12px;box-shadow:0 16px 34px -24px rgba(90,66,160,.4)}
+.board-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.b-all{font-weight:800;font-size:12px;color:var(--accent);cursor:pointer}
+.brow{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.brow.last{border-bottom:0}
+.bic{width:34px;height:34px;border-radius:11px;background:#F2EEFB;color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+.b-t{font-weight:800;font-size:13.5px;line-height:1.3}
+.b-s{font-weight:700;font-size:11.5px;color:var(--muted);margin-top:1px}
+/* rail stat card */
+.railstat{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px 20px;box-shadow:0 16px 34px -24px rgba(90,66,160,.4)}
+.rs-row{display:flex;gap:10px}
+.rs-cell{flex:1;text-align:center;background:#FBFAFF;border:1px solid var(--line);border-radius:14px;padding:12px 8px}
+.rs-n{font-family:var(--disp);font-weight:600;font-size:26px;color:var(--accent);line-height:1}
+.rs-l{font-weight:700;font-size:11px;color:var(--muted);margin-top:3px}
+
+/* — Empty state (Bev-led) — */
+.empty{background:#fff;border:1px solid var(--line);border-radius:26px;padding:44px 40px 40px;text-align:center;box-shadow:0 16px 34px -24px rgba(90,66,160,.4);position:relative;overflow:hidden}
+.empty:before{content:"";position:absolute;inset:0;background:radial-gradient(560px 220px at 50% -40px,rgba(123,106,212,.10),transparent 70%);pointer-events:none}
+.empty img.bev{width:104px;height:104px;border-radius:50%;border:4px solid #fff;box-shadow:0 14px 30px -12px rgba(90,66,160,.55);position:relative}
+.empty-t{font-family:var(--disp);font-weight:600;font-size:26px;margin-top:16px}
+.empty-s{font-weight:700;font-size:14.5px;color:var(--muted);margin:8px auto 0;max-width:420px;line-height:1.55}
+.empty-cta{margin-top:22px;border:0;border-radius:14px;padding:15px 26px;background:var(--accent);color:#fff;font-family:var(--body);font-weight:800;font-size:15.5px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;box-shadow:0 14px 26px -12px var(--accent)}
+.empty-ghosts{display:flex;justify-content:center;gap:14px;margin-top:30px;opacity:.5}
+.ghost{width:88px;height:104px;border-radius:16px;background:linear-gradient(180deg,#F4F1FB,#EEE9F8);border:1px dashed #D8CCF2}
+
+/* — reference scaffolding (labels + mobile note) — captions only, not product chrome — */
+.refcap{max-width:1180px;margin:0 auto;padding:26px 40px 6px;font-family:var(--body)}
+.refcap .rc-k{display:inline-block;font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--accent);padding:5px 12px;border-radius:999px}
+.refcap .rc-d{font-weight:700;font-size:13px;color:var(--muted);margin-top:8px}
+.refband{background:#F4F1FB}
+.mobilenote{max-width:1180px;margin:0 auto;padding:20px 40px 60px;display:grid;grid-template-columns:300px 1fr;gap:30px;align-items:start}
+.phone{width:300px;border:10px solid #2E2748;border-radius:38px;overflow:hidden;background:var(--bg);box-shadow:0 30px 60px -30px rgba(46,39,72,.6)}
+.phone .pnav{background:linear-gradient(90deg,#8474DA,#6E5AC8);height:56px;display:flex;align-items:center;justify-content:space-around;padding:0 8px}
+.pnav div{width:22px;height:22px;border-radius:6px;background:rgba(255,255,255,.28)}
+.pnav div.on{background:#fff}
+.pbody{padding:16px 14px 20px}
+.mn-t{font-family:var(--disp);font-weight:600;font-size:24px}
+.mn-list{margin:14px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:11px}
+.mn-list li{font-weight:700;font-size:14px;color:var(--muted);line-height:1.5;padding-left:26px;position:relative}
+.mn-list li:before{content:"";position:absolute;left:0;top:6px;width:14px;height:14px;border-radius:5px;background:var(--soft);border:1.5px solid var(--accent)}
+</style></helmet>
+
+<!-- ══════════ STATE 1 · POPULATED FEED (primary reference) ══════════ -->
+<div class="refcap"><span class="rc-k">Yarn Circle · Feed view</span><div class="rc-d">Desktop layout · community feed (left) + Noticeboard rail (right). New route on the existing 2b app shell; matches "Wovely App 2b.dc.html" verbatim.</div></div>
+
+<div class="app">
+  <!-- Sidebar (ported shell, Yarn Circle active) -->
+  <div class="side">
+    <div class="brand"><img src="assets/bev.png" alt="Bev"><div class="bname">Wovely</div><div class="btag">Your crochet space</div></div>
+    <button class="addbtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add Pattern</button>
+    <div class="nav">
+      <div class="navitem"><div class="ni-ic"><svg class="wico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7.3"/><path d="M9 5.4c3 3.6 3 9.6 0 13.2"/><path d="M15 5.4c-3 3.6-3 9.6 0 13.2"/><path d="M5.3 9.6c4 1.9 9.4 1.9 13.4 0"/><path d="M5.3 14.4c4-1.9 9.4-1.9 13.4 0"/></svg></div><div><div class="ni-t">My Wovely</div><div class="ni-s">Your patterns</div></div></div>
+      <div class="navitem"><div class="ni-ic"><svg class="wico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5" style="stroke-dasharray:none"/></svg></div><div><div class="ni-t">Find Patterns</div><div class="ni-s">Clip from the web</div></div></div>
+      <div class="navitem"><div class="ni-ic"><svg class="wico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12c0-2.3 3.1-3.6 7-3.6s7 1.3 7 3.6-3.1 3.6-7 3.6-7-1.3-7-3.6z"/><rect x="9.8" y="7.8" width="4.4" height="8.4" rx="1.4" style="stroke-dasharray:none"/></svg></div><div><div class="ni-t">Yarn Stash</div><div class="ni-s">What you own</div></div></div>
+      <div class="navitem"><div class="ni-ic"><svg class="wico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2" style="stroke-dasharray:none"/></svg></div><div><div class="ni-t">Bev Check</div><div class="ni-s">Stitch Check</div></div></div>
+      <div class="navitem on"><div class="ni-ic"><svg class="wico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19.6c-4.6-3.1-7.2-5.8-7.2-9C4.8 8 6.6 6.3 8.9 6.3c1.3 0 2.5.6 3.1 1.6.6-1 1.8-1.6 3.1-1.6 2.3 0 4.1 1.7 4.1 4.3 0 3.2-2.6 5.9-7.2 9z"/></svg></div><div><div class="ni-t">Yarn Circle</div><div class="ni-s">Finished makes, shared</div></div></div>
+      <div class="navitem"><div class="ni-ic"><svg class="wico" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2"/></svg></div><div><div class="ni-t">Profile &amp; Settings</div><div class="ni-s">Your corner</div></div></div>
+    </div>
+    <div class="side-foot">
+      <div class="plan"><div><div class="pl-t">Free plan</div><div class="pl-s">3 of 3 patterns</div></div><button class="upbtn">Go Craft</button></div>
+    </div>
+    <div class="yarncord"><img src="https://res.cloudinary.com/dmaupzhcx/image/upload/e_background_removal/c_crop,g_center,h_0.9,w_1.0/e_trim/v1782959427/website-assets/yarn-cord-plum.png" alt=""></div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tlink"><img src="assets/bev.png" alt="" style="width:26px;height:26px;border-radius:50%"><span>Ask Bev</span></div>
+      <button class="tadd"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add Pattern</button>
+    </div>
+
+    <div class="content">
+      <div class="pagetitle">The Yarn Circle</div>
+      <div class="pagesub">Finished makes from the circle. Cheer them on — a Lovely goes a long way.</div>
+
+      <div class="circlegrid">
+        <!-- LEFT: feed -->
+        <div class="feedcol">
+          <!-- Compose / share entry -->
+          <div class="sharebar">
+            <img src="assets/bev.png" alt="Bev">
+            <div><div class="share-t">Finished something?</div><div class="share-s">Show the circle — Bev loves a finished make.</div></div>
+            <button class="sharecta"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Share a Lovely</button>
+          </div>
+
+          <!-- Weekly theme -->
+          <div class="challenge">
+            <img src="assets/bev.png" alt="Bev">
+            <div class="f1"><div class="chal-t">Bev's weekly theme: Tiny &amp; Round</div><div class="chal-s">Share a palm-sized make by Sunday — 12 in so far. Bev picks a favorite Monday morning.</div></div>
+            <button class="sharecta">Join in</button>
+          </div>
+
+          <!-- POST 1 — Bev's pick, loved, comments expanded (shows every affordance) -->
+          <div class="fpost">
+            <div class="fp-head">
+              <div class="fp-av" style="background:var(--coral)">M</div>
+              <div><div class="fp-n">Marisol</div><div class="fp-s">2h ago · Frankfort, MI</div></div>
+              <div class="pickbadge"><img src="assets/bev.png" alt="">Bev's pick</div>
+            </div>
+            <div class="fp-img" style="background-image:url('assets/cover-manatee.png')"></div>
+            <div class="fp-body">
+              <div class="fp-cap"><b>Mellow the Manatee</b> — finally finished! The color changes fought me but Bev's row counter kept me honest. So squishy.</div>
+              <a class="fp-patchip"><span class="pc-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 19.5L15.4 9.6"/><path d="M15.4 9.6c1-1.3 2.8-1.5 3.6-.4.8 1.1-.1 2.6-1.7 2.8"/></svg></span><span><span class="pc-lab">Made from</span><br>Mellow the Manatee</span></a>
+              <div class="fp-chips"><span class="fp-chip">Worsted · seafoam</span><span class="fp-chip">4.0mm hook</span></div>
+              <div class="fp-actions">
+                <button class="lovebtn on"><svg width="16" height="16" viewBox="0 0 24 24" fill="var(--coral)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-5-3.4-8-6.4-8-9.9C4 7.3 6 5.4 8.5 5.4c1.5 0 2.7.7 3.5 1.8.8-1.1 2-1.8 3.5-1.8C18 5.4 20 7.3 20 10.1c0 3.5-3 6.5-8 9.9z"/></svg><span>48 Lovelies</span></button>
+                <button class="combtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg><span>6</span></button>
+                <button class="hookbtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Hook this too</button>
+              </div>
+              <!-- comment thread (expanded state) -->
+              <div class="fp-comments">
+                <div class="cmt"><div class="cmt-av" style="background:var(--accent)"><img src="assets/bev.png" alt="Bev" style="width:100%;height:100%;border-radius:50%"></div><div class="cmt-bub"><div class="cmt-n">Bev</div><div class="cmt-x">The seafoam gradient is <b>chef's kiss</b>. Adding you to Monday's shortlist.</div></div></div>
+                <div class="cmt"><div class="cmt-av" style="background:var(--sky)">J</div><div class="cmt-bub"><div class="cmt-n">Jen</div><div class="cmt-x">Okay this is the third manatee I've seen today and now I need one.</div></div></div>
+                <div class="cmt-more">View all 6 comments</div>
+                <div class="cmt-compose"><div class="cmt-av">A</div><div class="cmt-input">Add a kind word…</div><button class="cmt-send"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg></button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- POST 2 — default (collapsed comments), your own make -->
+          <div class="fpost">
+            <div class="fp-head">
+              <div class="fp-av avme">A</div>
+              <div><div class="fp-n">Adam</div><div class="fp-s">Yesterday · your make</div></div>
+            </div>
+            <div class="fp-img" style="background-image:url('assets/cover-mushroom-photo.png')"></div>
+            <div class="fp-body">
+              <div class="fp-cap"><b>Button the Mushroom</b> — first amigurumi off the hook. The magic ring took four tries. Worth it.</div>
+              <a class="fp-patchip"><span class="pc-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 19.5L15.4 9.6"/><path d="M15.4 9.6c1-1.3 2.8-1.5 3.6-.4.8 1.1-.1 2.6-1.7 2.8"/></svg></span><span><span class="pc-lab">Made from</span><br>Button the Mushroom</span></a>
+              <div class="fp-chips"><span class="fp-chip">Worsted · brick red</span><span class="fp-chip">3.5mm hook</span></div>
+              <div class="fp-actions">
+                <button class="lovebtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-5-3.4-8-6.4-8-9.9C4 7.3 6 5.4 8.5 5.4c1.5 0 2.7.7 3.5 1.8.8-1.1 2-1.8 3.5-1.8C18 5.4 20 7.3 20 10.1c0 3.5-3 6.5-8 9.9z"/></svg><span>9 Lovelies</span></button>
+                <button class="combtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg><span>2</span></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- POST 3 — default, another maker -->
+          <div class="fpost">
+            <div class="fp-head">
+              <div class="fp-av" style="background:var(--mint)">P</div>
+              <div><div class="fp-n">Priya</div><div class="fp-s">2 days ago</div></div>
+            </div>
+            <div class="fp-img" style="background-image:url('assets/cover-honeybee.png')"></div>
+            <div class="fp-body">
+              <div class="fp-cap"><b>Buzz the Honeybee</b> — made for my niece. She named him before the wings were done.</div>
+              <a class="fp-patchip"><span class="pc-ic"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 19.5L15.4 9.6"/><path d="M15.4 9.6c1-1.3 2.8-1.5 3.6-.4.8 1.1-.1 2.6-1.7 2.8"/></svg></span><span><span class="pc-lab">Made from</span><br>Buzz the Honeybee</span></a>
+              <div class="fp-chips"><span class="fp-chip">DK · marigold</span><span class="fp-chip">3.0mm hook</span></div>
+              <div class="fp-actions">
+                <button class="lovebtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20c-5-3.4-8-6.4-8-9.9C4 7.3 6 5.4 8.5 5.4c1.5 0 2.7.7 3.5 1.8.8-1.1 2-1.8 3.5-1.8C18 5.4 20 7.3 20 10.1c0 3.5-3 6.5-8 9.9z"/></svg><span>21 Lovelies</span></button>
+                <button class="combtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg><span>4</span></button>
+                <button class="hookbtn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Hook this too</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: Noticeboard rail -->
+        <div class="rail">
+          <div class="board">
+            <div class="board-h"><div class="rvlabel">The Noticeboard</div><span class="b-all">Refresh →</span></div>
+            <div class="brow">
+              <div class="bic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 4.4 4.8.7-3.5 3.4.8 4.8L12 14l-4.3 2.3.8-4.8L5 8.1l4.8-.7z"/></svg></div>
+              <div><div class="b-t">The Yarn Circle is open</div><div class="b-s">New from Wovely · share finished makes, send Lovelies</div></div>
+            </div>
+            <div class="brow">
+              <div class="bic"><img src="assets/bev.png" alt="" style="width:24px;height:24px;border-radius:50%"></div>
+              <div><div class="b-t">Marisol shared Mellow the Manatee</div><div class="b-s">2h ago · Bev's pick · 48 Lovelies</div></div>
+            </div>
+            <div class="brow last">
+              <div class="bic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5l3 2"/><circle cx="12" cy="12" r="9"/></svg></div>
+              <div><div class="b-t">Weekly theme ends Sunday</div><div class="b-s">Tiny &amp; Round · 12 makes in · pick is Monday AM</div></div>
+            </div>
+          </div>
+
+          <div class="railstat">
+            <div class="rvlabel" style="margin-bottom:12px">This week in the Circle</div>
+            <div class="rs-row">
+              <div class="rs-cell"><div class="rs-n">12</div><div class="rs-l">makes shared</div></div>
+              <div class="rs-cell"><div class="rs-n">184</div><div class="rs-l">Lovelies sent</div></div>
+              <div class="rs-cell"><div class="rs-n">36</div><div class="rs-l">makers</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STATE 2 · EMPTY STATE (small / new community) ══════════ -->
+<div class="refband">
+  <div class="refcap"><span class="rc-k">Yarn Circle · Empty state</span><div class="rc-d">Pre-launch, ~36 makers. Warm, Bev-led, invites the first post, never a sad blank. Noticeboard still greets from the rail.</div></div>
+  <div style="max-width:1180px;margin:0 auto;padding:0 40px 40px">
+    <div class="circlegrid">
+      <div class="feedcol">
+        <div class="sharebar">
+          <img src="assets/bev.png" alt="Bev">
+          <div><div class="share-t">Be the first to share</div><div class="share-s">The circle's small and cozy right now. Perfect time to set the tone.</div></div>
+          <button class="sharecta"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Share a Lovely</button>
+        </div>
+        <div class="empty">
+          <img class="bev" src="assets/bev.png" alt="Bev">
+          <div class="empty-t">The Circle is warming up</div>
+          <div class="empty-s">No finished makes yet, and that's the fun part. Share your first and Bev sends the very first Lovely, every time. Someone has to start the pile.</div>
+          <button class="empty-cta"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>Share your first make</button>
+          <div class="empty-ghosts"><div class="ghost"></div><div class="ghost"></div><div class="ghost"></div></div>
+        </div>
+      </div>
+      <div class="rail">
+        <div class="board">
+          <div class="board-h"><div class="rvlabel">The Noticeboard</div><span class="b-all">Refresh →</span></div>
+          <div class="brow">
+            <div class="bic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 4.4 4.8.7-3.5 3.4.8 4.8L12 14l-4.3 2.3.8-4.8L5 8.1l4.8-.7z"/></svg></div>
+            <div><div class="b-t">Welcome to the Yarn Circle</div><div class="b-s">Brand new · your finished makes go here</div></div>
+          </div>
+          <div class="brow last">
+            <div class="bic"><img src="assets/bev.png" alt="" style="width:24px;height:24px;border-radius:50%"></div>
+            <div><div class="b-t">Bev's first weekly theme: Tiny &amp; Round</div><div class="b-s">Share a palm-sized make by Sunday</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MOBILE COLLAPSE NOTE ══════════ -->
+<div class="refcap"><span class="rc-k">Responsive · Mobile</span><div class="rc-d">Below 1100px the rail drops under the feed; below 768px everything is one column and the sidebar becomes the bottom tab bar (per Responsive Spec).</div></div>
+<div class="mobilenote">
+  <div class="phone">
+    <div class="pbody" style="background:repeating-linear-gradient(45deg,rgba(123,106,212,.03) 0 2px,transparent 2px 12px),var(--bg)">
+      <div style="font-family:var(--disp);font-weight:600;font-size:24px">The Yarn Circle</div>
+      <div style="font-weight:700;font-size:12px;color:var(--muted);margin-top:2px">Finished makes — send a Lovely.</div>
+      <!-- Noticeboard collapses to a single pinned strip at the top on mobile -->
+      <div class="board" style="margin-top:14px;padding:12px 14px 6px;border-radius:16px">
+        <div class="brow last" style="padding:6px 0"><div class="bic" style="width:28px;height:28px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 4.4 4.8.7-3.5 3.4.8 4.8L12 14l-4.3 2.3.8-4.8L5 8.1l4.8-.7z"/></svg></div><div><div class="b-t" style="font-size:12px">Noticeboard</div><div class="b-s">Tap to expand · 3 updates</div></div></div>
+      </div>
+      <div class="sharebar" style="margin-top:12px;padding:12px 14px;border-radius:16px">
+        <img src="assets/bev.png" alt="Bev" style="width:40px;height:40px">
+        <div style="flex:1"><div class="share-t" style="font-size:15px">Finished something?</div></div>
+        <button class="sharecta" style="width:100%;margin-left:0;margin-top:4px;padding:11px">Share a Lovely</button>
+      </div>
+      <div class="fpost" style="margin-top:12px;border-radius:16px">
+        <div class="fp-head" style="padding:11px 13px"><div class="fp-av" style="width:34px;height:34px;font-size:15px;background:var(--coral)">M</div><div><div class="fp-n" style="font-size:13px">Marisol</div><div class="fp-s">2h ago</div></div></div>
+        <div class="fp-img" style="height:200px;background-image:url('assets/cover-manatee.png')"></div>
+        <div class="fp-body" style="padding:12px 13px 14px"><div class="fp-cap" style="font-size:13.5px"><b>Mellow the Manatee</b> — so squishy.</div>
+          <div class="fp-actions" style="margin-top:11px;padding-top:11px"><button class="lovebtn on" style="padding:7px 12px;font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--coral)" stroke="currentColor" stroke-width="2"><path d="M12 20c-5-3.4-8-6.4-8-9.9C4 7.3 6 5.4 8.5 5.4c1.5 0 2.7.7 3.5 1.8.8-1.1 2-1.8 3.5-1.8C18 5.4 20 7.3 20 10.1c0 3.5-3 6.5-8 9.9z"/></svg>48</button><button class="combtn" style="padding:7px 12px;font-size:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6.1A8.4 8.4 0 1121 11.5z"/></svg>6</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="pnav"><div></div><div></div><div></div><div></div><div class="on"></div><div></div></div>
+  </div>
+  <div>
+    <div class="mn-t">How it collapses</div>
+    <ul class="mn-list">
+      <li><b>&lt; 1100px:</b> the Noticeboard rail moves from the right column to directly under the feed header, full width; feed stays a single centered column (max 680px).</li>
+      <li><b>&lt; 768px:</b> one column edge-to-edge. The sidebar becomes the fixed bottom tab bar (Yarn Circle = heart icon), exactly as the app shell already does in the 2b Responsive Spec.</li>
+      <li>The Noticeboard condenses to a single tappable "Noticeboard · N updates" strip pinned above the compose bar; tapping expands it in place.</li>
+      <li>Post cards keep every affordance (Lovely, comment, Hook this too, pattern chip); photo height drops to ~200px and buttons shrink to icon+count.</li>
+      <li>The compose bar's "Share a Lovely" button goes full-width; the weekly-theme banner stacks its button below the copy.</li>
+      <li>Comment composer stays a single-row input pinned to the bottom of an expanded post.</li>
+    </ul>
+  </div>
+</div>
+
+</x-dc>
+</body>
+</html>
