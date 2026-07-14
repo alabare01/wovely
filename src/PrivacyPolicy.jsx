@@ -8,7 +8,7 @@ export default function PrivacyPolicy() {
     <div style={S.page}>
       <button onClick={() => navigate(-1)} style={S.back}>← Back</button>
       <div style={S.title}>Privacy Policy</div>
-      <div style={S.sub}>Last updated March 30, 2026</div>
+      <div style={S.sub}>Last updated July 14, 2026</div>
 
       <p style={S.p}>This Privacy Notice for Wovely LLC describes how and why we might access, collect, store, use, and/or share your personal information when you use our services, including when you visit wovely.app.</p>
 
@@ -56,10 +56,10 @@ export default function PrivacyPolicy() {
       <p style={S.p}>Yes. We will update this notice as necessary to stay compliant with relevant laws.</p>
 
       <div style={S.h2}>12. How Can You Contact Us About This Notice?</div>
-      <p style={S.p}>WOVELY LLC<br/>487 S Aberdeenshire Dr<br/>Saint Johns, FL 32259<br/>United States<br/>Phone: 9045047881<br/>Email: alabare@gmail.com</p>
+      <p style={S.p}>WOVELY LLC<br/>487 S Aberdeenshire Dr<br/>Saint Johns, FL 32259<br/>United States<br/>Email: bev@wovely.app</p>
 
       <div style={S.h2}>13. How Can You Review, Update, or Delete the Data We Collect from You?</div>
-      <p style={S.p}>Based on applicable laws, you may have the right to request access to, correct, or delete your personal information. Contact us at alabare@gmail.com.</p>
+      <p style={S.p}>Based on applicable laws, you may have the right to request access to, correct, or delete your personal information. Contact us at bev@wovely.app.</p>
     </div>
   );
 }

@@ -8,7 +8,7 @@ export default function TermsOfService() {
     <div style={S.page}>
       <button onClick={() => navigate(-1)} style={S.back}>← Back</button>
       <div style={S.title}>Terms of Service</div>
-      <div style={S.sub}>Last updated March 30, 2026</div>
+      <div style={S.sub}>Last updated July 14, 2026</div>
 
       <div style={S.h2}>Agreement to Legal Terms</div>
       <p style={S.p}>These Terms of Service constitute a legally binding agreement between you and Wovely LLC ("Company," "we," "us," or "our") concerning your access to and use of the website wovely.app and any related services (collectively, the "Services"). By accessing or using the Services, you agree to be bound by these Terms. If you do not agree, do not use the Services.</p>
@@ -63,7 +63,7 @@ export default function TermsOfService() {
       <p style={S.p}>We reserve the right to change these Terms at any time. Updated Terms will be posted on this page with a revised "Last updated" date. Your continued use of the Services after changes constitutes acceptance of the revised Terms.</p>
 
       <div style={S.h2}>Contact Us</div>
-      <p style={S.p}>WOVELY LLC<br/>487 S Aberdeenshire Dr<br/>Saint Johns, FL 32259<br/>United States<br/>Phone: 9045047881<br/>Email: alabare@gmail.com</p>
+      <p style={S.p}>WOVELY LLC<br/>487 S Aberdeenshire Dr<br/>Saint Johns, FL 32259<br/>United States<br/>Email: bev@wovely.app</p>
     </div>
   );
 }
