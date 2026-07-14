@@ -1022,7 +1022,7 @@ const bumpDayStreak = () => {
   } catch { return 0; }
 };
 
-const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHome,patterns=[],isAnonymous=false,onSignOut,onCreateAccount}) => {
+const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHome,patterns=[],isAnonymous=false,onSignOut,onCreateAccount,onSignIn}) => {
   const profileNav=useNavigate();
   const [username,setUsername]=useState(""),[displayName,setDisplayName]=useState(""),[bio,setBio]=useState("");
   const [socialInstagram,setSocialInstagram]=useState(""),[socialPinterest,setSocialPinterest]=useState(""),[socialRavelry,setSocialRavelry]=useState("");
@@ -1033,6 +1033,10 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
   // form lives one tab over, fully intact.
   const [profileTab,setProfileTab]=useState("corner");
   const [shareState,setShareState]=useState(null); // null | "copied"
+  // Guest log-out is a two-tap confirm: signing out of an anonymous session
+  // abandons the Supabase anon user, and the guest's imported patterns go with
+  // it. A signed-in user's log out stays one tap — their work is on their account.
+  const [guestExitArmed,setGuestExitArmed]=useState(false);
   const{isDesktop}=useBreakpoint();
   const user = supabaseAuth.getUser();
   const session = getSession();
@@ -1235,6 +1239,23 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
             <div onClick={onCreateAccount} style={{display:"flex",alignItems:"center",gap:13,background:"#fff",border:`1px solid ${T.line}`,borderRadius:14,padding:"15px 18px",fontWeight:800,fontSize:14.5,color:T.ink,cursor:"pointer"}}>
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={T.accent} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="14" r="4.2"/><path d="M11 11L19.5 2.5M15.5 6.5l3 3M18 4l2 2"/></svg>
               Create account<span style={{marginLeft:"auto",color:T.muted,fontWeight:700,fontSize:13}}>Save your work everywhere</span>
+            </div>
+          )}
+          {/* Guest exit. A guest is a real (anonymous) Supabase session, so the
+              app shell had no way out of it: no Log out, no Sign in. A returning
+              user who tapped "Try free" was stranded in a guest session with no
+              route back to their own account. Both rows are the way out. */}
+          {isAnonymous&&onSignIn&&(
+            <div onClick={onSignIn} style={{display:"flex",alignItems:"center",gap:13,background:"#fff",border:`1px solid ${T.line}`,borderRadius:14,padding:"15px 18px",fontWeight:800,fontSize:14.5,color:T.ink,cursor:"pointer"}}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={T.accent} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a1.5 1.5 0 011.5 1.5v15A1.5 1.5 0 0119 21h-4"/><path d="M10 8.5L13.5 12 10 15.5M13 12H3.5"/></svg>
+              Sign in<span style={{marginLeft:"auto",color:T.muted,fontWeight:700,fontSize:13}}>Already have an account</span>
+            </div>
+          )}
+          {isAnonymous&&onSignOut&&(
+            <div onClick={()=>{if(!guestExitArmed){setGuestExitArmed(true);return;}onSignOut();}} style={{display:"flex",alignItems:"center",gap:13,background:guestExitArmed?"#FFF4F2":"#fff",border:`1px solid ${guestExitArmed?T.coral:T.line}`,borderRadius:14,padding:"15px 18px",fontWeight:800,fontSize:14.5,color:T.coral,cursor:"pointer"}}>
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M9 4.5H6.5A1.5 1.5 0 005 6v12a1.5 1.5 0 001.5 1.5H9M15 8.5l4 3.5-4 3.5M19 12H9.5"/></svg>
+              {guestExitArmed?"Tap again to log out":"Log out"}
+              <span style={{marginLeft:"auto",color:guestExitArmed?T.coral:T.muted,fontWeight:700,fontSize:13,textAlign:"right"}}>{guestExitArmed?"Guest work will be lost":"Ends your guest session"}</span>
             </div>
           )}
           {!isAnonymous&&authed&&onSignOut&&(
@@ -2230,6 +2251,9 @@ export default function Wovely() {
   // before any Pro paywall. Critical invariant: never show the Pro paywall to an unauthed user.
   const [authWallOpen,setAuthWallOpen]=useState(false);
   const [authWallContext,setAuthWallContext]=useState(null);
+  // Which face the wall opens on: "signup" (default) or "signin" for a returning
+  // user stuck in a guest session.
+  const [authWallMode,setAuthWallMode]=useState("signup");
   const{isTablet,isDesktop}=useBreakpoint();
   const allPatterns = [...userPatterns,...starterPatterns];
   const userStarterCount=userPatterns.filter(p=>p.isStarter).length;
@@ -2560,7 +2584,16 @@ export default function Wovely() {
   // no-op). The wall opens in signup mode with isAnonymous=true, so AuthWallModal
   // runs convertAnonymousToUser, preserving the guest's UUID and their patterns.
   const openNavAuthWall = () => {
+    setAuthWallMode("signup");
     setAuthWallContext({ title: "Create your free account", subtitle: "Save your work and pick up on any device.", intent: "nav_sign_in", requiresPro: false, onSuccess: () => {} });
+    setAuthWallOpen(true);
+  };
+
+  // Returning user who tapped "Try free" and is now sitting in a guest session.
+  // They do not want a create-account form, they want their own account back.
+  const openNavSignIn = () => {
+    setAuthWallMode("signin");
+    setAuthWallContext({ title: "Welcome back", subtitle: "Sign in and your library comes with you.", intent: "nav_sign_in_returning", requiresPro: false, onSuccess: () => {} });
     setAuthWallOpen(true);
   };
 
@@ -3631,7 +3664,7 @@ export default function Wovely() {
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:`${T.crosshatch},${T.bg}`,fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous} initialMode={authWallMode}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
@@ -3675,7 +3708,7 @@ export default function Wovely() {
           {view==="stitch-check"&&<div style={{paddingTop:24}}><StitchCheck gateAction={gateAction}/></div>}
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
           {view==="community"&&<div style={{paddingTop:24}}><YarnCircle isDesktop={isDesktop} isTablet={isTablet} authed={authed} isAnonymous={!authed||isAnonymous} onShare={()=>openAddModal()} onOpenPattern={(pid)=>navigate("/pattern/"+encodeURIComponent(pid))} onSignIn={openNavAuthWall}/></div>}
-          {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
+          {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} onSignIn={openNavSignIn} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
           {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
           {view==="privacy"&&<PrivacyPolicy/>}
@@ -3690,7 +3723,7 @@ export default function Wovely() {
     <div style={{fontFamily:T.sans,background:`${T.crosshatch},${T.bg}`,minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous} initialMode={authWallMode}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast}/>
@@ -3739,7 +3772,7 @@ export default function Wovely() {
         {view==="stitch-check"&&<div style={{paddingTop:18}}><StitchCheck gateAction={gateAction}/></div>}
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
         {view==="community"&&<div style={{paddingTop:18}}><YarnCircle isDesktop={isDesktop} isTablet={isTablet} authed={authed} isAnonymous={!authed||isAnonymous} onShare={()=>openAddModal()} onOpenPattern={(pid)=>navigate("/pattern/"+encodeURIComponent(pid))} onSignIn={openNavAuthWall}/></div>}
-        {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
+        {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} onSignIn={openNavSignIn} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
         {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
         {view==="privacy"&&<PrivacyPolicy/>}

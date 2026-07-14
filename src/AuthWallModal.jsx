@@ -32,8 +32,11 @@ const AuthWallModal = ({
   subtitle = "Takes 10 seconds. No credit card.",
   intent,
   isAnonymous = false,
+  // "signup" (default) or "signin". A guest who already has an account needs to
+  // land straight on sign-in, not on a create-account form they will bounce off.
+  initialMode = "signup",
 }) => {
-  const [mode, setMode] = useState("signup");
+  const [mode, setMode] = useState(initialMode);
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
@@ -41,10 +44,10 @@ const AuthWallModal = ({
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!isOpen) {
-      setMode("signup"); setEmail(""); setPass(""); setConfirmPass(""); setError(null); setLoading(false);
-    }
-  }, [isOpen]);
+    // Reset on close, and re-arm the requested mode on open, so reopening the
+    // wall from the "Sign in" row does not inherit the previous signup state.
+    setMode(initialMode); setEmail(""); setPass(""); setConfirmPass(""); setError(null); setLoading(false);
+  }, [isOpen, initialMode]);
 
   if (!isOpen) return null;
 
