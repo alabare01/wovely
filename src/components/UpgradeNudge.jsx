@@ -10,7 +10,7 @@ import { requiredTier } from "../utils/featureGates.js";
 const NUDGE_COPY = {
   patternCap: {
     headline: "Your pattern box is full",
-    body: "Craft gives you a much larger library. Add far more patterns than Free.",
+    body: "Craft holds up to 100 patterns. Room to save nearly everything you make.",
   },
   bevCheck: {
     headline: "Bev checked this pattern",
