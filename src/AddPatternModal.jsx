@@ -66,6 +66,29 @@ const uploadPatternFile = async (file, onProgress) => {
   }
 };
 
+// Mark a reserved ('preparing') import job as failed. Used when the client
+// dies between reserving the row and finalizing it — a bad PDF, a dropped
+// connection. Without this the row would sit in 'preparing' until the 15-min
+// cron sweep reaps it, and the pill would spin the whole time. RLS confines
+// the PATCH to the caller's own row. Best-effort: never throws.
+const failJob = async (jobId, userToken, message) => {
+  if (!jobId || !userToken) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/import_jobs?id=eq.${jobId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${userToken}`,
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({ status: 'failed', error_message: message }),
+    });
+  } catch (e) {
+    console.warn('[Wovely] failJob best-effort PATCH failed:', e?.message);
+  }
+};
+
 // Extract pattern data from PDF/image using Gemini
 // Convert File to base64 (used for images only, not PDFs)
 const fileToBase64 = (file) => new Promise((resolve, reject) => {
@@ -912,6 +935,11 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
   const [pollingJobId,setPollingJobId]=useState(initialPollingJobId||null);
   const pollingJobIdRef=useRef(initialPollingJobId||null);
   useEffect(()=>{pollingJobIdRef.current=pollingJobId;},[pollingJobId]);
+  // Non-null ONLY while this tab holds the sole copy of the extracted PDF text
+  // (job reserved as 'preparing', not yet finalized). Drives the beforeunload
+  // guard. A ref, not state: the beforeunload handler must read it synchronously
+  // and we never want it to trigger a re-render.
+  const clientOwnedJobRef=useRef(null);
   // Pill-resume mount: announce extracting so the modal's backdrop logic
   // knows we're in the loading state right away, before any in-modal upload.
   useEffect(()=>{if(initialPollingJobId)onExtractionStart?.();
@@ -972,6 +1000,8 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
   },[pollingJobId,polling.isComplete,polling.isFailed]);
   // Unmount-only: if we still have an active polling job (user navigated
   // away during extraction), hand off to ImportPill so the import survives.
+  // This now fires for 'preparing' jobs too — the row is reserved before the
+  // slow local PDF read, so in-app navigation is safe from second one.
   useEffect(()=>{
     return ()=>{
       if(pollingJobIdRef.current){
@@ -979,6 +1009,27 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
         if(intv2Ref.current) clearInterval(intv2Ref.current);
       }
     };
+  },[]);
+
+  // ── THE GUARD (2026-07-14) ──────────────────────────────────────────────
+  // Between reserving the job and finalizing it, the extracted PDF text exists
+  // ONLY in this tab. Navigating inside the app is fine (the tab lives on, the
+  // async read keeps going, the pill tracks it). Closing or reloading the tab
+  // kills the read, and nothing can recover it — the server never got the text.
+  //
+  // So we guard exactly that case, and nothing more. No route blocking: routing
+  // is genuinely safe now and warning about it would be a lie in the other
+  // direction. Cleared the instant finalize succeeds.
+  useEffect(()=>{
+    const onBeforeUnload=(e)=>{
+      if(!clientOwnedJobRef.current) return;
+      e.preventDefault();
+      // Browsers show their own generic text; returnValue just arms the prompt.
+      e.returnValue="Bev is still reading your pattern. Close this tab and the import is lost.";
+      return e.returnValue;
+    };
+    window.addEventListener("beforeunload",onBeforeUnload);
+    return ()=>window.removeEventListener("beforeunload",onBeforeUnload);
   },[]);
   const [showFullReport,setShowFullReport]=useState(false);
   const [matExpanded,setMatExpanded]=useState(false);
@@ -1062,60 +1113,133 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
       let result;let extractedText=null;
       try{
         if(isPDF){
-          console.log("[Wovely] Using pdf.js text extraction for PDF...");
-          const {text:pdfText,metadataTitle:pdfMetaTitle}=await extractTextFromPDF(f);extractedText=pdfText;
-
-          // Queue path (S65 Task 2): post the job, keep this modal mounted,
-          // and poll job-status from the in-modal effect above. On completion
-          // the form flips to its review stage in place. If the user
-          // navigates away mid-import the unmount-only cleanup hands off to
-          // ImportPill. The PILL is the navigate-away fallback, not the
-          // default handoff. TODO(S66): remove inline extract-pattern path
-          // entirely once queue path is the only one in use.
-          {
-            const session = getSession();
-            const userToken = session?.access_token;
-            if (userToken && uploaded?.url) {
-              try {
-                const jobRes = await fetch('/api/import-job', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userToken}` },
-                  body: JSON.stringify({ file_url: uploaded.url, file_type: 'pdf', raw_text: pdfText, cover_image_url: coverCloudinaryUrl || null, pdf_metadata_title: pdfMetaTitle || null }),
-                });
-                if (jobRes.ok) {
-                  const { job_id } = await jobRes.json();
-                  setPollingJobId(job_id);
-                  return; // intervals + stage="extracting" stay running; polling effect transitions to review
-                }
-                const errBody = await jobRes.json().catch(() => ({}));
-                console.error('[Wovely] Queue POST failed:', jobRes.status, errBody);
+          // ── Queue path — RESERVE FIRST, THEN READ (2026-07-14) ───────────
+          // This used to run extractTextFromPDF() first and only POST the job
+          // afterwards. On an 87-page pattern that is up to 4 minutes with NO
+          // job row in existence: ImportPill had nothing to attach to, and
+          // navigating away destroyed the import without a trace. Verified on
+          // production.
+          //
+          // Now the row is reserved the moment the file is in Storage
+          // (status='preparing'), so the pill exists from second one and the
+          // user can move around the app immediately. We then read the PDF
+          // locally and FINALIZE the job with the text, which flips it to
+          // 'pending' and releases it to the worker.
+          //
+          // The tab must stay OPEN until finalize — the extracted text lives
+          // only in this browser until then. clientOwnedJobRef drives the
+          // beforeunload guard that says so.
+          const session = getSession();
+          const userToken = session?.access_token;
+          if (userToken && uploaded?.url) {
+            let reservedJobId = null;
+            try {
+              const reserveRes = await fetch('/api/import-job', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userToken}` },
+                body: JSON.stringify({ file_url: uploaded.url, file_type: 'pdf', cover_image_url: coverCloudinaryUrl || null }),
+              });
+              if (!reserveRes.ok) {
+                const errBody = await reserveRes.json().catch(() => ({}));
+                console.error('[Wovely] Queue reserve failed:', reserveRes.status, errBody);
                 clearInterval(intv2);intv2Ref.current=null;
                 onExtractionEnd?.();
                 setStage('error');
-                // 402 from the chunked-import tier gate gets its own
-                // errorType so the error stage renders the upgrade nudge
-                // instead of the generic "stumped" retry copy.
-                if (jobRes.status === 402 && errBody.error === 'chunked_import_requires_paid_tier') {
-                  setErrorType('tier_gated_chunked');
-                  setErrorMsg(errBody.message || 'This pattern is a big one. Craft members get full support for complex patterns.');
+                if (reserveRes.status === 402) {
+                  setErrorType(errBody.error === 'chunked_import_requires_paid_tier' ? 'tier_gated_chunked' : 'extraction_failed');
+                  setErrorMsg(errBody.message || 'This pattern needs a paid plan.');
                 } else {
                   setErrorType('extraction_failed');
                   setErrorMsg(errBody.error || 'We couldn’t start your import. Try again.');
                 }
                 return;
-              } catch (queueErr) {
-                console.error('[Wovely] Queue POST exception:', queueErr.message);
-                clearInterval(intv2);intv2Ref.current=null;
-                onExtractionEnd?.();
-                setStage('error');
-                setErrorType('server_hiccup');
-                setErrorMsg('We couldn’t reach the import service. Try again.');
-                return;
               }
+              const reserved = await reserveRes.json();
+              reservedJobId = reserved.job_id;
+              console.log('[Wovely] Import job reserved (preparing):', reservedJobId);
+              // Pill/polling attach NOW, before the slow local read. If the
+              // user navigates away from here on, the import survives.
+              clientOwnedJobRef.current = reservedJobId;
+              setPollingJobId(reservedJobId);
+            } catch (reserveErr) {
+              console.error('[Wovely] Queue reserve exception:', reserveErr.message);
+              clearInterval(intv2);intv2Ref.current=null;
+              onExtractionEnd?.();
+              setStage('error');
+              setErrorType('server_hiccup');
+              setErrorMsg('We couldn’t reach the import service. Try again.');
+              return;
             }
-            // Falls through to inline extraction below if no session / no upload URL —
-            // shouldn't happen in normal flow, kept as deprecated safety net.
+
+            // The slow part. The job already exists, so this is now covered.
+            console.log("[Wovely] Using pdf.js text extraction for PDF...");
+            let pdfText, pdfMetaTitle;
+            try {
+              const out = await extractTextFromPDF(f);
+              pdfText = out.text; pdfMetaTitle = out.metadataTitle;
+            } catch (readErr) {
+              console.error('[Wovely] PDF read failed:', readErr?.message);
+              clientOwnedJobRef.current = null;
+              await failJob(reservedJobId, userToken, "Bev couldn't read that PDF. Try re-saving or re-exporting it.");
+              clearInterval(intv2);intv2Ref.current=null;
+              setPollingJobId(null);
+              onExtractionEnd?.();
+              setStage('error');
+              setErrorType('extraction_failed');
+              setErrorMsg("Bev couldn't read that PDF. Try re-saving or re-exporting it.");
+              return;
+            }
+            extractedText = pdfText;
+
+            // FINALIZE — hand the text to the server. From here the work is
+            // durable: the tab can close, the worker owns it.
+            try {
+              const finRes = await fetch('/api/import-job', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userToken}` },
+                body: JSON.stringify({ job_id: reservedJobId, raw_text: pdfText, pdf_metadata_title: pdfMetaTitle || null }),
+              });
+              clientOwnedJobRef.current = null; // server owns it now (or it failed)
+              if (finRes.ok) {
+                console.log('[Wovely] Import job finalized → pending:', reservedJobId);
+                return; // polling effect drives the rest, in modal or in pill
+              }
+              const errBody = await finRes.json().catch(() => ({}));
+              console.error('[Wovely] Queue finalize failed:', finRes.status, errBody);
+              clearInterval(intv2);intv2Ref.current=null;
+              setPollingJobId(null);
+              onExtractionEnd?.();
+              setStage('error');
+              // 402 from the chunked-import tier gate gets its own errorType so
+              // the error stage renders the upgrade nudge instead of the
+              // generic "stumped" retry copy. The API already marked the row
+              // failed, so there is no ghost job left behind.
+              if (finRes.status === 402 && errBody.error === 'chunked_import_requires_paid_tier') {
+                setErrorType('tier_gated_chunked');
+                setErrorMsg(errBody.message || 'This pattern is a big one. Craft members get full support for complex patterns.');
+              } else {
+                setErrorType('extraction_failed');
+                setErrorMsg(errBody.error || 'We couldn’t start your import. Try again.');
+              }
+              return;
+            } catch (finErr) {
+              console.error('[Wovely] Queue finalize exception:', finErr.message);
+              clientOwnedJobRef.current = null;
+              await failJob(reservedJobId, userToken, 'The import was interrupted. Try again.');
+              clearInterval(intv2);intv2Ref.current=null;
+              setPollingJobId(null);
+              onExtractionEnd?.();
+              setStage('error');
+              setErrorType('server_hiccup');
+              setErrorMsg('We couldn’t reach the import service. Try again.');
+              return;
+            }
           }
+
+          // No session / no upload URL — shouldn't happen in normal flow.
+          // Deprecated inline safety net below still needs the text.
+          console.log("[Wovely] Using pdf.js text extraction for PDF (inline fallback)...");
+          const {text:pdfText}=await extractTextFromPDF(f);extractedText=pdfText;
 
           // Detect complexity from page count + text density
           const pageMatches=(pdfText.match(/--- PAGE \d+ ---/g)||[]).length;
@@ -1299,6 +1423,18 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
       ? (PHASE_STEP[polling.currentPhase] ?? 0)
       : (STEP_STAGE[stage] ?? 0);
     const STEPS = ["Reading the source","Finding parts, rows & materials","BevCheck — validating accuracy","Tucking the original into your Vault"];
+    // Say who is holding the work, and say it truthfully.
+    //   preparing → this tab is reading the file. Moving around the app is
+    //               safe (the pill follows you), closing the tab is not.
+    //   pending/processing → the server owns it. The tab is now disposable.
+    //   no job yet (upload in flight, or the legacy sync path) → promise
+    //               nothing. We used to say "we'll keep your place" here while
+    //               keeping nothing at all.
+    const reassurance = polling.isClientOwned
+      ? "Keep this tab open while Bev reads the file. You can move around the app."
+      : (pollingJobId && polling.isActive)
+        ? REASSURANCE_LINE
+        : "Getting your file into the Vault…";
     const gaugeScore = typeof validationReport?.score === "number" ? validationReport.score : null;
     const gaugePhase = validationReport ? "done" : (bevCheckFailed ? "idle" : (activeStep >= 2 ? "checking" : "idle"));
     const gaugeNote = validationReport
@@ -1310,7 +1446,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
       <style>{`@keyframes bevbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}@keyframes fadeInMsg{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
       <img src="/bev-hero.png" alt="Bev reading your pattern" style={{width:96,filter:"drop-shadow(0 12px 18px rgba(90,66,160,.32))",animation:"bevbob 2.2s ease-in-out infinite"}}/>
       <div key={loadingInfo.headline} style={{fontFamily:"'Fredoka','Segoe UI',sans-serif",fontSize:26,fontWeight:600,color:"#2E2748",marginTop:18,lineHeight:1.15,animation:"fadeInMsg .4s ease both"}}>Bev's reading your pattern…</div>
-      <div style={{fontWeight:700,fontSize:14.5,color:"#726A92",marginTop:6}}>{elapsedLabel ? `Under a minute — we'll keep your place. · ${elapsedLabel}` : "Under a minute — we'll keep your place."}</div>
+      <div style={{fontWeight:700,fontSize:14.5,color:"#726A92",marginTop:6}}>{reassurance}{elapsedLabel ? ` · ${elapsedLabel}` : ""}</div>
       <div style={{width:"100%",maxWidth:390,marginTop:22,display:"flex",justifyContent:"center"}}>
         <ScanGauge phase={gaugePhase} score={gaugeScore} state={validationReport?deriveState(validationReport):null} note={gaugeNote}/>
       </div>

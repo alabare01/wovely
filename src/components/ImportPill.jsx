@@ -77,7 +77,7 @@ export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) 
     onMissing: () => { setActiveImportJob(null); setJobId(null); },
   });
 
-  const { job, currentPhase, phaseElapsed, totalElapsed, isComplete, isFailed, isActive, validationReport, extractedData, coverImageUrl, fileType, fileUrl, retryCount, extractionMethod, errorMessage } = polling;
+  const { job, currentPhase, phaseElapsed, totalElapsed, isComplete, isFailed, isActive, isClientOwned, validationReport, extractedData, coverImageUrl, fileType, fileUrl, retryCount, extractionMethod, errorMessage } = polling;
 
   // Detect the completed transition to set the prominent pulse window.
   useEffect(() => {
@@ -137,8 +137,16 @@ export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) 
 
   let title, sub, subAllowsWrap = false, ringSpinning = false;
   if (isActive) {
-    title = phaseCopy || "Bev's on it...";
-    sub = REASSURANCE_LINE;
+    // While the job is 'preparing', THIS TAB is still reading the PDF and holds
+    // the only copy of the text. The pill follows the user around the app, so
+    // navigation is safe — but a tab close would lose it, and the old blanket
+    // "close this if you like" line would have been a lie. Say the true thing.
+    // Once the worker has the text (pending/processing), the tab is disposable
+    // and the standard reassurance is honest again.
+    title = isClientOwned ? "Reading your file..." : (phaseCopy || "Bev's on it...");
+    sub = isClientOwned
+      ? "Keep this tab open — Bev's still reading. Wander the app all you like."
+      : REASSURANCE_LINE;
     subAllowsWrap = true;
     ringSpinning = true;
   } else if (isComplete) {

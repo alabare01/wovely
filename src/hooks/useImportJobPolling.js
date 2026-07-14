@@ -75,6 +75,11 @@ export function useImportJobPolling(jobId, { onMissing } = {}) {
   // they only care about phase change, not elapsed seconds.
   const derived = useMemo(() => {
     const status = job?.status || null;
+    // 'preparing' = row reserved, but THIS BROWSER is still extracting the PDF
+    // text and hasn't handed it to the server yet. The work is not yet durable:
+    // navigating within the app is fine (the tab stays alive), closing the tab
+    // is not. Everything downstream keys off isClientOwned to say so honestly.
+    const isPreparing = status === "preparing";
     const isPending = status === "pending";
     const isProcessing = status === "processing";
     const isComplete = status === "completed";
@@ -93,9 +98,14 @@ export function useImportJobPolling(jobId, { onMissing } = {}) {
     return {
       job,
       status,
+      isPreparing,
       isPending,
       isProcessing,
-      isActive: isPending || isProcessing,
+      isActive: isPreparing || isPending || isProcessing,
+      // True while the browser still holds the only copy of the extracted text.
+      // Consumers use this to (a) warn before a tab close and (b) avoid
+      // promising "close this and we'll carry on" before it is true.
+      isClientOwned: isPreparing,
       isComplete,
       isFailed,
       currentPhase,

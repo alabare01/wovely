@@ -155,6 +155,14 @@ const EXTRACTION_TIMEOUT_MS = 300_000;
 // Stuck-in-processing sweep: rows whose updated_at hasn't moved in this
 // window are treated as orphans (crash / function timeout).
 const STUCK_PROCESSING_WINDOW_MS = 5 * 60 * 1000;
+// Abandoned-'preparing' sweep. A 'preparing' row is one the browser reserved
+// before it started pdf.js text extraction; the browser owns it until it
+// FINALIZEs. If the tab is closed mid-extraction nobody will ever finalize it,
+// so it would sit in 'preparing' forever. 15 minutes is far past the slowest
+// client extraction we have measured (~4 min on an 87-page pattern) — anything
+// older than that lost its browser. There is no retry: the raw text only ever
+// existed in that tab, so the user has to re-upload.
+const ABANDONED_PREPARING_WINDOW_MS = 15 * 60 * 1000;
 
 function captureServerEvent({ posthogKey, distinctId, event, properties }) {
   if (!posthogKey || !distinctId) return;
@@ -271,6 +279,39 @@ export default async function handler(req, res) {
     }
   } else {
     console.error('[sweep] stuck-list query failed:', stuckListRes.status);
+  }
+
+  // ── Sweep: reap 'preparing' rows whose browser never came back. ─────────
+  // The client reserves the row, then extracts PDF text locally and FINALIZEs.
+  // A closed tab mid-extraction means nobody will ever finalize. Fail these
+  // honestly rather than leaving a ghost job the pill would poll forever.
+  const abandonedCutoff = new Date(Date.now() - ABANDONED_PREPARING_WINDOW_MS).toISOString();
+  const abandonedRes = await fetch(
+    `${supabaseUrl}/rest/v1/import_jobs?status=eq.preparing&updated_at=lt.${encodeURIComponent(abandonedCutoff)}&select=id`,
+    { headers: supaHeaders }
+  );
+  if (abandonedRes.ok) {
+    const abandoned = await abandonedRes.json();
+    if (Array.isArray(abandoned) && abandoned.length > 0) {
+      for (const row of abandoned) {
+        await fetch(`${supabaseUrl}/rest/v1/import_jobs?id=eq.${row.id}`, {
+          method: 'PATCH',
+          headers: { ...supaHeaders, 'Prefer': 'return=minimal' },
+          body: JSON.stringify({
+            status: 'failed',
+            error_message: 'Import was interrupted before Bev finished reading the file. Upload it again.',
+          }),
+        });
+      }
+      console.log(`[sweep] failed ${abandoned.length} abandoned 'preparing' jobs`);
+      logToVercelLogs({
+        supabaseUrl, serviceKey, level: 'warn',
+        message: `[sweep] failed ${abandoned.length} abandoned 'preparing' jobs`,
+        status_code: 200,
+      });
+    }
+  } else {
+    console.error('[sweep] abandoned-preparing query failed:', abandonedRes.status);
   }
 
   // Fetch pending rows (oldest first). The retry_count filter is a defensive
