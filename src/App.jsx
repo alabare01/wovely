@@ -2215,8 +2215,13 @@ export default function Wovely() {
     try { intent = sessionStorage.getItem("wovely_first_run_intent"); sessionStorage.removeItem("wovely_first_run_intent"); } catch {}
     if (intent === "starter") { setStarterError(false); setFirstRunMode("gallery"); }
     else if (intent === "import") {
-      setMenuAnchor({ top: 96, left: Math.max(12, window.innerWidth / 2 - 110) });
-      setAddMenuOpen(true);
+      // Route straight to the 2b "Add a pattern" hub, NOT the legacy emoji
+      // popover (QC 2026-07-12, Blocker 2). Same state the topbar Add button
+      // and the /hive-vision route drive, so every entry point lands on one
+      // picker. Setters are declared above; safe to call from this effect.
+      setPendingImportUrl(null);
+      setPendingMethod(null);
+      setAddOpen(true);
     }
   }, [anonymousMode]);
   // AuthWallModal global state — the gateAction helper (below) routes anonymous users here
@@ -2709,13 +2714,17 @@ export default function Wovely() {
     if (!inContext) { setPinnedImage(null); setPinnedLightboxOpen(false); }
   }, [view, selectedCollection?.id, selected, pinnedImage]);
 
-  // /hive-vision route: open add-pattern modal (Snap & Stitch tab) and redirect to /hive
+  // /hive-vision route: open add-pattern modal (Snap & Stitch tab) and redirect to /hive.
+  // Guests count too — anonymous mode is a real session (ANON_PATTERN_CAP=1) and
+  // /hive-vision is the public Snap & Stitch entry point. Gating on `authed`
+  // alone left guests on a blank shell with no content (found in the 7/14
+  // render pass, screenshot 06).
   useEffect(()=>{
-    if(view==="hive-vision"&&authed){
+    if(view==="hive-vision"&&(authed||anonymousMode)){
       setAddOpen(true);
       navigate("/",{replace:true});
     }
-  },[view,authed]);
+  },[view,authed,anonymousMode]);
 
   const checkUpgradeIntent=async()=>{
     if(localStorage.getItem("yh_upgrade_intent")!=="true") return;
