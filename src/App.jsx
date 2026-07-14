@@ -1313,7 +1313,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
           </div>
         : <div style={{...SECTION,background:`linear-gradient(135deg,${T.accent},${T.accentD})`,border:"none"}}>
             <div style={{fontSize:14,fontWeight:700,color:"#fff",marginBottom:4}}>✨ Upgrade your plan</div>
-            <div style={{fontSize:12,color:"rgba(255,255,255,.75)",lineHeight:1.5,marginBottom:12}}>Craft gives you big imports, a large library, Collections, and BevCheck.</div>
+            <div style={{fontSize:12,color:"rgba(255,255,255,.75)",lineHeight:1.5,marginBottom:12}}>Craft gives you big imports, up to 100 patterns, Collections, and BevCheck.</div>
             <div onClick={onOpenProModal} style={{background:"rgba(255,255,255,.2)",borderRadius:10,padding:"10px",textAlign:"center",fontSize:14,fontWeight:700,color:"#fff",cursor:"pointer"}}>See plans</div>
           </div>
       }
