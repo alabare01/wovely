@@ -4,9 +4,11 @@
 //   STRIPE_SECRET_KEY            — from Stripe dashboard
 //   STRIPE_WEBHOOK_SECRET        — from Stripe webhook endpoint config
 //   STRIPE_CRAFT_PRICE_ID        — recurring price for the $6.99/mo Craft tier;
-//                                  matched to derive tier. The $59.99/yr annual
-//                                  price resolves to Craft via fallback, so the
-//                                  webhook doesn't need the annual price id.
+//                                  matched to derive tier. The $54.99/yr annual
+//                                  price (canon) resolves to Craft via fallback,
+//                                  so the webhook doesn't need the annual price id.
+//                                  Annual checkout reads STRIPE_CRAFT_ANNUAL_PRICE_ID
+//                                  (see api/stripe-checkout.js) — this file never does.
 //   SUPABASE_SERVICE_ROLE_KEY — bypasses RLS so we can write tier on any row
 //   VITE_SUPABASE_URL      — Supabase project URL
 //
