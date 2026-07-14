@@ -154,7 +154,9 @@ const useTier = (tier, userCount, starterCount=0) => {
 const CSS = () => (
   <style>{`
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; }
+    /* Deliberately no height:100% on html/body here. It clamps the document to one
+       viewport and, with the overflow-x guard, makes BODY the scroll container on
+       iOS Safari, so the page will not scroll past the fold. See src/index.css. */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #EAE0D5; border-radius: 99px; }

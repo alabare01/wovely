@@ -33,7 +33,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      html, body { height: 100%; background: transparent; -webkit-font-smoothing: antialiased; }
+      /* No height:100% on html/body: it clamps the document to one viewport and, with
+         the overflow-x guard in index.css, makes BODY the scroll container on iOS
+         Safari, so the page will not scroll past the fold on a phone. */
+      html, body { background: transparent; -webkit-font-smoothing: antialiased; }
       body { display: flex; }
       #root { width: 100%; min-height: 100vh; }
     </style>
