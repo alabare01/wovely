@@ -15,8 +15,13 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseAuth, getSession } from "./sup
      fo_comments       → comments (fo_id, user_id, author_name, avatar_color, body)
    RLS: public read, authed insert/delete own. Guests can browse; love/comment
    route to sign-in. Counts are read client-side (low volume, pre-launch).
-   `demo` injects the reference makes for visual verification; with no rows the
-   feed shows the Bev-led empty state (the real launch reality).
+
+   2026-07-14 — NO FABRICATED SOCIAL PROOF. The demo posts, the seeded
+   Noticeboard entries ("Marisol shared Mellow the Manatee · 48 Lovelies"),
+   the hardcoded weekly-theme count of 12, and the `makers || 36` fallback in
+   the stat card are all gone. Every name, number and event on this surface is
+   read from Supabase or it is not shown. With an empty table the Circle reads
+   as an open invitation, not a party that already happened.
    NOTE: "Share a Lovely" (composing a finished make w/ photo + pattern) opens
    the existing add flow for now — the dedicated share composer is a follow-up.
    ──────────────────────────────────────────────────────────────────────────── */
@@ -41,36 +46,51 @@ const apiHeaders = () => {
   return { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${s?.access_token || SUPABASE_ANON_KEY}`, "Content-Type": "application/json" };
 };
 
-const WEEKLY_THEME = { title: "Tiny & Round", blurb: "Share a palm-sized make by Sunday. Bev picks a favorite Monday morning.", count: 12 };
-const NOTICE = [
-  { icon: "sparkle", t: "The Yarn Circle is open", s: "New from Wovely: share finished makes, send Lovelies" },
-  { icon: "heart", t: "Marisol shared Mellow the Manatee", s: "2h ago · Bev's pick · 48 Lovelies" },
-  { icon: "clock", t: "Weekly theme ends Sunday", s: "Tiny & Round · 12 makes in · pick is Monday AM" },
-];
+/* Bev's weekly theme is an editorial prompt, not a statistic. It carries no
+   invented participation count — the "so far" number is computed from the real
+   feed in makesThisWeek() below and is only ever rendered when it is > 0.
+   HARD RULE (2026-07-14): nothing in the Yarn Circle may display a number, a
+   name, or an event that did not come out of Supabase. No demo posts, no
+   seeded Lovelies, no fictional makers. This is a trust surface. */
+const WEEKLY_THEME = { title: "Tiny & Round", blurb: "Share a palm-sized make by Sunday. Bev picks a favourite on Monday." };
 
-const DEMO_POSTS = [
-  { id: "p1", maker_name: "Marisol", avatar_color: "coral", meta: "2h ago · Frankfort, MI", is_pick: true, is_own: false, tint: TINTS[0],
-    pattern_id: "demo-manatee", pattern_title: "Mellow the Manatee",
-    caption: "finally finished! The color changes fought me but Bev's row counter kept me honest. So squishy.",
-    yarn_label: "Worsted · seafoam", hook_label: "4.0mm hook", love_count: 48, loved_by_me: false, comment_count: 6,
-    comments: [
-      { author_name: "Bev", avatar_color: "accent", isBev: true, body: "The seafoam gradient is chef's kiss. Adding you to Monday's shortlist." },
-      { author_name: "Jen", avatar_color: "sky", body: "Okay this is the third manatee I've seen today and now I need one." },
-    ] },
-  { id: "p2", maker_name: "Adam", avatar_color: "accent", meta: "Yesterday · your make", is_pick: false, is_own: true, tint: TINTS[1],
-    pattern_id: "demo-mushroom", pattern_title: "Button the Mushroom",
-    caption: "first amigurumi off the hook. The magic ring took four tries. Worth it.",
-    yarn_label: "Worsted · brick red", hook_label: "3.5mm hook", love_count: 9, loved_by_me: false, comment_count: 2,
-    comments: [
-      { author_name: "Priya", avatar_color: "mint", body: "The little face! Instant serotonin." },
-      { author_name: "Bev", avatar_color: "accent", isBev: true, body: "First one off the hook and it is this clean? Show-off (proud of you)." },
-    ] },
-  { id: "p3", maker_name: "Priya", avatar_color: "mint", meta: "2 days ago", is_pick: false, is_own: false, tint: TINTS[2],
-    pattern_id: "demo-honeybee", pattern_title: "Buzz the Honeybee",
-    caption: "made for my niece. She named him before the wings were done.",
-    yarn_label: "DK · marigold", hook_label: "3.0mm hook", love_count: 21, loved_by_me: false, comment_count: 1,
-    comments: [{ author_name: "Marisol", avatar_color: "coral", body: "Naming it before it's done is the whole hobby honestly." }] },
-];
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const makesThisWeek = (posts) => posts.filter(p => p.created_at && (Date.now() - new Date(p.created_at).getTime()) < WEEK_MS).length;
+
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+/* Noticeboard items, derived entirely from the real feed. With an empty feed we
+   invite the first make instead of manufacturing a crowd. */
+function buildNotices(posts) {
+  const items = [{ icon: "sparkle", t: "The Yarn Circle is open", s: "Share a finished make, send Lovelies, cheer someone on." }];
+
+  if (!posts.length) {
+    items.push({ icon: "heart", t: "No makes shared yet", s: "The first one off the hook gets Bev's first Lovely." });
+    items.push({ icon: "clock", t: `Bev's weekly theme: ${WEEKLY_THEME.title}`, s: `${WEEKLY_THEME.blurb} Be the one who starts it.` });
+    return items;
+  }
+
+  const latest = posts[0];
+  const latestBits = [latest.meta].filter(Boolean);
+  if (latest.love_count > 0) latestBits.push(plural(latest.love_count, "Lovely", "Lovelies"));
+  items.push({
+    icon: "heart",
+    t: `${latest.maker_name} shared ${latest.pattern_title || "a finished make"}`,
+    s: latestBits.join(" · "),
+  });
+
+  const pick = posts.find(p => p.is_pick);
+  if (pick) items.push({ icon: "sparkle", t: `Bev's pick: ${pick.pattern_title || "a finished make"}`, s: `by ${pick.maker_name}` });
+
+  const week = makesThisWeek(posts);
+  items.push({
+    icon: "clock",
+    t: `Bev's weekly theme: ${WEEKLY_THEME.title}`,
+    s: week > 0 ? `${plural(week, "make", "makes")} in so far · pick is Monday` : `${WEEKLY_THEME.blurb} Nothing in yet — go first.`,
+  });
+
+  return items;
+}
 
 /* ── icons ── */
 const svg = (p, sw = 1.9) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round">{p}</svg>);
@@ -226,24 +246,28 @@ function ComposeBar({ empty, onShare }) {
     </div>
   );
 }
-function ThemeBanner({ theme, onShare }) {
+function ThemeBanner({ theme, posts, onShare }) {
+  // Real count only. Zero is not dressed up as a crowd — it is an invitation.
+  const week = makesThisWeek(posts);
+  const tail = week > 0 ? ` · ${plural(week, "make", "makes")} in so far.` : " Nothing in yet, so first one sets the bar.";
   return (
     <div style={{ ...card, display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", marginTop: 14, background: "linear-gradient(100deg,#F1EBFF,#FBEEF0)" }}>
       <BevAvatar size={44} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontFamily: T.disp, fontWeight: 600, fontSize: 16, color: T.ink }}>Bev's weekly theme: {theme.title}</div>
-        <div style={{ fontSize: 12.5, color: T.muted, fontWeight: 700, lineHeight: 1.45, marginTop: 1 }}>{theme.blurb} · {theme.count} in so far.</div>
+        <div style={{ fontSize: 12.5, color: T.muted, fontWeight: 700, lineHeight: 1.45, marginTop: 1 }}>{theme.blurb}{tail}</div>
       </div>
       <button onClick={onShare} style={{ ...pill, border: "none", background: T.accentD, color: "#fff", fontSize: 13, padding: "10px 17px", flex: "none" }}>Join in</button>
     </div>
   );
 }
-function Noticeboard() {
+function Noticeboard({ posts }) {
+  const notices = buildNotices(posts);
   return (
     <div style={{ ...card, padding: "16px 17px" }}>
       <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", color: T.muted, marginBottom: 12 }}>The Noticeboard</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-        {NOTICE.map((n, i) => (
+        {notices.map((n, i) => (
           <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start" }}>
             <span style={{ width: 30, height: 30, borderRadius: 9, flex: "none", background: T.soft, color: T.accent, display: "flex", alignItems: "center", justifyContent: "center" }}>{typeof IC[n.icon] === "function" ? IC[n.icon]() : IC[n.icon]}</span>
             <div style={{ minWidth: 0 }}>
@@ -257,9 +281,25 @@ function Noticeboard() {
   );
 }
 function StatCard({ posts }) {
+  // Every number here is counted off the real feed. The old `makers || 36`
+  // fallback invented 36 makers next to 0 makes and 0 Lovelies — removed.
   const loves = posts.reduce((s, p) => s + (p.love_count || 0), 0);
-  const makers = new Set(posts.map(p => p.maker_name)).size;
-  const stats = [[posts.length, "makes shared"], [loves, "Lovelies sent"], [makers || 36, "makers"]];
+  const makers = new Set(posts.map(p => p.maker_name).filter(Boolean)).size;
+
+  // A row of three zeros reads as a dead room. Say the true thing warmly instead.
+  if (!posts.length) {
+    return (
+      <div style={{ ...card, padding: "16px 17px", marginTop: 14 }}>
+        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", color: T.muted, marginBottom: 10 }}>This week in the Circle</div>
+        <div style={{ fontSize: 13, color: T.ink, fontWeight: 800, lineHeight: 1.4 }}>Quiet so far.</div>
+        <div style={{ fontSize: 12.5, color: T.muted, fontWeight: 700, lineHeight: 1.5, marginTop: 4 }}>
+          The Circle opened this week and nobody has shared yet. Whoever goes first sets the tone for everyone after them, and Bev is watching for it.
+        </div>
+      </div>
+    );
+  }
+
+  const stats = [[posts.length, "makes shared"], [loves, "Lovelies sent"], [makers, makers === 1 ? "maker" : "makers"]];
   return (
     <div style={{ ...card, padding: "16px 17px", marginTop: 14 }}>
       <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", color: T.muted, marginBottom: 12 }}>This week in the Circle</div>
@@ -290,15 +330,15 @@ function EmptyState({ onShare }) {
   );
 }
 
-export default function YarnCircle({ isDesktop, isTablet, authed, isAnonymous, demo, onShare, onOpenPattern, onSignIn }) {
+export default function YarnCircle({ isDesktop, isTablet, authed, isAnonymous, onShare, onOpenPattern, onSignIn }) {
   const canInteract = !!authed && !isAnonymous;
-  const [posts, setPosts] = useState(demo ? DEMO_POSTS : []);
-  const [loading, setLoading] = useState(!demo);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const twoCol = !!isDesktop;
 
   // Fetch the real feed: finished_objects + fo_likes (counts + my-likes) + comment counts.
+  // There is no demo/seed path any more — an empty table renders the empty state.
   useEffect(() => {
-    if (demo) return;
     let alive = true;
     (async () => {
       try {
@@ -316,6 +356,7 @@ export default function YarnCircle({ isDesktop, isTablet, authed, isAnonymous, d
         for (const c of coms) comCount[c.fo_id] = (comCount[c.fo_id] || 0) + 1;
         const mapped = (rows || []).map(r => ({
           id: r.id, maker_name: r.maker_name || "A maker", avatar_initial: initialOf(r.maker_name), avatar_color: r.avatar_color || "accent",
+          created_at: r.created_at,
           meta: relTime(r.created_at) + (uid && r.user_id === uid ? " · your make" : ""), is_pick: !!r.is_pick, is_own: !!(uid && r.user_id === uid),
           photo_url: r.photo_url || null, tint: tintFor(r.id), pattern_id: r.pattern_id || null, pattern_title: r.pattern_title || null,
           caption: r.caption || "", yarn_label: r.yarn_label || null, hook_label: r.hook_label || null,
@@ -325,31 +366,30 @@ export default function YarnCircle({ isDesktop, isTablet, authed, isAnonymous, d
       } catch { if (alive) { setPosts([]); setLoading(false); } }
     })();
     return () => { alive = false; };
-  }, [demo]);
+  }, []);
 
   const handleLove = useCallback((post, next) => {
-    if (demo || !canInteract) return;
+    if (!canInteract) return;
     const uid = supabaseAuth.getUser()?.id; if (!uid) return;
     if (next) fetch(`${SUPABASE_URL}/rest/v1/fo_likes`, { method: "POST", headers: { ...apiHeaders(), Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ fo_id: post.id, user_id: uid }) }).catch(() => {});
     else fetch(`${SUPABASE_URL}/rest/v1/fo_likes?fo_id=eq.${post.id}&user_id=eq.${uid}`, { method: "DELETE", headers: apiHeaders() }).catch(() => {});
-  }, [demo, canInteract]);
+  }, [canInteract]);
 
   const handleComment = useCallback((post, body) => {
-    if (demo || !canInteract) return;
+    if (!canInteract) return;
     const user = supabaseAuth.getUser(); if (!user) return;
     fetch(`${SUPABASE_URL}/rest/v1/fo_comments`, { method: "POST", headers: { ...apiHeaders(), Prefer: "return=minimal" }, body: JSON.stringify({ fo_id: post.id, user_id: user.id, author_name: user.display_name || user.email?.split("@")[0] || "A maker", avatar_color: "sky", body }) }).catch(() => {});
-  }, [demo, canInteract]);
+  }, [canInteract]);
 
   const loadComments = useCallback(async (foId) => {
-    if (demo) return [];
     try {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/fo_comments?fo_id=eq.${foId}&select=author_name,avatar_color,body,created_at&order=created_at.asc`, { headers: apiHeaders() });
       return res.ok ? await res.json() : [];
     } catch { return []; }
-  }, [demo]);
+  }, []);
 
   const empty = !loading && posts.length === 0;
-  const rail = (<div style={{ position: twoCol ? "sticky" : "static", top: 84 }}><Noticeboard /><StatCard posts={posts} /></div>);
+  const rail = (<div style={{ position: twoCol ? "sticky" : "static", top: 84 }}><Noticeboard posts={posts} /><StatCard posts={posts} /></div>);
 
   return (
     <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 0 48px" }}>
@@ -361,7 +401,7 @@ export default function YarnCircle({ isDesktop, isTablet, authed, isAnonymous, d
         <div style={{ maxWidth: twoCol ? "none" : 680, margin: twoCol ? 0 : "0 auto" }}>
           {!twoCol && <div style={{ marginBottom: 14 }}>{rail}</div>}
           <ComposeBar empty={empty} onShare={onShare} />
-          <ThemeBanner theme={WEEKLY_THEME} onShare={onShare} />
+          <ThemeBanner theme={WEEKLY_THEME} posts={posts} onShare={onShare} />
           {loading
             ? <div style={{ ...card, marginTop: 14, padding: "48px 24px", textAlign: "center", color: T.muted, fontWeight: 700, fontSize: 14 }}>Gathering the circle…</div>
             : empty
