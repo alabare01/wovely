@@ -9,7 +9,13 @@
 // 50 Growth/(C) Win-Back Sequence - DRAFT 2026-07-14.md
 import fs from 'fs';
 
-const env = Object.fromEntries(fs.readFileSync('C:/Users/alaba/wovely/.env.local', 'utf8')
+// Env comes from the repo's own .env.local, whatever machine this runs on
+// (the old absolute C:/Users/alaba path only existed on one box). The script
+// needs SUPABASE_SERVICE_ROLE_KEY and RESEND_API_KEY, which the checked-out
+// .env.local may not carry - populate it first with:
+//   vercel env pull .env.local --environment=production
+const envFile = new URL('../.env.local', import.meta.url);
+const env = Object.fromEntries(fs.readFileSync(envFile, 'utf8')
   .split(/\r?\n/).filter(l => l.includes('=') && !l.startsWith('#'))
   .map(l => { const i = l.indexOf('='); return [l.slice(0, i).trim(), l.slice(i + 1).trim().replace(/^"|"$/g, '')]; }));
 const { VITE_SUPABASE_URL: SB, SUPABASE_SERVICE_ROLE_KEY: SVC, RESEND_API_KEY: RK } = env;
@@ -90,8 +96,15 @@ const cohort = users.filter(u =>
   !(u.last_sign_in_at && new Date(u.last_sign_in_at).getTime() > cutoff)
 );
 
-const firstName = (u) => (u.user_metadata?.full_name || u.user_metadata?.name || u.email.split('@')[0])
-  .split(/[\s.]+/)[0].replace(/^./, c => c.toUpperCase());
+// Greeting name. Only trust a real profile name; a name derived from the
+// email local-part produces "Hi Stinkyswife," / "Hi A," / the wrong half of
+// "mackay.amanda" - an automation tell in a letter that is supposed to read
+// human. No profile name -> "there" ("Hi there,").
+const firstName = (u) => {
+  const profileName = u.user_metadata?.full_name || u.user_metadata?.name;
+  if (!profileName) return 'there';
+  return profileName.split(/[\s.]+/)[0].replace(/^./, c => c.toUpperCase());
+};
 
 console.log(`TOTAL USERS: ${users.length}`);
 console.log(`COHORT (lapsed, excluding Adam/Danielle/last-7-day actives): ${cohort.length}`);
