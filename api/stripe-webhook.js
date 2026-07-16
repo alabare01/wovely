@@ -48,6 +48,22 @@ function getRawBody(req) {
   });
 }
 
+// Admin notification via Resend. Never fatal — a failed email must never
+// break the entitlement write or make Stripe retry the event.
+async function notifyAdmin(subject, text) {
+  if (!process.env.RESEND_API_KEY) { console.warn('[stripe-webhook] RESEND_API_KEY missing, notification skipped'); return; }
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: 'Wovely App <support@wovely.app>', to: 'adam@wovely.app', subject, text }),
+    });
+    if (!r.ok) console.error('[stripe-webhook] Resend error:', r.status, await r.text());
+  } catch (e) {
+    console.error('[stripe-webhook] notifyAdmin failed:', e.message);
+  }
+}
+
 async function setTierForUser(userId, tier, extra = {}) {
   const isPro = tier === 'pro' || tier === 'craft';
   const { error } = await supabase
@@ -118,6 +134,12 @@ export default async function handler(req, res) {
     } else {
       console.warn('[stripe-webhook] checkout.session.completed missing metadata.userId');
     }
+    const buyerEmail = session.customer_details?.email || session.customer_email || 'unknown email';
+    const amount = typeof session.amount_total === 'number' ? `$${(session.amount_total / 100).toFixed(2)}` : 'unknown amount';
+    await notifyAdmin(
+      `💸 Wovely purchase: ${buyerEmail} (${amount})`,
+      `Someone just paid for Wovely.\n\nEmail: ${buyerEmail}\nAmount: ${amount}\nTier: ${purchasedTier}\nSubscription: ${subscriptionId || 'n/a'}\nUser ID: ${userId || 'MISSING metadata.userId'}\nCheckout session: ${session.id}\n\n— Wovely`
+    );
   }
 
   // 2. Plan change (Pro ↔ Craft) — update tier from the new price.
@@ -138,6 +160,10 @@ export default async function handler(req, res) {
     const subscription = event.data.object;
     await setTierBySubscription(subscription.id, 'free');
     console.log('[stripe-webhook] tier=free (cancelled) for subscription:', subscription.id);
+    await notifyAdmin(
+      `📉 Wovely subscription cancelled: ${subscription.id}`,
+      `A Wovely subscription ended and the account dropped to free.\n\nSubscription: ${subscription.id}\nCustomer: ${subscription.customer}\n\n— Wovely`
+    );
   }
 
   if (_url && _key) {

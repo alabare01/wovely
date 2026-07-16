@@ -44,6 +44,12 @@ export default async function handler(req, res) {
     const record = req.body?.record || req.body;
     const { id, email, created_at } = record;
 
+    // Guest sessions INSERT an anonymous auth.users row (no email) — that is
+    // normal, not an error. The real signup arrives later as the UPDATE that
+    // sets the email (see the "notify-signup-email-set" trigger on auth.users).
+    if (id && !email) {
+      return res.status(200).json({ success: true, skipped: 'anonymous user, no email yet' });
+    }
     if (!id || !email) {
       console.error('[notify-signup] Missing id or email in payload:', JSON.stringify(req.body));
       return res.status(400).json({ error: 'Missing id or email' });
