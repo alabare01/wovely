@@ -107,6 +107,20 @@ const collectionIdFromPath = (pathname) => {
   return m ? decodeURIComponent(m[1]) : null;
 };
 
+// DB patterns row → local pattern shape. Shared by the login list fetch and
+// the /pattern/:id deep-link fallback fetch so the two can never drift.
+const mapDbPatternRow = (r) => ({
+  id:r.id,_supabaseId:r.id,title:r.title||"",cat:r.cat||"",source:r.source||"",source_url:r.source_url||"",
+  notes:r.notes||"",pattern_notes:r.pattern_notes||"",photo:r.cover_image_url||r.photo||r.image_url||"",cover_image_url:r.cover_image_url||null,hook:r.hook||r.hook_size||"",weight:r.weight||r.yarn_weight||"",
+  yardage:r.yardage||0,materials:r.materials||[],rows:(r.rows||[]).map(row=>({...row,done:!!row.done})),
+  rating:r.rating||0,skeins:r.skeins||0,skeinYards:r.skein_yards||200,
+  gauge:r.gauge||{stitches:12,rows:16,size:4},dimensions:r.dimensions||{},
+  status:r.status||"active",isStarter:!!r.is_starter,is_ai_generated:!!r.is_ai_generated,difficulty:r.difficulty||"",tags:r.tags||[],started:r.status==="in_progress",
+  source_file_url:r.source_file_url||"",source_file_name:r.source_file_name||"",source_file_type:r.source_file_type||"",
+  my_hook_size:r.my_hook_size||null,my_yarn_weight:r.my_yarn_weight||null,my_yardage:r.my_yardage||null,my_skeins:r.my_skeins||null,
+  collection_id:r.collection_id||null,is_collection_part:!!r.is_collection_part,collection_order:r.collection_order||0,
+});
+
 // sessionStorage key for the tier picked from TieredUpgradeModal before
 // signup. Survives remounts (OAuth round-trip, page reload during the
 // auth flow) so the post-signup auto-checkout finds the right tier.
@@ -2644,17 +2658,7 @@ export default function Wovely() {
           const data=await res.json();
           console.log("[Wovely] Pattern fetch count:", data.length, "titles:", data.map(r=>r.title));
           if(data.length>0){
-            const patterns=data.map(r=>({
-              id:r.id,_supabaseId:r.id,title:r.title||"",cat:r.cat||"",source:r.source||"",source_url:r.source_url||"",
-              notes:r.notes||"",pattern_notes:r.pattern_notes||"",photo:r.cover_image_url||r.photo||r.image_url||"",cover_image_url:r.cover_image_url||null,hook:r.hook||r.hook_size||"",weight:r.weight||r.yarn_weight||"",
-              yardage:r.yardage||0,materials:r.materials||[],rows:(r.rows||[]).map(row=>({...row,done:!!row.done})),
-              rating:r.rating||0,skeins:r.skeins||0,skeinYards:r.skein_yards||200,
-              gauge:r.gauge||{stitches:12,rows:16,size:4},dimensions:r.dimensions||{},
-              status:r.status||"active",isStarter:!!r.is_starter,is_ai_generated:!!r.is_ai_generated,difficulty:r.difficulty||"",tags:r.tags||[],started:r.status==="in_progress",
-              source_file_url:r.source_file_url||"",source_file_name:r.source_file_name||"",source_file_type:r.source_file_type||"",
-              my_hook_size:r.my_hook_size||null,my_yarn_weight:r.my_yarn_weight||null,my_yardage:r.my_yardage||null,my_skeins:r.my_skeins||null,
-              collection_id:r.collection_id||null,is_collection_part:!!r.is_collection_part,collection_order:r.collection_order||0,
-            }));
+            const patterns=data.map(mapDbPatternRow);
             // Backfill known patterns missing cover images
             const MARINA_COVER="https://res.cloudinary.com/dmaupzhcx/image/upload/v1774406086/l0rdxjgszsdkctqrnyeh.png";
             patterns.forEach(p=>{
@@ -2696,8 +2700,36 @@ export default function Wovely() {
     if(selected&&(String(selected.id)===pid||String(selected._supabaseId)===pid)) return;
     const allP=[...userPatterns,...starterPatterns];
     const match=allP.find(p=>String(p.id)===pid||String(p._supabaseId)===pid);
-    if(match) setSelected(match);
-    else if(authed&&authChecked&&patternsFetched&&allP.length>0) navigate("/",{replace:true});
+    if(match){ setSelected(match); return; }
+    // Not in local state. That is NOT proof it doesn't exist — it happens on
+    // the post-save handoff race, on a deep link from an email, and after any
+    // state reset. Fetch the row by id before giving up; bailing straight to
+    // My Wovely silently eats the navigation (the Start Building bug,
+    // reproduced 2026-07-16). RLS scopes the read to the owner's rows.
+    if(!(authed&&authChecked&&patternsFetched)) return;
+    const session=getSession();
+    if(!session?.access_token){ navigate("/",{replace:true}); return; }
+    let cancelled=false;
+    (async()=>{
+      try{
+        const res=await fetch(`${SUPABASE_URL}/rest/v1/patterns?id=eq.${encodeURIComponent(pid)}&status=neq.deleted&select=*`,{
+          headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${session.access_token}`},
+        });
+        if(cancelled) return;
+        if(res.ok||res.status===206){
+          const rows=await res.json();
+          if(cancelled) return;
+          if(rows[0]){
+            const p=mapDbPatternRow(rows[0]);
+            setUserPatterns(prev=>prev.some(x=>x.id===p.id||x._supabaseId===p.id)?prev:[p,...prev]);
+            setSelected(p);
+            return;
+          }
+        }
+        navigate("/",{replace:true});
+      }catch{ if(!cancelled) navigate("/",{replace:true}); }
+    })();
+    return ()=>{cancelled=true;};
   },[view,location.pathname,userPatterns,starterPatterns,authed,authChecked,patternsFetched]);
 
   // Last URL memory: save pattern detail URLs to sessionStorage with timestamp
