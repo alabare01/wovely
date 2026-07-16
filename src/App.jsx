@@ -1042,6 +1042,8 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
   const [socialInstagram,setSocialInstagram]=useState(""),[socialPinterest,setSocialPinterest]=useState(""),[socialRavelry,setSocialRavelry]=useState("");
   const [profileSaving,setProfileSaving]=useState(false),[profileMsg,setProfileMsg]=useState(null),[profileLoaded,setProfileLoaded]=useState(false);
   const [saveBtnText,setSaveBtnText]=useState("Save Profile");
+  const [avatarUrl,setAvatarUrl]=useState(""),[avatarUploading,setAvatarUploading]=useState(false);
+  const avatarFileRef=useRef(null);
   const [curPass,setCurPass]=useState(""),[newPass,setNewPass]=useState(""),[passSaving,setPassSaving]=useState(false),[passMsg,setPassMsg]=useState(null);
   // "Your corner" (2b) is the default face of /profile; the working settings
   // form lives one tab over, fully intact.
@@ -1088,17 +1090,44 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
     if (!user || profileLoaded) return;
     (async ()=>{
       try {
-        const res = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${user.id}&select=username,display_name,bio,social_instagram,social_pinterest,social_ravelry`, {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${user.id}&select=username,display_name,bio,avatar_url,social_instagram,social_pinterest,social_ravelry`, {
           headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${session.access_token}`},
         });
         if (res.ok) {
           const rows = await res.json();
-          if (rows[0]) { setUsername(rows[0].username||""); setDisplayName(rows[0].display_name||""); setBio(rows[0].bio||""); setSocialInstagram(rows[0].social_instagram||""); setSocialPinterest(rows[0].social_pinterest||""); setSocialRavelry(rows[0].social_ravelry||""); }
+          if (rows[0]) { setUsername(rows[0].username||""); setDisplayName(rows[0].display_name||""); setBio(rows[0].bio||""); setAvatarUrl(rows[0].avatar_url||""); setSocialInstagram(rows[0].social_instagram||""); setSocialPinterest(rows[0].social_pinterest||""); setSocialRavelry(rows[0].social_ravelry||""); }
         }
       } catch {}
       setProfileLoaded(true);
     })();
   },[user?.id]);
+
+  // Avatar photo → Cloudinary (Images rule — never Supabase Storage), URL
+  // saved to user_profiles.avatar_url immediately (no Save button involved).
+  // Face-crop thumb at 2x for the 92px circle; non-Cloudinary URLs pass through.
+  const avatarThumb=u=>u&&u.includes("/image/upload/")?u.replace("/image/upload/","/image/upload/c_fill,g_face,w_184,h_184,q_auto,f_auto/"):u;
+  const handleAvatarFile=async e=>{
+    const file=e.target.files?.[0]; e.target.value="";
+    if(!file)return;
+    if(!file.type.startsWith("image/")){setProfileMsg({type:"error",text:"That file isn't an image — try a JPG or PNG."});return;}
+    if(file.size>8*1024*1024){setProfileMsg({type:"error",text:"Photo must be under 8MB."});return;}
+    setAvatarUploading(true);setProfileMsg(null);
+    try{
+      const fd=new FormData();fd.append("file",file);fd.append("upload_preset","yarnhive_patterns");
+      const res=await fetch("https://api.cloudinary.com/v1_1/dmaupzhcx/image/upload",{method:"POST",body:fd});
+      if(!res.ok)throw new Error("Cloudinary "+res.status);
+      const d=await res.json();
+      const pr=await fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${user.id}`,{
+        method:"PATCH",
+        headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${session.access_token}`,"Content-Type":"application/json","Prefer":"return=minimal"},
+        body:JSON.stringify({avatar_url:d.secure_url}),
+      });
+      if(!pr.ok)throw new Error("profile save "+pr.status);
+      setAvatarUrl(d.secure_url);
+    }catch(err){console.error("[Wovely] Avatar upload error:",err);setProfileMsg({type:"error",text:"Photo upload failed — give it another try."});}
+    setAvatarUploading(false);
+  };
+  const pickAvatar=()=>gateAction?.({ intent: "profile_photo", title: "Create a free account to add a photo", subtitle: "Your photo stays with your profile across devices." },()=>avatarFileRef.current?.click());
 
   const handleProfileSave = async () => {
     const handle = username.trim().replace(/^@/,"");
@@ -1162,6 +1191,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
 
   return (
     <div style={{padding:isDesktop?"24px 0 80px":"16px 18px 100px",maxWidth:760,fontFamily:T.body}}>
+      <input ref={avatarFileRef} type="file" accept="image/*" style={{display:"none"}} onChange={handleAvatarFile}/>
       <button onClick={onGoHome} style={{background:"none",border:"none",color:T.ink3,cursor:"pointer",fontSize:13,fontWeight:500,padding:0,marginBottom:16,display:"flex",alignItems:"center",gap:4}}>← My Wovely</button>
 
       {/* ── 2b "Your corner" header (Wovely App 2b.dc.html Profile screen) ── */}
@@ -1177,7 +1207,16 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
       {profileTab==="corner"&&(<>
         {/* profhead — avatar hero */}
         <div style={{display:"flex",alignItems:"center",gap:isDesktop?22:14,background:"#fff",border:`1px solid ${T.line}`,borderRadius:24,padding:isDesktop?"26px 30px":"20px 18px",marginTop:22,boxShadow:T.shadowLg}}>
-          <div style={{width:92,height:92,borderRadius:"50%",border:"3px solid #DCD0F7",background:T.soft,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.disp,fontWeight:600,fontSize:36,color:T.accent}}>{initials}</div>
+          <div onClick={avatarUploading?undefined:pickAvatar} role="button" aria-label={avatarUrl?"Change profile photo":"Add profile photo"} title={avatarUrl?"Change photo":"Add photo"} style={{position:"relative",width:92,height:92,flexShrink:0,cursor:avatarUploading?"default":"pointer"}}>
+            <div style={{width:92,height:92,borderRadius:"50%",border:"3px solid #DCD0F7",background:T.soft,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.disp,fontWeight:600,fontSize:36,color:T.accent,overflow:"hidden"}}>
+              {avatarUrl?<img src={avatarThumb(avatarUrl)} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>:initials}
+            </div>
+            {avatarUploading
+              ?<div style={{position:"absolute",inset:-3,borderRadius:"50%",border:"3px solid transparent",borderTopColor:T.accent,animation:"spin 1s linear infinite"}}/>
+              :<div style={{position:"absolute",right:-2,bottom:-2,width:30,height:30,borderRadius:"50%",background:T.accent,border:"2.5px solid #fff",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 6px 14px -6px rgba(90,66,160,.5)"}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 8.5A1.5 1.5 0 015.5 7H8l1.4-2h5.2L16 7h2.5A1.5 1.5 0 0120 8.5V17a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 17z"/><circle cx="12" cy="12.5" r="3.2"/></svg>
+              </div>}
+          </div>
           <div style={{minWidth:0}}>
             <div style={{fontFamily:T.disp,fontWeight:600,fontSize:28,color:T.ink,lineHeight:1.1}}>{displayName||"Wovely maker"}</div>
             <div style={{fontWeight:700,fontSize:14,color:T.muted,marginTop:3}}>{sinceYear?`Making since ${sinceYear} · ${planLabel} plan`:`${planLabel} plan`}</div>
@@ -1186,6 +1225,10 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
             ?<span style={{marginLeft:"auto",display:"inline-flex",alignItems:"center",gap:5,background:"linear-gradient(120deg,#FFD98A,#F5B93E)",color:"#5A3E0E",fontWeight:800,fontSize:11,letterSpacing:".07em",textTransform:"uppercase",padding:"5px 11px",borderRadius:999,boxShadow:"0 6px 14px -6px rgba(200,150,40,.6)",flexShrink:0}}>✦ {planLabel}</span>
             :<button onClick={onOpenProModal} style={{marginLeft:"auto",border:0,borderRadius:11,padding:"9px 14px",background:T.sun,color:"#5A3E0E",fontFamily:T.body,fontWeight:800,fontSize:13,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>Upgrade</button>}
         </div>
+
+        {/* Avatar upload errors surface here too — the Msg block in Settings
+            is invisible from this tab. */}
+        {profileMsg&&<div style={{marginTop:10}}><Msg msg={profileMsg}/></div>}
 
         {/* profstats — 4 real-data tiles */}
         <div style={{display:isDesktop?"flex":"grid",gridTemplateColumns:"1fr 1fr",gap:12,margin:"18px 0 0"}}>
@@ -1296,7 +1339,19 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
       <div style={SECTION}>
         <div style={SECTION_TITLE}>Your Profile</div>
         <div style={{textAlign:"center",marginBottom:24}}>
-          <div style={{width:92,height:92,borderRadius:"50%",background:T.soft,display:"inline-flex",alignItems:"center",justifyContent:"center",fontFamily:T.disp,fontSize:34,fontWeight:600,color:T.accent,border:"3px solid #DCD0F7"}}>{(displayName||username||"W").trim().charAt(0).toUpperCase()}</div>
+          <div onClick={avatarUploading?undefined:pickAvatar} role="button" aria-label={avatarUrl?"Change profile photo":"Add profile photo"} style={{position:"relative",width:92,height:92,display:"inline-block",cursor:avatarUploading?"default":"pointer"}}>
+            <div style={{width:92,height:92,borderRadius:"50%",background:T.soft,display:"inline-flex",alignItems:"center",justifyContent:"center",fontFamily:T.disp,fontSize:34,fontWeight:600,color:T.accent,border:"3px solid #DCD0F7",overflow:"hidden"}}>
+              {avatarUrl?<img src={avatarThumb(avatarUrl)} alt="" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>:(displayName||username||"W").trim().charAt(0).toUpperCase()}
+            </div>
+            {avatarUploading
+              ?<div style={{position:"absolute",inset:-3,borderRadius:"50%",border:"3px solid transparent",borderTopColor:T.accent,animation:"spin 1s linear infinite"}}/>
+              :<div style={{position:"absolute",right:-2,bottom:-2,width:30,height:30,borderRadius:"50%",background:T.accent,border:"2.5px solid #fff",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 6px 14px -6px rgba(90,66,160,.5)"}}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 8.5A1.5 1.5 0 015.5 7H8l1.4-2h5.2L16 7h2.5A1.5 1.5 0 0120 8.5V17a1.5 1.5 0 01-1.5 1.5h-13A1.5 1.5 0 014 17z"/><circle cx="12" cy="12.5" r="3.2"/></svg>
+              </div>}
+          </div>
+          <div style={{marginTop:8}}>
+            <button onClick={pickAvatar} disabled={avatarUploading} style={{background:"none",border:"none",padding:0,fontFamily:T.body,fontWeight:800,fontSize:12.5,color:T.accent,cursor:avatarUploading?"default":"pointer",opacity:avatarUploading?.6:1}}>{avatarUploading?"Uploading…":avatarUrl?"Change photo":"Add photo"}</button>
+          </div>
           <div style={{fontFamily:T.disp,fontSize:17,fontWeight:600,color:T.ink,marginTop:12}}>{displayName||"Your Name"}</div>
           <div style={{fontSize:13,fontWeight:700,color:T.muted,marginTop:2}}>{username?"@"+username:"Set your username"}</div>
         </div>

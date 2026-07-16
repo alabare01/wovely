@@ -1,5 +1,12 @@
 export const CHANGELOG = [
   {
+    version: "Session 79",
+    date: "2026-07-16",
+    updates: [
+      { emoji: "📸", text: "Your corner just got personal — tap your avatar to add a profile photo" },
+    ]
+  },
+  {
     version: "Session 78",
     date: "2026-07-07",
     updates: [
