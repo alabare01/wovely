@@ -31,6 +31,16 @@ const EXCLUDE_IDS = new Set([
   '038442a2-b13d-4abb-9960-24a360078f6c', // Danielle (gmail)
 ]);
 
+// CAN-SPAM floor for commercial email: an opt-out mechanism and a physical
+// postal address (the LLC address published on the Terms page). Reply-based
+// opt-out is valid under the rule; SAMM watches the adam@wovely.app inbox
+// for stops before each follow-up send.
+const FOOTER = `
+
+--
+Wovely LLC, 487 S Aberdeenshire Dr, Saint Johns, FL 32259
+You are receiving this because you created a Wovely account. Reply with the word stop and you will not hear from me again.`;
+
 const EMAILS = {
   1: { subject: 'We rebuilt Wovely', body: (n) => `Hi ${n},
 
@@ -53,7 +63,7 @@ It is free to come back and look. Your account is still there.
 https://wovely.app
 
 Adam
-Founder, Wovely` },
+Founder, Wovely${FOOTER}` },
   2: { subject: 'The part I think you will actually care about', body: (n) => `Hi ${n},
 
 Short one.
@@ -68,7 +78,7 @@ It is in the app right now, and your account still works.
 
 https://wovely.app
 
-Adam` },
+Adam${FOOTER}` },
   3: { subject: 'Last note from me', body: (n) => `Hi ${n},
 
 This is the last email I will send about the rebuild, so I will keep it to two things.
@@ -82,7 +92,7 @@ Two. If you are not coming back, I would rather know why than wonder. Hit reply 
 Either way, thank you for taking a chance on the early version.
 
 Adam
-Founder, Wovely` },
+Founder, Wovely${FOOTER}` },
 };
 
 const H = { apikey: SVC, Authorization: `Bearer ${SVC}` };
