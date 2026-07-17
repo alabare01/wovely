@@ -78,7 +78,7 @@ const extractTextFromPDF = async (file) => {
   });
 };
 
-const BADGE = { valid: { color: "#1E8A63", bg: T.sageLt, emoji: "\u2705", label: "Pattern Looks Good" }, review: { color: "#C9A84C", bg: "#FFF8EC", emoji: "\u26A0\uFE0F", label: "Review Suggested" }, issues: { color: "#C0544A", bg: "#FFF0EE", emoji: "\u274C", label: "Issues Found" } };
+const BADGE = { valid: { color: "#1E8A63", bg: T.sageLt, emoji: "\u2705", label: "Pattern Looks Good" }, review: { color: "#B07B1E", bg: "#FFF8EC", emoji: "\u26A0\uFE0F", label: "Review Suggested" }, issues: { color: "#C2564A", bg: "#FFF0EE", emoji: "\u274C", label: "Issues Found" } };
 const badgeForScore = (score) => score >= 80 ? BADGE.valid : score >= 60 ? BADGE.review : BADGE.issues;
 const CHECK_ICON = { pass: "\u2705", warn: "\u26A0\uFE0F", warning: "\u26A0\uFE0F", fail: "\u274C" };
 const displayScore = (report) => {
@@ -87,7 +87,9 @@ const displayScore = (report) => {
   return allPass ? 100 : report.score;
 };
 
-const CARD = {background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,padding:24,border:"1px solid rgba(255,255,255,0.6)",boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)"};
+// 2b card — solid white panel on the woven canvas (glass was the v1 leftover
+// the facelift's palette swap missed; blur is reserved for over-photo surfaces).
+const CARD = {background:"#FFFFFF",borderRadius:22,padding:24,border:`1px solid ${T.line}`,boxShadow:"0 16px 34px -22px rgba(90,66,160,0.4)"};
 const LABEL = {fontSize:11,fontWeight:600,color:T.ink2,textTransform:"uppercase",letterSpacing:".05em",marginBottom:6};
 
 const extractFirstRowNumber = (text) => {
@@ -173,9 +175,9 @@ const StitchCheck = ({ onNavigateToRow, gateAction } = {}) => {
         <div key={c.id} onClick={isActionable ? () => onNavigateToRow(rowNum) : undefined} style={{ ...CARD, padding: "16px 20px", marginBottom: 10, display: "flex", gap: 12, alignItems: "flex-start", cursor: isActionable ? "pointer" : "default", transition: "transform .1s", opacity: opacity || 1 }} onMouseEnter={isActionable ? e => { e.currentTarget.style.transform = "translateY(-1px)"; } : undefined} onMouseLeave={isActionable ? e => { e.currentTarget.style.transform = "none"; } : undefined}>
           <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>{CHECK_ICON[c.status] || "\u2753"}</span>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 14, fontWeight: 600, color: isFail ? "#C0544A" : isWarning ? "#C9A84C" : T.ink, marginBottom: 4 }}>{sentenceCase(c.label)}</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: isFail ? "#C2564A" : isWarning ? "#B07B1E" : T.ink, marginBottom: 4 }}>{sentenceCase(c.label)}</div>
             <div style={{ fontSize: 12, color: T.ink2, lineHeight: 1.7 }}>{c.detail}</div>
-            {isWarning && <div style={{ fontSize: 11, color: "#C9A84C", fontWeight: 600, fontFamily: "'Nunito', sans-serif", marginTop: 6 }}>Bev couldn't verify this — review manually</div>}
+            {isWarning && <div style={{ fontSize: 11, color: "#B07B1E", fontWeight: 600, fontFamily: "'Nunito', sans-serif", marginTop: 6 }}>Bev couldn't verify this — review manually</div>}
             {isActionable && <div style={{ fontSize: 11, color: "#7B6AD4", fontWeight: 600, fontFamily: "'Nunito', sans-serif", marginTop: 6 }}>→ View in rows</div>}
           </div>
         </div>
