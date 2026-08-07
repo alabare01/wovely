@@ -46,7 +46,44 @@
         { "@type": "Offer", "name": "Craft (monthly)", "price": "6.99", "priceCurrency": "USD" },
         { "@type": "Offer", "name": "Craft (annual)", "price": "54.99", "priceCurrency": "USD" }
       ],
-      "publisher": { "@type": "Organization", "name": "WOVELY LLC", "url": "https://wovely.app" }
+      "publisher": { "@id": "https://wovely.app/#org" }
+    }
+    </script>
+
+    <!-- The entity, stated so it is self-verifying. Searching "Wovely LLC" currently
+         returns an unrelated AI resume builder as the first result, and nothing on
+         either property connected this company to its other trade name or its founder.
+         A researcher checking the legal party on a contract found a different company.
+         This block is the machine-readable half of that fix; the footer is the human half. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://wovely.app/#org",
+      "name": "Wovely",
+      "legalName": "WOVELY, LLC",
+      "url": "https://wovely.app",
+      "identifier": "L26000181882",
+      "foundingDate": "2026-03-30",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Ponte Vedra Beach",
+        "addressRegion": "FL",
+        "addressCountry": "US"
+      },
+      "founder": {
+        "@type": "Person",
+        "name": "Adam LaBare",
+        "sameAs": "https://www.linkedin.com/in/adamlabare/"
+      },
+      "brand": [
+        { "@type": "Brand", "name": "Wovely" },
+        { "@type": "Brand", "name": "2ndBrain", "url": "https://2ndbrainconsulting.com" }
+      ],
+      "sameAs": [
+        "https://2ndbrainconsulting.com",
+        "https://www.linkedin.com/in/adamlabare/"
+      ]
     }
     </script>
 
