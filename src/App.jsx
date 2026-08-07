@@ -38,6 +38,7 @@ import {
 import { canAccess, requiredTier, ANON_PATTERN_CAP } from "./utils/featureGates.js";
 import { DOC_TYPES, importRouteMismatch, resolveChildSourceUrl } from "./utils/docType.js";
 import { markImagesPending } from "./utils/patternImages.js";
+import { applySeo } from "./utils/seo.js";
 
 // Parse Supabase auth tokens from the email-confirmation URL hash and write
 // the session to localStorage BEFORE React mounts. Users arriving from a
@@ -2489,6 +2490,13 @@ export default function Wovely() {
     if (imageImportOpen) setImageImportOpen(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
+
+  // Per-route <head>: title, description, canonical, robots. Without this every
+  // URL inherits index.html's canonical of https://wovely.app, which told Google
+  // that /privacy and /terms were duplicates of the homepage — two of the three
+  // URLs in the sitemap were asking to be dropped from the index. See
+  // src/utils/seo.js for the honest limit of a client-side fix.
+  useEffect(() => { applySeo(location.pathname); }, [location.pathname]);
 
   // Guard to prevent concurrent profile fetches from racing
   const isFetchingProfile = useRef(false);
