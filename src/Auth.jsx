@@ -406,7 +406,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
             <div className="pper">/mo</div>
             {annual && <div className="was">$6.99</div>}
           </div>
-          <div className="pbill">{annual ? "$54.99 billed yearly — 2 months free" : "billed monthly — switch to annual to save 34%"}</div>
+          <div className="pbill">{annual ? "$54.99 billed yearly, over 4 months free" : "billed monthly, switch to annual and save 34%"}</div>
           <ul className="plist">
             <li><Check size={16} sw={2.6} />Everything in Free, plus a large pattern library</li>
             <li><Check size={16} sw={2.6} />Advanced imports + Collections (MCAL/MKAL)</li>
@@ -616,7 +616,10 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
 
   // Pricing cadence for the landing toggle. Annual is the default per the
   // mockup (annualDefault: true). Values come from Pricing Canon (locked):
-  // $6.99/mo · $54.99/yr ($4.58/mo, "2 months free").
+  // $6.99/mo · $54.99/yr ($4.58/mo). The annual saves $28.89 against 12x
+  // monthly ($83.88), which is 4.1 months free, not 2. The old copy said "2
+  // months free" and undersold the discount by more than half. Stated as
+  // "over 4 months free", which understates slightly and cannot be disputed.
   const [annual, setAnnual] = useState(true);
 
   // Hide the app shell's fixed background photo while the landing is up
