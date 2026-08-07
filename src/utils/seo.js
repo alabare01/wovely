@@ -38,6 +38,19 @@ const PUBLIC_ROUTES = {
     description: "The terms that govern your use of Wovely, including subscriptions and billing, ownership of patterns you upload, acceptable use, and dispute resolution.",
     canonical: SITE + "/terms",
   },
+  // OPENED 2026-08-07 on Adam's "open the gates" call. These calculators were
+  // already reachable signed out (non-root paths fall through the auth check)
+  // but were being noindexed along with the app shell, so nobody could find
+  // them. The search demand is real and undefended: the results for "crochet
+  // yardage calculator" and "crochet gauge swatch calculator" are almost
+  // entirely interactive calculators on small independent sites, with no large
+  // publisher holding either query. Wovely already shipped the tool. It was
+  // just hidden.
+  "/tools": {
+    title: "Crochet Yardage, Gauge and Scale Calculators | Wovely",
+    description: "Free crochet calculators, no signup. Work out how much yarn a project needs, turn a gauge swatch into real stitch counts, and scale a pattern up or down without redoing the math.",
+    canonical: SITE + "/tools",
+  },
 };
 
 // "/hive" is a legacy alias for "/" and must never compete with it in the
