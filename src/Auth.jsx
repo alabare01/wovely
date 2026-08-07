@@ -239,7 +239,7 @@ const TopNav = ({ onLanding, onSignIn, onStartFree, showLinks }) => (
         <a className="tlink hidem" href="#craft">Craft</a>
         <a className="tlink hidem" href="#pricing">Pricing</a>
       </>}
-      <a className="tlink" onClick={onSignIn}>Sign in</a>
+      <a className="tlink" onClick={onSignIn} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onSignIn(e);}}}>Sign in</a>
       <button className="cta" onClick={onStartFree}>Start free</button>
     </div>
   </div>
@@ -318,34 +318,34 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
       <div className="how">
         <div className="howc">
           <div className="hown">Step 1</div>
-          <CoverFill src="/landing-manatee.jpg" bgSrc="/landing-manatee-blur.jpg" className="howimg" />
+          <CoverFill src="/landing-manatee.jpg" bgSrc="/landing-manatee-blur.jpg" alt="A crocheted manatee made from a pattern imported into Wovely" className="howimg" />
           <div className="howbody">
             <div className="howic">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 3.5H7.5A1.5 1.5 0 006 5v14a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0018 19V8z" /><path d="M13.5 3.5V8H18" /></svg>
             </div>
-            <div className="how-t">Hand her anything</div>
+            <h3 className="how-t">Hand her anything</h3>
             <div className="how-s">A bought PDF, photos of a paper pattern, a Ravelry link, or a blog URL. Bev reads them all — the original goes safely into your Vault.</div>
           </div>
         </div>
         <div className="howc">
           <div className="hown">Step 2</div>
-          <CoverFill src="/grab-bevcheck.png" className="howimg" />
+          <CoverFill src="/grab-bevcheck.png" alt="BevCheck flagging a stitch-count error on a specific row of a crochet pattern" className="howimg" />
           <div className="howbody">
             <div className="howic">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z" /><path d="M9 12l2 2 4-4.2" /></svg>
             </div>
-            <div className="how-t">She checks the math</div>
+            <h3 className="how-t">She checks the math</h3>
             <div className="how-s">BevCheck verifies every row's stitch counts before you start. Errors get flagged on the exact row — no more discovering them at round 40.</div>
           </div>
         </div>
         <div className="howc">
           <div className="hown">Step 3</div>
-          <CoverFill src="/grab-rows.png" className="howimg" />
+          <CoverFill src="/grab-rows.png" alt="Wovely's row tracker with completed crochet rows ticked off" className="howimg" />
           <div className="howbody">
             <div className="howic">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19V9M10 19V5M16 19v-8M22 19H2" /></svg>
             </div>
-            <div className="how-t">You just crochet</div>
+            <h3 className="how-t">You just crochet</h3>
             <div className="how-s">Tick rows as you go — your place kept on every device. Running low? Bev already counted your yardage and can order the difference.</div>
           </div>
         </div>
@@ -357,7 +357,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
       <div className="craftin">
         <div>
           <div className="craftbadge">✦ Craft — $6.99/mo</div>
-          <div className="craft-h">For the patterns that deserve better than a binder</div>
+          <h2 className="craft-h">For the patterns that deserve better than a binder</h2>
           <div className="craft-s">Everything in Free, plus the deep tools: Bev's best work for your most ambitious makes.</div>
           <button className="cta gold" style={{ marginTop: 22 }} onClick={onGoCraft}>Try Craft</button>
         </div>
@@ -385,7 +385,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
       </div>
       <div className="plans">
         <div className="pcard">
-          <div className="pname">Free</div>
+          <h3 className="pname">Free</h3>
           <div className="pdesc">For the occasional make.</div>
           <div className="price"><div className="pamt">$0</div><div className="pper">forever</div></div>
           <div className="pbill">No card required</div>
@@ -399,7 +399,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
         </div>
         <div className="pcard hot">
           <div className="pop">Most popular</div>
-          <div className="pname">Craft</div>
+          <h3 className="pname">Craft</h3>
           <div className="pdesc">For makers who mean it.</div>
           <div className="price">
             <div className="pamt">${annual ? "4.58" : "6.99"}</div>
@@ -433,7 +433,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
       <div className="endin">
         <img src="/bev-hero.png" alt="Bev" />
         <div>
-          <div className="end-h">Your next make is waiting.</div>
+          <h2 className="end-h">Your next make is waiting.</h2>
           <div className="end-s">Bring one pattern over and see what Bev does with it. Two minutes, no card, and your hooks will thank you.</div>
           <button className="cta" onClick={onStartFree}>Start free with Bev</button>
         </div>
@@ -490,7 +490,7 @@ const TryScreen = ({ onImport, onStarter, onSignIn }) => (
       <div className="auth-h">Let's get your first pattern going</div>
       <div className="auth-s">No account, no card — pick a way in and you're stitching in two minutes.</div>
       <GuestForkRow onImport={onImport} onStarter={onStarter} />
-      <div className="authmicro">Sign up whenever you like — everything you make carries over. Already have an account? <a className="authlink" onClick={onSignIn}>Sign in</a></div>
+      <div className="authmicro">Sign up whenever you like — everything you make carries over. Already have an account? <a className="authlink" onClick={onSignIn} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onSignIn(e);}}}>Sign in</a></div>
     </div>
   </div>
 );
@@ -559,7 +559,7 @@ const AuthCard = ({ mode, onSwitchMode, onSignedIn, onSignedUp, pulseKey }) => {
         </div>
         <div className="authmicro">
           {isSignIn ? "New here? " : "Already have an account? "}
-          <a className="authlink" onClick={onSwitchMode}>{isSignIn ? "Create an account" : "Sign in"}</a>
+          <a className="authlink" onClick={onSwitchMode} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onSwitchMode(e);}}}>{isSignIn ? "Create an account" : "Sign in"}</a>
           {" · By continuing you agree to our "}
           <a className="authlink" href="/terms">Terms</a>{" & "}<a className="authlink" href="/privacy">Privacy</a>.
         </div>
