@@ -3,6 +3,28 @@ import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
 import { PUBLIC_ROUTES } from './src/utils/seo.js'
+import { checkFirstRunInvariant } from './scripts/first-run-invariant.mjs'
+
+// ─── FIRST-RUN STARTER GATE ──────────────────────────────────────────────────
+//
+// Refuses to build an app that opens on nothing for a brand-new user. This has
+// shipped before: DEFAULT_STARTERS was emptied on 2026-04-19 and for the seven
+// weeks until the S83 starter landed, a stranger's only way in was to go find
+// and upload their own PDF. Nothing failed, nothing warned.
+//
+// The rule lives in scripts/first-run-invariant.mjs, shared with
+// test/firstRun.test.mjs so the build gate and the test cannot disagree.
+const firstRunGate = () => ({
+  name: 'wovely-first-run-gate',
+  apply: 'build',
+  buildStart() {
+    const src = fs.readFileSync(path.resolve('src/App.jsx'), 'utf8')
+    const { ok, reason } = checkFirstRunInvariant(src)
+    if (!ok) this.error(`[first-run] ${reason}`)
+    // eslint-disable-next-line no-console
+    console.log('[first-run] starter present — a new user opens on a pattern')
+  },
+})
 
 // ─── PER-ROUTE STATIC HEADS ──────────────────────────────────────────────────
 //
@@ -51,7 +73,7 @@ const seoHeadPrerender = () => ({
 })
 
 export default defineConfig({
-  plugins: [react(), seoHeadPrerender()],
+  plugins: [react(), firstRunGate(), seoHeadPrerender()],
   server: {
     historyApiFallback: true
   },

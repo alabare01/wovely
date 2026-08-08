@@ -143,6 +143,17 @@ function buildExtractionPostChecks(data, rawText) {
 }
 
 const POSTHOG_HOST = 'https://us.i.posthog.com';
+// PostHog PROJECT write key — the only credential /capture/ accepts in the
+// `api_key` field. It is public by design (the browser bundle ships the same
+// value from src/main.jsx posthog.init) so hardcoding it here leaks nothing.
+//
+// It is hardcoded because the env does not carry it. What the env carries is
+// POSTHOG_API_KEY / VITE_POSTHOG_API_KEY, both holding a `phx_` PERSONAL API
+// key — a Bearer credential for the query and management APIs, not an
+// ingestion key. Posting it as `api_key` to /capture/ is rejected, so every
+// import_job_* event this worker has ever sent was dropped on arrival. Keep
+// this constant in sync with src/main.jsx if the project key is ever rotated.
+const POSTHOG_PROJECT_KEY = 'phc_CgK3ydJGk6XRtRPLQ8cnXxkqSroQBsuYrV9VsWk2r76Y';
 // A job fails permanently once retry_count reaches this value (so the original
 // attempt + one retry, then status='failed'). Shared by the in-loop catch
 // block and the stuck-in-processing sweep.
@@ -215,7 +226,13 @@ export default async function handler(req, res) {
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const geminiKey = process.env.GEMINI_API_KEY;
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
-  const posthogKey = process.env.VITE_POSTHOG_KEY || process.env.POSTHOG_API_KEY;
+  // Only accept an env override that is actually an ingestion key (`phc_`).
+  // VITE_POSTHOG_KEY was never a real variable name (the deployed one is
+  // VITE_POSTHOG_API_KEY) and both env entries hold a `phx_` personal key,
+  // so the old `VITE_POSTHOG_KEY || POSTHOG_API_KEY` chain resolved to a
+  // credential /capture/ refuses. Fall through to the project key instead.
+  const envPosthogKey = process.env.POSTHOG_PROJECT_KEY || process.env.VITE_POSTHOG_API_KEY || process.env.POSTHOG_API_KEY;
+  const posthogKey = (envPosthogKey && envPosthogKey.startsWith('phc_')) ? envPosthogKey : POSTHOG_PROJECT_KEY;
   const cronSecret = process.env.CRON_SECRET;
 
   if (!supabaseUrl || !serviceKey) {
