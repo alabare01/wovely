@@ -23,6 +23,9 @@ import ImageImportModal from "./ImageImportModal.jsx";
 import ImportPill, { setActiveImportJob } from "./components/ImportPill.jsx";
 import PrivacyPolicy from "./PrivacyPolicy.jsx";
 import TermsOfService from "./TermsOfService.jsx";
+import UkUsConverter from "./UkUsConverter.jsx";
+import CrochetAbbreviations from "./CrochetAbbreviations.jsx";
+import StitchCounter from "./StitchCounter.jsx";
 import FeedbackWidget from "./FeedbackWidget.jsx";
 import BevChat from "./BevChat.jsx";
 import YarnCircle from "./YarnCircle.jsx";
@@ -89,6 +92,15 @@ import { applySeo } from "./utils/seo.js";
 // My Wovely (Dashboard) and the only Collections-specific route is the
 // deep-link detail at /collections/:id. /collections falls back to / so
 // older bookmarks land on My Wovely instead of a dead route.
+// Public, indexable tool pages: standalone routes that bypass the app shell and
+// the auth check entirely. Kept OUT of VIEW_TO_PATH / PATH_TO_VIEW on purpose —
+// they have no in-app view to map to, and adding them there would let the shell
+// try to render them as one.
+const PUBLIC_TOOL_PAGES = {
+  "/uk-us-crochet-terms": UkUsConverter,
+  "/crochet-abbreviations": CrochetAbbreviations,
+  "/crochet-stitch-counter": StitchCounter,
+};
 const VIEW_TO_PATH = {collection:"/",detail:"/",wip:"/builds",browse:"/browse",stash:"/stash",calculator:"/tools","stitch-check":"/stitch-check",shopping:"/shopping",profile:"/profile",community:"/circle"};
 const PATH_TO_VIEW = {"/":"collection","/hive":"collection","/builds":"wip","/browse":"browse","/stash":"stash","/tools":"calculator","/stitch-check":"stitch-check","/shopping":"shopping","/profile":"profile","/circle":"community","/hive-vision":"hive-vision","/privacy":"privacy","/terms":"terms"};
 const viewFromPath = (pathname) => {
@@ -2904,6 +2916,15 @@ export default function Wovely() {
   if(location.pathname==="/master-doc") return <MasterDocView/>;
   // Redirect old /changelog URL to /master-doc
   if(location.pathname==="/changelog") return <Navigate to="/master-doc" replace/>;
+  // Public, indexable tool pages. Rendered BEFORE the auth check and for signed-in
+  // and signed-out visitors alike, because these are search landing pages: a
+  // stranger from Google must get the tool with no session fetch, no auth gate and
+  // no app shell in the way. They are deliberately absent from PATH_TO_VIEW and
+  // VIEW_TO_PATH — they are not app views and must never be reachable as one.
+  if(PUBLIC_TOOL_PAGES[location.pathname]) {
+    const Page = PUBLIC_TOOL_PAGES[location.pathname];
+    return <><CSS/><Page/></>;
+  }
   // Public legal pages — render without auth if not logged in, inside shell if logged in
   if(!authed&&(location.pathname==="/privacy"||location.pathname==="/terms")) {
     return <><CSS/>{location.pathname==="/privacy"?<PrivacyPolicy/>:<TermsOfService/>}<LegalFooter/></>;
@@ -2924,7 +2945,11 @@ export default function Wovely() {
   // Unknown routes redirect to /
   // /collections (bare) is kept in knownPaths so old bookmarks don't 404 —
   // viewFromPath maps it to "collection" so the user lands on My Wovely.
-  const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/circle","/hive-vision","/master-doc","/privacy","/terms","/collections"];
+  // The public tool pages return above this line and never reach it. They are
+  // listed anyway so that if that early return is ever moved or refactored they
+  // degrade to "renders the app shell" rather than "silently redirects to /",
+  // which would drop three indexed URLs without anything failing loudly.
+  const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/circle","/hive-vision","/master-doc","/privacy","/terms","/collections",...Object.keys(PUBLIC_TOOL_PAGES)];
   if(!knownPaths.some(p=>location.pathname===p||location.pathname.startsWith("/pattern/")||location.pathname.startsWith("/hive/")||location.pathname.startsWith("/collections/"))) return <Navigate to="/" replace/>;
   const detailOnSave=u=>{
     const withTimestamp={...u,updated_at:new Date().toISOString()};

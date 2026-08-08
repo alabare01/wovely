@@ -84,7 +84,11 @@ const Calculators = () => {
 
   return (
     <div style={{padding:isDk?"24px 24px 100px":"0 18px 100px",maxWidth:960,margin:"0 auto"}}>
-      <div style={{fontFamily:T.serif,fontSize:22,color:T.ink,marginBottom:4,fontWeight:700}}>Crochet Calculators</div>
+      {/* This was a plain styled div, so /tools shipped to search with NO h1 at
+          all — the one heading Google looks at first was simply absent on a page
+          that was just opened for indexing. Same size, same weight, now an
+          actual heading. */}
+      <h1 style={{fontFamily:T.serif,fontSize:22,color:T.ink,margin:"0 0 4px",fontWeight:700}}>Crochet Calculators</h1>
       <div style={{fontSize:13,color:T.ink3,marginBottom:20}}>Essential tools for planning your projects.</div>
 
       {/* Tab pills */}
@@ -221,6 +225,22 @@ const Calculators = () => {
           <div style={{fontSize:12,color:T.ink2,lineHeight:1.7}}>For amigurumi, scaling via hook size + yarn weight change is often easier than adjusting every stitch count. A 5mm hook with bulky yarn instead of 3.5mm with DK roughly doubles your finished size with zero math.</div>
         </div>
       </>}
+
+      {/* Crawl path. /tools is the only one of these pages search already knows
+          about, so it is the page that can pass discovery on to the three new
+          ones. Plain <a> rather than <Link>: this component renders inside the
+          app shell, and the tool pages are standalone routes that must be
+          entered with a clean mount. */}
+      <div style={{marginTop:28,paddingTop:22,borderTop:`1px solid ${T.border}`}}>
+        <div style={{fontSize:11,fontWeight:700,color:T.ink2,textTransform:"uppercase",letterSpacing:".05em",marginBottom:12}}>More free crochet tools</div>
+        <div style={{display:"flex",flexWrap:"wrap",gap:10}}>
+          {[["/uk-us-crochet-terms","UK to US pattern converter"],
+            ["/crochet-abbreviations","Crochet abbreviations explained"],
+            ["/crochet-stitch-counter","Stitch count checker"]].map(([href,label])=>(
+            <a key={href} href={href} style={{padding:"9px 15px",borderRadius:9999,background:"#fff",border:`1px solid ${T.border}`,color:T.terra,fontWeight:700,fontSize:13.5,textDecoration:"none"}}>{label}</a>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

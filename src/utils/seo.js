@@ -51,6 +51,26 @@ const PUBLIC_ROUTES = {
     description: "Free crochet calculators, no signup. Work out how much yarn a project needs, turn a gauge swatch into real stitch counts, and scale a pattern up or down without redoing the math.",
     canonical: SITE + "/tools",
   },
+  // ADDED 2026-08-07. Same thesis as /tools, applied to the queries the audit
+  // found undefended: the winning format is an interactive tool, and every page
+  // currently ranking serves a static chart. All three render standalone with
+  // no auth check, so a signed-out stranger from a search result gets the
+  // working tool and nothing else.
+  "/uk-us-crochet-terms": {
+    title: "UK to US Crochet Term Converter: Paste a Whole Pattern | Wovely",
+    description: "Convert a whole crochet pattern between UK and US terms in one pass. Handles dc, tr, htr and dtr together, so the shared abbreviations cannot collide the way they do when you edit by hand. Free, no signup, nothing uploaded.",
+    canonical: SITE + "/uk-us-crochet-terms",
+  },
+  "/crochet-abbreviations": {
+    title: "Crochet Abbreviations Explained: sc2tog, dc2tog, Magic Ring, fpdc | Wovely",
+    description: "Every common crochet abbreviation with its UK equivalent and a plain-English description of how the stitch is actually worked. Paste a row you are stuck on and each term in it gets labelled.",
+    canonical: SITE + "/crochet-abbreviations",
+  },
+  "/crochet-stitch-counter": {
+    title: "Crochet Stitch Count Checker: Does This Round Add Up? | Wovely",
+    description: "Paste a written crochet round and see how many stitches it makes and how many it works across. When a count stops adding up, the gap between those two numbers tells you which round to recount.",
+    canonical: SITE + "/crochet-stitch-counter",
+  },
 };
 
 // "/hive" is a legacy alias for "/" and must never compete with it in the
