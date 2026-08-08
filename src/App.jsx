@@ -23,6 +23,10 @@ import ImageImportModal from "./ImageImportModal.jsx";
 import ImportPill, { setActiveImportJob } from "./components/ImportPill.jsx";
 import PrivacyPolicy from "./PrivacyPolicy.jsx";
 import TermsOfService from "./TermsOfService.jsx";
+import PublicCalculators from "./PublicCalculators.jsx";
+import UkUsConverter from "./UkUsConverter.jsx";
+import CrochetAbbreviations from "./CrochetAbbreviations.jsx";
+import StitchCounter from "./StitchCounter.jsx";
 import FeedbackWidget from "./FeedbackWidget.jsx";
 import BevChat from "./BevChat.jsx";
 import YarnCircle from "./YarnCircle.jsx";
@@ -89,6 +93,15 @@ import { applySeo } from "./utils/seo.js";
 // My Wovely (Dashboard) and the only Collections-specific route is the
 // deep-link detail at /collections/:id. /collections falls back to / so
 // older bookmarks land on My Wovely instead of a dead route.
+// Public, indexable tool pages: standalone routes that bypass the app shell and
+// the auth check entirely. Kept OUT of VIEW_TO_PATH / PATH_TO_VIEW on purpose —
+// they have no in-app view to map to, and adding them there would let the shell
+// try to render them as one.
+const PUBLIC_TOOL_PAGES = {
+  "/uk-us-crochet-terms": UkUsConverter,
+  "/crochet-abbreviations": CrochetAbbreviations,
+  "/crochet-stitch-counter": StitchCounter,
+};
 const VIEW_TO_PATH = {collection:"/",detail:"/",wip:"/builds",browse:"/browse",stash:"/stash",calculator:"/tools","stitch-check":"/stitch-check",shopping:"/shopping",profile:"/profile",community:"/circle"};
 const PATH_TO_VIEW = {"/":"collection","/hive":"collection","/builds":"wip","/browse":"browse","/stash":"stash","/tools":"calculator","/stitch-check":"stitch-check","/shopping":"shopping","/profile":"profile","/circle":"community","/hive-vision":"hive-vision","/privacy":"privacy","/terms":"terms"};
 const viewFromPath = (pathname) => {
@@ -2491,11 +2504,10 @@ export default function Wovely() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // Per-route <head>: title, description, canonical, robots. Without this every
-  // URL inherits index.html's canonical of https://wovely.app, which told Google
-  // that /privacy and /terms were duplicates of the homepage — two of the three
-  // URLs in the sitemap were asking to be dropped from the index. See
-  // src/utils/seo.js for the honest limit of a client-side fix.
+  // Per-route <head>: title, description, canonical, robots, applied on the
+  // render pass. The raw-HTML pass is covered separately by the build, which
+  // writes a real static file per public route from the same table in
+  // src/utils/seo.js. Both passes, one source of truth.
   useEffect(() => { applySeo(location.pathname); }, [location.pathname]);
 
   // Guard to prevent concurrent profile fetches from racing
@@ -2904,9 +2916,28 @@ export default function Wovely() {
   if(location.pathname==="/master-doc") return <MasterDocView/>;
   // Redirect old /changelog URL to /master-doc
   if(location.pathname==="/changelog") return <Navigate to="/master-doc" replace/>;
+  // Public, indexable tool pages. Rendered BEFORE the auth check and for signed-in
+  // and signed-out visitors alike, because these are search landing pages: a
+  // stranger from Google must get the tool with no session fetch, no auth gate and
+  // no app shell in the way. They are deliberately absent from PATH_TO_VIEW and
+  // VIEW_TO_PATH — they are not app views and must never be reachable as one.
+  if(PUBLIC_TOOL_PAGES[location.pathname]) {
+    const Page = PUBLIC_TOOL_PAGES[location.pathname];
+    return <><CSS/><Page/></>;
+  }
   // Public legal pages — render without auth if not logged in, inside shell if logged in
   if(!authed&&(location.pathname==="/privacy"||location.pathname==="/terms")) {
     return <><CSS/>{location.pathname==="/privacy"?<PrivacyPolicy/>:<TermsOfService/>}<LegalFooter/></>;
+  }
+  // /tools is a search landing page that is already live and already requested
+  // for indexing, and the app shell is the wrong container for it: a stranger
+  // arriving from a search result was handed a sidebar built for a signed-in
+  // user, complete with a "Sign out" button they had never signed in to use,
+  // and no way to sign up. Signed out, it now renders standalone on the same
+  // public chrome as the other three tool pages. Signed in, nothing changes:
+  // it stays the Workbench inside the shell.
+  if(!authed&&location.pathname==="/tools") {
+    return <><CSS/><PublicCalculators/></>;
   }
 
   // Show nothing until session is validated against Supabase
@@ -2924,7 +2955,11 @@ export default function Wovely() {
   // Unknown routes redirect to /
   // /collections (bare) is kept in knownPaths so old bookmarks don't 404 —
   // viewFromPath maps it to "collection" so the user lands on My Wovely.
-  const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/circle","/hive-vision","/master-doc","/privacy","/terms","/collections"];
+  // The public tool pages return above this line and never reach it. They are
+  // listed anyway so that if that early return is ever moved or refactored they
+  // degrade to "renders the app shell" rather than "silently redirects to /",
+  // which would drop three indexed URLs without anything failing loudly.
+  const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/circle","/hive-vision","/master-doc","/privacy","/terms","/collections",...Object.keys(PUBLIC_TOOL_PAGES)];
   if(!knownPaths.some(p=>location.pathname===p||location.pathname.startsWith("/pattern/")||location.pathname.startsWith("/hive/")||location.pathname.startsWith("/collections/"))) return <Navigate to="/" replace/>;
   const detailOnSave=u=>{
     const withTimestamp={...u,updated_at:new Date().toISOString()};
@@ -3725,7 +3760,12 @@ export default function Wovely() {
       {coverPickerTarget&&<CoverImagePicker pattern={coverPickerTarget} onConfirm={handleCoverConfirm} onClose={()=>setCoverPickerTarget(null)} pdfThumbUrl={pdfThumbUrl} CAT_IMG={CAT_IMG} ALL_CAT_ENTRIES={ALL_CAT_ENTRIES}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
-      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={()=>openAddModal()} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall} userPatterns={userPatterns} allPatterns={allPatterns}/>
+      {/* onSignOut is gated on `authed`: SidebarNav renders the button whenever
+          the prop is present, so a signed-out visitor was being offered a "Sign
+          out" control for a session they never had. Signed out, the sidebar
+          offers "Create account" instead, which is the action that is actually
+          available to them. */}
+      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={()=>openAddModal()} onSignOut={authed?handleSignOut:null} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall} userPatterns={userPatterns} allPatterns={allPatterns}/>
       <div ref={mainScrollRef} style={{flex:1,minWidth:0,overflowY:"auto",display:"flex",flexDirection:"column",background:"transparent"}}>
         <WelcomeBanner visible={showWelcomeBanner}/>
         <div style={{padding:"0 40px",height:68,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0,background:"rgba(251,249,255,.86)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
