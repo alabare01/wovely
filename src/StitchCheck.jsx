@@ -3,6 +3,7 @@ import { T, useBreakpoint } from "./theme.jsx";
 import ScanGauge, { ProcSteps } from "./components/ScanGauge.jsx";
 import posthog from "posthog-js";
 import BevGauge, { deriveState, sentenceCase, checkTier } from "./components/BevGauge.jsx";
+import { bevCheckScope, visibleBevCheckChecks, withheldBevCheckCount, BEVCHECK_SCOPE_FULL } from "./utils/featureGates.js";
 
 // VALIDATION_PROMPT kept for export — used by AddPatternModal and ImageImportModal for client-side background validation
 const VALIDATION_PROMPT = `You are a crochet pattern validator. Analyze this pattern and return ONLY a JSON object with this exact structure — no markdown, no backticks, no explanation:
@@ -95,7 +96,7 @@ const extractFirstRowNumber = (text) => {
   return match ? parseInt(match[1], 10) : null;
 };
 
-const StitchCheck = ({ onNavigateToRow, gateAction } = {}) => {
+const StitchCheck = ({ onNavigateToRow, gateAction, tier, isAnonymous = false, onUpgrade } = {}) => {
   const [mode, setMode] = useState(null); // null | "pdf" | "text"
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -159,9 +160,17 @@ const StitchCheck = ({ onNavigateToRow, gateAction } = {}) => {
   // Report card view
   if (report) {
     const resolvedState = deriveState(report);
-    const coreChecks = (report.checks || []).filter(c => checkTier(c) === "core");
-    const advisoryChecks = (report.checks || []).filter(c => checkTier(c) === "advisory");
-    const issueCount = (report.checks || []).filter(c => c.status === "fail" || c.status === "warning" || c.status === "warn").length;
+    // Entitlement, applied to the data before layout. Free and guest sessions
+    // see the four core checks; full verification (the advisory pair) is the
+    // Craft wedge. Same boundary /crochet-stitch-counter draws in public.
+    const scope = bevCheckScope(tier, isAnonymous);
+    const grantedChecks = visibleBevCheckChecks(report.checks, scope);
+    const lockedCount = withheldBevCheckCount(report.checks, scope);
+    const coreChecks = grantedChecks.filter(c => checkTier(c) === "core");
+    const advisoryChecks = grantedChecks.filter(c => checkTier(c) === "advisory");
+    // Issue count is reported over what the user can actually see, so the
+    // gauge never claims a problem it then refuses to show them.
+    const issueCount = grantedChecks.filter(c => c.status === "fail" || c.status === "warning" || c.status === "warn").length;
     const numericScore = typeof report.score === "number" ? report.score : undefined;
 
     const renderCheck = (c, opacity) => {
@@ -206,6 +215,31 @@ const StitchCheck = ({ onNavigateToRow, gateAction } = {}) => {
               <div style={{ borderTop: "0.5px solid #ECE6F8", margin: "16px 0" }} />
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#7B6AD4", fontFamily: "'Nunito', sans-serif", marginBottom: 12 }}>Advisory</div>
               {advisoryChecks.map(c => renderCheck(c, 0.85))}
+            </>
+          )}
+
+          {/* Full verification is the Craft wedge. Name the number of checks
+              being held back rather than gesturing at "more" — a vague lock
+              reads as a tease, a counted one reads as a scope. */}
+          {scope !== BEVCHECK_SCOPE_FULL && lockedCount > 0 && (
+            <>
+              <div style={{ borderTop: "0.5px solid #ECE6F8", margin: "16px 0" }} />
+              <div style={{ ...CARD, padding: "16px 20px", display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <img src="/bev_neutral.png" alt="Bev" style={{ width: 34, height: 34, borderRadius: "50%", flexShrink: 0, objectFit: "cover", background: "#F2EEFB" }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: T.ink, marginBottom: 4 }}>
+                    Full verification adds {lockedCount} more {lockedCount === 1 ? "check" : "checks"}
+                  </div>
+                  <div style={{ fontSize: 12, color: T.ink2, lineHeight: 1.7 }}>
+                    The math above is free on every import. Craft adds Bev's advisory pass: translation artifacts and component structure, the two that catch a pattern that counts correctly and still cannot be followed.
+                  </div>
+                  {onUpgrade && (
+                    <button onClick={onUpgrade} style={{ marginTop: 10, background: T.terra, color: "#fff", border: "none", borderRadius: 9999, padding: "9px 18px", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+                      See Craft
+                    </button>
+                  )}
+                </div>
+              </div>
             </>
           )}
         </div>

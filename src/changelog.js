@@ -1,5 +1,14 @@
 export const CHANGELOG = [
   {
+    version: "Session 79",
+    date: "2026-08-08",
+    updates: [
+      { emoji: "💳", text: "If anything goes wrong while you are subscribing, Bev now tells you what happened, confirms nothing was charged, and gives you a way to finish" },
+      { emoji: "🔐", text: "Long crochet sessions stay signed in. Wovely renews your session in the background instead of quietly losing it" },
+      { emoji: "🧭", text: "If a session does end, you land on the sign in screen with a plain explanation instead of a blank start" },
+    ]
+  },
+  {
     version: "Session 78",
     date: "2026-07-07",
     updates: [

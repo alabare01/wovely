@@ -1,6 +1,8 @@
 import { useState, useRef } from "react";
 import { T } from "./theme.jsx";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseAuth, getSession } from "./supabase.js";
+import { FREE_SCANS_PER_MONTH, SCAN_STITCH_VISION, canScan, recordScan, scansLeft } from "./utils/scanQuota.js";
+import { TIER_FREE, TIER_CRAFT } from "./utils/tierUtils.js";
 
 const MSGS = [
   "Analyzing the stitch pattern…",
@@ -33,38 +35,22 @@ const compressForVision = (file) => new Promise((resolve, reject) => {
   img.src = url;
 });
 
-const getUsage = () => {
-  try {
-    const raw = localStorage.getItem("wv_sv_uses");
-    if (!raw) return { count: 0, month: "" };
-    return JSON.parse(raw);
-  } catch { return { count: 0, month: "" }; }
-};
-
-const currentMonth = () => {
-  const d = new Date();
-  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
-};
-
-const incrementUsage = () => {
-  const m = currentMonth();
-  const u = getUsage();
-  const count = u.month === m ? u.count + 1 : 1;
-  localStorage.setItem("wv_sv_uses", JSON.stringify({ count, month: m }));
-};
-
-const canUse = (isPro) => {
-  if (isPro) return true;
-  const m = currentMonth();
-  const u = getUsage();
-  return u.month !== m || u.count < 3;
-};
+// Quota lives in src/utils/scanQuota.js now, shared with Snap & Stitch, which
+// published the same "3 free scans a month" and counted none of them. The
+// storage key and { count, month } shape are unchanged, so counters already
+// in the wild carry over rather than resetting to zero.
 
 const ANON_SCAN_FLAG = "wovely_sov_anon_scan_used";
 const anonScanUsed = () => { try { return sessionStorage.getItem(ANON_SCAN_FLAG) === "true"; } catch { return false; } };
 const markAnonScanUsed = () => { try { sessionStorage.setItem(ANON_SCAN_FLAG, "true"); } catch {} };
 
-const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPattern }) => {
+// NOTE: this component is not currently mounted anywhere in the app (no JSX
+// call site exists; only /stitch/:id result pages survive). It is kept
+// compiling and on the shared quota so that whenever it is remounted it
+// enforces the published limit instead of reintroducing an uncounted one.
+// `tier` is preferred; isPro is honoured for the old boolean call signature.
+const StitchVision = ({ isPro, tier, isAnon, onUpgrade, onRequireAccount, onImportAsPattern }) => {
+  const effectiveTier = tier || (isPro ? TIER_CRAFT : TIER_FREE);
   const [stage, setStage] = useState("pick"); // pick | loading | result | limit
   const [result, setResult] = useState(null);
   const [thumb, setThumb] = useState(null);
@@ -87,7 +73,7 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
       onRequireAccount && onRequireAccount(wasUsed);
       return;
     }
-    if (!canUse(isPro)) {
+    if (!canScan(effectiveTier, SCAN_STITCH_VISION)) {
       setStage("limit");
       return;
     }
@@ -133,7 +119,7 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
       console.log("[StitchVision] Step 3 done: API status:", res.status, "data keys:", Object.keys(data), "data:", JSON.stringify(data).substring(0, 500));
       if (!res.ok) throw new Error(data.message || data.error || "Server error: " + res.status);
       if (data.error) throw new Error(data.message || "Stitch identification failed. Please try again.");
-      incrementUsage();
+      recordScan(effectiveTier, SCAN_STITCH_VISION);
       setResult(data);
       setStage("result");
       // Save result to Supabase (best-effort, don't block)
@@ -172,7 +158,7 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
   if (stage === "limit") return (
     <div style={{ padding: "60px 20px", textAlign: "center", maxWidth: 400, margin: "0 auto" }}>
       <div style={{ fontSize: 48, marginBottom: 16 }}>🔍</div>
-      <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 8 }}>You've used your 3 free identifications this month</div>
+      <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 8 }}>You've used your {FREE_SCANS_PER_MONTH} free identifications this month</div>
       <div style={{ fontSize: 14, color: T.ink2, lineHeight: 1.7, marginBottom: 24 }}>Upgrade to Craft for unlimited Stitch-O-Vision.</div>
       {onUpgrade && <button onClick={onUpgrade} style={{ background: T.terra, color: "#fff", border: "none", borderRadius: 99, padding: "14px 32px", fontSize: 15, fontWeight: 600, cursor: "pointer", boxShadow: "0 4px 16px rgba(123,106,212,.3)", marginBottom: 12 }}>Upgrade to Craft</button>}
       <div><button onClick={reset} style={{ background: "none", border: "none", color: T.terra, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: 8 }}>← Back</button></div>
@@ -348,8 +334,7 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
   }
 
   // ── PICK SCREEN ──
-  const usage = getUsage();
-  const usesLeft = isPro ? "unlimited" : Math.max(0, 3 - (usage.month === currentMonth() ? usage.count : 0));
+  const usesLeft = scansLeft(effectiveTier, SCAN_STITCH_VISION);
   return (
     <div style={{ maxWidth: 480, margin: "0 auto", padding: "40px 24px", textAlign: "center" }}>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 6 }}>
@@ -369,7 +354,7 @@ const StitchVision = ({ isPro, isAnon, onUpgrade, onRequireAccount, onImportAsPa
       </label>
 
       <div style={{ fontSize: 11, color: T.ink3, marginTop: 14, lineHeight: 1.6 }}>Works with photos, screenshots, and images from social media</div>
-      {!isPro && !isAnon && <div style={{ fontSize: 11, color: T.terra, marginTop: 8, fontWeight: 500 }}>{usesLeft} free identification{usesLeft !== 1 ? "s" : ""} left this month</div>}
+      {usesLeft !== Infinity && !isAnon && <div style={{ fontSize: 11, color: T.terra, marginTop: 8, fontWeight: 500 }}>{usesLeft} free identification{usesLeft !== 1 ? "s" : ""} left this month</div>}
       {isAnon && <div style={{ fontSize: 11, color: T.terra, marginTop: 8, fontWeight: 500 }}>Sign up free for Stitch-O-Vision</div>}
     </div>
   );

@@ -110,7 +110,10 @@ export default async function handler(req, res) {
   // 1. New subscription — set tier from the purchased price.
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    const userId = session.metadata?.userId;
+    // client_reference_id is the fallback carrier set by api/stripe-checkout.js.
+    // metadata has come back empty on this endpoint before, and a paid session
+    // we cannot attach to an account is money taken with nothing delivered.
+    const userId = session.metadata?.userId || session.client_reference_id || null;
     const customerId = session.customer;
     const subscriptionId = session.subscription;
     // The session's line_items isn't expanded by default; fetch the
@@ -132,13 +135,13 @@ export default async function handler(req, res) {
       });
       console.log(`[stripe-webhook] tier=${purchasedTier} activated for user:`, userId);
     } else {
-      console.warn('[stripe-webhook] checkout.session.completed missing metadata.userId');
+      console.error('[stripe-webhook] PAID SESSION WITH NO USER ID — metadata.userId and client_reference_id both empty. Session:', session.id);
     }
     const buyerEmail = session.customer_details?.email || session.customer_email || 'unknown email';
     const amount = typeof session.amount_total === 'number' ? `$${(session.amount_total / 100).toFixed(2)}` : 'unknown amount';
     await notifyAdmin(
       `💸 Wovely purchase: ${buyerEmail} (${amount})`,
-      `Someone just paid for Wovely.\n\nEmail: ${buyerEmail}\nAmount: ${amount}\nTier: ${purchasedTier}\nSubscription: ${subscriptionId || 'n/a'}\nUser ID: ${userId || 'MISSING metadata.userId'}\nCheckout session: ${session.id}\n\n— Wovely`
+      `Someone just paid for Wovely.\n\nEmail: ${buyerEmail}\nAmount: ${amount}\nTier: ${purchasedTier}\nSubscription: ${subscriptionId || 'n/a'}\nUser ID: ${userId || 'MISSING — no metadata.userId and no client_reference_id, this payment is NOT attached to an account'}\nCheckout session: ${session.id}\n\n— Wovely`
     );
   }
 

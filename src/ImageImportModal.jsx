@@ -4,6 +4,7 @@ import { PILL } from "./constants.js";
 import { buildRowsFromComponents } from "./AddPatternModal.jsx";
 import { CHECK_ICON } from "./StitchCheck.jsx";
 import BevGauge, { deriveState, sentenceCase, checkTier } from "./components/BevGauge.jsx";
+import { bevCheckScope, visibleBevCheckChecks, withheldBevCheckCount, BEVCHECK_SCOPE_FULL } from "./utils/featureGates.js";
 import ScanGauge, { ProcSteps } from "./components/ScanGauge.jsx";
 import { getSession } from "./supabase.js";
 import { setActiveImportJob } from "./components/ImportPill.jsx";
@@ -72,7 +73,7 @@ async function mergeImagesVertically(items) {
   return cvs.toDataURL("image/jpeg", 0.85);
 }
 
-const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, initialExtracted, initialCoverUrl, initialValidationReport, initialPollingJobId }) => {
+const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, tier, isAnonymous = false, onUpgrade, initialExtracted, initialCoverUrl, initialValidationReport, initialPollingJobId }) => {
   const [items, setItems] = useState([]); // [{file, thumb, base64}]
   const [stage, setStage] = useState("pick");
   const [loadingMsg, setLoadingMsg] = useState(LOADING_MSGS[0]);
@@ -604,9 +605,12 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, onUpgrade, i
               variant="hero"
               score={typeof validationReport.score === "number" ? validationReport.score : undefined}
               state={typeof validationReport.score === "number" ? undefined : deriveState(validationReport)}
-              issueCount={(validationReport.checks || []).filter(c => c.status === "fail" || c.status === "warning" || c.status === "warn").length}
+              issueCount={visibleBevCheckChecks(validationReport.checks, bevCheckScope(tier, isAnonymous)).filter(c => c.status === "fail" || c.status === "warning" || c.status === "warn").length}
             /></div>
-            {(()=>{const allChecks=validationReport.checks||[];const coreC=allChecks.filter(c=>checkTier(c)==="core");const advC=allChecks.filter(c=>checkTier(c)==="advisory");const renderC=(c,op)=>(<div key={c.id} style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 12px",marginBottom:6,display:"flex",gap:8,alignItems:"flex-start",opacity:op||1}}><span style={{fontSize:14,flexShrink:0}}>{CHECK_ICON[c.status]||"\u2753"}</span><div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:c.status==="fail"?"#C0544A":(c.status==="warning"||c.status==="warn")?"#C9A84C":T.ink,marginBottom:2}}>{sentenceCase(c.label)}</div><div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>{c.detail}</div></div></div>);return <>{coreC.map(c=>renderC(c))}{advC.length>0&&<><div style={{borderTop:"0.5px solid #ECE6F8",margin:"10px 0"}}/><div style={{fontSize:10,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:"#7B6AD4",fontFamily:"'Nunito',sans-serif",marginBottom:8}}>Advisory</div>{advC.map(c=>renderC(c,0.85))}</>}</>;})()}
+            {/* Core checks free on every import, advisory pass on Craft. The
+                filter runs on the data, so a locked check is absent rather
+                than merely hidden by styling. */}
+            {(()=>{const scope=bevCheckScope(tier,isAnonymous);const allChecks=visibleBevCheckChecks(validationReport.checks,scope);const lockedCount=withheldBevCheckCount(validationReport.checks,scope);const coreC=allChecks.filter(c=>checkTier(c)==="core");const advC=allChecks.filter(c=>checkTier(c)==="advisory");const renderC=(c,op)=>(<div key={c.id} style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 12px",marginBottom:6,display:"flex",gap:8,alignItems:"flex-start",opacity:op||1}}><span style={{fontSize:14,flexShrink:0}}>{CHECK_ICON[c.status]||"\u2753"}</span><div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:c.status==="fail"?"#C0544A":(c.status==="warning"||c.status==="warn")?"#C9A84C":T.ink,marginBottom:2}}>{sentenceCase(c.label)}</div><div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>{c.detail}</div></div></div>);return <>{coreC.map(c=>renderC(c))}{advC.length>0&&<><div style={{borderTop:"0.5px solid #ECE6F8",margin:"10px 0"}}/><div style={{fontSize:10,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:"#7B6AD4",fontFamily:"'Nunito',sans-serif",marginBottom:8}}>Advisory</div>{advC.map(c=>renderC(c,0.85))}</>}{scope!==BEVCHECK_SCOPE_FULL&&lockedCount>0&&<><div style={{borderTop:"0.5px solid #ECE6F8",margin:"10px 0"}}/><div style={{background:T.linen,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 12px",display:"flex",gap:8,alignItems:"flex-start"}}><img src="/bev_neutral.png" alt="Bev" style={{width:26,height:26,borderRadius:"50%",flexShrink:0,objectFit:"cover",background:"#F2EEFB"}}/><div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:T.ink,marginBottom:2}}>Craft adds {lockedCount} more {lockedCount===1?"check":"checks"}</div><div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>The stitch math is free on every import. Full verification adds Bev's advisory pass.</div>{onUpgrade&&<button onClick={onUpgrade} style={{marginTop:8,background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer"}}>See Craft</button>}</div></div></>}</>;})()}
             {validationReport.summary&&<div style={{background:T.linen,borderRadius:12,padding:"12px 14px",marginTop:10,border:`1px solid ${T.border}`}}><div style={{fontSize:11,fontWeight:700,color:T.terra,marginBottom:4}}>Bev says:</div><div style={{fontSize:12,color:T.ink2,lineHeight:1.6}}>{validationReport.summary}</div></div>}
             <button onClick={()=>{setShowFullReport(false);handleSave();}} style={{marginTop:14,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Import Now</button>
           </div>

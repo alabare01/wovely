@@ -94,8 +94,13 @@ export default async function handler(req, res) {
     if (isAnonymous) {
       return {
         error: 'chunked_import_requires_paid_tier',
-        message: "This pattern is a big one. Create a free account first, then upgrade to Pro for full support.",
-        required_tier: 'pro',
+        message: "This pattern is a big one. Create a free account first, then upgrade to Craft for full support.",
+        // Craft, not 'pro'. Pro is a legacy tier that survives on old
+        // user_profiles rows but cannot be bought: api/stripe-checkout.js
+        // rejects every tier except craft, and FEATURE_GATES.chunkedImport
+        // gates on TIER_CRAFT. Naming 'pro' here sent users to buy a plan
+        // that does not exist.
+        required_tier: 'craft',
         text_length: text.length,
       };
     }
@@ -111,8 +116,8 @@ export default async function handler(req, res) {
         if (tier === 'free') {
           return {
             error: 'chunked_import_requires_paid_tier',
-            message: "This pattern is a big one. Pro members get full support for complex patterns.",
-            required_tier: 'pro',
+            message: "This pattern is a big one. Craft members get full support for complex patterns.",
+            required_tier: 'craft',
             text_length: text.length,
           };
         }

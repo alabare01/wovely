@@ -3,6 +3,11 @@
 // during the transition; derive it from tier when the new column is set.
 
 export const TIER_FREE = 'free';
+// LEGACY, NOT PURCHASABLE. Craft is the only tier Stripe sells
+// (api/stripe-checkout.js rejects every other value). 'pro' survives only so
+// that user_profiles rows written before the collapse to two tiers keep their
+// paid entitlement — isPaidTier() must go on honouring it. Never surface Pro
+// as an upgrade target, a price, or a gate requirement.
 export const TIER_PRO = 'pro';
 export const TIER_CRAFT = 'craft';
 
