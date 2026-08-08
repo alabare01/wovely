@@ -8,6 +8,8 @@ import ScanGauge, { ProcSteps } from "./components/ScanGauge.jsx";
 import { setActiveImportJob } from "./components/ImportPill.jsx";
 import { useImportJobPolling } from "./hooks/useImportJobPolling.js";
 import { PHASE_COPY_POOLS, REASSURANCE_LINE, pickPhaseCopy } from "./utils/importPhaseCopy.js";
+import { bevCheckScope, visibleBevCheckChecks, withheldBevCheckCount, BEVCHECK_SCOPE_FULL } from "./utils/featureGates.js";
+import { FREE_SCANS_PER_MONTH, SCAN_SNAP_STITCH, canScan, recordScan, scansLeft } from "./utils/scanQuota.js";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 
@@ -488,19 +490,31 @@ const useSnapProgress = (active) => {
   return{progress,phase,complete};
 };
 
-const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer}) => {
+const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer,tier,onUpgrade}) => {
   const [file,setFile]=useState(null),[imgSrc,setImgSrc]=useState(null),[loading,setLoading]=useState(false);
   const [analysis,setAnalysis]=useState(null),[confidence,setConfidence]=useState(null),[preview,setPreview]=useState(null);
   const [error,setError]=useState(null),[wireframeMode,setWireframeMode]=useState("labeled"),[lightbox,setLightbox]=useState(null);
+  // The card has always published "3 free scans/month". Until now nothing
+  // counted them, so the number was decoration and the paid wedge was free.
+  // atLimit is state (not a bare read) so the pick screen re-renders into the
+  // limit message the moment the third scan is spent.
+  const [atLimit,setAtLimit]=useState(false);
+  const remaining=scansLeft(tier,SCAN_SNAP_STITCH);
   const{progress,phase,complete}=useSnapProgress(loading);
   const handleFile=async(e)=>{
     const f=e.target.files?.[0]; if(!f) return;
+    // Check before spending anything: no upload, no Gemini call, no cost.
+    if(!canScan(tier,SCAN_SNAP_STITCH)){ if(e.target) e.target.value=""; setAtLimit(true); return; }
     setFile(f);setError(null);setAnalysis(null);setPreview(null);
     const reader=new FileReader();
     reader.onload=async(ev)=>{
       const src=ev.target.result; setImgSrc(src); setLoading(true);
       try{
         const result=await callGeminiVision(src);
+        // Charge only once the scan actually succeeded. Billing a user for
+        // our own failed request is how a 3-scan allowance becomes a 1-scan
+        // allowance in practice.
+        recordScan(tier,SCAN_SNAP_STITCH);
         const conf=calculateConfidence(result), pattern=buildStarterPattern(result);
         complete(); await new Promise(r=>setTimeout(r,400));
         setAnalysis(result);setConfidence(conf);setPreview(pattern);
@@ -509,6 +523,14 @@ const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer}) => {
     };
     reader.readAsDataURL(f);
   };
+  if(atLimit&&!analysis&&!loading) return (
+    <div style={{padding:"48px 20px",textAlign:"center",maxWidth:400,margin:"0 auto"}}>
+      <img src="/bev_neutral.png" alt="Bev" style={{width:88,height:"auto",margin:"0 auto 16px",display:"block",filter:"drop-shadow(0 4px 16px rgba(123,106,212,0.3))"}}/>
+      <div style={{fontFamily:T.serif,fontSize:20,fontWeight:700,color:T.ink,marginBottom:8}}>You've used your {FREE_SCANS_PER_MONTH} free scans this month</div>
+      <div style={{fontSize:13,color:T.ink2,lineHeight:1.7,marginBottom:22}}>Your scans reset at the start of next month. Craft has no scan limit, and you can still add patterns by PDF or link in the meantime.</div>
+      {onUpgrade&&<button onClick={onUpgrade} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"13px 30px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>See Craft</button>}
+    </div>
+  );
   const reset=()=>{setFile(null);setImgSrc(null);setAnalysis(null);setPreview(null);setError(null);setConfidence(null);};
   const confInfo=confidence?confidenceLabel(confidence):null;
   return (
@@ -527,7 +549,7 @@ const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer}) => {
         </div>
       )}
       <div style={{background:`linear-gradient(135deg,${T.terraLt},#FFF8F5)`,borderRadius:12,padding:"12px 14px",marginBottom:14,border:`1px solid ${T.border}`}}>
-        <div style={{fontSize:12,color:T.terra,fontWeight:600,marginBottom:3}}>✨ Snap & Stitch — 3 free scans/month</div>
+        <div style={{fontSize:12,color:T.terra,fontWeight:600,marginBottom:3}}>✨ Snap &amp; Stitch{remaining===Infinity?"":`: ${remaining} of ${FREE_SCANS_PER_MONTH} free scans left this month`}</div>
         <div style={{fontSize:12,color:T.ink2,lineHeight:1.6}}>Photograph any finished crochet object. We identify the components and build a starter pattern to recreate it.</div>
       </div>
       {!file&&(
@@ -890,7 +912,7 @@ const URLImportForm = ({onSave,Btn,Photo,initialUrl,onExtractionStart,onExtracti
   );
 };
 
-const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onExtractionEnd,onBevCheckActive,onReviewActive,initialExtracted,initialValidationReport,initialPollingJobId,isCollectionImport=false,isStarterImport=false}) => {
+const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrade,onExtractionStart,onExtractionEnd,onBevCheckActive,onReviewActive,initialExtracted,initialValidationReport,initialPollingJobId,isCollectionImport=false,isStarterImport=false}) => {
   // initialPollingJobId (S1.5.3): when the ImportPill re-opens the modal
   // mid-import, land directly in the extracting stage and let polling
   // resume against the existing job_id. The hook computes totalElapsed
@@ -1626,14 +1648,17 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,onUpgrade,onExtractionStart,onE
               variant="hero"
               score={typeof validationReport.score === "number" ? validationReport.score : undefined}
               state={typeof validationReport.score === "number" ? undefined : deriveState(validationReport)}
-              issueCount={(validationReport.checks || []).filter(c => c.status === "fail" || c.status === "warning" || c.status === "warn").length}
+              issueCount={visibleBevCheckChecks(validationReport.checks, bevCheckScope(tier, isAnonymous)).filter(c => c.status === "fail" || c.status === "warning" || c.status === "warn").length}
             /></div>
-            {(()=>{const allChecks=validationReport.checks||[];const coreC=allChecks.filter(c=>checkTier(c)==="core");const advC=allChecks.filter(c=>checkTier(c)==="advisory");const renderC=(c,op)=>{const isIssue=c.status==="fail"||c.status==="warning"||c.status==="warn";const checkRowNum=isIssue?extractFirstRowNumber(c.detail):null;return(
+            {/* Core checks free on every import, advisory pass on Craft. The
+                filter runs on the data, so a locked check is absent rather
+                than merely hidden by styling. */}
+            {(()=>{const scope=bevCheckScope(tier,isAnonymous);const allChecks=visibleBevCheckChecks(validationReport.checks,scope);const lockedCount=withheldBevCheckCount(validationReport.checks,scope);const coreC=allChecks.filter(c=>checkTier(c)==="core");const advC=allChecks.filter(c=>checkTier(c)==="advisory");const renderC=(c,op)=>{const isIssue=c.status==="fail"||c.status==="warning"||c.status==="warn";const checkRowNum=isIssue?extractFirstRowNumber(c.detail):null;return(
               <div key={c.id} onClick={isIssue?()=>{setShowFullReport(false);const rows=buildRowsFromComponents(extracted.components);const mats=(extracted.materials||[]).map((m,i)=>({id:i+1,name:m.name||"",amount:m.amount||"",yardage:0,notes:m.notes||""}));const finalCover=coverUrl||fileInfo?.coverUrl||null;onSave({id:Date.now(),title:editTitle||"Imported Pattern",source:editDesigner||"PDF Import",cat:"Uncategorized",hook:editHook||"",weight:editWeight||"",notes:"",pattern_notes:extracted.pattern_notes||"",yardage:0,rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},materials:mats,rows,photo:finalCover||PILL[Math.floor(Math.random()*PILL.length)],cover_image_url:finalCover,source_file_url:fileInfo?.url||"",source_file_name:fileInfo?.name||"",source_file_type:fileInfo?.type||"",extracted_by_ai:true,components:extracted.components||[],assembly_notes:extracted.assembly_notes||"",difficulty:extracted.difficulty||"",abbreviations_map:extracted.abbreviations_map||{},suggested_resources:extracted.suggested_resources||[],validation_flags:validationFlags.length>0?validationFlags:null,validation_report:isPro&&validationReport?{...validationReport,flaggedRows:(validationReport.checks||[]).filter(ch=>ch.status==="fail"||ch.status==="warning"||ch.status==="warn").map(ch=>({rowNumber:extractFirstRowNumber(ch.detail),status:ch.status==="warn"?"warning":ch.status})).filter(f=>f.rowNumber!=null).filter((f,idx,arr)=>arr.findIndex(x=>x.rowNumber===f.rowNumber)===idx)}:null,_reviewRowNumber:checkRowNum});}:undefined} style={{background:T.surface,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 12px",marginBottom:6,display:"flex",gap:8,alignItems:"flex-start",cursor:isIssue?"pointer":"default",transition:"transform .1s",opacity:op||1}} onMouseEnter={isIssue?e=>{e.currentTarget.style.transform="translateY(-1px)";}:undefined} onMouseLeave={isIssue?e=>{e.currentTarget.style.transform="none";}:undefined}>
                 <span style={{fontSize:14,flexShrink:0}}>{CHECK_ICON[c.status]||"❓"}</span>
                 <div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:c.status==="fail"?"#C0544A":(c.status==="warning"||c.status==="warn")?"#C9A84C":T.ink,marginBottom:2}}>{sentenceCase(c.label)}</div><div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>{c.detail}</div></div>
                 {isIssue&&<div style={{fontSize:11,color:"#7B6AD4",fontWeight:600,fontFamily:"'Nunito',sans-serif",flexShrink:0,alignSelf:"center"}}>{checkRowNum?"→ Go to row":"→ Go to rows"}</div>}
-              </div>);};return <>{coreC.map(c=>renderC(c))}{advC.length>0&&<><div style={{borderTop:"0.5px solid #ECE6F8",margin:"10px 0"}}/><div style={{fontSize:10,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:"#7B6AD4",fontFamily:"'Nunito',sans-serif",marginBottom:8}}>Advisory</div>{advC.map(c=>renderC(c,0.85))}</>}</>;})()}
+              </div>);};return <>{coreC.map(c=>renderC(c))}{advC.length>0&&<><div style={{borderTop:"0.5px solid #ECE6F8",margin:"10px 0"}}/><div style={{fontSize:10,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:"#7B6AD4",fontFamily:"'Nunito',sans-serif",marginBottom:8}}>Advisory</div>{advC.map(c=>renderC(c,0.85))}</>}{scope!==BEVCHECK_SCOPE_FULL&&lockedCount>0&&<><div style={{borderTop:"0.5px solid #ECE6F8",margin:"10px 0"}}/><div style={{background:T.linen,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 12px",display:"flex",gap:8,alignItems:"flex-start"}}><img src="/bev_neutral.png" alt="Bev" style={{width:26,height:26,borderRadius:"50%",flexShrink:0,objectFit:"cover",background:"#F2EEFB"}}/><div style={{flex:1}}><div style={{fontSize:12,fontWeight:600,color:T.ink,marginBottom:2}}>Craft adds {lockedCount} more {lockedCount===1?"check":"checks"}</div><div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>The stitch math is free on every import. Full verification adds Bev's advisory pass.</div>{onUpgrade&&<button onClick={onUpgrade} style={{marginTop:8,background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"7px 14px",fontSize:11,fontWeight:600,cursor:"pointer"}}>See Craft</button>}</div></div></>}</>;})()}
 
             {validationReport.summary&&<div style={{background:T.linen,borderRadius:12,padding:"12px 14px",marginTop:10,border:`1px solid ${T.border}`}}><div style={{fontSize:11,fontWeight:700,color:T.terra,marginBottom:4}}>Bev says:</div><div style={{fontSize:12,color:T.ink2,lineHeight:1.6}}>{validationReport.summary}</div></div>}
             {(()=>{const checks=validationReport.checks||[];const hasIssues=checks.some(c=>c.status==="fail"||c.status==="warning"||c.status==="warn");if(!hasIssues) return <button onClick={()=>{setShowFullReport(false);handleSave();}} style={{marginTop:14,width:"100%",background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Import Now</button>;const firstIssue=checks.find(c=>c.status==="fail"||c.status==="warning"||c.status==="warn");const rowNum=firstIssue?extractFirstRowNumber(firstIssue.detail):null;return <div style={{marginTop:14,display:"flex",gap:10}}><button onClick={()=>{setShowFullReport(false);handleSave();}} style={{flex:1,background:"#fff",color:T.terra,border:`1.5px solid ${T.terra}`,borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",minHeight:44}}>Import Now</button><button onClick={()=>{setShowFullReport(false);const rows=buildRowsFromComponents(extracted.components);const mats=(extracted.materials||[]).map((m,i)=>({id:i+1,name:m.name||"",amount:m.amount||"",yardage:0,notes:m.notes||""}));const finalCover=coverUrl||fileInfo?.coverUrl||null;onSave({id:Date.now(),title:editTitle||"Imported Pattern",source:editDesigner||"PDF Import",cat:"Uncategorized",hook:editHook||"",weight:editWeight||"",notes:"",pattern_notes:extracted.pattern_notes||"",yardage:0,rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},materials:mats,rows,photo:finalCover||PILL[Math.floor(Math.random()*PILL.length)],cover_image_url:finalCover,source_file_url:fileInfo?.url||"",source_file_name:fileInfo?.name||"",source_file_type:fileInfo?.type||"",extracted_by_ai:true,components:extracted.components||[],assembly_notes:extracted.assembly_notes||"",difficulty:extracted.difficulty||"",abbreviations_map:extracted.abbreviations_map||{},suggested_resources:extracted.suggested_resources||[],validation_flags:validationFlags.length>0?validationFlags:null,validation_report:isPro&&validationReport?{...validationReport,flaggedRows:(validationReport.checks||[]).filter(ch=>ch.status==="fail"||ch.status==="warning"||ch.status==="warn").map(ch=>({rowNumber:extractFirstRowNumber(ch.detail),status:ch.status==="warn"?"warning":ch.status})).filter(f=>f.rowNumber!=null).filter((f,idx,arr)=>arr.findIndex(x=>x.rowNumber===f.rowNumber)===idx)}:null,_reviewRowNumber:rowNum});}} style={{flex:1,background:"#7B6AD4",color:"#fff",border:"none",borderRadius:99,padding:"13px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)",minHeight:44}}>Review Issue →</button></div>;})()}
@@ -1684,7 +1709,7 @@ const BrowserImport = ({onSave,Btn,Photo}) => {
   );
 };
 
-const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,onPhotoImport,initialMethod,initialUrl,initialExtracted,initialCoverUrl,initialFileUrl,initialValidationReport,initialPollingJobId,isCollectionImport=false,initialIsStarter=false}) => {
+const AddPatternModal = ({onClose,onSave,isPro,tier,isAnonymous=false,patternCount,Btn,Photo,Bar,WireframeViewer,onUpgrade,onPhotoImport,initialMethod,initialUrl,initialExtracted,initialCoverUrl,initialFileUrl,initialValidationReport,initialPollingJobId,isCollectionImport=false,initialIsStarter=false}) => {
   // initialExtracted (from ImportPill queue completion) is wrapped into pdfHandoff
   // so PDFUploadForm lands directly on its review stage. initialCoverUrl is the
   // Cloudinary URL the client rendered & uploaded during the original upload
@@ -1860,9 +1885,9 @@ const AddPatternModal = ({onClose,onSave,isPro,patternCount,Btn,Photo,Bar,Wirefr
       {!method&&methodList}
       {method==="manual"&&<ManualEntryForm onSave={handleSave} Btn={Btn}/>}
       {method==="url"&&<URLImportForm onSave={handleSave} Btn={Btn} Photo={Photo} initialUrl={hubUrl||initialUrl} onExtractionStart={()=>{extractingRef.current=true;}} onExtractionEnd={()=>{extractingRef.current=false;}} onBevCheckActive={(v)=>{bevCheckActiveRef.current=v;setBevCheckActiveTick(v);}} onReviewActive={(v)=>{reviewActiveRef.current=v;setReviewActiveTick(v);}} onPdfHandoff={(handoffData)=>{setPdfHandoff(handoffData);setMethod('pdf');}}/>}
-      {method==="pdf"&&<PDFUploadForm onSave={handleSave} onClose={dismiss} Btn={Btn} isPro={isPro} onUpgrade={()=>{if(onUpgrade){dismiss();onUpgrade();}}} onExtractionStart={()=>{extractingRef.current=true;}} onExtractionEnd={()=>{extractingRef.current=false;}} onBevCheckActive={(v)=>{bevCheckActiveRef.current=v;setBevCheckActiveTick(v);}} onReviewActive={(v)=>{reviewActiveRef.current=v;setReviewActiveTick(v);}} initialExtracted={pdfHandoff} initialValidationReport={initialValidationReport} initialPollingJobId={initialPollingJobId} isCollectionImport={isCollectionImport} isStarterImport={initialIsStarter}/>}
+      {method==="pdf"&&<PDFUploadForm onSave={handleSave} onClose={dismiss} Btn={Btn} isPro={isPro} tier={tier} isAnonymous={isAnonymous} onUpgrade={()=>{if(onUpgrade){dismiss();onUpgrade();}}} onExtractionStart={()=>{extractingRef.current=true;}} onExtractionEnd={()=>{extractingRef.current=false;}} onBevCheckActive={(v)=>{bevCheckActiveRef.current=v;setBevCheckActiveTick(v);}} onReviewActive={(v)=>{reviewActiveRef.current=v;setReviewActiveTick(v);}} initialExtracted={pdfHandoff} initialValidationReport={initialValidationReport} initialPollingJobId={initialPollingJobId} isCollectionImport={isCollectionImport} isStarterImport={initialIsStarter}/>}
       {method==="browser"&&<BrowserImport onSave={handleSave} Btn={Btn} Photo={Photo}/>}
-      {method==="snap"&&<HiveVisionForm onSave={handleSave} Btn={Btn} Bar={Bar} WireframeViewer={WireframeViewer}/>}
+      {method==="snap"&&<HiveVisionForm onSave={handleSave} Btn={Btn} Bar={Bar} WireframeViewer={WireframeViewer} tier={tier} onUpgrade={()=>{if(onUpgrade){dismiss();onUpgrade();}}}/>}
     </div>
   );
 

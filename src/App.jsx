@@ -40,6 +40,7 @@ import {
   readCachedIsAnonymous, writeCachedIsAnonymous, clearCachedIsAnonymous,
 } from "./utils/tierUtils.js";
 import { canAccess, requiredTier, ANON_PATTERN_CAP } from "./utils/featureGates.js";
+import { countActivePatterns } from "./utils/patternCounts.js";
 import { DOC_TYPES, importRouteMismatch, resolveChildSourceUrl } from "./utils/docType.js";
 import { markImagesPending } from "./utils/patternImages.js";
 import { applySeo } from "./utils/seo.js";
@@ -167,8 +168,14 @@ const TIER_CONFIG = {
 // useTier returns gating info for the active session. Pass the user's tier
 // string ('free' | 'pro' | 'craft'); isPro is derived for back-compat with
 // call sites that still want a boolean.
-const useTier = (tier, userCount, starterCount=0) => {
-  const realCount = userCount - starterCount;
+//
+// activeCount MUST come from countActivePatterns (src/utils/patternCounts.js).
+// It used to take a raw array length minus a starter count, which counted
+// deleted and parked rows against the cap and paywalled users who had freed
+// their own slots. Taking a single already-filtered number leaves no seam for
+// that bug to grow back in.
+const useTier = (tier, activeCount) => {
+  const realCount = activeCount;
   const paid = isPaidTier(tier);
   // Every tier now has a finite patternCap (Free 5, Craft 100 fair-use
   // ceiling), so the cap is authoritative for all tiers — paid no longer
@@ -536,6 +543,8 @@ export const UPGRADE_TIER_DEFS = [
     features: [
       { label: '5 patterns', sub: 'Try Wovely with a small library' },
       { label: 'Standard imports', sub: 'Short and medium patterns welcome' },
+      { label: 'BevCheck stitch math', sub: 'On every import, free. Sequence, counts, duplicates and cross-references' },
+      { label: '3 photo scans a month', sub: 'Snap & Stitch turns a photo into a starter pattern' },
     ],
   },
   {
@@ -545,10 +554,10 @@ export const UPGRADE_TIER_DEFS = [
     name: 'Craft',
     blurb: 'For makers who want it all.',
     features: [
-      { label: 'Everything in Free, plus', sub: 'Up to 100 patterns, big imports, and BevCheck' },
+      { label: 'Everything in Free, plus', sub: 'Up to 100 patterns, big imports, and full BevCheck' },
       { label: 'Up to 100 patterns', sub: 'Our fair-use ceiling. Need more? Email us and we lift it.' },
       { label: 'Big patterns welcome', sub: 'Full support for complex multi-component imports' },
-      { label: 'BevCheck quality scoring', sub: 'Catch off-counts and broken rounds before you start' },
+      { label: 'Full BevCheck verification', sub: "Free covers the stitch math. Craft adds Bev's advisory pass: translation artifacts and component structure" },
       { label: 'Collections', sub: 'Organize pattern books and MKALs' },
       { label: 'More Craft features coming', sub: 'First in line as Craft grows' },
     ],
@@ -948,7 +957,7 @@ const SidebarCord = () => (
 );
 
 const SidebarNav = ({view,onNavigate,count,isPro,tier,isAnonymous,onAddPattern,onSignOut,onUpgrade,onOpenAuthWall,userPatterns=[],allPatterns=[]}) => {
-  const starterC=DEFAULT_STARTERS.length;const addedC=userPatterns.filter(p=>!p.isStarter&&p.status!=="deleted"&&p.status!=="parked").length;
+  const starterC=DEFAULT_STARTERS.length;const addedC=countActivePatterns(userPatterns);
   // For anonymous users, surface Pro items without the padlock/"Pro feature" visual — the gate fires
   // on click. Showing the lock pre-gate suggests "sign up and you still can't have this" which kills conversion.
   const bevCheckSub = isAnonymous ? "Validate any pattern" : (isPro ? "Validate any pattern" : "Craft feature");
@@ -2430,11 +2439,16 @@ export default function Wovely() {
   const [authWallMode,setAuthWallMode]=useState("signup");
   const{isTablet,isDesktop}=useBreakpoint();
   const allPatterns = [...userPatterns,...starterPatterns];
-  const userStarterCount=userPatterns.filter(p=>p.isStarter).length;
+  // Slots actually occupied: starters excluded (they're on the house), and
+  // deleted/parked rows excluded (the user gave those slots back). Soft
+  // deletes stay in userPatterns for the rest of the session, so counting the
+  // raw array meant a delete didn't free a slot until the next page load, and
+  // a park never freed one at all.
+  const activePatternCount=countActivePatterns(userPatterns);
   // Gating info for the active session — atCap, canAdd, isPro derived
   // from tier string. Named tierGate to disambiguate from the tier state
   // (string) above.
-  const tierGate=useTier(tier,userPatterns.length,userStarterCount);
+  const tierGate=useTier(tier,activePatternCount);
 
   // 5-tap Wovely logo easter egg (adam only)
   const handleLogoTap = useWovelySuperTap(triggerWhatsNew);
@@ -3757,7 +3771,7 @@ export default function Wovely() {
       cb();
       return;
     }
-    if (isAnonymous && (userPatterns.length - userStarterCount) >= ANON_PATTERN_CAP) {
+    if (isAnonymous && activePatternCount >= ANON_PATTERN_CAP) {
       // Guest already used their 1 import. Show the AuthWall with copy
       // that emphasizes "create an account to keep importing", not a
       // paid-tier upsell.
@@ -4031,8 +4045,8 @@ export default function Wovely() {
       <VaultReveal open={showVault} onDone={()=>setShowVault(false)}/>
       {checkoutFailureOverlay}
       {collectionSuggestion && <CollectionSuggestionPrompt pattern={collectionSuggestion.pattern} meta={collectionSuggestion.meta} onYes={handleAcceptCollectionSuggestion} onNo={()=>setCollectionSuggestion(null)} />}
-      {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} onPhotoImport={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);openImageImport();}} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id} initialIsStarter={(pendingExtractedHandoff?.fileType==='pdf'&&!!pendingExtractedHandoff?.isStarter)||(pendingResumeJobId?.fileType==='pdf'&&isStarterJobId(pendingResumeJobId.jobId))}/>}
-      {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
+      {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} patternCount={activePatternCount} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} onPhotoImport={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);openImageImport();}} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id} initialIsStarter={(pendingExtractedHandoff?.fileType==='pdf'&&!!pendingExtractedHandoff?.isStarter)||(pendingResumeJobId?.fileType==='pdf'&&isStarterJobId(pendingResumeJobId.jobId))}/>}
+      {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
       {addMenuOpen&&menuAnchor&&<><div onClick={()=>{setAddMenuOpen(false);setMenuAnchor(null);}} style={{position:"fixed",inset:0,zIndex:49}}/><div style={{position:"fixed",top:menuAnchor.top,left:menuAnchor.left,zIndex:50,background:"#fff",border:`1px solid ${T.border}`,borderRadius:14,boxShadow:"0 8px 32px rgba(45,45,78,.12)",minWidth:220,padding:"6px 0",fontFamily:"Nunito,sans-serif"}}>{[{icon:"📄",label:"Add PDF",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openImageImport();}},{icon:"🔗",label:"Paste a URL",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",action:()=>{setAddMenuOpen(false);setMenuAnchor(null);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 16px",cursor:"pointer",fontSize:13,fontWeight:500,color:T.ink,transition:"background .12s"}} onMouseEnter={e=>e.currentTarget.style.background=T.linen} onMouseLeave={e=>e.currentTarget.style.background="transparent"}><span style={{fontSize:16,width:22,textAlign:"center"}}>{item.icon}</span>{item.label}</div>))}</div></>}
       {createdPattern&&<PatternCreatedOverlay pattern={createdPattern} onStartBuilding={()=>{const p=createdPattern;const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);startAndOpenPattern(p);}} onGoToHive={()=>{const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);if(ctx?.id){setSelectedCollection(ctx);navigate("/collections/"+ctx.id);}else{navigateToView("collection");}}}/>}
       {multiSectionNotice&&<MultiSectionAnnouncePrompt count={multiSectionNotice.count} isCraft={tier===TIER_CRAFT} onGo={()=>{const pat=multiSectionNotice.pattern;setMultiSectionNotice(null);if(pat)startAndOpenPattern(pat);}} onSeeCraft={()=>{setMultiSectionNotice(null);setPaywallRecommend(requiredTier('collections'));setShowPaywall(true);}}/>}
@@ -4068,7 +4082,7 @@ export default function Wovely() {
           {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
           {view==="stash"&&<div style={{paddingTop:24}}><YarnStash gateAction={gateAction}/></div>}
           {view==="calculator"&&<div style={{paddingTop:24}}><Calculators/></div>}
-          {view==="stitch-check"&&<div style={{paddingTop:24}}><StitchCheck gateAction={gateAction}/></div>}
+          {view==="stitch-check"&&<div style={{paddingTop:24}}><StitchCheck gateAction={gateAction} tier={tier} isAnonymous={!authed || isAnonymous} onUpgrade={()=>setShowProModal(true)}/></div>}
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
           {view==="community"&&<div style={{paddingTop:24}}><YarnCircle isDesktop={isDesktop} isTablet={isTablet} authed={authed} isAnonymous={!authed||isAnonymous} onShare={()=>openAddModal()} onOpenPattern={(pid)=>navigate("/pattern/"+encodeURIComponent(pid))} onSignIn={openNavAuthWall}/></div>}
           {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} onSignIn={openNavSignIn} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
@@ -4100,8 +4114,8 @@ export default function Wovely() {
       <VaultReveal open={showVault} onDone={()=>setShowVault(false)}/>
       {checkoutFailureOverlay}
       {collectionSuggestion && <CollectionSuggestionPrompt pattern={collectionSuggestion.pattern} meta={collectionSuggestion.meta} onYes={handleAcceptCollectionSuggestion} onNo={()=>setCollectionSuggestion(null)} />}
-      {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} onPhotoImport={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);openImageImport();}} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id} initialIsStarter={(pendingExtractedHandoff?.fileType==='pdf'&&!!pendingExtractedHandoff?.isStarter)||(pendingResumeJobId?.fileType==='pdf'&&isStarterJobId(pendingResumeJobId.jobId))}/>}
-      {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
+      {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} patternCount={activePatternCount} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} onPhotoImport={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);openImageImport();}} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id} initialIsStarter={(pendingExtractedHandoff?.fileType==='pdf'&&!!pendingExtractedHandoff?.isStarter)||(pendingResumeJobId?.fileType==='pdf'&&isStarterJobId(pendingResumeJobId.jobId))}/>}
+      {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
       {createdPattern&&<PatternCreatedOverlay pattern={createdPattern} onStartBuilding={()=>{const p=createdPattern;const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);startAndOpenPattern(p);}} onGoToHive={()=>{const ctx=collectionContext;setCreatedPattern(null);setCollectionContext(null);if(ctx?.id){setSelectedCollection(ctx);navigate("/collections/"+ctx.id);}else{navigateToView("collection");}}}/>}
       {multiSectionNotice&&<MultiSectionAnnouncePrompt count={multiSectionNotice.count} isCraft={tier===TIER_CRAFT} onGo={()=>{const pat=multiSectionNotice.pattern;setMultiSectionNotice(null);if(pat)startAndOpenPattern(pat);}} onSeeCraft={()=>{setMultiSectionNotice(null);setPaywallRecommend(requiredTier('collections'));setShowPaywall(true);}}/>}
       {pinnedImage?.image && <PinnedThumbnail image={pinnedImage.image} onOpen={()=>setPinnedLightboxOpen(true)} onUnpin={()=>{setPinnedImage(null);setPinnedLightboxOpen(false);}} />}
@@ -4133,7 +4147,7 @@ export default function Wovely() {
         {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
         {view==="stash"&&<div style={{paddingTop:18}}><YarnStash gateAction={gateAction}/></div>}
         {view==="calculator"&&<div style={{paddingTop:18}}><Calculators/></div>}
-        {view==="stitch-check"&&<div style={{paddingTop:18}}><StitchCheck gateAction={gateAction}/></div>}
+        {view==="stitch-check"&&<div style={{paddingTop:18}}><StitchCheck gateAction={gateAction} tier={tier} isAnonymous={!authed || isAnonymous} onUpgrade={()=>setShowProModal(true)}/></div>}
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
         {view==="community"&&<div style={{paddingTop:18}}><YarnCircle isDesktop={isDesktop} isTablet={isTablet} authed={authed} isAnonymous={!authed||isAnonymous} onShare={()=>openAddModal()} onOpenPattern={(pid)=>navigate("/pattern/"+encodeURIComponent(pid))} onSignIn={openNavAuthWall}/></div>}
         {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} onSignIn={openNavSignIn} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}

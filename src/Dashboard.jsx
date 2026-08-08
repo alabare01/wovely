@@ -1022,7 +1022,11 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
   // the hero is a collection part.
   const inProgress=allPatterns.filter(p=>p.status!=="deleted").filter(p=>{const v=pct(p);return !p.isStarter&&p.status!=="parked"&&(p.status==="in_progress"||p.started||(v>0&&v<100))&&v<100;}).sort((a,b)=>new Date(b.updated_at||0)-new Date(a.updated_at||0));
   const [viewMode,setViewMode]=useState("grid");
-  const emptySlots=isPro?0:Math.max(0,TIER_CONFIG.free.patternCap-addedPats.length);
+  // Placeholder slots must be drawn off the SAME number the gate enforces
+  // (tier.userCount, now active-only), not off the grid's row count. Drawing
+  // it off addedPats counted parked patterns as occupied and showed a free
+  // user fewer open slots than the paywall would actually let them fill.
+  const emptySlots=isPro?0:Math.max(0,TIER_CONFIG.free.patternCap-(typeof tier?.userCount==="number"?tier.userCount:addedPats.length));
 
   return (
     <div style={{ minHeight: "100vh", background: "transparent" }}>

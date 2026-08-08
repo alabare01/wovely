@@ -367,7 +367,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
           <div className="craftit"><Check size={15} />Collections for MCALs &amp; MKALs, clue calendar included</div>
           <div className="craftit"><Check size={15} />The Vault — every original, backed up</div>
           <div className="craftit"><Check size={15} />Gauge, yardage &amp; scale calculators</div>
-          <div className="craftit"><Check size={15} />Dedicated 24/7 human support</div>
+          <div className="craftit"><Check size={15} />Live chat that reaches a real person, plus Bev in the app</div>
         </div>
       </div>
     </div>
@@ -391,8 +391,8 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
           <div className="pbill">No card required</div>
           <ul className="plist">
             <li><Check size={16} sw={2.6} />5 patterns with full row tracking</li>
-            <li><Check size={16} sw={2.6} />BevCheck on every import</li>
-            <li><Check size={16} sw={2.6} />3 Snap &amp; Stitch photo imports a month</li>
+            <li><Check size={16} sw={2.6} />BevCheck stitch math on every import</li>
+            <li><Check size={16} sw={2.6} />3 Snap &amp; Stitch photo scans a month</li>
           </ul>
           <div className="spacer" />
           <button className="pbtn ghost" onClick={onStartFree}>Start free</button>
@@ -408,9 +408,9 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
           </div>
           <div className="pbill">{annual ? "$54.99 billed yearly, over 4 months free" : "billed monthly, switch to annual and save 34%"}</div>
           <ul className="plist">
-            <li><Check size={16} sw={2.6} />Everything in Free, plus a large pattern library</li>
+            <li><Check size={16} sw={2.6} />Full BevCheck verification, plus a large pattern library</li>
             <li><Check size={16} sw={2.6} />Advanced imports + Collections (MCAL/MKAL)</li>
-            <li><Check size={16} sw={2.6} />Vault, calculators &amp; 24/7 human support</li>
+            <li><Check size={16} sw={2.6} />Vault, calculators &amp; live chat with a real person</li>
           </ul>
           <div className="spacer" />
           <button className="pbtn" onClick={onGoCraft}>Go Craft</button>
@@ -423,7 +423,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
       <div className="trustrow">
         <div className="tchip"><Check size={15} sw={2.8} />Cancel anytime</div>
         <div className="tchip"><Check size={15} sw={2.8} />Secure checkout</div>
-        <div className="tchip"><Check size={15} sw={2.8} />Real human support, 24/7</div>
+        <div className="tchip"><Check size={15} sw={2.8} />A real person reads every message</div>
         <div className="tchip"><Check size={15} sw={2.8} />Made with makers</div>
       </div>
     </div>
@@ -580,7 +580,7 @@ const ForkScreen = ({ annual, onFree, onCraft }) => (
       <div className="forkrow">
         <button className="fork" onClick={onFree}>
           <div className="fork-t">Start free</div>
-          <div className="fork-s">5 patterns, full row tracking, BevCheck on every import. No card, no clock.</div>
+          <div className="fork-s">5 patterns, full row tracking, BevCheck stitch math on every import. No card, no clock.</div>
           <div className="minipat">
             <img src="/cover-mushroom-photo.png" alt="Button the Mushroom starter" />
             <span>Includes Button the Mushroom — our free original, on the house</span>
@@ -589,7 +589,7 @@ const ForkScreen = ({ annual, onFree, onCraft }) => (
         </button>
         <button className="fork gold" onClick={onCraft}>
           <div className="fork-t">Go Craft <span className="craftbadge">✦</span></div>
-          <div className="fork-s">A large pattern library, Advanced imports, Collections, the Vault, 24/7 support.</div>
+          <div className="fork-s">A large pattern library, Advanced imports, Collections, the Vault, live chat with a real person.</div>
           <div className="fork-p">${annual ? "4.58" : "6.99"}/mo · cancel anytime →</div>
         </button>
       </div>
