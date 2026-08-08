@@ -20,6 +20,67 @@ export const isAnonymousSession = () => {
   } catch { return false; }
 };
 
+// ─── SESSION LIFETIME ────────────────────────────────────────────────────────
+// Supabase access tokens are short-lived (one hour by default). The only
+// renewal the app used to do was the single refresh inside the mount-time
+// validate(), so a tab left open past the hour quietly lost its session: REST
+// reads started 401ing and getUser() started returning null with nothing on
+// screen to explain it. These three helpers give the app one place to ask when
+// the token dies and one deduped way to renew it.
+
+// Epoch ms at which the current access token expires. Prefers the session's
+// own expires_at (seconds since epoch), falls back to the JWT `exp` claim, and
+// returns 0 when neither can be read so callers treat it as "already dead".
+export const sessionExpiresAt = (s = getSession()) => {
+  if (!s?.access_token) return 0;
+  if (typeof s.expires_at === "number" && s.expires_at > 0) return s.expires_at * 1000;
+  try {
+    const p = JSON.parse(atob(s.access_token.split(".")[1]));
+    return typeof p?.exp === "number" ? p.exp * 1000 : 0;
+  } catch { return 0; }
+};
+
+// Milliseconds of life left in the current access token. Negative once expired.
+export const millisUntilExpiry = (s = getSession()) => sessionExpiresAt(s) - Date.now();
+
+// Renew the access token from the stored refresh token.
+//
+// Deduped on purpose: Supabase invalidates a refresh token the moment it is
+// used, so two concurrent rotations (a timer firing at the same instant the
+// tab regains focus) would have the loser's token rejected and log the user
+// out. Concurrent callers share the one in-flight request instead.
+//
+// Resolves { ok:true, session } or { ok:false, reason } and never throws.
+// `reason` matters to the caller: "network" means we could not reach Supabase
+// and the current token may still be perfectly good, so the caller should
+// retry rather than tear the session down. Anything else means the refresh
+// token itself was rejected and the session is genuinely over.
+let inFlightRefresh = null;
+export const refreshSession = () => {
+  if (inFlightRefresh) return inFlightRefresh;
+  const s = getSession();
+  if (!s?.refresh_token) return Promise.resolve({ ok: false, reason: "no_refresh_token" });
+  inFlightRefresh = (async () => {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+        method: "POST",
+        headers: { "apikey": SUPABASE_ANON_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh_token: s.refresh_token }),
+      });
+      if (!res.ok) return { ok: false, reason: `http_${res.status}` };
+      const ns = await res.json();
+      if (!ns?.access_token) return { ok: false, reason: "no_access_token" };
+      saveSession(ns);
+      return { ok: true, session: ns };
+    } catch {
+      return { ok: false, reason: "network" };
+    } finally {
+      inFlightRefresh = null;
+    }
+  })();
+  return inFlightRefresh;
+};
+
 export const supabaseAuth = {
   // Native Supabase anonymous sign-in. Requires "Allow anonymous sign-ins"
   // toggle in the Supabase Dashboard (Authentication > Settings > User

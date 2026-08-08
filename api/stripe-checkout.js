@@ -34,19 +34,31 @@ export default async function handler(req, res) {
   const _t0 = Date.now();
 
   const { userId, email, tier: rawTier, cadence: rawCadence } = req.body || {};
-  if (!userId || !email) return res.status(400).json({ error: 'Missing userId or email' });
+
+  // Every failure response carries BOTH a machine-readable `error` code and a
+  // `message` the client is allowed to show a customer verbatim. Raw Stripe
+  // exception text never goes in `message` — it lands in the logs instead.
+  // The client falls back to its own generic copy if `message` is ever absent,
+  // so no failure can reach a user as silence.
+  const fail = (status, code, message) => res.status(status).json({ error: code, message });
+
+  if (!userId || !email) {
+    return fail(400, 'missing_identity', 'We could not confirm your account, so checkout did not open. Nothing has been charged. Sign out, sign back in, and try again.');
+  }
 
   // Craft is the only purchasable tier now. Reject any explicit tier param
   // that isn't 'craft'; otherwise default to 'craft' unconditionally.
   if (rawTier != null && rawTier !== 'craft') {
-    return res.status(400).json({ error: `Unknown tier "${rawTier}". The only purchasable tier is "craft".` });
+    console.error(`[stripe-checkout] Rejected unknown tier "${rawTier}"`);
+    return fail(400, 'unknown_tier', 'That plan is not available. Close this and open the plans list again to pick Wovely Craft.');
   }
   const tier = 'craft';
 
   // Billing cadence selects which Stripe price we charge. Defaults to monthly
   // for any client that hasn't sent the field yet; reject anything else.
   if (rawCadence != null && rawCadence !== 'monthly' && rawCadence !== 'annual') {
-    return res.status(400).json({ error: `Unknown cadence "${rawCadence}". Use "monthly" or "annual".` });
+    console.error(`[stripe-checkout] Rejected unknown cadence "${rawCadence}"`);
+    return fail(400, 'unknown_cadence', 'That billing option is not available. Open the plans list again and choose monthly or yearly.');
   }
   const cadence = rawCadence || 'monthly';
   const priceEnvKey = PRICE_ENV[tier][cadence];
@@ -54,7 +66,7 @@ export default async function handler(req, res) {
 
   if (!priceId) {
     console.error(`[stripe-checkout] Missing env var ${priceEnvKey} for tier=${tier}`);
-    return res.status(500).json({ error: `Checkout for ${tier} is not configured yet. Try again in a moment, or contact support.` });
+    return fail(500, 'price_not_configured', 'Checkout is not set up on our side yet, so nothing has been charged. Email support@wovely.app and we will get you subscribed by hand.');
   }
 
   try {
@@ -64,10 +76,22 @@ export default async function handler(req, res) {
       customer_email: email,
       line_items: [{ price: priceId, quantity: 1 }],
       metadata: { userId, tier, cadence },
+      // Second carrier for the same id. metadata is the primary channel, but
+      // the webhook has already logged "missing metadata.userId" in the wild,
+      // and a payment we cannot attach to an account is the worst outcome on
+      // this path. client_reference_id survives independently of metadata.
+      client_reference_id: userId,
       success_url: `https://wovely.app?upgrade=success&tier=${tier}&cadence=${cadence}`,
       cancel_url: 'https://wovely.app?upgrade=cancelled',
     });
 
+    // A 200 with no url would send the client to the string "undefined".
+    // Treat it as the failure it is, and check BEFORE the success log so the
+    // log never claims a 200 we did not send.
+    if (!session?.url) {
+      console.error('[stripe-checkout] Stripe returned a session with no url:', session?.id);
+      return fail(502, 'no_session_url', 'Stripe did not return a checkout page. Nothing has been charged. Try again in a moment, or email support@wovely.app.');
+    }
     if (_url && _key) {
       await fetch(`${_url}/rest/v1/vercel_logs`, {
         method: 'POST',
@@ -85,6 +109,8 @@ export default async function handler(req, res) {
         body: JSON.stringify({ timestamp: new Date().toISOString(), level: 'error', message: `[stripe-checkout] tier=${tier} error: ${err.message} (${Date.now() - _t0}ms)`, source: 'serverless', request_path: '/api/stripe-checkout', request_method: 'POST', status_code: 500, project_id: 'wovely', user_id: userId })
       }).catch(() => {});
     }
-    res.status(500).json({ error: err.message });
+    // err.message is Stripe's internal text ("No such price: ..."). It goes to
+    // the logs above, never to the customer.
+    return fail(500, 'stripe_error', 'Stripe could not open a checkout page just now. Nothing has been charged. Try again in a moment, or email support@wovely.app and we will sort it out.');
   }
 }

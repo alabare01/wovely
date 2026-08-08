@@ -599,19 +599,25 @@ const ForkScreen = ({ annual, onFree, onCraft }) => (
 );
 
 /* ── Main Auth component: landing ⇄ try ⇄ auth ⇄ fork screens ── */
-const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
+// `startAt` ('signin' | 'signup' | null) lets the caller open straight onto the
+// auth card without a hash round-trip. Used by the expired-session path, which
+// needs the sign-in form in front of the user immediately rather than dropping
+// them on the marketing hero and hoping they find the nav. `notice` renders
+// above the card and carries the explanation for why they are back here.
+const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = null }) => {
   // Initial screen honors the mockup's hash deep-links (#try, #signup,
   // #signin) so marketing can link straight to an entry point.
   // Exact-match only — Supabase auth callbacks also use the hash
   // (#access_token=...&type=signup), which must never hijack the screen.
   const [screen, setScreen] = useState(() => {
+    if (startAt === "signin" || startAt === "signup") return "auth";
     const h = (typeof location !== "undefined" && location.hash) || "";
     if (h === "#try") return "try";
     if (h === "#signup" || h === "#signin") return "auth";
     return "landing";
   }); // 'landing' | 'try' | 'auth' | 'fork'
   const [authMode, setAuthMode] = useState(() =>
-    (typeof location !== "undefined" && location.hash === "#signin") ? "signin" : "signup");
+    startAt === "signin" || (typeof location !== "undefined" && location.hash === "#signin") ? "signin" : "signup");
   const [pulseKey, setPulseKey] = useState(0);
 
   // Pricing cadence for the landing toggle. Annual is the default per the
@@ -682,6 +688,12 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous }) => {
         onStartFree={goTry}
         showLinks={screen === "landing"}
       />
+      {/* Above every screen, not just the auth card. A guest whose session
+          died lands on the marketing hero, and a notice rendered after that
+          whole page would sit below the fold and never be read. */}
+      {notice && (
+        <div style={{ padding: "18px 20px 0" }}>{notice}</div>
+      )}
       {screen === "landing" && (
         <Landing annual={annual} setAnnual={setAnnual} onStartFree={goTry} onGoCraft={goCraft} />
       )}

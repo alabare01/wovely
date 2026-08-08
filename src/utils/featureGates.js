@@ -7,7 +7,7 @@
 // returns the cheapest tier in the allowlist so the upgrade prompt can
 // recommend the right plan.
 
-import { TIER_FREE, TIER_PRO, TIER_CRAFT } from './tierUtils.js';
+import { TIER_FREE, TIER_CRAFT } from './tierUtils.js';
 
 export const FEATURE_GATES = {
   // Craft is a 100-pattern fair-use tier, NOT truly unlimited. The real cap is
@@ -36,10 +36,15 @@ export const canAccess = (feature, tier, isAnonymous = false) => {
   return allowed ? allowed.includes(tier) : true;
 };
 
+// The cheapest tier that unlocks a feature, used to pick which plan the
+// upgrade prompt recommends. It must never answer TIER_PRO: Pro is a legacy
+// entitlement that some old user_profiles rows still carry, but nobody can buy
+// it (api/stripe-checkout.js sells craft and nothing else). Recommending it
+// would send a customer looking for a plan that does not exist, which is
+// exactly the dead end the import-job gate used to create.
 export const requiredTier = (feature) => {
   const allowed = FEATURE_GATES[feature];
   if (!allowed || allowed.length === 0) return TIER_FREE;
-  if (allowed.includes(TIER_PRO)) return TIER_PRO;
   return TIER_CRAFT;
 };
 

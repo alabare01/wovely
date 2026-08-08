@@ -3,7 +3,7 @@ import { initErrorReporter, setErrorReporterUser } from './utils/errorReporter.j
 import { useNavigate, useLocation, useParams, Routes, Route, Navigate } from "react-router-dom";
 import posthog from "posthog-js";
 import { T, useBreakpoint, Field } from "./theme.jsx";
-import { SUPABASE_URL, SUPABASE_ANON_KEY, APP_ORIGIN, saveSession, getSession, supabaseAuth, isAnonymousSession } from "./supabase.js";
+import { SUPABASE_URL, SUPABASE_ANON_KEY, APP_ORIGIN, saveSession, getSession, supabaseAuth, isAnonymousSession, refreshSession, millisUntilExpiry } from "./supabase.js";
 import { PHOTOS, PILL, APP_VERSION } from "./constants.js";
 import Calculators from "./Calculators.jsx";
 import StitchCheck from "./StitchCheck.jsx";
@@ -43,6 +43,10 @@ import { canAccess, requiredTier, ANON_PATTERN_CAP } from "./utils/featureGates.
 import { DOC_TYPES, importRouteMismatch, resolveChildSourceUrl } from "./utils/docType.js";
 import { markImagesPending } from "./utils/patternImages.js";
 import { applySeo } from "./utils/seo.js";
+import {
+  requestCheckoutSession, CHECKOUT_SUPPORT_EMAIL,
+  CHECKOUT_STALLED_MSG, CHECKOUT_REDIRECT_WATCHDOG_MS,
+} from "./utils/checkout.js";
 
 // Parse Supabase auth tokens from the email-confirmation URL hash and write
 // the session to localStorage BEFORE React mounts. Users arriving from a
@@ -551,6 +555,81 @@ export const UPGRADE_TIER_DEFS = [
   },
 ];
 
+// ── Checkout plumbing ────────────────────────────────────────────────────────
+// requestCheckoutSession (src/utils/checkout.js) is the ONLY place in the app
+// that may call /api/stripe-checkout. It always resolves to { ok:true, url } or
+// { ok:false, code, message }, so no call site can drop a payment failure on
+// the floor the way all three of them used to.
+
+// Shared failure panel. Used by the plans modal and by the app-level notice so
+// a checkout failure reads the same wherever it happens: what went wrong, that
+// no money moved, and the next thing to do.
+const CheckoutFailurePanel = ({ message, url, onRetry, retryLabel = "Try again", compact = false }) => (
+  <div role="alert" style={{
+    background: "#FFF4F1",
+    border: "1px solid #F3C9BE",
+    borderRadius: 14,
+    padding: compact ? "12px 14px" : "14px 16px",
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  }}>
+    <div style={{ fontSize: 13, lineHeight: 1.55, color: "#7A3B2E", fontWeight: 600 }}>{message}</div>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+      {url && (
+        <a href={url} style={{
+          background: "#C2564A", color: "#fff", textDecoration: "none",
+          borderRadius: 99, padding: "9px 18px", fontSize: 13, fontWeight: 700,
+        }}>Continue to checkout</a>
+      )}
+      {onRetry && (
+        <button onClick={onRetry} style={{
+          background: url ? "transparent" : "#C2564A",
+          color: url ? "#C2564A" : "#fff",
+          border: url ? "1.5px solid #C2564A" : "none",
+          borderRadius: 99, padding: "9px 18px", fontSize: 13, fontWeight: 700, cursor: "pointer",
+        }}>{retryLabel}</button>
+      )}
+      <a href={`mailto:${CHECKOUT_SUPPORT_EMAIL}?subject=${encodeURIComponent("Trouble subscribing to Wovely")}`}
+         style={{ fontSize: 12, color: "#7A3B2E", fontWeight: 600 }}>Email us instead</a>
+    </div>
+  </div>
+);
+
+// Shown on the entry screen after a session ends for real (refresh token
+// rejected). It exists because the previous behaviour was to silently drop the
+// user back to the marketing page, which reads as "the app lost my library"
+// rather than "you need to sign in again".
+const SessionEndedNotice = ({ wasAnonymous, onDismiss }) => (
+  <div role="status" style={{
+    maxWidth: 520,
+    margin: "0 auto 18px",
+    background: "#F2EEFB",
+    border: "1px solid #DCD2F2",
+    borderRadius: 16,
+    padding: "14px 16px",
+    display: "flex",
+    gap: 12,
+    alignItems: "flex-start",
+    fontFamily: "Nunito, sans-serif",
+  }}>
+    <div style={{ flex: 1, minWidth: 0 }}>
+      <div style={{ fontSize: 14, fontWeight: 800, color: "#2E2748", marginBottom: 4 }}>
+        {wasAnonymous ? "Your guest session has ended" : "Your session has ended"}
+      </div>
+      <div style={{ fontSize: 13, lineHeight: 1.6, color: "#726A92" }}>
+        {wasAnonymous
+          ? "Guest sessions do not last forever, and this one has run out. Create a free account and your work stays saved from here on."
+          : "You were signed out after a long stretch away. Sign in below and your library comes back exactly as you left it."}
+      </div>
+    </div>
+    <button onClick={onDismiss} aria-label="Dismiss" style={{
+      background: "transparent", border: "none", cursor: "pointer",
+      fontSize: 18, lineHeight: 1, color: "#726A92", flexShrink: 0, padding: 2,
+    }}>×</button>
+  </div>
+);
+
 // Fair-use wall — shown when a Craft user hits the pattern ceiling. Craft is
 // already the only paid tier, so there's nothing to upsell: this is a plain
 // support message with NO upgrade CTA, unlike the Free paywall (TieredUpgradeModal).
@@ -580,6 +659,12 @@ const FairUseWall = ({ onClose, cap }) => {
 const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false, onSignupRequired, recommendedTier = null }) => {
   const { isDesktop } = useBreakpoint();
   const [checkingOut, setCheckingOut] = useState(null); // tier key in flight
+  // { tier, message, url? } while a checkout attempt has failed or stalled.
+  // Rendered above the plan cards, so a failed payment can never look like
+  // nothing happened.
+  const [checkoutFailure, setCheckoutFailure] = useState(null);
+  const watchdogRef = useRef(null);
+  useEffect(() => () => { if (watchdogRef.current) clearTimeout(watchdogRef.current); }, []);
   const safeTier = normalizeTier(currentTier);
   // Default step-up: Craft is the natural pick for Free; Craft users see no
   // recommendation (there's no higher tier). When the modal was opened by a
@@ -610,24 +695,39 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
       if (onSignupRequired) onSignupRequired(tierKey, cadence);
       return;
     }
+    setCheckoutFailure(null);
+    // A retry must not leave the previous attempt's watchdog armed, or it
+    // fires mid-second-attempt and shows a stale failure.
+    if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
     setCheckingOut(tierKey);
-    try {
-      const user = supabaseAuth.getUser();
-      const s = getSession();
-      if (!user || !s) throw new Error("Not authenticated");
-      const uid = (()=>{try{const p=JSON.parse(atob(s.access_token.split(".")[1]));return p.sub;}catch{return null;}})();
-      const res = await fetch("/api/stripe-checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: uid || user.id, email: user.email, tier: tierKey, cadence }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Checkout failed");
-      window.location.href = data.url;
-    } catch (err) {
-      console.error("[Wovely] Checkout error:", err);
+    const user = supabaseAuth.getUser();
+    const s = getSession();
+    const uid = s?.access_token
+      ? (()=>{try{const p=JSON.parse(atob(s.access_token.split(".")[1]));return p.sub;}catch{return null;}})()
+      : null;
+    const result = await requestCheckoutSession({
+      userId: uid || user?.id,
+      email: user?.email,
+      tier: tierKey,
+      cadence,
+    });
+    if (!result.ok) {
+      // Every failure now lands on screen inside the modal the user is
+      // already looking at, next to the button they just pressed.
       setCheckingOut(null);
+      setCheckoutFailure({ tier: tierKey, message: result.message });
+      posthog.capture("checkout_failed", { tier: tierKey, cadence, code: result.code, surface: "plans_modal" });
+      return;
     }
+    window.location.href = result.url;
+    // If we are still mounted after the watchdog window the navigation never
+    // happened (blocked, or the tab lost the gesture). Hand the user the URL
+    // rather than leaving them with a spinner that never resolves.
+    watchdogRef.current = setTimeout(() => {
+      setCheckingOut(null);
+      setCheckoutFailure({ tier: tierKey, message: CHECKOUT_STALLED_MSG, url: result.url });
+      posthog.capture("checkout_failed", { tier: tierKey, cadence, code: "redirect_stalled", surface: "plans_modal" });
+    }, CHECKOUT_REDIRECT_WATCHDOG_MS);
   };
 
   // Headline copy varies by who's looking. Guests see a signup-first frame
@@ -680,6 +780,18 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
           </div>
           <div style={{fontSize:11,fontWeight:700,color:T.terra,letterSpacing:"0.02em"}}>Best value · save ${annualSavings}/yr</div>
         </div>
+
+        {/* Checkout failure surface. Sits directly above the plan cards so the
+            user sees it without scrolling, right where they pressed. */}
+        {checkoutFailure && (
+          <div style={{flexShrink:0,padding:isDesktop?"0 28px 12px":"0 18px 12px"}}>
+            <CheckoutFailurePanel
+              message={checkoutFailure.message}
+              url={checkoutFailure.url}
+              onRetry={checkoutFailure.url ? null : () => handleCheckout(checkoutFailure.tier)}
+            />
+          </div>
+        )}
 
         <div style={{
           flex:1,
@@ -794,7 +906,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
                         boxShadow: isRecommended ? "0 4px 16px rgba(123,106,212,.3)" : "none",
                         opacity: isCheckingOut ? 0.7 : 1,
                       }}
-                    >{isCheckingOut ? "Opening checkout..." : `${isAnonymous ? "Create account & get" : "Get"} ${def.name} — ${chargeLabel}`}</button>
+                    >{isCheckingOut ? "Opening checkout..." : `${isAnonymous ? "Create account & get" : "Get"} ${def.name} · ${chargeLabel}`}</button>
                   )}
                 </div>
               </div>
@@ -2202,6 +2314,17 @@ export default function Wovely() {
   const [readyPromptPattern,setReadyPromptPattern]=useState(null);
   const [deleteTarget,setDeleteTarget]=useState(null);
   const [upgradeToast,setUpgradeToast]=useState(null);
+  // App-level checkout failure. Set by fireUpgradeCheckout / checkUpgradeIntent,
+  // which run with no modal on screen (post-signup, post-OAuth), so they need
+  // their own surface. { tier, cadence, message, url? }.
+  const [checkoutFailure,setCheckoutFailure]=useState(null);
+  const checkoutWatchdogRef=useRef(null);
+  useEffect(()=>()=>{if(checkoutWatchdogRef.current) clearTimeout(checkoutWatchdogRef.current);},[]);
+  // Set when the refresh token itself is rejected, i.e. the session is really
+  // over. { wasAnonymous } so the notice can say the right thing to a guest
+  // (whose work is tied to a session that no longer exists) versus a returning
+  // account holder (who just needs to sign in again).
+  const [sessionExpired,setSessionExpired]=useState(null);
   const [showVault,setShowVault]=useState(()=>{try{return typeof window!=='undefined'&&new URLSearchParams(window.location.search).get('vaultdemo')==='1';}catch{return false;}});
   // When a Craft-only capability (multi-section/MKAL hub, collections) opens the
   // upgrade modal, the tier to recommend. null → modal's default Free→Pro step-up.
@@ -2254,6 +2377,29 @@ export default function Wovely() {
   // refresh/nav within the tab keeps them in the app shell instead of bouncing to the landing.
   const [anonymousMode,setAnonymousMode]=useState(()=>{try{return sessionStorage.getItem("wovely_anonymous_mode")==="1";}catch{return false;}});
   const enterAnonymousMode=useCallback(()=>{try{sessionStorage.setItem("wovely_anonymous_mode","1");}catch{}setAnonymousMode(true);try{posthog.capture("anonymous_mode_entered");}catch{}},[]);
+
+  // The refresh token was rejected: this session cannot be saved. Clear the
+  // wreckage and put the user on the entry screen with the sign-in card
+  // already open and a plain explanation of what happened. The old behaviour
+  // was to drop `authed` and say nothing, which read as "the app lost my
+  // library". Redirect intent is cleared deliberately: per WOVELY_CONTEXT, an
+  // expired session always lands on My Wovely, never on a stale deep link.
+  const endExpiredSession = (wasAnonymous) => {
+    saveSession(null);
+    clearCachedTier();
+    clearCachedIsAnonymous();
+    setAuthed(false);
+    setIsAnonymous(false);
+    setAnonymousMode(false);
+    setTier(TIER_FREE);
+    try {
+      sessionStorage.removeItem("wovely_anonymous_mode");
+      sessionStorage.removeItem("wovely_redirect_intent");
+    } catch {}
+    document.cookie = "wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    setSessionExpired({ wasAnonymous: !!wasAnonymous });
+    navigate("/");
+  };
 
   // Landing "Try free" fork stashes the picked path (wovely_first_run_intent)
   // before entering guest mode — honor it once the shell is up so the user
@@ -2328,38 +2474,41 @@ export default function Wovely() {
   // where supabaseAuth.getUser() can briefly lag the rotated JWT during
   // the anonymous-to-real flip. Trusting the user object returned by
   // waitForSession() in the AuthWallModal avoids that race entirely.
-  // Navigates the page on success, returns false on failure so the
-  // caller can decide how to recover.
+  // Navigates the page on success. Every failure raises the app-level
+  // checkout notice (see `checkoutFailure`) before returning false — this
+  // runs on the post-signup auto-checkout path, where the user has just
+  // committed to paying and there is no modal left on screen to fail into.
+  // Silence here is what a lost customer looks like.
   const fireUpgradeCheckout = async (tierKey, passedUser, cadence) => {
-    try {
-      let email, userId;
-      if (passedUser?.email) {
-        email = passedUser.email;
-        userId = passedUser.id;
-      } else {
-        const u = supabaseAuth.getUser();
-        const s = getSession();
-        if (!u || !s) {
-          console.warn("[Wovely] fireUpgradeCheckout: no user/session, bailing");
-          return false;
-        }
-        email = u.email;
-        userId = (()=>{try{const p=JSON.parse(atob(s.access_token.split(".")[1]));return p.sub;}catch{return null;}})() || u.id;
-      }
-      console.log("[Wovely] fireUpgradeCheckout:", { tierKey, hasPassedUser: !!passedUser, email, userId });
-      const res = await fetch("/api/stripe-checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, email, tier: tierKey, cadence: cadence || 'monthly' }),
-      });
-      const data = await res.json();
-      if (!res.ok) { console.error("[Wovely] Checkout error:", data?.error || data); return false; }
-      window.location.href = data.url;
-      return true;
-    } catch (err) {
-      console.error("[Wovely] Checkout exception:", err);
+    const cad = cadence || 'monthly';
+    // A retry must not leave the previous attempt's watchdog armed.
+    if (checkoutWatchdogRef.current) { clearTimeout(checkoutWatchdogRef.current); checkoutWatchdogRef.current = null; }
+    let email = passedUser?.email || null;
+    let userId = passedUser?.id || null;
+    if (!email) {
+      const u = supabaseAuth.getUser();
+      const s = getSession();
+      email = u?.email || null;
+      userId = (s?.access_token
+        ? (()=>{try{const p=JSON.parse(atob(s.access_token.split(".")[1]));return p.sub;}catch{return null;}})()
+        : null) || u?.id || null;
+    }
+    console.log("[Wovely] fireUpgradeCheckout:", { tierKey, hasPassedUser: !!passedUser, email, userId });
+    const result = await requestCheckoutSession({ userId, email, tier: tierKey, cadence: cad });
+    if (!result.ok) {
+      posthog.capture("checkout_failed", { tier: tierKey, cadence: cad, code: result.code, surface: "post_signup" });
+      setCheckoutFailure({ tier: tierKey, cadence: cad, message: result.message });
       return false;
     }
+    setCheckoutFailure(null);
+    window.location.href = result.url;
+    // Still here after the watchdog window means the redirect never took.
+    // Surface the URL so the user can finish by hand.
+    checkoutWatchdogRef.current = setTimeout(() => {
+      posthog.capture("checkout_failed", { tier: tierKey, cadence: cad, code: "redirect_stalled", surface: "post_signup" });
+      setCheckoutFailure({ tier: tierKey, cadence: cad, message: CHECKOUT_STALLED_MSG, url: result.url });
+    }, CHECKOUT_REDIRECT_WATCHDOG_MS);
+    return true;
   };
 
   // Called by TieredUpgradeModal when an anonymous user picks any plan
@@ -2524,7 +2673,10 @@ export default function Wovely() {
       if (isValidating.current) return;
       isValidating.current = true;
       const s = getSession();
+      // No stored session at all is a first-time visitor, not an expired one.
+      // Never show the "session ended" notice for that.
       if (!s?.refresh_token) { clearAuth(); setAuthChecked(true); isValidating.current=false; return; }
+      const hadAnonymousSession = isAnonymousSession();
       try {
         const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
           method:"POST",
@@ -2572,16 +2724,95 @@ export default function Wovely() {
           setIsAnonymous(isAnonymousSession());
           setAuthed(true);document.cookie="wovely_authed=1;path=/;max-age=31536000";
         } else {
-          clearAuth();
+          // The refresh token was rejected: a returning user whose session
+          // really has ended. They used to land on the marketing page with no
+          // idea why their library vanished. Say what happened.
+          posthog.capture("session_refresh_failed", { reason: `http_${res.status}`, anonymous: hadAnonymousSession, at: "mount" });
+          endExpiredSession(hadAnonymousSession);
         }
       } catch {
-        clearAuth();
+        // Network failure, not expiry. Signing someone out because their wifi
+        // blinked is its own dead end. If the stored token has life left in
+        // it, keep the session and let the refresh timer try again.
+        if (millisUntilExpiry(s) > 0) {
+          setIsAnonymous(isAnonymousSession());
+          setAuthed(true);
+          document.cookie="wovely_authed=1;path=/;max-age=31536000";
+        } else {
+          posthog.capture("session_refresh_failed", { reason: "network_and_expired", anonymous: hadAnonymousSession, at: "mount" });
+          endExpiredSession(hadAnonymousSession);
+        }
       }
       setAuthChecked(true);
       isValidating.current=false;
     };
     validate();
   },[]);
+
+  // ── Proactive session refresh ──────────────────────────────────────────────
+  // Supabase access tokens live about an hour. Until now the only renewal was
+  // the single refresh inside validate() above, which runs once on mount, so a
+  // tab left open past the hour hit a wall with no explanation: reads 401'd,
+  // getUser() returned null, and the UI simply stopped working. Crocheters keep
+  // a pattern open for hours, so this was not an edge case.
+  //
+  // Three things happen here: renew on a timer well before expiry, renew on
+  // tab wake (timers do not survive a sleeping laptop), and when the refresh
+  // token is genuinely dead, say so out loud instead of blanking the app.
+  const REFRESH_LEAD_MS = 5 * 60 * 1000;
+  const refreshTimerRef = useRef(null);
+  useEffect(() => {
+    if (!authed) return;
+    let cancelled = false;
+    const clearTimer = () => {
+      if (refreshTimerRef.current) { clearTimeout(refreshTimerRef.current); refreshTimerRef.current = null; }
+    };
+    const schedule = () => {
+      clearTimer();
+      if (cancelled) return;
+      // Fire REFRESH_LEAD_MS early, never sooner than 5s (so a clock skew
+      // cannot spin), never later than ~21 days (setTimeout overflows past
+      // 2^31 ms and would fire immediately, forever).
+      const delay = Math.min(Math.max(millisUntilExpiry() - REFRESH_LEAD_MS, 5000), 21 * 24 * 60 * 60 * 1000);
+      refreshTimerRef.current = setTimeout(run, delay);
+    };
+    const run = async () => {
+      if (cancelled) return;
+      const wasAnonymous = isAnonymousSession();
+      const r = await refreshSession();
+      if (cancelled) return;
+      if (r.ok) {
+        setIsAnonymous(isAnonymousSession());
+        schedule();
+        return;
+      }
+      if (r.reason === "network") {
+        // Connectivity, not expiry. The token in hand may still be valid, so
+        // do NOT tear the session down over a dropped wifi. Retry shortly.
+        clearTimer();
+        refreshTimerRef.current = setTimeout(run, 30 * 1000);
+        return;
+      }
+      // The refresh token was rejected. The session is over; tell the user.
+      clearTimer();
+      posthog.capture("session_refresh_failed", { reason: r.reason, anonymous: wasAnonymous, at: "timer" });
+      endExpiredSession(wasAnonymous);
+    };
+    const onWake = () => {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
+      if (millisUntilExpiry() <= REFRESH_LEAD_MS) run(); else schedule();
+    };
+    schedule();
+    document.addEventListener("visibilitychange", onWake);
+    window.addEventListener("focus", onWake);
+    return () => {
+      cancelled = true;
+      clearTimer();
+      document.removeEventListener("visibilitychange", onWake);
+      window.removeEventListener("focus", onWake);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authed]);
 
   // Handle Stripe upgrade redirect — check URL params on mount
   useEffect(()=>{
@@ -2590,7 +2821,13 @@ export default function Wovely() {
     if(!upgradeStatus) return;
     window.history.replaceState({},"",window.location.pathname);
     if(upgradeStatus==="success"){
-      posthog.capture("upgrade_completed");
+      // upgrade_completed fires off the redirect param alone, so it proves the
+      // browser came back from Stripe and nothing more: anyone loading
+      // /?upgrade=success fires it. upgrade_entitlement_check below reports
+      // what the database actually says once the webhook has had its turn.
+      // An upgrade_completed with no matching entitlement check on tier=craft
+      // is a checkout that took the user's click but not their money.
+      posthog.capture("upgrade_completed",{had_session:!!getSession()});
       setShowVault(true); // Free→Craft vault-door reveal celebration (replaces the plain toast)
       // Re-fetch profile to pick up is_pro=true from webhook
       const s=getSession();
@@ -2600,8 +2837,14 @@ export default function Wovely() {
           fetch(`${SUPABASE_URL}/rest/v1/user_profiles?id=eq.${uid}&select=tier,is_pro`,{
             headers:{"apikey":SUPABASE_ANON_KEY,"Authorization":`Bearer ${s.access_token}`},
           }).then(r=>r.ok?r.json():null).then(rows=>{
-            if(rows?.[0]){setTier(rows[0].tier||tierFromLegacyIsPro(rows[0].is_pro===true));}
-          }).catch(()=>{});
+            if(rows?.[0]){
+              const nextTier=rows[0].tier||tierFromLegacyIsPro(rows[0].is_pro===true);
+              setTier(nextTier);
+              posthog.capture("upgrade_entitlement_check",{tier:nextTier,paid:isPaidTier(nextTier)});
+            } else {
+              posthog.capture("upgrade_entitlement_check",{tier:null,paid:false,reason:"no_profile_row"});
+            }
+          }).catch(()=>{posthog.capture("upgrade_entitlement_check",{tier:null,paid:false,reason:"fetch_failed"});});
         }
       }
       setTimeout(()=>setUpgradeToast(null),5000);
@@ -2813,17 +3056,26 @@ export default function Wovely() {
     }
   },[view,authed,anonymousMode]);
 
+  // Legacy "I meant to upgrade" flag, replayed after signup. Same rule as
+  // fireUpgradeCheckout: a failure here is a customer who asked to pay and
+  // got nothing, so it goes on screen rather than into the console.
   const checkUpgradeIntent=async()=>{
     if(localStorage.getItem("yh_upgrade_intent")!=="true") return;
     localStorage.removeItem("yh_upgrade_intent");
     const user=supabaseAuth.getUser();const s=getSession();
-    if(!user||!s) return;
-    try{
-      const uid=(()=>{try{const p=JSON.parse(atob(s.access_token.split(".")[1]));return p.sub;}catch{return null;}})();
-      const res=await fetch("/api/stripe-checkout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({userId:uid||user.id,email:user.email})});
-      const data=await res.json();
-      if(res.ok&&data.url) window.location.href=data.url;
-    }catch(e){console.error("[Wovely] Upgrade intent checkout failed:",e);}
+    const uid=s?.access_token?(()=>{try{const p=JSON.parse(atob(s.access_token.split(".")[1]));return p.sub;}catch{return null;}})():null;
+    const result=await requestCheckoutSession({userId:uid||user?.id,email:user?.email,tier:TIER_CRAFT,cadence:"monthly"});
+    if(!result.ok){
+      posthog.capture("checkout_failed",{tier:TIER_CRAFT,cadence:"monthly",code:result.code,surface:"upgrade_intent"});
+      setCheckoutFailure({tier:TIER_CRAFT,cadence:"monthly",message:result.message});
+      return;
+    }
+    setCheckoutFailure(null);
+    window.location.href=result.url;
+    checkoutWatchdogRef.current=setTimeout(()=>{
+      posthog.capture("checkout_failed",{tier:TIER_CRAFT,cadence:"monthly",code:"redirect_stalled",surface:"upgrade_intent"});
+      setCheckoutFailure({tier:TIER_CRAFT,cadence:"monthly",message:CHECKOUT_STALLED_MSG,url:result.url});
+    },CHECKOUT_REDIRECT_WATCHDOG_MS);
   };
 
   const handleNewSignup = () => {
@@ -2940,6 +3192,30 @@ export default function Wovely() {
     return <><CSS/><PublicCalculators/></>;
   }
 
+  // App-level checkout failure surface. Built before every return path so a
+  // checkout that dies outside the plans modal (post-signup, post-OAuth, the
+  // legacy upgrade-intent replay) still has somewhere to say so.
+  const checkoutFailureOverlay = checkoutFailure ? (
+    <div style={{
+      position:"fixed",left:"50%",bottom:20,transform:"translateX(-50%)",zIndex:1000,
+      width:"min(460px, calc(100vw - 32px))",fontFamily:"Nunito, sans-serif",
+      filter:"drop-shadow(0 12px 30px rgba(90,66,160,.28))",
+    }}>
+      <CheckoutFailurePanel
+        message={checkoutFailure.message}
+        url={checkoutFailure.url}
+        onRetry={checkoutFailure.url ? null : () => {
+          const { tier: t, cadence: c } = checkoutFailure;
+          setCheckoutFailure(null);
+          fireUpgradeCheckout(t, undefined, c);
+        }}
+      />
+      <div style={{textAlign:"center",marginTop:8}}>
+        <button onClick={()=>setCheckoutFailure(null)} style={{background:"transparent",border:"none",color:"#726A92",fontSize:12,fontWeight:700,cursor:"pointer"}}>Dismiss</button>
+      </div>
+    </div>
+  ) : null;
+
   // Show nothing until session is validated against Supabase
   if(!authChecked) return <><CSS/><div style={{minHeight:"100vh",background:T.bg,display:"flex",alignItems:"center",justifyContent:"center"}}><div className="spinner" style={{width:28,height:28,border:`3px solid ${T.border}`,borderTopColor:T.terra,borderRadius:"50%"}}/></div></>;
   // Stitch result page — show standalone for public, app shell for logged-in users
@@ -2949,7 +3225,13 @@ export default function Wovely() {
     // Once in anon mode, they can browse the entire shell. Non-root paths always fall through
     // so deep links like /pattern/:id work for signed-out users too.
     if(location.pathname==="/"&&!anonymousMode){
-      return <><CSS/><Auth onEnter={handleSignIn} onEnterAsNew={handleNewSignup} onTryAnonymous={enterAnonymousMode}/></>;
+      return <><CSS/><Auth
+        onEnter={handleSignIn}
+        onEnterAsNew={handleNewSignup}
+        onTryAnonymous={enterAnonymousMode}
+        startAt={sessionExpired && !sessionExpired.wasAnonymous ? "signin" : null}
+        notice={sessionExpired ? <SessionEndedNotice wasAnonymous={sessionExpired.wasAnonymous} onDismiss={()=>setSessionExpired(null)}/> : null}
+      />{checkoutFailureOverlay}</>;
     }
   }
   // Unknown routes redirect to /
@@ -3747,6 +4029,7 @@ export default function Wovely() {
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>{setShowProModal(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       <BevChat open={chatOpen} onClose={()=>setChatOpen(false)} onPaywall={()=>{setChatOpen(false);setShowProModal(true);}} onCircle={()=>setChatOpen(false)}/>
       <VaultReveal open={showVault} onDone={()=>setShowVault(false)}/>
+      {checkoutFailureOverlay}
       {collectionSuggestion && <CollectionSuggestionPrompt pattern={collectionSuggestion.pattern} meta={collectionSuggestion.meta} onYes={handleAcceptCollectionSuggestion} onNo={()=>setCollectionSuggestion(null)} />}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} onPhotoImport={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);openImageImport();}} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id} initialIsStarter={(pendingExtractedHandoff?.fileType==='pdf'&&!!pendingExtractedHandoff?.isStarter)||(pendingResumeJobId?.fileType==='pdf'&&isStarterJobId(pendingResumeJobId.jobId))}/>}
       {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
@@ -3815,6 +4098,7 @@ export default function Wovely() {
       {showProModal&&<TieredUpgradeModal currentTier={tier} reason="general" onClose={()=>{setShowProModal(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
       <BevChat open={chatOpen} onClose={()=>setChatOpen(false)} onPaywall={()=>{setChatOpen(false);setShowProModal(true);}} onCircle={()=>setChatOpen(false)}/>
       <VaultReveal open={showVault} onDone={()=>setShowVault(false)}/>
+      {checkoutFailureOverlay}
       {collectionSuggestion && <CollectionSuggestionPrompt pattern={collectionSuggestion.pattern} meta={collectionSuggestion.meta} onYes={handleAcceptCollectionSuggestion} onNo={()=>setCollectionSuggestion(null)} />}
       {addOpen&&<AddPatternModal onClose={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);setPendingExtractedHandoff(null);setPendingResumeJobId(null);setCollectionContext(null);setStartingCollection(false);}} onSave={handleAddPattern} isPro={isPro} patternCount={userPatterns.length} Btn={Btn} Photo={Photo} Bar={Bar} WireframeViewer={WireframeViewer} onUpgrade={()=>openProGate("bevcheck_preview")} onPhotoImport={()=>{setAddOpen(false);setPendingImportUrl(null);setPendingMethod(null);openImageImport();}} initialMethod={pendingImportUrl?"url":pendingMethod||undefined} initialUrl={pendingImportUrl||undefined} initialExtracted={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.coverImageUrl:null} initialFileUrl={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.fileUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='pdf'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='pdf'?pendingResumeJobId.jobId:null} isCollectionImport={!!startingCollection || !!collectionContext?.id} initialIsStarter={(pendingExtractedHandoff?.fileType==='pdf'&&!!pendingExtractedHandoff?.isStarter)||(pendingResumeJobId?.fileType==='pdf'&&isStarterJobId(pendingResumeJobId.jobId))}/>}
       {imageImportOpen&&<ImageImportModal onClose={()=>{setImageImportOpen(false);setPendingExtractedHandoff(null);setPendingResumeJobId(null);}} onPatternSaved={handleAddPattern} userId={supabaseAuth.getUser()?.id} isPro={isPro} onUpgrade={()=>openProGate("bevcheck_preview")} initialExtracted={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.extractedData:null} initialCoverUrl={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.coverImageUrl:null} initialValidationReport={pendingExtractedHandoff?.fileType==='image'?pendingExtractedHandoff.validationReport:null} initialPollingJobId={pendingResumeJobId?.fileType==='image'?pendingResumeJobId.jobId:null}/>}
