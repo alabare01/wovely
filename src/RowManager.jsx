@@ -79,11 +79,38 @@ const STITCH_DICT = {
   "YO":{full:"Yarn Over"},
   "PM":{full:"Place Marker"},
   "SM":{full:"Slip Marker"},
+
+  // ── SPELLED-OUT FORMS (2026-08-08) ───────────────────────────────────────
+  // Found during a live demo: markers never surfaced. The dictionary only had
+  // the abbreviations, and real patterns overwhelmingly write markers OUT.
+  // "place marker in the first stitch", "move the marker up", "slip marker"
+  // all produced nothing, so the one instruction a beginner most needs help
+  // with was the one the app stayed silent about.
+  //
+  // `show` is what the pill displays, so a spelled-out hit still teaches the
+  // abbreviation the rest of the pattern will use.
+  "PLACE A STITCH MARKER":{full:"Place Marker",show:"PM"},
+  "PLACE STITCH MARKER":{full:"Place Marker",show:"PM"},
+  "PLACE A MARKER":{full:"Place Marker",show:"PM"},
+  "PLACE MARKER":{full:"Place Marker",show:"PM"},
+  "MOVE THE MARKER":{full:"Slip Marker",show:"SM"},
+  "MOVE MARKER":{full:"Slip Marker",show:"SM"},
+  "SLIP MARKER":{full:"Slip Marker",show:"SM"},
+  "STITCH MARKER":{full:"Place Marker",show:"PM"},
+  "MARKER":{full:"Place Marker",show:"PM"},
 };
+// Longest first, so "place a stitch marker" is not eaten by "marker".
 const ABBR_PATTERN=new RegExp("\\b("+Object.keys(STITCH_DICT).sort((a,b)=>b.length-a.length).map(k=>k.replace(/\s+/g,"\\s+")).join("|")+")\\b","gi");
 const findNewAbbr=(text,seenAbbr)=>{
   const found=[],regex=new RegExp(ABBR_PATTERN.source,"gi");let match;
-  while((match=regex.exec(text))!==null){const raw=match[0].toUpperCase().replace(/\s+/g," ");const info=STITCH_DICT[raw];if(!info)continue;if(!seenAbbr.has(raw)){seenAbbr.add(raw);found.push({raw,...info});}}
+  while((match=regex.exec(text))!==null){
+    const raw=match[0].toUpperCase().replace(/\s+/g," ");const info=STITCH_DICT[raw];if(!info)continue;
+    // Dedupe on the CONCEPT, not the spelling. Otherwise a pattern using both
+    // "sl st" and "ss", or both "pm" and "place marker", teaches the same
+    // stitch twice under two names, which is worse than not teaching it.
+    if(seenAbbr.has(info.full))continue;
+    seenAbbr.add(info.full);found.push({...info,raw:info.show||raw});
+  }
   return found;
 };
 
