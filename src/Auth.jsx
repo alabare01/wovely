@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import posthog from "posthog-js";
 
 import { supabaseAuth, getSession } from "./supabase.js";
+import GuestDemo from "./GuestDemo.jsx";
 
 // Mirror AuthWallModal's guard: after signUp, confirm a real session actually
 // landed before entering the app shell. Without this, a failed session setup
@@ -459,10 +461,35 @@ const ArrowIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h13M13 6.5l5.5 5.5-5.5 5.5" /></svg>
 );
 
-/* ── Import-your-own / start-with-ours fork cards (mockup .forkrow) — shared
-     by the Try screen; the same real handlers back both cards. ── */
-const GuestForkRow = ({ onImport, onStarter }) => (
+/* ── The guest fork cards (mockup .forkrow) ─────────────────────────────────
+     WHAT CHANGED AND WHY (2026-08-08)
+     This row used to be "Import your own" + "Start with ours", and both cards
+     asked the visitor for a commitment: go find a PDF, or commit to crocheting
+     a mushroom. Neither was "show me what this does", and the numbers agreed:
+     three weeks of clicks on "Try Wovely free" with zero signups and zero
+     uploads behind them.
+
+     "Start with ours" is now the demo. Same pattern, same photo, but it opens
+     Button the Mushroom already loaded with the counter running instead of
+     kicking off an anonymous sign-in and a real import job. Nothing was
+     removed: the real starter import is the primary button inside the demo,
+     one tap in, still going through tryFork("starter").
+
+     Deliberately still TWO cards. A third card is worse on a 390px phone,
+     where .forkrow collapses to one column and the third card lands below the
+     fold, which would bury the one option that asks for nothing. And a
+     "Start with ours" card sitting next to a "Just show me" card is the same
+     pattern and the same photo twice, with the difference buried in the body
+     copy. Demoting the starter to the demo's own CTA removes the collision
+     instead of asking the visitor to resolve it. ── */
+const GuestForkRow = ({ onDemo, onImport }) => (
   <div className="forkrow">
+    <button className="fork" onClick={onDemo}>
+      <div className="forkcov covbg" role="img" aria-label="Button the Mushroom, open in the Wovely row tracker" style={{ backgroundImage: "url('/cover-mushroom-photo.png')" }} />
+      <div className="fork-t">Just show me</div>
+      <div className="fork-s">Button the Mushroom, already open with the rows and the counter running. Tap a round and watch it tick. Nothing saved, nothing asked.</div>
+      <div className="fork-p">Open the demo →</div>
+    </button>
     <button className="fork" onClick={onImport}>
       <div className="impviz">
         <div className="impback" />
@@ -473,27 +500,27 @@ const GuestForkRow = ({ onImport, onStarter }) => (
       <div className="fork-s">A PDF, photos of a paper pattern, or a link — Bev reads it, checks every stitch count, and sets it up to track.</div>
       <div className="fork-p">Import a pattern →</div>
     </button>
-    <button className="fork" onClick={onStarter}>
-      <div className="forkcov covbg" role="img" aria-label="Button the Mushroom starter pattern" style={{ backgroundImage: "url('/cover-mushroom-photo.png')" }} />
-      <div className="fork-t">Start with ours</div>
-      <div className="fork-s">Button the Mushroom — a friendly little toadstool to learn the round on. A Wovely original, on the house.</div>
-      <div className="fork-p">Start this one →</div>
-    </button>
   </div>
 );
 
 /* ── Try screen (mockup "Try free") — zero-barrier guest entry ── */
-const TryScreen = ({ onImport, onStarter, onSignIn }) => (
-  <div className="authwrap">
-    <div className="authcard" style={{ width: 640 }}>
-      <img className="bevimg" src="/bev-hero.png" alt="Bev" />
-      <div className="auth-h">Let's get your first pattern going</div>
-      <div className="auth-s">No account, no card — pick a way in and you're stitching in two minutes.</div>
-      <GuestForkRow onImport={onImport} onStarter={onStarter} />
-      <div className="authmicro">Sign up whenever you like — everything you make carries over. Already have an account? <a className="authlink" onClick={onSignIn} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onSignIn(e);}}}>Sign in</a></div>
+const TryScreen = ({ onDemo, onImport, onSignIn }) => {
+  // This screen is where the funnel was dying and it had no telemetry at all.
+  useEffect(() => {
+    try { posthog.capture("guest_fork_shown"); } catch {}
+  }, []);
+  return (
+    <div className="authwrap">
+      <div className="authcard" style={{ width: 640 }}>
+        <img className="bevimg" src="/bev-hero.png" alt="Bev" />
+        <div className="auth-h">Start wherever you like</div>
+        <div className="auth-s">No account, no card, either way. If you would rather just watch it work first, take the demo.</div>
+        <GuestForkRow onDemo={onDemo} onImport={onImport} />
+        <div className="authmicro">Sign up whenever you like — everything you make carries over. Already have an account? <a className="authlink" onClick={onSignIn} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onSignIn(e);}}}>Sign in</a></div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 /* ── Signup / signin card (mockup "Sign up") — same Supabase plumbing as
      before: signUp/signIn/signInWithOAuth. Successful signup hands control
@@ -613,9 +640,10 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
     if (startAt === "signin" || startAt === "signup") return "auth";
     const h = (typeof location !== "undefined" && location.hash) || "";
     if (h === "#try") return "try";
+    if (h === "#demo") return "demo";
     if (h === "#signup" || h === "#signin") return "auth";
     return "landing";
-  }); // 'landing' | 'try' | 'auth' | 'fork'
+  }); // 'landing' | 'try' | 'demo' | 'auth' | 'fork'
   const [authMode, setAuthMode] = useState(() =>
     startAt === "signin" || (typeof location !== "undefined" && location.hash === "#signin") ? "signin" : "signup");
   const [pulseKey, setPulseKey] = useState(0);
@@ -643,6 +671,12 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
   const toTop = () => { try { window.scrollTo(0, 0); } catch {} };
   const goLanding = () => { setScreen("landing"); toTop(); };
   const goTry = () => { setScreen("try"); toTop(); };
+  // The zero-commitment path. Costs nothing and creates nothing: no session,
+  // no anonymous sign-in, no import job, no storage write. See GuestDemo.jsx.
+  const goDemo = () => {
+    try { posthog.capture("guest_fork_path_chosen", { path: "demo" }); } catch {}
+    setScreen("demo"); toTop();
+  };
   const goAuth = (mode) => {
     // Re-clicking "Sign in"/"Start free" while already on the auth card pulses
     // it (mockup behavior) instead of appearing dead.
@@ -664,7 +698,13 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
 
   // Try-screen forks: enter the real guest mode with the picked path stashed —
   // App.jsx reads wovely_first_run_intent and opens the matching first-run UI.
+  // Unchanged contract: "import" opens the Add-a-pattern hub, "starter" opens
+  // the starter gallery. Both are still reached from here; "starter" now comes
+  // from the demo's own CTA rather than from a cold card on the fork screen.
+  // enterAnonymousMode fires anonymous_mode_entered, so the pair
+  // guest_fork_path_chosen → anonymous_mode_entered is the funnel step.
   const tryFork = (intent) => {
+    try { posthog.capture("guest_fork_path_chosen", { path: intent }); } catch {}
     try { sessionStorage.setItem("wovely_first_run_intent", intent); } catch {}
     onTryAnonymous();
   };
@@ -698,7 +738,15 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
         <Landing annual={annual} setAnnual={setAnnual} onStartFree={goTry} onGoCraft={goCraft} />
       )}
       {screen === "try" && (
-        <TryScreen onImport={() => tryFork("import")} onStarter={() => tryFork("starter")} onSignIn={() => goAuth("signin")} />
+        <TryScreen onDemo={goDemo} onImport={() => tryFork("import")} onSignIn={() => goAuth("signin")} />
+      )}
+      {screen === "demo" && (
+        <GuestDemo
+          onBack={goTry}
+          onStartReal={() => tryFork("starter")}
+          onImportOwn={() => tryFork("import")}
+          onSignIn={() => goAuth("signin")}
+        />
       )}
       {screen === "auth" && (
         <AuthCard

@@ -1,5 +1,13 @@
 export const CHANGELOG = [
   {
+    version: "Session 80",
+    date: "2026-08-08",
+    updates: [
+      { emoji: "👀", text: "You can now watch Wovely work before you hand over anything at all. Open the demo from the start screen and Button the Mushroom is already there, rows listed and the counter running. Tap a round and it ticks. Nothing is saved, no account, no card" },
+      { emoji: "🍄", text: "Like it? Button is still free and still yours. Start him for real from inside the demo and Bev sets him up properly, with your place kept from then on" },
+    ]
+  },
+  {
     version: "Session 79",
     date: "2026-08-08",
     updates: [
