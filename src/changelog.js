@@ -6,6 +6,8 @@ export const CHANGELOG = [
       { emoji: "💳", text: "If anything goes wrong while you are subscribing, Bev now tells you what happened, confirms nothing was charged, and gives you a way to finish" },
       { emoji: "🔐", text: "Long crochet sessions stay signed in. Wovely renews your session in the background instead of quietly losing it" },
       { emoji: "🧭", text: "If a session does end, you land on the sign in screen with a plain explanation instead of a blank start" },
+      { emoji: "🧶", text: "The yardage calculator now asks which yarn weight and which stitch you are using instead of a raw yards per stitch figure, and it says so plainly when the numbers you gave it cannot be right" },
+      { emoji: "📐", text: "Scaling a pattern now uses your row gauge for row counts and your stitch gauge for stitch counts, which matters whenever the two do not match" },
     ]
   },
   {
