@@ -12,6 +12,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { T, useBreakpoint } from "../theme.jsx";
+import { stopReplayForToolPage } from "../utils/analytics.js";
 
 /** The standard 2b card: solid white panel on the woven canvas. */
 export const CARD = {
@@ -68,29 +69,35 @@ const TopBar = () => (
 );
 
 /** The honest close. Every claim here is a feature that exists in the app, and
- *  nothing on the page is gated behind it. */
-const Closer = ({ isMobile }) => (
+ *  nothing on this page is gated behind it. Pages that need a different
+ *  argument pass their own `title`, `body` and `cta`. */
+export const Closer = ({
+  isMobile,
+  title = "Once it is converted, you still have to work it",
+  body = "That is the part this page cannot help with. Wovely is the app for it: keep your patterns in one place, tick off rows as you go, and open your phone to the row you actually stopped on rather than the one you think you stopped on.",
+  cta = "Try Wovely free",
+  note = "No account needed to start",
+  to = "/",
+}) => (
   <div style={{ ...CARD, padding: isMobile ? 22 : 30, marginTop: 34, background: T.soft, borderColor: "#E2DAF6" }}>
     <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
       <img src="/bev_neutral.png" alt="" width="42" height="42" style={{ borderRadius: 12, display: "block", flexShrink: 0 }} />
-      <div style={{ fontFamily: T.disp, fontWeight: 700, fontSize: 20, color: T.ink, lineHeight: 1.25 }}>
-        Once it is converted, you still have to work it
+      <div style={{ fontFamily: T.disp, fontWeight: 700, fontSize: isMobile ? 18 : 20, color: T.ink, lineHeight: 1.25 }}>
+        {title}
       </div>
     </div>
     <p style={{ fontFamily: T.body, fontSize: 15, lineHeight: 1.72, color: T.ink, margin: "0 0 14px" }}>
-      That is the part this page cannot help with. Wovely is the app for it: keep your
-      patterns in one place, tick off rows as you go, and open your phone to the row you
-      actually stopped on rather than the one you think you stopped on.
+      {body}
     </p>
     <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: 12 }}>
-      <Link to="/" style={{
+      <Link to={to} style={{
         display: "inline-block", padding: "12px 22px", borderRadius: 999,
         background: `linear-gradient(180deg, ${T.accent}, ${T.accentD})`,
         color: "#fff", fontFamily: T.body, fontWeight: 800, fontSize: 15,
         textDecoration: "none", boxShadow: "0 8px 20px -10px rgba(90,66,160,.7)",
-      }}>Try Wovely free</Link>
+      }}>{cta}</Link>
       <span style={{ fontFamily: T.body, fontSize: 13, color: T.muted, fontWeight: 600 }}>
-        No account needed to start
+        {note}
       </span>
     </div>
   </div>
@@ -131,8 +138,12 @@ const Footer = ({ current }) => (
  * @param {string} path      this page's own path, so it is not linked to itself
  * @param {bool}   showCloser whether to render the Wovely pitch above the footer
  */
-export default function PublicPage({ h1, intro, path, children, showCloser = true }) {
+export default function PublicPage({ h1, intro, path, children, showCloser = true, closer }) {
   const { isMobile } = useBreakpoint();
+  // These pages promise that a pasted pattern stays in the browser. Session
+  // replay would break that promise, so it is stopped here as well as at init,
+  // which covers a signed-in reader who navigated in without a page load.
+  useEffect(() => { stopReplayForToolPage(); }, []);
   return (
     <div style={{ minHeight: "100vh", fontFamily: T.body, color: T.ink }}>
       <TopBar />
@@ -149,7 +160,7 @@ export default function PublicPage({ h1, intro, path, children, showCloser = tru
 
         {children}
 
-        {showCloser && <Closer isMobile={isMobile} />}
+        {showCloser && <Closer isMobile={isMobile} {...(closer || {})} />}
         <Footer current={path} />
       </div>
     </div>

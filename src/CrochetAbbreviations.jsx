@@ -59,6 +59,13 @@ export default function CrochetAbbreviations() {
           in it.
         </>
       }
+      closer={{
+        title: "Looking one up is quick. Looking up forty is an evening.",
+        body:
+          "A pattern written in shorthand you half know is a pattern you read twice. Wovely keeps your patterns in one place, marks off rows as you go, and opens on your phone at the row you actually stopped on rather than the one you think you stopped on.",
+        cta: "Try Wovely free",
+        note: "No account needed to start",
+      }}
     >
       {/* ── ROW ANNOTATOR ── */}
       <div style={{ ...CARD, padding: isMobile ? 18 : 26 }}>

@@ -1,0 +1,18 @@
+# JavaScript and JSX are always text, and must always diff as text.
+#
+# src/utils/crochetTerms.js was committed with a raw NUL byte on line 167, used
+# as a separator inside a Map key. Git treats any file with a NUL in its first
+# 8000 bytes as binary, so a 585-line engine landed in the history as
+# "Bin 0 -> 30882 bytes" and could not be reviewed in a diff at all. The byte is
+# gone, and the `diff` attribute below makes sure a future one cannot hide a
+# change to this code again.
+#
+# Only the `diff` attribute is set. Nothing here touches line endings or
+# checkout behaviour, so no file is renormalised by adding it.
+*.js   diff
+*.jsx  diff
+*.mjs  diff
+*.cjs  diff
+*.json diff
+*.css  diff
+*.html diff

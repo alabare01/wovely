@@ -23,6 +23,12 @@
     }
   ],
   "rewrites": [
+    { "source": "/tools", "destination": "/tools.html" },
+    { "source": "/uk-us-crochet-terms", "destination": "/uk-us-crochet-terms.html" },
+    { "source": "/crochet-abbreviations", "destination": "/crochet-abbreviations.html" },
+    { "source": "/crochet-stitch-counter", "destination": "/crochet-stitch-counter.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
     { "source": "/((?!api/|.*\\.).*)", "destination": "/index.html" }
   ]
 }

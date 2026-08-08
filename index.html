@@ -12,7 +12,17 @@
     <link rel="shortcut icon" href="/favicon.ico?v=2" />
     <meta name="theme-color" content="#7B6AD4" />
     <meta name="description" content="Save every crochet pattern, track every row, and keep your projects in one place. The home for your hooks, yarn, and works in progress." />
-    <link rel="canonical" href="https://wovely.app" />
+    <!-- No canonical here on purpose. This file is the template every route was
+         served, so a hard-coded canonical of "https://wovely.app" told the
+         crawler that /uk-us-crochet-terms, /crochet-abbreviations,
+         /crochet-stitch-counter and /tools were all duplicates of the homepage
+         on the raw-HTML pass, undoing the per-route canonical seo.js sets after
+         hydration. The build now writes the correct self-referencing canonical
+         into each route's own HTML file (see the seoHeadPrerender plugin in
+         vite.config.js), including this one. A page served without a canonical
+         self-canonicalises, so the failure mode if that build step were ever
+         removed is "no hint" rather than "wrong hint". -->
+    <link rel="alternate" href="https://wovely.app/" hreflang="en" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="Wovely: Crochet Pattern Organizer, Row Counter and Stitch Tracker" />

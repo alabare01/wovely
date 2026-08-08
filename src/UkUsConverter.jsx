@@ -91,9 +91,9 @@ export default function UkUsConverter() {
       h1="UK to US crochet term converter"
       intro={
         <>
-          Paste a whole pattern and convert every term at once. Nothing is uploaded and
-          nothing is saved: the conversion runs in your browser, so you can paste a
-          pattern you paid for without it leaving your device.
+          Paste a whole pattern and convert every term at once. The conversion runs in
+          your browser: your pattern text is never uploaded, never stored, and closing
+          the tab discards it.
         </>
       }
     >
@@ -183,6 +183,26 @@ export default function UkUsConverter() {
                   )
                 : <span style={{ color: T.ink3, fontFamily: T.body }}>Your converted pattern appears here as you type.</span>}
             </div>
+            {/* Anything the engine recognises as belonging to the source
+                dialect but did not convert is named here, above the tally.
+                A count of successful changes on its own is not an account of
+                what happened to the document: bare "treble" used to survive
+                untranslated while this panel reported a clean conversion. */}
+            {result.unhandled.length > 0 && (
+              <div style={{
+                marginTop: 10, borderRadius: 12, padding: "11px 14px",
+                background: "#FFF8E8", border: "1px solid #F5E2B8", color: "#7A5A15",
+                fontFamily: T.body, fontSize: 13, lineHeight: 1.6, fontWeight: 600,
+              }}>
+                <b>Not converted.</b> {result.unhandled.length === 1 ? "This term is" : "These terms are"}{" "}
+                {fromLabel} but the engine does not have a rule for{" "}
+                {result.unhandled.length === 1 ? "it" : "them"}:{" "}
+                {result.unhandled.map((u, i) => (
+                  <span key={u.term}>{i > 0 && ", "}<b>{u.term}</b>{u.n > 1 && ` ×${u.n}`}</span>
+                ))}. The output above is incomplete, so check{" "}
+                {result.unhandled.length === 1 ? "that one" : "those"} by hand before you work from it.
+              </div>
+            )}
             {result.totalChanges > 0 && (
               <div style={{ marginTop: 10, fontFamily: T.body, fontSize: 13, color: T.muted, fontWeight: 600 }}>
                 {result.totalChanges} {result.totalChanges === 1 ? "term" : "terms"} changed:{" "}
@@ -196,7 +216,7 @@ export default function UkUsConverter() {
                 {result.changes.length > 8 && <span> and {result.changes.length - 8} more</span>}
               </div>
             )}
-            {text.trim() && result.totalChanges === 0 && (
+            {text.trim() && result.totalChanges === 0 && result.unhandled.length === 0 && (
               <div style={{ marginTop: 10, fontFamily: T.body, fontSize: 13, color: T.muted, fontWeight: 600 }}>
                 Nothing to change. No {fromLabel} terms were found in this text.
               </div>
@@ -296,6 +316,13 @@ export default function UkUsConverter() {
             still use the US names for front and back post stitches. If your pattern does that, check
             those rows yourself.
           </Li>
+          <Li>
+            <b>It tells you when it has missed something.</b> After every pass the output is checked
+            against a separate list of vocabulary that belongs to the dialect you are converting
+            from. Anything from that list still sitting in the output is named above the result,
+            because a count of successful changes is not the same as an account of what happened to
+            your document.
+          </Li>
         </ul>
       </Section>
 
@@ -325,8 +352,13 @@ export default function UkUsConverter() {
           wrong size, that is a gauge problem, not a terminology one.
         </Faq>
         <Faq q="Is my pattern uploaded anywhere?">
-          No. The conversion runs entirely in your browser. Nothing is sent to a server, nothing is
-          stored, and closing the tab discards it.
+          No. The conversion runs entirely in your browser. Your pattern text is never sent to a
+          server and never stored, and closing the tab discards it. To be exact about what does
+          leave: Wovely counts that this page was viewed, the same as any website counts a visit,
+          and screen recording is switched off on this page so that nothing you paste can be
+          captured. The{" "}
+          <a href="/privacy" style={{ color: T.accent, fontWeight: 700 }}>privacy policy</a> covers
+          the rest.
         </Faq>
       </Section>
     </PublicPage>
@@ -417,6 +449,23 @@ const DetectionNote = ({ detection, override, mismatch, direction }) => {
         {detection.dialect === "uk" ? ` (found ${detection.ukHits.slice(0, 3).join(", ")})` : ` (found ${detection.usHits.slice(0, 3).join(", ")})`},
         but you have asked for {direction === "uk-to-us" ? "UK → US" : "US → UK"}. Converting the
         wrong way round will change every stitch height. Switch the toggle if that was not deliberate.
+      </div>
+    );
+  }
+
+  // "Unknown" has two quite different causes and they need different sentences.
+  // Saying "this text only uses shared abbreviations" over a pattern that
+  // plainly contains the word miss is a false statement about the reader's own
+  // document, and it costs the page the trust the rest of it is built on.
+  const conflicted = detection.dialect === "unknown" && detection.ukHits.length > 0 && detection.usHits.length > 0;
+  if (conflicted) {
+    return (
+      <div style={{ ...base, background: "#FFF8E8", border: "1px solid #F5E2B8", color: "#7A5A15" }}>
+        This text has markers from <b>both</b> dialects, and they cancel out. UK:{" "}
+        {detection.ukHits.slice(0, 3).map((h, i) => <span key={h}>{i > 0 && ", "}<b>{h}</b></span>)}. US:{" "}
+        {detection.usHits.slice(0, 3).map((h, i) => <span key={h}>{i > 0 && ", "}<b>{h}</b></span>)}.
+        A pattern that mixes them is usually one that has been half converted already, so read those
+        rows before you convert, and set the direction yourself above.
       </div>
     );
   }

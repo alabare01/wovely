@@ -10,10 +10,12 @@
 // Two of the three URLs in sitemap.xml were instructing the crawler to ignore
 // them. This module fixes the head per route after hydration.
 //
-// Honest limit: this runs in JavaScript, so it lands on Google's render pass,
-// not the raw-HTML pass. It is the correct fix available without SSR or
-// prerendering. Static per-route HTML would be strictly better and is the
-// follow-up, not a substitute for this.
+// This module runs in JavaScript, so on its own it only lands on Google's
+// render pass. The raw-HTML pass is now covered too: vite.config.js reads the
+// table below at build time and writes a real static HTML file per public
+// route, each with its own title, description and self-referencing canonical.
+// This module and that build step share one source of truth so the two passes
+// can never disagree.
 
 const SITE = "https://wovely.app";
 const DEFAULT_TITLE = "Wovely: Crochet Pattern Organizer, Row Counter and Stitch Tracker";
@@ -22,7 +24,7 @@ const DEFAULT_DESC = "Save every crochet pattern, track every row, and keep your
 // Public, indexable routes. Anything not listed here is app shell or private
 // user content and gets noindex — an empty authed shell rendering under the
 // homepage's title is worse than no page at all.
-const PUBLIC_ROUTES = {
+export const PUBLIC_ROUTES = {
   "/": {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESC,

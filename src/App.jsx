@@ -23,6 +23,7 @@ import ImageImportModal from "./ImageImportModal.jsx";
 import ImportPill, { setActiveImportJob } from "./components/ImportPill.jsx";
 import PrivacyPolicy from "./PrivacyPolicy.jsx";
 import TermsOfService from "./TermsOfService.jsx";
+import PublicCalculators from "./PublicCalculators.jsx";
 import UkUsConverter from "./UkUsConverter.jsx";
 import CrochetAbbreviations from "./CrochetAbbreviations.jsx";
 import StitchCounter from "./StitchCounter.jsx";
@@ -2503,11 +2504,10 @@ export default function Wovely() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
-  // Per-route <head>: title, description, canonical, robots. Without this every
-  // URL inherits index.html's canonical of https://wovely.app, which told Google
-  // that /privacy and /terms were duplicates of the homepage — two of the three
-  // URLs in the sitemap were asking to be dropped from the index. See
-  // src/utils/seo.js for the honest limit of a client-side fix.
+  // Per-route <head>: title, description, canonical, robots, applied on the
+  // render pass. The raw-HTML pass is covered separately by the build, which
+  // writes a real static file per public route from the same table in
+  // src/utils/seo.js. Both passes, one source of truth.
   useEffect(() => { applySeo(location.pathname); }, [location.pathname]);
 
   // Guard to prevent concurrent profile fetches from racing
@@ -2928,6 +2928,16 @@ export default function Wovely() {
   // Public legal pages — render without auth if not logged in, inside shell if logged in
   if(!authed&&(location.pathname==="/privacy"||location.pathname==="/terms")) {
     return <><CSS/>{location.pathname==="/privacy"?<PrivacyPolicy/>:<TermsOfService/>}<LegalFooter/></>;
+  }
+  // /tools is a search landing page that is already live and already requested
+  // for indexing, and the app shell is the wrong container for it: a stranger
+  // arriving from a search result was handed a sidebar built for a signed-in
+  // user, complete with a "Sign out" button they had never signed in to use,
+  // and no way to sign up. Signed out, it now renders standalone on the same
+  // public chrome as the other three tool pages. Signed in, nothing changes:
+  // it stays the Workbench inside the shell.
+  if(!authed&&location.pathname==="/tools") {
+    return <><CSS/><PublicCalculators/></>;
   }
 
   // Show nothing until session is validated against Supabase
@@ -3750,7 +3760,12 @@ export default function Wovely() {
       {coverPickerTarget&&<CoverImagePicker pattern={coverPickerTarget} onConfirm={handleCoverConfirm} onClose={()=>setCoverPickerTarget(null)} pdfThumbUrl={pdfThumbUrl} CAT_IMG={CAT_IMG} ALL_CAT_ENTRIES={ALL_CAT_ENTRIES}/>}
       <WelcomeToast visible={showWelcomeToast}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
-      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={()=>openAddModal()} onSignOut={handleSignOut} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall} userPatterns={userPatterns} allPatterns={allPatterns}/>
+      {/* onSignOut is gated on `authed`: SidebarNav renders the button whenever
+          the prop is present, so a signed-out visitor was being offered a "Sign
+          out" control for a session they never had. Signed out, the sidebar
+          offers "Create account" instead, which is the action that is actually
+          available to them. */}
+      <SidebarNav view={view} onNavigate={navigateToView} count={userPatterns.length} isPro={isPro} tier={tier} isAnonymous={!authed || isAnonymous} onAddPattern={()=>openAddModal()} onSignOut={authed?handleSignOut:null} onUpgrade={()=>setShowProModal(true)} onOpenAuthWall={openNavAuthWall} userPatterns={userPatterns} allPatterns={allPatterns}/>
       <div ref={mainScrollRef} style={{flex:1,minWidth:0,overflowY:"auto",display:"flex",flexDirection:"column",background:"transparent"}}>
         <WelcomeBanner visible={showWelcomeBanner}/>
         <div style={{padding:"0 40px",height:68,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0,background:"rgba(251,249,255,.86)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>

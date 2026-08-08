@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { T, useBreakpoint } from "./theme.jsx";
 
-const Calculators = () => {
+/**
+ * @param {boolean} embedded  true when this renders inside the public /tools
+ *        page shell (PublicCalculators), which owns the h1, the page padding
+ *        and the cross-links. Inside the signed-in app shell it is false and
+ *        nothing about the component changes.
+ */
+const Calculators = ({embedded=false}) => {
   const [active,setActive]=useState("gauge");
   // Gauge calc state
   const [stitches,setStitches]=useState("20"),[rows,setRows]=useState("24"),[swatchSize,setSwatchSize]=useState("4");
@@ -56,24 +62,41 @@ const Calculators = () => {
     return { newDesc, scaledRepeat, newTotal, origRepeat };
   };
   const repeatResult = showRepeat ? scaleRepeat(origDesc, rawCount) : null;
-  const {isDesktop:isDk}=useBreakpoint();
+  const {isDesktop:isDk,isMobile}=useBreakpoint();
 
-  const CARD = {background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,padding:24,border:"1px solid rgba(255,255,255,0.6)",boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)",marginBottom:16};
+  // ── MOBILE LAYOUT ─────────────────────────────────────────────────────────
+  // At 390px this page was clipping. The cause was fixed two-up grids nested
+  // inside cards with 24px of padding each: two side-by-side cards, each
+  // holding its own two-column grid, left roughly 55px per number field on a
+  // phone, so the labels and the values ran off their own boxes. Every grid
+  // below is now single-column under the mobile breakpoint, card padding drops
+  // to 16, and each input is min-width:0 so a grid cell can actually shrink
+  // rather than forcing its parent wider than the viewport. /tools is where the
+  // search traffic lands, and most of it lands on a phone.
+  const PAD = isMobile ? 16 : 24;
+  const CARD = {background:"rgba(255,255,255,0.82)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderRadius:20,padding:PAD,border:"1px solid rgba(255,255,255,0.6)",boxShadow:"0 2px 4px rgba(0,0,0,0.04), 0 8px 32px rgba(123,106,212,0.13)",marginBottom:16,minWidth:0};
   const LABEL = {fontSize:11,fontWeight:600,color:T.ink2,textTransform:"uppercase",letterSpacing:".05em",marginBottom:6};
   const DIVIDER = {height:1,background:T.border,margin:"20px 0"};
+  // Two-up and three-up survive a phone for short numeric fields inside ONE
+  // card. What does not survive is the Scale tab's card-beside-card pair, each
+  // holding its own two-column grid: that is four fields across 354px of
+  // viewport minus four lots of padding. That one stacks.
+  const two = "1fr 1fr";
+  const three = isMobile ? "1fr 1fr 1fr" : "1fr 1fr 1fr";
+  const pairOfCards = isMobile ? "1fr" : "1fr 1fr";
 
   const Input = ({label,val,set,step="1"}) => (
-    <div>
-      <div style={LABEL}>{label}</div>
-      <input value={val} onChange={e=>set(e.target.value)} type="number" step={step}
-        style={{width:"100%",padding:"12px 0",background:"transparent",border:"none",borderBottom:"2px solid transparent",fontSize:17,fontWeight:600,color:T.ink,textAlign:"center",outline:"none",transition:"border-color .2s"}}
+    <div style={{minWidth:0}}>
+      <div style={{...LABEL,overflowWrap:"anywhere"}}>{label}</div>
+      <input value={val} onChange={e=>set(e.target.value)} type="number" step={step} inputMode="decimal"
+        style={{width:"100%",minWidth:0,maxWidth:"100%",padding:"12px 0",background:"transparent",border:"none",borderBottom:"2px solid transparent",fontSize:17,fontWeight:600,color:T.ink,textAlign:"center",outline:"none",transition:"border-color .2s"}}
         onFocus={e=>e.target.style.borderBottomColor=T.terra} onBlur={e=>e.target.style.borderBottomColor="transparent"}/>
     </div>
   );
   const ResultCard = ({label,val,flag}) => (
-    <div style={{textAlign:"center",padding:"12px 8px"}}>
-      <div style={LABEL}>{label}</div>
-      <div style={{fontSize:32,fontWeight:700,fontFamily:T.serif,color:flag?T.terra:T.ink,lineHeight:1}}>{val}</div>
+    <div style={{textAlign:"center",padding:isMobile?"12px 4px":"12px 8px",minWidth:0}}>
+      <div style={{...LABEL,overflowWrap:"anywhere"}}>{label}</div>
+      <div style={{fontSize:isMobile?26:32,fontWeight:700,fontFamily:T.serif,color:flag?T.terra:T.ink,lineHeight:1,overflowWrap:"anywhere"}}>{val}</div>
       {flag&&<div style={{fontSize:10,color:T.terra,marginTop:4}}>rounding &gt;5%</div>}
     </div>
   );
@@ -83,13 +106,17 @@ const Calculators = () => {
   );
 
   return (
-    <div style={{padding:isDk?"24px 24px 100px":"0 18px 100px",maxWidth:960,margin:"0 auto"}}>
+    <div style={{padding:embedded?0:(isDk?"24px 24px 100px":"0 18px 100px"),maxWidth:embedded?"none":960,margin:"0 auto",minWidth:0}}>
       {/* This was a plain styled div, so /tools shipped to search with NO h1 at
           all — the one heading Google looks at first was simply absent on a page
           that was just opened for indexing. Same size, same weight, now an
-          actual heading. */}
-      <h1 style={{fontFamily:T.serif,fontSize:22,color:T.ink,margin:"0 0 4px",fontWeight:700}}>Crochet Calculators</h1>
-      <div style={{fontSize:13,color:T.ink3,marginBottom:20}}>Essential tools for planning your projects.</div>
+          actual heading.
+          When embedded in the public shell the surrounding page owns the h1, so
+          this one is suppressed: two h1s on one document is worse than none. */}
+      {!embedded&&<>
+        <h1 style={{fontFamily:T.serif,fontSize:22,color:T.ink,margin:"0 0 4px",fontWeight:700}}>Crochet Calculators</h1>
+        <div style={{fontSize:13,color:T.ink3,marginBottom:20}}>Essential tools for planning your projects.</div>
+      </>}
 
       {/* Tab pills */}
       <div style={{display:"flex",gap:4,marginBottom:20,background:T.surface,borderRadius:9999,padding:4}}>
@@ -102,20 +129,20 @@ const Calculators = () => {
       {active==="gauge"&&<>
         <div style={CARD}>
           <div style={LABEL}>your swatch</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:16,marginTop:8}}>
+          <div style={{display:"grid",gridTemplateColumns:three,gap:16,marginTop:8}}>
             <Input label="stitches" val={stitches} set={setStitches}/>
             <Input label="rows" val={rows} set={setRows}/>
             <Input label="swatch (in)" val={swatchSize} set={setSwatchSize}/>
           </div>
           <div style={DIVIDER}/>
           <div style={LABEL}>target dimensions</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginTop:8}}>
+          <div style={{display:"grid",gridTemplateColumns:two,gap:16,marginTop:8}}>
             <Input label="width (in)" val={targetW} set={setTargetW}/>
             <Input label="height (in)" val={targetH} set={setTargetH}/>
           </div>
           <div style={DIVIDER}/>
           <div style={LABEL}>results</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:8}}>
+          <div style={{display:"grid",gridTemplateColumns:two,gap:8,marginTop:8}}>
             <ResultCard label="cast on" val={castOn}/>
             <ResultCard label="total rows" val={totalRowsCalc}/>
             <ResultCard label="sts / inch" val={stPerInch.toFixed(1)}/>
@@ -128,7 +155,7 @@ const Calculators = () => {
       {active==="yardage"&&<>
         <div style={CARD}>
           <div style={LABEL}>project details</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginTop:8}}>
+          <div style={{display:"grid",gridTemplateColumns:two,gap:16,marginTop:8}}>
             <Input label="width (in)" val={projW} set={setProjW}/>
             <Input label="height (in)" val={projH} set={setProjH}/>
             <Input label="sts per 4in" val={stPer4} set={setStPer4}/>
@@ -149,11 +176,11 @@ const Calculators = () => {
           Enter the pattern's gauge and your gauge. We'll calculate exact scaled stitch counts.
         </div>
 
-        {/* Gauge inputs side by side */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginBottom:16}}>
+        {/* Gauge inputs side by side on a desktop, stacked on a phone */}
+        <div style={{display:"grid",gridTemplateColumns:pairOfCards,gap:12,marginBottom:16}}>
           <div style={CARD}>
             <div style={LABEL}>pattern gauge</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:8,marginBottom:8}}>
+            <div style={{display:"grid",gridTemplateColumns:two,gap:12,marginTop:8,marginBottom:8}}>
               <Input label="sts" val={patSt} set={setPatSt}/>
               <Input label="rows" val={patRows} set={setPatRows}/>
             </div>
@@ -161,7 +188,7 @@ const Calculators = () => {
           </div>
           <div style={CARD}>
             <div style={LABEL}>my gauge</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:8,marginBottom:8}}>
+            <div style={{display:"grid",gridTemplateColumns:two,gap:12,marginTop:8,marginBottom:8}}>
               <Input label="sts" val={mySt} set={setMySt}/>
               <Input label="rows" val={myRows} set={setMyRows}/>
             </div>
@@ -172,21 +199,21 @@ const Calculators = () => {
         {/* Scale factor summary */}
         <div style={CARD}>
           <div style={LABEL}>your scale factors</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginTop:8}}>
+          <div style={{display:"grid",gridTemplateColumns:three,gap:8,marginTop:8}}>
             <ResultCard label="stitch mult." val={`\u00D7${stScale.toFixed(2)}`}/>
             <ResultCard label="width result" val={`${(sizeChangeW*100).toFixed(0)}%`} flag={Math.abs(sizeChangeW-1)>0.3}/>
             <ResultCard label="yardage mult." val={`${(sizeChangeW*sizeChangeH*100).toFixed(0)}%`}/>
           </div>
-          {Math.abs(stScale-1)<0.03&&<div style={{marginTop:12,fontSize:12,color:T.sage,fontWeight:600,textAlign:"center"}}>Gauges match — no scaling needed</div>}
+          {Math.abs(stScale-1)<0.03&&<div style={{marginTop:12,fontSize:12,color:T.sage,fontWeight:600,textAlign:"center"}}>Gauges match, so no scaling is needed</div>}
           {stScale!==1&&<div style={{marginTop:12,fontSize:12,color:T.ink2,lineHeight:1.6,textAlign:"center"}}>
-            {stScale>1?"Your gauge is tighter — multiply stitch counts to match.":"Your gauge is looser — reduce stitch counts to match."}
+            {stScale>1?"Your gauge is tighter, so multiply stitch counts to match.":"Your gauge is looser, so reduce stitch counts to match."}
           </div>}
         </div>
 
         {/* Single stitch count scaler */}
         <div style={CARD}>
           <div style={LABEL}>scale a stitch count</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,marginTop:8,marginBottom:8}}>
+          <div style={{display:"grid",gridTemplateColumns:two,gap:16,marginTop:8,marginBottom:8}}>
             <Input label="pattern calls for" val={origCount} set={setOrigCount}/>
             <div>
               <div style={LABEL}>you should work</div>
@@ -231,7 +258,7 @@ const Calculators = () => {
           ones. Plain <a> rather than <Link>: this component renders inside the
           app shell, and the tool pages are standalone routes that must be
           entered with a clean mount. */}
-      <div style={{marginTop:28,paddingTop:22,borderTop:`1px solid ${T.border}`}}>
+      {!embedded&&<div style={{marginTop:28,paddingTop:22,borderTop:`1px solid ${T.border}`}}>
         <div style={{fontSize:11,fontWeight:700,color:T.ink2,textTransform:"uppercase",letterSpacing:".05em",marginBottom:12}}>More free crochet tools</div>
         <div style={{display:"flex",flexWrap:"wrap",gap:10}}>
           {[["/uk-us-crochet-terms","UK to US pattern converter"],
@@ -240,7 +267,7 @@ const Calculators = () => {
             <a key={href} href={href} style={{padding:"9px 15px",borderRadius:9999,background:"#fff",border:`1px solid ${T.border}`,color:T.terra,fontWeight:700,fontSize:13.5,textDecoration:"none"}}>{label}</a>
           ))}
         </div>
-      </div>
+      </div>}
     </div>
   );
 };
