@@ -95,8 +95,11 @@ const YardageHeld = ({r,weightLabel,stitchLabel}) => {
  *        and the cross-links. Inside the signed-in app shell it is false and
  *        nothing about the component changes.
  */
-const Calculators = ({embedded=false}) => {
-  const [active,setActive]=useState("gauge");
+const Calculators = ({embedded=false,initialTab="gauge"}) => {
+  // initialTab lets the three dedicated calculator URLs open on their own tool.
+  // The other two stay one click away on purpose: somebody working out yardage
+  // is usually about to check gauge as well.
+  const [active,setActive]=useState(initialTab);
   // Gauge calc state
   const [stitches,setStitches]=useState("20"),[rows,setRows]=useState("24"),[swatchSize,setSwatchSize]=useState("4");
   const [targetW,setTargetW]=useState("50"),[targetH,setTargetH]=useState("60");
@@ -113,7 +116,10 @@ const Calculators = ({embedded=false}) => {
   // Gauge calculator
   const stPerInch=parseFloat(stitches)/parseFloat(swatchSize)||0;
   const roPerInch=parseFloat(rows)/parseFloat(swatchSize)||0;
-  const castOn=Math.round(stPerInch*parseFloat(targetW)||0);
+  // Casting on is knitting. A crocheter chains, or works a foundation row, and
+  // the wrong verb here is the exact tell that a tool was built by someone who
+  // does not crochet. Renamed 2026-09-07.
+  const startingStitches=Math.round(stPerInch*parseFloat(targetW)||0);
   const totalRowsCalc=Math.round(roPerInch*parseFloat(targetH)||0);
   // ── YARDAGE ENGINE INPUTS ───────────────────────────────────────
   // Two things went wrong here and both were invisible on screen.
@@ -234,7 +240,7 @@ const Calculators = ({embedded=false}) => {
           <div style={DIVIDER}/>
           <div style={LABEL}>results</div>
           <div style={{display:"grid",gridTemplateColumns:two,gap:8,marginTop:8}}>
-            <ResultCard isMobile={isMobile} label="cast on" val={castOn}/>
+            <ResultCard isMobile={isMobile} label="starting stitches" val={startingStitches}/>
             <ResultCard isMobile={isMobile} label="total rows" val={totalRowsCalc}/>
             <ResultCard isMobile={isMobile} label="sts / inch" val={stPerInch.toFixed(1)}/>
             <ResultCard isMobile={isMobile} label="rows / inch" val={roPerInch.toFixed(1)}/>

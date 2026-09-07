@@ -106,6 +106,12 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 .wv-land .howic{width:52px;height:52px;border-radius:15px;background:#F2EEFB;color:var(--accent);display:flex;align-items:center;justify-content:center}
 .wv-land .how-t{font-family:var(--disp);font-weight:600;font-size:20px;margin-top:16px}
 .wv-land .how-s{font-weight:700;font-size:14px;color:var(--muted);line-height:1.55;margin-top:7px}
+.wv-land .toolgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:28px}
+.wv-land .toolcard{display:block;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px 24px;text-decoration:none;color:inherit;box-shadow:0 10px 24px -18px rgba(90,66,160,.55);transition:.15s}
+.wv-land .toolcard:hover{transform:translateY(-2px);border-color:#DCD2F4}
+.wv-land .tool-t{font-family:var(--disp);font-weight:600;font-size:20px;color:var(--ink)}
+.wv-land .tool-s{font-weight:700;font-size:14px;color:var(--muted);line-height:1.55;margin-top:7px}
+.wv-land .tool-g{font-weight:800;font-size:13.5px;color:var(--accent);margin-top:12px}
 .wv-land .craftband{max-width:1160px;margin:46px auto 0;padding:0 54px}
 .wv-land .craftin{background:linear-gradient(#fff,#fff) padding-box,linear-gradient(135deg,#F2C744,#E9A83C 45%,#F6E7C9) border-box;border:2px solid transparent;border-radius:28px;padding:32px 38px;display:grid;grid-template-columns:1fr 1.3fr;gap:32px;align-items:center;box-shadow:0 30px 60px -34px rgba(200,150,40,.45)}
 .wv-land .craftbadge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(120deg,#FFD98A,#F5B93E);color:#5A3E0E;font-weight:800;font-size:11px;letter-spacing:.07em;text-transform:uppercase;padding:5px 11px;border-radius:999px}
@@ -186,7 +192,7 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 .wv-land .minipat{display:flex;align-items:center;gap:10px;margin-top:13px;background:var(--bg);border-radius:11px;padding:8px 10px;font-weight:700;font-size:12px;color:var(--muted);line-height:1.4;text-align:left}
 .wv-land .minipat img{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0}
 @media (max-width:1024px){.wv-land .hero{grid-template-columns:1fr;padding:34px 40px 10px;gap:64px}.wv-land .heroviz{order:0}.wv-land .stats{grid-template-columns:1fr 1fr}.wv-land .heroviz{max-width:560px}.wv-land .top{padding:16px 40px}.wv-land .sect{padding:54px 40px 0}.wv-land .craftin{grid-template-columns:1fr;padding:36px}.wv-land .endin{flex-direction:column;text-align:center;padding:44px 36px}.wv-land .end-s{margin-left:auto;margin-right:auto}.wv-land .pagecord{display:none}}
-@media (max-width:640px){.wv-land .forkrow{grid-template-columns:1fr}.wv-land .authcard{padding:32px 24px}.wv-land .h1{font-size:36px}.wv-land .pcard.hot{order:-1}.wv-land .stats{grid-template-columns:1fr}.wv-land .vizbev{width:180px;left:-14px}.wv-land .vizcard{margin-left:30px;height:280px}.wv-land .statfoot{flex-direction:column;text-align:center}.wv-land .howimg{height:180px}.wv-land .uline{white-space:normal;background-size:100% 9px;padding-bottom:10px}.wv-land .hero{padding:34px 22px 6px;gap:30px}.wv-land .top{padding:14px 18px;gap:12px}.wv-land .tlink.hidem{display:none}.wv-land .sect{padding:44px 22px 0}.wv-land .how{grid-template-columns:1fr;gap:20px}.wv-land .plans{grid-template-columns:1fr}.wv-land .craftband,.wv-land .endband{padding-left:22px;padding-right:22px}.wv-land .craftlist{grid-template-columns:1fr}.wv-land .foot{padding:0 22px 36px}.wv-land .vizcard{height:300px}}
+@media (max-width:640px){.wv-land .forkrow{grid-template-columns:1fr}.wv-land .authcard{padding:32px 24px}.wv-land .h1{font-size:36px}.wv-land .pcard.hot{order:-1}.wv-land .stats{grid-template-columns:1fr}.wv-land .vizbev{width:180px;left:-14px}.wv-land .vizcard{margin-left:30px;height:280px}.wv-land .statfoot{flex-direction:column;text-align:center}.wv-land .howimg{height:180px}.wv-land .uline{white-space:normal;background-size:100% 9px;padding-bottom:10px}.wv-land .hero{padding:34px 22px 6px;gap:30px}.wv-land .top{padding:14px 18px;gap:12px}.wv-land .tlink.hidem{display:none}.wv-land .sect{padding:44px 22px 0}.wv-land .how{grid-template-columns:1fr;gap:20px}.wv-land .toolgrid{grid-template-columns:1fr}.wv-land .plans{grid-template-columns:1fr}.wv-land .craftband,.wv-land .endband{padding-left:22px;padding-right:22px}.wv-land .craftlist{grid-template-columns:1fr}.wv-land .foot{padding:0 22px 36px}.wv-land .vizcard{height:300px}}
 #__ph_survey_widget, div[class*="PostHog"], div[id*="posthog"], .__ph_toolbar { display: none !important; }
 /* iOS Safari only (-webkit-touch-callout is iOS-specific): live filter layers
    break the tile compositor on real devices — sections stop painting mid-
@@ -238,6 +244,7 @@ const TopNav = ({ onLanding, onSignIn, onStartFree, showLinks }) => (
     <div className="tlinks">
       {showLinks && <>
         <a className="tlink hidem" href="#how">How Bev works</a>
+        <a className="tlink hidem" href="#tools">Free tools</a>
         <a className="tlink hidem" href="#craft">Craft</a>
         <a className="tlink hidem" href="#pricing">Pricing</a>
       </>}
@@ -430,6 +437,41 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
       </div>
     </div>
 
+    {/* ── Free tools ──────────────────────────────────────────────────────
+         ADDED 2026-09-07. These four pages existed, ranked-ready and in the
+         sitemap, since 2026-08-07 and the homepage linked to none of them.
+         Their only discovery path was sitemap.xml, so the one page on the
+         domain with any authority passed none of it down. They are also the
+         honest top of this funnel: a stranger who is not ready to sign up for
+         anything can still get a real answer here, which is the whole
+         argument for the app underneath. ── */}
+    <div className="sect" id="tools">
+      <h2 className="sect-h">Free crochet tools, no signup</h2>
+      <p className="sect-s">Four small tools for the moments a pattern stops making sense. They run in your browser, nothing you paste is uploaded, and none of them asks for an account.</p>
+      <div className="toolgrid">
+        <a className="toolcard" href="/uk-us-crochet-terms">
+          <div className="tool-t">UK to US term converter</div>
+          <div className="tool-s">Paste a whole pattern and convert every term in one pass. Handles dc, tr, htr and dtr together, so the shared abbreviations cannot collide the way they do when you edit by hand.</div>
+          <div className="tool-g">Convert a pattern →</div>
+        </a>
+        <a className="toolcard" href="/crochet-abbreviations">
+          <div className="tool-t">Crochet abbreviations, explained</div>
+          <div className="tool-s">Every common abbreviation with its UK equivalent and a plain description of what your hands actually do. Paste a row you are stuck on and each term in it gets labelled.</div>
+          <div className="tool-g">Look up a stitch →</div>
+        </a>
+        <a className="toolcard" href="/crochet-stitch-counter">
+          <div className="tool-t">Stitch count checker</div>
+          <div className="tool-s">Paste one written round and see how many stitches it makes against how many it works across. When a count stops adding up, the gap tells you which round to recount.</div>
+          <div className="tool-g">Check a round →</div>
+        </a>
+        <a className="toolcard" href="/tools">
+          <div className="tool-t">Gauge, yardage and scale calculators</div>
+          <div className="tool-s">How much yarn a project needs, what your swatch means in real stitch counts, and what to change when your gauge does not match the pattern's.</div>
+          <div className="tool-g">Open the calculators →</div>
+        </a>
+      </div>
+    </div>
+
     {/* ── End CTA band ── */}
     <div className="endband">
       <div className="endin">
@@ -445,6 +487,12 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
     {/* ── Footer ── */}
     <div className="foot">
       <span>© 2026 Wovely</span>
+      <a href="/uk-us-crochet-terms">UK to US converter</a>
+      <a href="/crochet-abbreviations">Abbreviations</a>
+      <a href="/crochet-stitch-counter">Stitch count checker</a>
+      <a href="/crochet-gauge-calculator">Gauge calculator</a>
+      <a href="/yarn-yardage-calculator">Yardage calculator</a>
+      <a href="/crochet-pattern-scale-calculator">Scale calculator</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="mailto:bev@wovely.app">Talk to us</a>

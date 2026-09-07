@@ -177,7 +177,7 @@ const BevCorner = ({ patterns, isMobile, isPro }) => {
     else if (hr < 9) pool.push(...["Morning! Bev's already been up for hours. She's very serious about yarn. ☀️", "Early crafter energy detected. Bev approves. ☀️", "Starting the day with crochet. Bev says this is the correct way to live."]);
     else if (hr < 12) pool.push(...["Morning craft session. Bev has her coffee. She's ready. ☕", "Peak productivity hours. Bev suggests we use them wisely. 🧶", "Good morning. Bev has opinions about your WIP and she's ready to share them."]);
     else if (hr < 14) pool.push(...["Lunch break crafting. Bev calls this efficient. 🍵", "Midday check-in. Bev wants to know how the stitch count is going.", "You opened Wovely at lunch. Bev is not surprised. She would do the same."]);
-    else if (hr < 17) pool.push(...["Afternoon slump? Bev recommends yarn as a cure. 🧶", "Mid-afternoon. Prime time for a few rows, according to Bev.", "Bev's afternoon energy is high. She thinks you should cast on something new."]);
+    else if (hr < 17) pool.push(...["Afternoon slump? Bev recommends yarn as a cure. 🧶", "Mid-afternoon. Prime time for a few rows, according to Bev.", "Bev's afternoon energy is high. She thinks you should start something new."]);
     else if (hr < 21) pool.push(...["Evening crafting hour. Best hour of the day, according to Bev. 🌙", "Post-work crochet. Bev calls this the correct way to decompress.", "Evening mode activated. Bev has been waiting for this. 🧶"]);
     else pool.push(...["Night owl crafter. Bev respects this lifestyle entirely.", "Late evening yarn time. Bev says just one more row. (She always says this.)", "Crafting before bed. Bev thinks this is the secret to a good night's sleep. 🌙"]);
 

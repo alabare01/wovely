@@ -16,20 +16,25 @@ import PublicPage, { CARD, useJsonLd } from "./components/PublicPage.jsx";
 import Calculators from "./Calculators.jsx";
 import { T, useBreakpoint } from "./theme.jsx";
 
+// Exported so the build can write this same block into the page's raw HTML
+// head (scripts/prerender.mjs). A crawler that does not run JavaScript was
+// getting no structured data at all, because useJsonLd runs in an effect.
+export const PAGE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Crochet Gauge, Yardage and Scale Calculators",
+  url: "https://wovely.app/tools",
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Work out how much yarn a crochet project needs, turn a gauge swatch into real stitch counts, and scale a pattern to your own gauge.",
+};
+
 export default function PublicCalculators() {
   const { isMobile } = useBreakpoint();
 
-  useJsonLd({
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "Crochet Gauge, Yardage and Scale Calculators",
-    url: "https://wovely.app/tools",
-    applicationCategory: "UtilitiesApplication",
-    operatingSystem: "Any",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description:
-      "Work out how much yarn a crochet project needs, turn a gauge swatch into real stitch counts, and scale a pattern to your own gauge.",
-  });
+  useJsonLd(PAGE_SCHEMA);
 
   return (
     <PublicPage
@@ -60,6 +65,12 @@ export default function PublicCalculators() {
           color: T.ink, margin: "0 0 14px", lineHeight: 1.25,
         }}>How to use each one</h2>
         <p style={P}>
+          Each calculator also has its own page, with the questions people actually ask about it:{" "}
+          <a href="/crochet-gauge-calculator" style={LINK}>the gauge calculator</a>,{" "}
+          <a href="/yarn-yardage-calculator" style={LINK}>the yarn yardage calculator</a>, and{" "}
+          <a href="/crochet-pattern-scale-calculator" style={LINK}>the pattern scale calculator</a>.
+        </p>
+        <p style={P}>
           <b>Gauge.</b> Crochet a square, measure four inches across the middle of it rather than at
           the edges, and count the stitches and rows inside that measurement. Put those numbers in
           with your target size and you get the number of stitches to start with and the number of
@@ -81,3 +92,4 @@ export default function PublicCalculators() {
 }
 
 const P = { fontFamily: T.body, fontSize: 15.5, lineHeight: 1.75, color: T.ink, margin: "0 0 14px" };
+const LINK = { color: T.accent, fontWeight: 700 };

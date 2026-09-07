@@ -31,10 +31,16 @@ export const LABEL = {
   fontFamily: T.body,
 };
 
-/** Inject a JSON-LD block for the page and clean it up on unmount. */
+/** Inject a JSON-LD block for the page and clean it up on unmount.
+ *
+ *  Skips the injection when the build has already written the same block into
+ *  the raw HTML head (see scripts/prerender.mjs), so a page loaded directly
+ *  from a search result carries exactly one copy. This hook still does the work
+ *  on a client-side navigation, where there is no per-route HTML file. */
 export function useJsonLd(data) {
   useEffect(() => {
     if (!data) return;
+    if (document.head.querySelector('script[data-wovely-jsonld="build"]')) return;
     const el = document.createElement("script");
     el.type = "application/ld+json";
     el.textContent = JSON.stringify(data);
@@ -107,7 +113,9 @@ const OTHER_TOOLS = [
   { to: "/uk-us-crochet-terms", label: "UK to US pattern converter" },
   { to: "/crochet-abbreviations", label: "Crochet abbreviations" },
   { to: "/crochet-stitch-counter", label: "Stitch count checker" },
-  { to: "/tools", label: "Gauge, yardage and scale calculators" },
+  { to: "/crochet-gauge-calculator", label: "Gauge calculator" },
+  { to: "/yarn-yardage-calculator", label: "Yarn yardage calculator" },
+  { to: "/crochet-pattern-scale-calculator", label: "Pattern scale calculator" },
 ];
 
 const Footer = ({ current }) => (

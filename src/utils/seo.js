@@ -68,6 +68,26 @@ export const PUBLIC_ROUTES = {
     description: "Every common crochet abbreviation with its UK equivalent and a plain-English description of how the stitch is actually worked. Paste a row you are stuck on and each term in it gets labelled.",
     canonical: SITE + "/crochet-abbreviations",
   },
+  // SPLIT OUT OF /tools 2026-09-07. Three calculators behind tabs on one URL is
+  // three searches with three intents fighting over one title. Each now owns a
+  // slug that names the tool a person actually typed, and /tools stays as the
+  // hub. The page ones for gauge and for pattern scaling are small craft blogs
+  // with embedded calculators and no publisher defending either query.
+  "/crochet-gauge-calculator": {
+    title: "Crochet Gauge Calculator: Swatch to Stitch Count | Wovely",
+    description: "Turn a crochet gauge swatch into real numbers. Enter your stitches and rows over a measured swatch and the finished size you want, and get the stitches to start with and the rows to work. Free, no signup.",
+    canonical: SITE + "/crochet-gauge-calculator",
+  },
+  "/yarn-yardage-calculator": {
+    title: "Yarn Yardage Calculator for Crochet: How Much Yarn Do I Need? | Wovely",
+    description: "Estimate the yards a crochet project needs from its finished size, the yarn weight and the stitch. Single crochet and double crochet are not the same answer. Free, no signup.",
+    canonical: SITE + "/yarn-yardage-calculator",
+  },
+  "/crochet-pattern-scale-calculator": {
+    title: "Crochet Pattern Scale Calculator: Resize to Your Gauge | Wovely",
+    description: "Resize a crochet pattern to a different finished size or to your own gauge, keeping the stitch counts a whole multiple of the repeat so the round still closes.",
+    canonical: SITE + "/crochet-pattern-scale-calculator",
+  },
   "/crochet-stitch-counter": {
     title: "Crochet Stitch Count Checker: Does This Round Add Up? | Wovely",
     description: "Paste a written crochet round and see how many stitches it makes and how many it works across. When a count stops adding up, the gap between those two numbers tells you which round to recount.",
@@ -145,5 +165,22 @@ export function applySeo(pathname) {
   const ownsTitle = pathname === "/master-doc" || pathname.startsWith("/stitch/");
   if (!ownsTitle) document.title = DEFAULT_TITLE;
 }
+
+// Crawl priority per route, used by the sitemap the build writes. Anything not
+// listed gets 0.5. Kept here rather than in a hand-edited public/sitemap.xml,
+// because that file went a month with every lastmod reading 2026-08-07 and no
+// entry for pages that had shipped since.
+export const SITEMAP_PRIORITY = {
+  "/": "1.0",
+  "/uk-us-crochet-terms": "0.9",
+  "/crochet-abbreviations": "0.9",
+  "/crochet-gauge-calculator": "0.9",
+  "/yarn-yardage-calculator": "0.9",
+  "/crochet-pattern-scale-calculator": "0.8",
+  "/tools": "0.8",
+  "/crochet-stitch-counter": "0.8",
+  "/privacy": "0.3",
+  "/terms": "0.3",
+};
 
 export { DEFAULT_TITLE, DEFAULT_DESC };

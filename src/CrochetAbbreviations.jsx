@@ -15,6 +15,21 @@ import { ABBREVIATIONS, annotateRow } from "./utils/crochetTerms.js";
 const GROUPS = ["Stitches", "Shaping", "Post & placement", "Amigurumi", "Pattern shorthand"];
 const EXAMPLE_ROW = "Rnd 4: ch 1, 2 dc in next st, sk 1 st, fpdc, sc2tog, sl st in blo to join. (24 sts)";
 
+// Exported so the build can write this same block into the page's raw HTML
+// head (scripts/prerender.mjs). A crawler that does not run JavaScript was
+// getting no structured data at all, because useJsonLd runs in an effect.
+export const PAGE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Crochet Abbreviations Reference",
+  url: "https://wovely.app/crochet-abbreviations",
+  applicationCategory: "ReferenceApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Every common crochet abbreviation with its UK equivalent and a plain-English description of how the stitch is worked, plus a tool that labels each term in a row you paste.",
+};
+
 export default function CrochetAbbreviations() {
   const { isMobile } = useBreakpoint();
   const [query, setQuery] = useState("");
@@ -36,17 +51,7 @@ export default function CrochetAbbreviations() {
     );
   }, [query]);
 
-  useJsonLd({
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "Crochet Abbreviations Reference",
-    url: "https://wovely.app/crochet-abbreviations",
-    applicationCategory: "ReferenceApplication",
-    operatingSystem: "Any",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description:
-      "Every common crochet abbreviation with its UK equivalent and a plain-English description of how the stitch is worked, plus a tool that labels each term in a row you paste.",
-  });
+  useJsonLd(PAGE_SCHEMA);
 
   return (
     <PublicPage

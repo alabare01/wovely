@@ -27,6 +27,7 @@ import PublicCalculators from "./PublicCalculators.jsx";
 import UkUsConverter from "./UkUsConverter.jsx";
 import CrochetAbbreviations from "./CrochetAbbreviations.jsx";
 import StitchCounter from "./StitchCounter.jsx";
+import { GaugeCalculatorPage, YardageCalculatorPage, ScaleCalculatorPage } from "./CalculatorPages.jsx";
 import FeedbackWidget from "./FeedbackWidget.jsx";
 import BevChat from "./BevChat.jsx";
 import YarnCircle from "./YarnCircle.jsx";
@@ -106,6 +107,9 @@ const PUBLIC_TOOL_PAGES = {
   "/uk-us-crochet-terms": UkUsConverter,
   "/crochet-abbreviations": CrochetAbbreviations,
   "/crochet-stitch-counter": StitchCounter,
+  "/crochet-gauge-calculator": GaugeCalculatorPage,
+  "/yarn-yardage-calculator": YardageCalculatorPage,
+  "/crochet-pattern-scale-calculator": ScaleCalculatorPage,
 };
 const VIEW_TO_PATH = {collection:"/",detail:"/",wip:"/builds",browse:"/browse",stash:"/stash",calculator:"/tools","stitch-check":"/stitch-check",shopping:"/shopping",profile:"/profile",community:"/circle"};
 const PATH_TO_VIEW = {"/":"collection","/hive":"collection","/builds":"wip","/browse":"browse","/stash":"stash","/tools":"calculator","/stitch-check":"stitch-check","/shopping":"shopping","/profile":"profile","/circle":"community","/hive-vision":"hive-vision","/privacy":"privacy","/terms":"terms"};

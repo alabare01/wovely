@@ -34,6 +34,21 @@ const EXAMPLES = [
   "[2 dc, ch 1] 8 times",
 ];
 
+// Exported so the build can write this same block into the page's raw HTML
+// head (scripts/prerender.mjs). A crawler that does not run JavaScript was
+// getting no structured data at all, because useJsonLd runs in an effect.
+export const PAGE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Crochet Stitch Count Checker",
+  url: "https://wovely.app/crochet-stitch-counter",
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Check one written crochet round: how many stitches it makes, how many it works across, and whether that agrees with the count the pattern states.",
+};
+
 export default function StitchCounter() {
   const { isMobile } = useBreakpoint();
   const [text, setText] = useState(EXAMPLES[0]);
@@ -44,17 +59,7 @@ export default function StitchCounter() {
     [text, prev]
   );
 
-  useJsonLd({
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "Crochet Stitch Count Checker",
-    url: "https://wovely.app/crochet-stitch-counter",
-    applicationCategory: "UtilitiesApplication",
-    operatingSystem: "Any",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description:
-      "Check one written crochet round: how many stitches it makes, how many it works across, and whether that agrees with the count the pattern states.",
-  });
+  useJsonLd(PAGE_SCHEMA);
 
   return (
     <PublicPage

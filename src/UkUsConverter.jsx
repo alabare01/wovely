@@ -24,6 +24,21 @@ Round 4: ch 3, 2 dc in next st, sk 1 st, 1 hdc in next st.
 Round 5: 1 tr in next st, dc2tog, sl st to join.
 Gauge: 16 sts and 18 rows to 10cm.`;
 
+// Exported so the build can write this same block into the page's raw HTML
+// head (scripts/prerender.mjs). A crawler that does not run JavaScript was
+// getting no structured data at all, because useJsonLd runs in an effect.
+export const PAGE_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "UK to US Crochet Term Converter",
+  url: "https://wovely.app/uk-us-crochet-terms",
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Any",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  description:
+    "Paste a whole crochet pattern and convert every UK abbreviation to its US equivalent in one pass, or convert US terms to UK.",
+};
+
 export default function UkUsConverter() {
   const { isMobile } = useBreakpoint();
   const [text, setText] = useState(EXAMPLE_UK);
@@ -66,17 +81,7 @@ export default function UkUsConverter() {
     }
   };
 
-  useJsonLd({
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "UK to US Crochet Term Converter",
-    url: "https://wovely.app/uk-us-crochet-terms",
-    applicationCategory: "UtilitiesApplication",
-    operatingSystem: "Any",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-    description:
-      "Paste a whole crochet pattern and convert every UK abbreviation to its US equivalent in one pass, or convert US terms to UK.",
-  });
+  useJsonLd(PAGE_SCHEMA);
 
   const btn = (on) => ({
     flex: 1, padding: "11px 14px", borderRadius: 999, border: "none", cursor: "pointer",

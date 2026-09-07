@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
-import { PUBLIC_ROUTES } from './src/utils/seo.js'
+import { PUBLIC_ROUTES, SITEMAP_PRIORITY } from './src/utils/seo.js'
 import { checkFirstRunInvariant } from './scripts/first-run-invariant.mjs'
 
 // ─── FIRST-RUN STARTER GATE ──────────────────────────────────────────────────
@@ -59,7 +59,14 @@ const seoHeadPrerender = () => ({
       .replace(/<meta property="og:url" content="[^"]*"\s*\/?>/, `<meta property="og:url" content="${esc(route.canonical)}" />`)
       .replace(/<meta name="twitter:title" content="[^"]*"\s*\/?>/, `<meta name="twitter:title" content="${esc(route.title)}" />`)
       .replace(/<meta name="twitter:description" content="[^"]*"\s*\/?>/, `<meta name="twitter:description" content="${esc(route.description)}" />`)
-      .replace('</head>', `  <link rel="canonical" href="${esc(route.canonical)}" />\n  </head>`)
+      // hreflang was hard-coded to the homepage in index.html, so every route
+      // shipped `<link rel="alternate" href="https://wovely.app/" hreflang="en">`
+      // and told a crawler its English equivalent was the homepage. Same class
+      // of bug as the hard-coded canonical above, and missed by that fix. Now
+      // self-referencing per route, which is what a single-language site should
+      // say if it says anything at all.
+      .replace(/<link rel="alternate"[^>]*hreflang="en"[^>]*>\s*/, '')
+      .replace('</head>', `  <link rel="canonical" href="${esc(route.canonical)}" />\n  <link rel="alternate" href="${esc(route.canonical)}" hreflang="en" />\n  </head>`)
 
     const written = []
     for (const [pathname, route] of Object.entries(PUBLIC_ROUTES)) {
@@ -67,8 +74,23 @@ const seoHeadPrerender = () => ({
       fs.writeFileSync(path.join(outDir, file), render(route), 'utf8')
       written.push(file)
     }
+    // The sitemap is generated from the same route table, so a new public page
+    // cannot ship without an entry. The hand-edited public/sitemap.xml went a
+    // month with every lastmod reading 2026-08-07.
+    const today = new Date().toISOString().slice(0, 10)
+    const urls = Object.entries(PUBLIC_ROUTES)
+      .map(([pathname, route]) => `  <url>\n    <loc>${route.canonical}</loc>\n    <lastmod>${today}</lastmod>\n    <priority>${SITEMAP_PRIORITY[pathname] || '0.5'}</priority>\n  </url>`)
+      .join('\n')
+    fs.writeFileSync(
+      path.join(outDir, 'sitemap.xml'),
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
+      'utf8',
+    )
+
     // eslint-disable-next-line no-console
     console.log(`[seo] wrote per-route heads: ${written.join(', ')}`)
+    // eslint-disable-next-line no-console
+    console.log(`[seo] wrote sitemap.xml with ${Object.keys(PUBLIC_ROUTES).length} URLs`)
   },
 })
 
