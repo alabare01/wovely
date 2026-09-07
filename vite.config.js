@@ -26,6 +26,32 @@ const firstRunGate = () => ({
   },
 })
 
+// ─── ROUTE-REACHABILITY GATE ─────────────────────────────────────────────────
+//
+// Every public route is served from its own prerendered HTML file, and the only
+// thing that connects the URL to that file is an explicit rewrite in
+// vercel.json. On 2026-09-07 three new calculator pages built correctly, wrote
+// correct heads, prerendered 2,238 to 2,550 characters of body each, deployed
+// green, and then answered as the homepage in production, because nobody added
+// their three lines to vercel.json. A page that builds is not a page that is
+// reachable. This refuses the build instead.
+const routeReachabilityGate = () => ({
+  name: 'wovely-route-reachability-gate',
+  apply: 'build',
+  buildStart() {
+    const vercel = JSON.parse(fs.readFileSync(path.resolve('vercel.json'), 'utf8'))
+    const sources = new Set((vercel.rewrites || []).map((r) => r.source))
+    const missing = Object.keys(PUBLIC_ROUTES).filter((p) => p !== '/' && !sources.has(p))
+    if (missing.length) {
+      this.error(
+        `[routes] these public routes have no rewrite in vercel.json and would serve the homepage shell: ${missing.join(', ')}`
+      )
+    }
+    // eslint-disable-next-line no-console
+    console.log(`[routes] ${Object.keys(PUBLIC_ROUTES).length} public routes, all reachable`)
+  },
+})
+
 // ─── PER-ROUTE STATIC HEADS ──────────────────────────────────────────────────
 //
 // Wovely is a client-rendered SPA behind a catch-all rewrite, so every URL was
@@ -95,7 +121,7 @@ const seoHeadPrerender = () => ({
 })
 
 export default defineConfig({
-  plugins: [react(), firstRunGate(), seoHeadPrerender()],
+  plugins: [react(), firstRunGate(), routeReachabilityGate(), seoHeadPrerender()],
   server: {
     historyApiFallback: true
   },

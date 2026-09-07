@@ -27,6 +27,9 @@
     { "source": "/uk-us-crochet-terms", "destination": "/uk-us-crochet-terms.html" },
     { "source": "/crochet-abbreviations", "destination": "/crochet-abbreviations.html" },
     { "source": "/crochet-stitch-counter", "destination": "/crochet-stitch-counter.html" },
+    { "source": "/crochet-gauge-calculator", "destination": "/crochet-gauge-calculator.html" },
+    { "source": "/yarn-yardage-calculator", "destination": "/yarn-yardage-calculator.html" },
+    { "source": "/crochet-pattern-scale-calculator", "destination": "/crochet-pattern-scale-calculator.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/((?!api/|.*\\.).*)", "destination": "/index.html" }
