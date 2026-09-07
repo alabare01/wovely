@@ -17,12 +17,20 @@ import { scaleCount } from "./utils/gaugeScale.js";
 const LABEL = {fontSize:11,fontWeight:600,color:T.ink2,textTransform:"uppercase",letterSpacing:".05em",marginBottom:6};
 const DIVIDER = {height:1,background:T.border,margin:"20px 0"};
 
+// These are the only editable things on a calculator page and they had a
+// transparent background, no border and no shadow, so on a fresh visit the
+// numbers read as a printed answer somebody else had already worked out. The
+// underline appeared on focus, which is no help to a reader who never guessed
+// there was a field to focus. Now the field looks like a field before it is
+// touched, and the accent underline still marks the one being edited.
+// Found by opening the page as a stranger, 2026-09-07.
 const Input = ({label,val,set,step="1"}) => (
   <div style={{minWidth:0}}>
     <div style={{...LABEL,overflowWrap:"anywhere"}}>{label}</div>
     <input value={val} onChange={e=>set(e.target.value)} type="number" step={step} inputMode="decimal"
-      style={{width:"100%",minWidth:0,maxWidth:"100%",padding:"12px 0",background:"transparent",border:"none",borderBottom:"2px solid transparent",fontSize:17,fontWeight:600,color:T.ink,textAlign:"center",outline:"none",transition:"border-color .2s"}}
-      onFocus={e=>e.target.style.borderBottomColor=T.terra} onBlur={e=>e.target.style.borderBottomColor="transparent"}/>
+      style={{width:"100%",minWidth:0,maxWidth:"100%",padding:"11px 8px",background:"#fff",border:`1.5px solid ${T.border}`,borderRadius:12,fontSize:17,fontWeight:600,color:T.ink,textAlign:"center",outline:"none",transition:"border-color .2s, box-shadow .2s"}}
+      onFocus={e=>{e.target.style.borderColor=T.terra;e.target.style.boxShadow=`0 0 0 3px ${T.terraLt}`;}}
+      onBlur={e=>{e.target.style.borderColor=T.border;e.target.style.boxShadow="none";}}/>
   </div>
 );
 
