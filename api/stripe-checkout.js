@@ -12,6 +12,7 @@
 // later.
 
 import Stripe from 'stripe';
+import { recordPulse } from './_monitor.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -99,6 +100,23 @@ export default async function handler(req, res) {
         body: JSON.stringify({ timestamp: new Date().toISOString(), level: 'info', message: `POST /api/stripe-checkout tier=${tier} cadence=${cadence} → 200 (${Date.now() - _t0}ms)`, source: 'serverless', request_path: '/api/stripe-checkout', request_method: 'POST', status_code: 200, project_id: 'wovely', user_id: userId })
       }).catch(() => {});
     }
+    // The closest thing this business has to a revenue event. Recorded from
+    // the server that created the session, so a person who bounces off the
+    // Stripe page still counts as having got that far.
+    await recordPulse({
+      supabaseUrl: _url,
+      serviceKey: _key,
+      events: [{
+        kind: 'checkout_started',
+        path: '/checkout',
+        ref: null,
+        sid: null,
+        uid: userId,
+        meta: { tier, cadence },
+        at: new Date().toISOString(),
+      }],
+    });
+
     res.json({ url: session.url, tier });
   } catch (err) {
     console.error('[stripe-checkout] Error:', err.message);

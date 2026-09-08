@@ -18,6 +18,7 @@
 import { runPdfExtraction, runBevCheck, MATERIALS_SECTION_KEYWORDS, ABBREVIATIONS_SECTION_KEYWORDS } from '../extract-pattern.js';
 import { runVisionExtraction } from '../extract-pattern-vision.js';
 import { alertImportFailures } from '../_alert.js';
+import { flushInterrupts, recordPulse } from '../_monitor.js';
 
 export const config = { maxDuration: 300 };
 
@@ -351,7 +352,8 @@ export default async function handler(req, res) {
     // Nothing to run does not mean nothing to report. The sweeps above may have
     // just marked rows failed, so the alert is evaluated on every tick.
     const alert = await alertImportFailures({ supabaseUrl, serviceKey });
-    return res.status(200).json({ ok: true, processed: 0, idle: true, alert: alert.reason });
+    const pulse = await flushInterrupts({ supabaseUrl, serviceKey });
+    return res.status(200).json({ ok: true, processed: 0, idle: true, alert: alert.reason, pulse: pulse.reason });
   }
 
   console.log(`[process-queue] Found ${pending.length} pending jobs`);
@@ -668,6 +670,23 @@ export default async function handler(req, res) {
       status_code: 200, user_id: claimedJob.user_id,
     });
 
+    // The monitor learns about a successful import HERE, from the worker that
+    // did it, and not from the browser. A tab that is closed the moment the
+    // pill turns green would never have reported it, and "somebody imported a
+    // pattern" is the single strongest signal this product has.
+    await recordPulse({
+      supabaseUrl, serviceKey,
+      events: [{
+        kind: 'import_succeeded',
+        path: '/import',
+        ref: null,
+        sid: null,
+        uid: claimedJob.user_id || null,
+        meta: { file_type: String(claimedJob.file_type || 'unknown').slice(0, 40) },
+        at: new Date().toISOString(),
+      }],
+    });
+
     summary.processed++;
     summary.completed++;
   }
@@ -676,5 +695,10 @@ export default async function handler(req, res) {
   // per ALERT_WINDOW_MS, covering every job that failed since the last one.
   const alert = await alertImportFailures({ supabaseUrl, serviceKey });
 
-  return res.status(200).json({ ok: true, ...summary, alert: alert.reason, total_elapsed_ms: Date.now() - t0 });
+  // The monitor's send decision. It lives on this tick rather than in
+  // /api/pulse because /api/pulse is public and anything public that can send
+  // mail is an inbox somebody else controls. See api/_monitor.js.
+  const pulse = await flushInterrupts({ supabaseUrl, serviceKey });
+
+  return res.status(200).json({ ok: true, ...summary, alert: alert.reason, pulse: pulse.reason, total_elapsed_ms: Date.now() - t0 });
 }

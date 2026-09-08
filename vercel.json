@@ -1,38 +1,147 @@
 {
   "functions": {
-    "api/extract-pattern.js": { "maxDuration": 300, "memory": 1024 },
-    "api/extract-pattern-vision.js": { "maxDuration": 300, "memory": 1024 },
-    "api/cron/process-queue.js": { "maxDuration": 300, "memory": 1024 },
-    "api/import-job.js": { "maxDuration": 30 },
-    "api/job-status/[job_id].js": { "maxDuration": 10 },
-    "api/fetch-pattern.js": { "maxDuration": 60 },
-    "api/stripe-webhook.js": { "maxDuration": 30 },
-    "api/stitch-vision.js": { "maxDuration": 30 },
-    "api/send-feedback.js": { "maxDuration": 10 },
-    "api/notify-signup.js": { "maxDuration": 20 },
-    "api/email-prefs.js": { "maxDuration": 10 }
+    "api/extract-pattern.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/extract-pattern-vision.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/cron/process-queue.js": {
+      "maxDuration": 300,
+      "memory": 1024
+    },
+    "api/import-job.js": {
+      "maxDuration": 30
+    },
+    "api/job-status/[job_id].js": {
+      "maxDuration": 10
+    },
+    "api/fetch-pattern.js": {
+      "maxDuration": 60
+    },
+    "api/stripe-webhook.js": {
+      "maxDuration": 30
+    },
+    "api/stitch-vision.js": {
+      "maxDuration": 30
+    },
+    "api/send-feedback.js": {
+      "maxDuration": 10
+    },
+    "api/notify-signup.js": {
+      "maxDuration": 20
+    },
+    "api/email-prefs.js": {
+      "maxDuration": 10
+    },
+    "api/cron/heartbeat.js": {
+      "maxDuration": 30
+    },
+    "api/pulse.js": {
+      "maxDuration": 10
+    },
+    "api/client-error.js": {
+      "maxDuration": 10
+    }
   },
   "crons": [
-    { "path": "/api/cron/process-queue", "schedule": "* * * * *" }
+    {
+      "path": "/api/cron/process-queue",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/heartbeat",
+      "schedule": "0 * * * *"
+    }
   ],
   "headers": [
     {
       "source": "/(favicon.*|apple-touch-icon.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json; charset=utf-8"
+        }
+      ]
+    },
+    {
+      "source": "/icons/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800, must-revalidate"
+        }
       ]
     }
   ],
   "rewrites": [
-    { "source": "/tools", "destination": "/tools.html" },
-    { "source": "/uk-us-crochet-terms", "destination": "/uk-us-crochet-terms.html" },
-    { "source": "/crochet-abbreviations", "destination": "/crochet-abbreviations.html" },
-    { "source": "/crochet-stitch-counter", "destination": "/crochet-stitch-counter.html" },
-    { "source": "/crochet-gauge-calculator", "destination": "/crochet-gauge-calculator.html" },
-    { "source": "/yarn-yardage-calculator", "destination": "/yarn-yardage-calculator.html" },
-    { "source": "/crochet-pattern-scale-calculator", "destination": "/crochet-pattern-scale-calculator.html" },
-    { "source": "/privacy", "destination": "/privacy.html" },
-    { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/((?!api/|.*\\.).*)", "destination": "/app.html" }
+    {
+      "source": "/tools",
+      "destination": "/tools.html"
+    },
+    {
+      "source": "/uk-us-crochet-terms",
+      "destination": "/uk-us-crochet-terms.html"
+    },
+    {
+      "source": "/crochet-abbreviations",
+      "destination": "/crochet-abbreviations.html"
+    },
+    {
+      "source": "/crochet-stitch-counter",
+      "destination": "/crochet-stitch-counter.html"
+    },
+    {
+      "source": "/crochet-gauge-calculator",
+      "destination": "/crochet-gauge-calculator.html"
+    },
+    {
+      "source": "/yarn-yardage-calculator",
+      "destination": "/yarn-yardage-calculator.html"
+    },
+    {
+      "source": "/crochet-pattern-scale-calculator",
+      "destination": "/crochet-pattern-scale-calculator.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms.html"
+    },
+    {
+      "source": "/((?!api/|.*\\.).*)",
+      "destination": "/app.html"
+    }
   ]
 }

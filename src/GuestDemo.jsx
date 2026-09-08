@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import posthog from "posthog-js";
 import { T } from "./theme.jsx";
+import { pulse } from "./utils/pulse.js";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    GUEST DEMO: the zero-commitment path off the try screen.
@@ -152,6 +153,10 @@ export default function GuestDemo({ onBack, onStartReal, onImportOwn, onSignIn }
       if (!firstTapSent.current) {
         firstTapSent.current = true;
         posthog.capture("demo_row_tapped", { first: true, row: row.label, row_index: idx });
+        // The first tap is the moment a stranger stops reading and starts
+        // using the product. It is rare, it means something, and it is one of
+        // the six things allowed to interrupt Adam. Later taps digest.
+        pulse("demo_started", { row_index: idx });
       } else if (nowDone) {
         posthog.capture("demo_row_tapped", { first: false, row: row.label, row_index: idx });
       }
@@ -160,6 +165,7 @@ export default function GuestDemo({ onBack, onStartReal, onImportOwn, onSignIn }
 
   const convert = (to, fn) => {
     try { posthog.capture("demo_converted", { to, rows_done: doneIds.size }); } catch {}
+    pulse("demo_converted", { to, rows_done: doneIds.size });
     fn();
   };
 

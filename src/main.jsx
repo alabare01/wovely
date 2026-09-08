@@ -5,6 +5,7 @@ import posthog from 'posthog-js'
 import App from './App.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import { isNoReplayPath } from './utils/analytics.js'
+import { startPulseSession } from './utils/pulse.js'
 import './index.css'
 
 // Prevent browser from restoring scroll position on back/forward (iOS bfcache)
@@ -22,6 +23,13 @@ posthog.init('phc_CgK3ydJGk6XRtRPLQ8cnXxkqSroQBsuYrV9VsWk2r76Y', {
   capture_pageleave: true,
   disable_session_recording: isNoReplayPath(),
 });
+
+// Tell the monitor a person arrived. Signups already emailed Adam; the much
+// larger group who show up and never sign up were invisible, and at ~49
+// visitors a month that group IS the business. Fires once per tab, carries a
+// path and a referring hostname and nothing else, and cannot throw.
+// See src/utils/pulse.js and api/_monitor.js.
+startPulseSession();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

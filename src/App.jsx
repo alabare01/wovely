@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { initErrorReporter, setErrorReporterUser } from './utils/errorReporter.js';
+import { pulse } from './utils/pulse.js';
 import { useNavigate, useLocation, useParams, Routes, Route, Navigate } from "react-router-dom";
 import posthog from "posthog-js";
 import { T, useBreakpoint, Field } from "./theme.jsx";
@@ -2535,6 +2536,9 @@ export default function Wovely() {
     const cb = typeof proceedCallback === "function" ? proceedCallback : () => {};
     if (!authed) {
       try { posthog.capture("auth_wall_shown", { intent: intent || "unknown", requires_pro: !!requiresPro }); } catch {}
+      // Somebody wanted something enough to be stopped by a wall. Rare, and it
+      // is the sentence Adam needs to hear on the day it happens.
+      pulse("paywall_hit", { wall: "auth", intent: String(intent || "unknown") });
       setAuthWallContext({
         title: title || "Create a free account",
         subtitle: subtitle || "Takes 10 seconds. No credit card.",
@@ -2551,6 +2555,7 @@ export default function Wovely() {
     }
     if (requiresPro && !isPro) {
       try { posthog.capture("pro_paywall_shown", { intent: intent || "unknown" }); } catch {}
+      pulse("paywall_hit", { wall: "pro", intent: String(intent || "unknown") });
       setShowProModal(true);
       return;
     }
@@ -2903,6 +2908,7 @@ export default function Wovely() {
       // An upgrade_completed with no matching entitlement check on tier=craft
       // is a checkout that took the user's click but not their money.
       posthog.capture("upgrade_completed",{had_session:!!getSession()});
+    pulse("checkout_completed");
       setShowVault(true); // Free→Craft vault-door reveal celebration (replaces the plain toast)
       // Re-fetch profile to pick up is_pro=true from webhook
       const s=getSession();
@@ -3187,6 +3193,10 @@ export default function Wovely() {
 
   const handleNewSignup = () => {
     posthog.capture("user_signed_up");
+    // Recorded, not interrupted: api/notify-signup.js already emails Adam on
+    // signup and has since day one. This row exists so the hourly digest can
+    // put the signup next to the visits that led to it.
+    pulse("signup");
     setAuthed(true);document.cookie="wovely_authed=1;path=/;max-age=31536000";
     try{sessionStorage.removeItem("wovely_anonymous_mode");}catch{}
     setAnonymousMode(false);
@@ -3903,6 +3913,7 @@ export default function Wovely() {
     const cb = typeof proceedCallback === "function" ? proceedCallback : () => {};
     if (!authed) {
       try { posthog.capture("guest_import_started", { intent }); } catch {}
+      pulse("import_started", { intent: String(intent || "unknown") });
       const { error } = await supabaseAuth.signInAnonymously();
       if (error) {
         // Anon sign-in failed (most likely Allow anonymous sign-ins is OFF
