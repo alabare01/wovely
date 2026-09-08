@@ -1100,6 +1100,20 @@ export async function runPdfExtraction({ pdfText, pageCount, geminiKey, anthropi
         return { data: finalized.data, extractionMethod: finalized.extractionMethod, providerUsed: 'gemini', durationMs: Date.now() - t0 };
       } catch (e) {
         console.error("[runPdfExtraction] Gemini attempt failed:", e.message);
+        // One retry before falling through. The Claude fallback below depends on
+        // ANTHROPIC_API_KEY, which returns 401 in production and cannot be
+        // replaced from a session, so Gemini is currently the only working
+        // provider and a single transient failure would otherwise fail the job.
+        if (Date.now() - t0 < 30000) {
+          try {
+            const data = await callGeminiExtract({ prompt: fullPrompt, pdfText, geminiKey, maxTokens: 65536 });
+            const finalized = applyPdfMetadataTitleFallback(data, pdfMetadataTitle, 'pdf-text');
+            console.log("[runPdfExtraction] Gemini succeeded on retry");
+            return { data: finalized.data, extractionMethod: finalized.extractionMethod, providerUsed: 'gemini-retry', durationMs: Date.now() - t0 };
+          } catch (e1) {
+            console.error("[runPdfExtraction] Gemini retry failed:", e1.message);
+          }
+        }
       }
     }
 
@@ -1183,7 +1197,11 @@ export default async function handler(req, res) {
         body: JSON.stringify({ timestamp: new Date().toISOString(), level: 'error', message: `[extract-pattern] ${err.message} (${Date.now() - _t0}ms)`, source: 'serverless', request_path: '/api/extract-pattern', request_method: 'POST', status_code: 500, project_id: 'wovely' })
       }).catch(() => {});
     }
-    return res.status(500).json({ error: "Internal server error", message: err.message });
+    // The detailed error keeps going to the server log, where it is debuggable.
+    // It does not go to the browser: it named our providers and their failure
+    // modes to whoever was standing in front of a broken import.
+    console.error("[extract-pattern] failing request:", err && err.stack ? err.stack : err);
+    return res.status(500).json({ error: "extraction_failed", message: "We could not read that pattern." });
   }
 }
 
