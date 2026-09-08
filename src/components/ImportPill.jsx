@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { T, useBreakpoint } from "../theme.jsx";
 import { useImportJobPolling } from "../hooks/useImportJobPolling.js";
 import { PHASE_COPY_POOLS, REASSURANCE_LINE, pickPhaseCopy } from "../utils/importPhaseCopy.js";
+import { friendlyImportError, logImportFailure, IMPORT_FAILED_HEADLINE } from "../utils/importErrors.js";
 
 // Floating import status pill. Mounts at App.jsx so it persists across navigation.
 // Reads/writes sessionStorage key 'wovely_active_import_job' (string job id).
@@ -84,6 +85,15 @@ export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) 
     if (isComplete) setProminentUntil(Date.now() + PROMINENT_DURATION_MS);
   }, [isComplete]);
 
+  // The raw failure text is kept, just not shown. Fires once per failed job.
+  const loggedFailureRef = useRef(null);
+  useEffect(() => {
+    if (!isFailed || !job) return;
+    if (loggedFailureRef.current === job.id) return;
+    loggedFailureRef.current = job.id;
+    logImportFailure("import-pill", errorMessage, { job_id: job.id, file_type: fileType });
+  }, [isFailed, job?.id, errorMessage, fileType]);
+
   // Pick a new copy line when the phase changes. Stays stable within a phase
   // so we aren't shuffling text on every 3s poll.
   useEffect(() => {
@@ -153,8 +163,12 @@ export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) 
     title = isProminent ? "Pattern ready!" : "Tap to review";
     sub = isProminent ? "Tap to review" : (fileType === "pdf" ? "PDF imported" : "Photo imported");
   } else if (isFailed) {
-    title = "Bev got tangled";
-    sub = errorMessage ? truncate(errorMessage, 80) : "Try again";
+    // NEVER render errorMessage. It is the worker's internal string and it has
+    // already been shown to a stranger once, naming our providers and cutting
+    // off mid-word. The person gets a plain line; the raw text goes to the
+    // console and /api/client-error via the effect below.
+    title = IMPORT_FAILED_HEADLINE;
+    sub = truncate(friendlyImportError(errorMessage), 80);
   }
   // tick is referenced via Date.now() above for prominent-window settle
   void tick;

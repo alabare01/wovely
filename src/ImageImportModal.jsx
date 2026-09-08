@@ -9,6 +9,7 @@ import ScanGauge, { ProcSteps } from "./components/ScanGauge.jsx";
 import { getSession } from "./supabase.js";
 import { setActiveImportJob } from "./components/ImportPill.jsx";
 import { useImportJobPolling } from "./hooks/useImportJobPolling.js";
+import { handleImportFailure } from "./utils/importErrors.js";
 
 
 const MAX_DIM = 1200;
@@ -164,7 +165,8 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, tier, isAnon
       setPollingJobId(null);
     } else if (polling.isFailed) {
       if (msgIntervalRef.current) { clearInterval(msgIntervalRef.current); msgIntervalRef.current = null; }
-      setErrorMsg(polling.errorMessage || "Bev got tangled — try again.");
+      // Raw worker text is internal. Log it, render a plain line.
+      setErrorMsg(handleImportFailure("photo-modal-poll", polling.errorMessage, { job_id: pollingJobId }));
       setStage("error");
       setPollingJobId(null);
     }

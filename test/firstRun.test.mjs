@@ -83,18 +83,44 @@ test('first run: the zero-pattern branch renders FirstRunFork', () => {
     `Expected FirstRunFork to be rendered in both the desktop and mobile shells, found ${forkRenders}`);
 });
 
-test('first run: the fork is wired to the real starter import', () => {
+test('first run: the fork is wired to the starter, in one click', () => {
+  // REWRITTEN 2026-09-08 with the starter itself.
+  //
+  // The old wiring was: card -> onShowGallery -> a gallery screen holding one
+  // card -> onPickStarter -> fetch a PDF -> pdf.js -> import job -> a model ->
+  // review modal -> save. This asserted every hop of that. Two of those hops
+  // were clicks on the same pattern and the rest was an extraction of a file we
+  // wrote ourselves, which is what broke for four months.
+  //
+  // What must hold now: the card picks the starter directly, the pick goes
+  // through gateImport (so a logged-out visitor gets the anonymous session the
+  // INSERT needs), and the pattern comes from the committed fixture rather than
+  // from an extraction.
   assert.match(APP, /onPickStarter=\{handlePickStarter\}/,
     'FirstRunFork is rendered but onPickStarter is not wired to handlePickStarter — the card would be dead');
   assert.match(APP, /const handlePickStarter\s*=\s*\(\)\s*=>\s*gateImport\("starter_pick",\s*startStarterImport\)/,
     'handlePickStarter must route through gateImport so a logged-out visitor gets the anonymous session ' +
-    'that startStarterImport needs for its Bearer token');
+    'that the starter INSERT needs for its Bearer token');
   assert.match(APP, /starter=\{STARTER\}/,
-    'FirstRunFork must receive the STARTER constant — without it the gallery renders no card');
+    'FirstRunFork must receive the STARTER constant. Without it the card renders no title.');
   assert.match(FORK, /onClick=\{onPickStarter\}/,
-    'FirstRunFork gallery card no longer calls onPickStarter');
-  assert.match(FORK, /onClick=\{onShowGallery\}/,
-    'FirstRunFork "Start with ours" card no longer opens the gallery');
+    'The "Start with ours" card no longer calls onPickStarter');
+  assert.doesNotMatch(FORK, /onShowGallery/,
+    'The one-item gallery is back. Picking our own free pattern must be one click from the card.');
+  assert.doesNotMatch(APP, /setFirstRunMode\(/,
+    'firstRunMode drove the fork/gallery split and should be gone with the gallery');
+});
+
+test('first run: the starter is seeded, not extracted', () => {
+  assert.match(APP, /import \{ starterPatternRow \} from "\.\/data\/starterPattern\.js"/,
+    'App must take the starter from the committed fixture');
+  assert.doesNotMatch(APP, /extractTextFromPDF/,
+    'App still runs client-side PDF extraction for the starter. That is the step that was ' +
+    'broken for four months, on a pattern we wrote and already have the parse for.');
+  assert.doesNotMatch(APP, /file_url: fileUrl, file_type: "pdf"/,
+    'App still POSTs an import job for the starter');
+  assert.match(APP, /seedStarterIfNewAccount/,
+    'A new account must be seeded with the starter. The signup card promises it.');
 });
 
 // ── Telemetry: the events that prove first run is working ────────────────────

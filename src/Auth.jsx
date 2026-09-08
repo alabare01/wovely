@@ -658,7 +658,7 @@ const ForkScreen = ({ annual, onFree, onCraft }) => (
           <div className="fork-s">5 patterns, full row tracking, BevCheck stitch math on every import. No card, no clock.</div>
           <div className="minipat">
             <img src="/cover-mushroom-photo.png" alt="Button the Mushroom starter" />
-            <span>Includes Button the Mushroom — our free original, on the house</span>
+            <span>Includes Button the Mushroom, our free original, already in your library</span>
           </div>
           <div className="fork-p">Continue free →</div>
         </button>

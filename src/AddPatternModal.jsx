@@ -10,6 +10,7 @@ import { useImportJobPolling } from "./hooks/useImportJobPolling.js";
 import { PHASE_COPY_POOLS, REASSURANCE_LINE, pickPhaseCopy } from "./utils/importPhaseCopy.js";
 import { bevCheckScope, visibleBevCheckChecks, withheldBevCheckCount, BEVCHECK_SCOPE_FULL } from "./utils/featureGates.js";
 import { FREE_SCANS_PER_MONTH, SCAN_SNAP_STITCH, canScan, recordScan, scansLeft } from "./utils/scanQuota.js";
+import { handleImportFailure, friendlyImportError, IMPORT_FAILED_HEADLINE, IMPORT_FAILED_BODY } from "./utils/importErrors.js";
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 
@@ -1015,7 +1016,8 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
     } else if(polling.isFailed){
       if(intv2Ref.current){clearInterval(intv2Ref.current);intv2Ref.current=null;}
       setStage("error");setErrorType("extraction_failed");
-      setErrorMsg(polling.errorMessage||"Bev got tangled — try again.");
+      // The worker's own message is internal. Log it, show a plain one.
+      setErrorMsg(handleImportFailure("pdf-modal-poll",polling.errorMessage,{job_id:pollingJobId}));
       setPollingJobId(null);
       onExtractionEnd?.();
     }
@@ -1172,7 +1174,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
                   setErrorMsg(errBody.message || 'This pattern needs a paid plan.');
                 } else {
                   setErrorType('extraction_failed');
-                  setErrorMsg(errBody.error || 'We couldn’t start your import. Try again.');
+                  setErrorMsg(handleImportFailure('pdf-queue-reserve', errBody.error, { status: reserveRes.status }));
                 }
                 return;
               }
@@ -1241,7 +1243,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
                 setErrorMsg(errBody.message || 'This pattern is a big one. Craft members get full support for complex patterns.');
               } else {
                 setErrorType('extraction_failed');
-                setErrorMsg(errBody.error || 'We couldn’t start your import. Try again.');
+                setErrorMsg(handleImportFailure('pdf-queue-finalize', errBody.error, { status: finRes.status }));
               }
               return;
             } catch (finErr) {
@@ -1498,18 +1500,37 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
         </div>
       );
     }
+    // RECOVERY MUST MATCH HOW THEY GOT HERE (2026-09-08).
+    // The only button on this screen used to say "Try a different file" no
+    // matter what, including for the free starter pattern, which the reader
+    // never supplied a file for. There is nothing for them to swap.
+    // So the action is chosen from provenance:
+    //   starter    -> they picked our pattern. Offer to bring in their own.
+    //   own upload -> they have a file in hand. Offer to swap it.
+    //   resumed    -> they came back to a job whose file is not in this tab.
+    //                 Offer to pick a pattern, not to "try a different" one.
+    const hasOwnFile = !!lastFileRef.current || !!fileInfo;
+    const canRetrySameFile = !!lastFileRef.current;
+    const swapLabel = isStarterImport
+      ? "Bring in a pattern of my own"
+      : hasOwnFile ? "Try a different file" : "Choose a pattern to import";
+    const body = isStarterImport
+      ? "The free starter pattern did not come through. Bring in a pattern of your own and Bev will set it up, or try the starter again in a moment."
+      : isHiccup
+        ? "The import service stopped part way through. Try it again, and it usually goes through on the second run."
+        : fileInfo
+          ? "We could not read the rows out of that one, but your file is saved. Start building and the PDF sits alongside you as you go."
+          : errorMsg || IMPORT_FAILED_BODY;
     return (
       <div style={{padding:"24px 0"}}>
         <div style={{fontSize:36,textAlign:"center",marginBottom:12}}>🧶</div>
         <div style={{fontFamily:T.serif,fontSize:17,color:T.ink,textAlign:"center",marginBottom:6}}>
-          {isHiccup?"Bev got a little tangled":"This one stumped us"}
+          {IMPORT_FAILED_HEADLINE}
         </div>
         <div style={{fontSize:13,color:T.ink2,textAlign:"center",lineHeight:1.7,marginBottom:20}}>
-          {isHiccup
-            ?"The server hiccuped mid-import. It happens! Give it another go — it usually works on the second try."
-            :(fileInfo?"We saved your file. Tap below to start building — your PDF will be right there as you go.":"We had trouble reading this pattern. Try another file or enter your rows manually.")}
+          {body}
         </div>
-        {isHiccup&&<div style={{marginBottom:8}}><Btn onClick={handleRetry}>Try again →</Btn></div>}
+        {isHiccup&&canRetrySameFile&&<div style={{marginBottom:8}}><Btn onClick={handleRetry}>Try again</Btn></div>}
         {!isHiccup&&fileInfo&&(
           <div style={{background:T.sageLt,borderRadius:14,padding:"16px",marginBottom:12,display:"flex",alignItems:"center",gap:12}}>
             <span style={{fontSize:20}}>📎</span>
@@ -1520,7 +1541,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
           </div>
         )}
         {!isHiccup&&fileInfo&&<Btn onClick={handleFallbackSave}>Start building — view PDF as I go</Btn>}
-        <div style={{marginTop:8}}><Btn variant="ghost" onClick={()=>{setStage("pick");setProgress(0);setErrorMsg("");setErrorType("");setComplexity(null);setComplexityStats(null);setAutoRetried(false);}}>Try a different file</Btn></div>
+        <div style={{marginTop:8}}><Btn variant="ghost" onClick={()=>{setStage("pick");setProgress(0);setErrorMsg("");setErrorType("");setComplexity(null);setComplexityStats(null);setAutoRetried(false);}}>{swapLabel}</Btn></div>
       </div>
     );
   }

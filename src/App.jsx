@@ -12,9 +12,11 @@ import Auth from "./Auth.jsx";
 import AuthWallModal from "./AuthWallModal.jsx";
 import PatternHeader from "./PatternHeader.jsx";
 import RowManager, { ensureRepeatBrackets } from "./RowManager.jsx";
-import AddPatternModal, { uploadPatternFile, buildRowsFromComponents, extractTextFromPDF } from "./AddPatternModal.jsx";
+import AddPatternModal, { uploadPatternFile, buildRowsFromComponents } from "./AddPatternModal.jsx";
 import CollectionView, { PatternCard } from "./Dashboard.jsx";
 import FirstRunFork from "./FirstRunFork.jsx";
+import DeleteAccountSection from "./DeleteAccountSection.jsx";
+import { starterPatternRow } from "./data/starterPattern.js";
 import { CollectionDetailView } from "./Collections.jsx";
 import { linkPatternToCollection, listPatternsInCollection, createCollection } from "./utils/collections.js";
 import Detail, { CoverImagePicker, DeleteConfirmModal, ReadyToBuildPrompt, PatternCreatedOverlay } from "./PatternDetail.jsx";
@@ -255,11 +257,18 @@ const pct = p => { const checkable=(p.rows||[]).filter(r=>!r.isHeader&&!r.isNote
 const DEFAULT_STARTERS = [];
 const makeStarterPatterns = () => DEFAULT_STARTERS.map(p=>({...p,rows:p.rows.map(r=>({...r}))}));
 
-// S83: the one first-run starter — a real PDF in Supabase Storage. Picking it
-// runs the REAL import pipeline (fetch the public file → same client pdf.js
-// extraction as an upload → POST /api/import-job → queue → ImportPill → review
-// modal → save), so "pick a starter" is identical to "user uploaded this PDF".
-// No table reads, no admin surface. One starter only.
+// The one first-run starter. The PDF at storagePath is still the source of
+// record and still what "View source" opens, but the app no longer re-reads it.
+//
+// REWRITTEN 2026-09-08. From 2026-06-10 (S83) picking the starter ran the whole
+// import pipeline: fetch the public file, run pdf.js in the browser, POST
+// /api/import-job, wait on the queue and a model, then confirm a review modal.
+// That made our own free pattern share a failure surface with every user
+// upload, and when extraction broke for four months the signup promise
+// ("Includes Button the Mushroom, our free original, on the house") broke with
+// it: the account was created holding nothing. The parse is now a committed
+// fixture, src/data/starterPattern.js, and the account is seeded from it.
+// Nothing to fetch, nothing to parse, nothing to fail.
 const STARTER = {
   title: "Button the Mushroom",
   blurb: "A friendly little toadstool to learn the round on. A Wovely original — on the house.",
@@ -270,10 +279,11 @@ const STARTER = {
 // starter flag survives the pill → review modal → save round trip (including a
 // mid-import reload — the pill itself resumes from its own sessionStorage key).
 const STARTER_JOB_KEY = "wovely_starter_job_id";
-// Text-empty guard: a starter export with no real text layer must never enter
-// the queue — the worker would "complete" with zero components and the user
-// would save an empty pattern (the Button_(1).pdf incident, S83 audit).
-const STARTER_MIN_TEXT_CHARS = 500;
+// Retired 2026-09-08 with the starter's trip through the import queue. The
+// text-layer guard existed because a thin PDF export would "complete" with zero
+// components and save an empty pattern (the Button_(1).pdf incident, S83
+// audit). The starter is a committed fixture now, so there is no export to
+// guard: STARTER_MIN_TEXT_CHARS is gone.
 
 const estYards = p => {
   if (p.yardage > 0) return p.yardage;
@@ -1175,7 +1185,7 @@ const bumpDayStreak = () => {
   } catch { return 0; }
 };
 
-const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHome,patterns=[],isAnonymous=false,onSignOut,onCreateAccount,onSignIn}) => {
+const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHome,patterns=[],isAnonymous=false,onSignOut,onCreateAccount,onSignIn,onAccountDeleted}) => {
   const profileNav=useNavigate();
   const [username,setUsername]=useState(""),[displayName,setDisplayName]=useState(""),[bio,setBio]=useState("");
   const [socialInstagram,setSocialInstagram]=useState(""),[socialPinterest,setSocialPinterest]=useState(""),[socialRavelry,setSocialRavelry]=useState("");
@@ -1473,6 +1483,9 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
           <Msg msg={passMsg}/>
           <button onClick={()=>gateAction?.({ intent: "change_password", title: "Create a free account first", subtitle: "Sign up to set a password." }, handleChangePassword)} disabled={passSaving} style={{background:T.accent,color:"#fff",border:"none",borderRadius:13,padding:"11px 22px",fontSize:13,fontWeight:800,fontFamily:T.body,cursor:"pointer",boxShadow:`0 12px 24px -12px ${T.accent}`,opacity:passSaving?.6:1}}>{passSaving?"Saving…":"Update Password"}</button>
         </div>
+        {/* Self-serve deletion. Signed-in accounts only: a guest has no account
+            to delete, and their anonymous session ends when they log out. */}
+        {authed&&!isAnonymous&&<DeleteAccountSection patternCount={activePats.length} onDeleted={onAccountDeleted}/>}
       </div>
 
       {DIVIDER}
@@ -2303,12 +2316,10 @@ export default function Wovely() {
   const [userPatterns,setUserPatterns]=useState([]);
   const [patternsFetched,setPatternsFetched]=useState(false);
   const [starterPatterns,setStarterPatterns]=useState(()=>makeStarterPatterns());
-  // Guided first-run: the empty-library fork (pick a starter OR import your
-  // own). The starter pick (S83) runs the real import pipeline; these two
-  // flags only drive the fork surface itself.
-  const [firstRunMode,setFirstRunMode]=useState("fork"); // "fork" | "gallery"
-  const [starterError,setStarterError]=useState(false); // starter fetch/extract/enqueue failed
-  const [starterImporting,setStarterImporting]=useState(false); // double-tap guard while enqueueing
+  // Guided first-run: the empty-library fork (take our pattern OR import your
+  // own). These two flags only drive the fork surface itself.
+  const [starterError,setStarterError]=useState(false); // starter insert failed
+  const [starterImporting,setStarterImporting]=useState(false); // double-tap guard while inserting
   // Derive view from URL path instead of state
   const view = viewFromPath(location.pathname);
   const [selected,setSelected]=useState(null),[navOpen,setNavOpen]=useState(false),[addOpen,setAddOpen]=useState(false),[imageImportOpen,setImageImportOpen]=useState(false),[addMenuOpen,setAddMenuOpen]=useState(false),[menuAnchor,setMenuAnchor]=useState(null),[showPaywall,setShowPaywall]=useState(false),[showFairUseWall,setShowFairUseWall]=useState(false),[cat,setCat]=useState("All"),[search,setSearch]=useState("");
@@ -2423,7 +2434,10 @@ export default function Wovely() {
     if (!anonymousMode) return;
     let intent = null;
     try { intent = sessionStorage.getItem("wovely_first_run_intent"); sessionStorage.removeItem("wovely_first_run_intent"); } catch {}
-    if (intent === "starter") { setStarterError(false); setFirstRunMode("gallery"); }
+    // "Start with ours" on the landing fork used to drop the visitor on a
+    // gallery screen holding exactly one card, which they then had to pick.
+    // The pattern is a single INSERT now, so honor the intent directly.
+    if (intent === "starter") { setStarterError(false); handlePickStarter(); }
     else if (intent === "import") {
       // Route straight to the 2b "Add a pattern" hub, NOT the legacy emoji
       // popover (QC 2026-07-12, Blocker 2). Same state the topbar Add button
@@ -2874,6 +2888,25 @@ export default function Wovely() {
 
   const handleSignOut = async () => { posthog.reset(); await supabaseAuth.signOut(); setAuthed(false); setTier(TIER_FREE); setUserPatterns([]); clearCachedTier(); setIsAnonymous(false); clearCachedIsAnonymous(); setPendingUpgradeTier(null); try { sessionStorage.removeItem("wovely_redirect_intent"); sessionStorage.removeItem("wovely_anonymous_mode"); sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {} setAnonymousMode(false); document.cookie="wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; navigate("/"); };
 
+  // The account is gone server-side. Tear the client down the same way a sign
+  // out does, then send them to the landing page. The stored session is a key
+  // to a login that no longer exists, so it must not survive this.
+  const handleAccountDeleted = async () => {
+    try { posthog.capture("account_deleted"); } catch {}
+    try { posthog.reset(); } catch {}
+    saveSession(null);
+    setAuthed(false); setIsAnonymous(false); setAnonymousMode(false);
+    setUserPatterns([]); setStarterPatterns([]); setSelected(null);
+    setPatternsFetched(false);
+    setTier(TIER_FREE); clearCachedTier(); clearCachedIsAnonymous();
+    try {
+      sessionStorage.clear();
+      localStorage.removeItem("yh_last_url");
+    } catch {}
+    document.cookie = "wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+    navigate("/");
+  };
+
   // Open the auth/convert wall for a guest from the nav. Bypasses gateAction
   // (which only opens the wall when !authed — a guest is authed, so it would
   // no-op). The wall opens in signup mode with isAnonymous=true, so AuthWallModal
@@ -2961,6 +2994,13 @@ export default function Wovely() {
             });
           }else{
             console.log("[Wovely] No patterns in Supabase for this user, keeping local state as-is");
+            // The signup card promises Button the Mushroom on the house. An
+            // account that opens on an empty library has not been given it.
+            // Guests are left out on purpose: an anonymous session is thrown
+            // away on sign-out, and seeding one writes a row nobody will ever
+            // come back for. They reach the same pattern in one click from the
+            // first-run card.
+            if(!isAnonymousSession()){ await seedStarterIfNewAccount(user,session); }
           }
           setPatternsFetched(true);
         }else{
@@ -3798,70 +3838,92 @@ export default function Wovely() {
     gateImport("import_pattern", () => { setPendingImportUrl(null); setPendingMethod(method||null); setAddOpen(true); });
   };
 
-  // ── Guided first-run: starter pick runs the REAL import pipeline (S83) ─────
-  // Mirrors the URL→PDF precedent in AddPatternModal: download the PDF, run
-  // the SAME client-side pdf.js extraction as a user upload (page markers, no
-  // truncation), then POST /api/import-job with the exact user-upload body.
-  // From the queue onward nothing diverges: real worker phases drive the
-  // ImportPill, the reveal is the pill's own completed state, review modal
-  // included, confirm → handleAddPattern → startAndOpenPattern.
-  const openStarterGallery = () => { setStarterError(false); setFirstRunMode("gallery"); };
+  // ── Guided first-run: the starter is handed over, not imported ────────────
+  // Rewritten 2026-09-08. The old path ran the full pipeline for our own
+  // pattern: fetch the PDF out of Storage, read it with pdf.js, queue a job,
+  // wait on a model, then make the reader confirm a review modal. Two clicks
+  // on the same card (fork, then a gallery holding exactly one item), a model
+  // call, and a shared failure surface with every user upload.
+  //
+  // It is a pattern we wrote. The parse is committed in
+  // src/data/starterPattern.js and this inserts it. One click, one INSERT, no
+  // network beyond Supabase, nothing to extract and nothing to fail.
   const isStarterJobId = (jobId) => { try { return !!jobId && sessionStorage.getItem(STARTER_JOB_KEY) === jobId; } catch { return false; } };
 
+  // Insert the starter for the signed-in user and fold it into local state.
+  // Returns the local pattern on success, null on any failure. Shared by the
+  // signup seed and the first-run card, so both put the same row in the table.
+  const insertStarterPattern = async () => {
+    const user = supabaseAuth.getUser();
+    const session = getSession();
+    if (!user || !session?.access_token) return null;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/patterns`, {
+        method: "POST",
+        headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${session.access_token}`, "Content-Type": "application/json", "Prefer": "return=representation" },
+        body: JSON.stringify(starterPatternRow(user.id)),
+      });
+      if (!res.ok) {
+        console.error("[Wovely] Starter insert failed:", res.status, await res.text().catch(() => ""));
+        return null;
+      }
+      const rows = await res.json();
+      if (!rows[0]?.id) return null;
+      const p = mapDbPatternRow(rows[0]);
+      setUserPatterns(prev => prev.some(x => x.id === p.id || x._supabaseId === p.id) ? prev : [p, ...prev]);
+      return p;
+    } catch (e) {
+      console.error("[Wovely] Starter insert error:", e?.message);
+      return null;
+    }
+  };
+
+  // Seed at account level. Called once, from the login pattern fetch, when the
+  // fetch came back empty.
+  //
+  // The guard reads rows at ANY status, not just the ones the library fetch
+  // returns. Delete is a soft delete (status='deleted'), so a user who deleted
+  // the mushroom on purpose still has the row, and checking the filtered list
+  // would hand it back to them on every login. One row of any kind, ever, means
+  // this account has been seeded and we leave it alone.
+  const seedStarterIfNewAccount = async (user, session) => {
+    if (!user || !session?.access_token) return;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/patterns?user_id=eq.${user.id}&select=id&limit=1`, {
+        headers: { "apikey": SUPABASE_ANON_KEY, "Authorization": `Bearer ${session.access_token}` },
+      });
+      // A read we could not complete is not proof the account is empty. Skip
+      // rather than risk a duplicate.
+      if (!res.ok && res.status !== 206) return;
+      const rows = await res.json();
+      if (Array.isArray(rows) && rows.length > 0) return;
+      const p = await insertStarterPattern();
+      if (p) {
+        console.log("[Wovely] Seeded the starter pattern for a new account");
+        try { posthog.capture("starter_seeded", { starter: STARTER.storagePath }); } catch {}
+      }
+    } catch (e) {
+      console.warn("[Wovely] Starter seed check failed:", e?.message);
+    }
+  };
+
+  // The first-run card. One click: insert, then open it.
   const startStarterImport = async () => {
     if (starterImporting) return;
     setStarterImporting(true); setStarterError(false);
     try {
-      const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/pattern-files/${STARTER.storagePath}`;
-      const res = await fetch(fileUrl);
-      if (!res.ok) throw new Error("starter fetch failed: " + res.status);
-      const blob = await res.blob();
-      const file = new File([blob], STARTER.storagePath.split("/").pop(), { type: "application/pdf" });
-      const { text: rawText } = await extractTextFromPDF(file);
-      if (!rawText || rawText.trim().length < STARTER_MIN_TEXT_CHARS) {
-        console.error("[Wovely] Starter PDF text layer too thin:", rawText ? rawText.trim().length : 0, "chars — refusing to enqueue");
-        setStarterError(true);
-        return;
-      }
-      const session = getSession();
-      if (!session?.access_token) { setStarterError(true); return; }
-      const jobRes = await fetch("/api/import-job", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${session.access_token}` },
-        body: JSON.stringify({ file_url: fileUrl, file_type: "pdf", raw_text: rawText, cover_image_url: STARTER.coverUrl || null, pdf_metadata_title: STARTER.title }),
-      });
-      if (!jobRes.ok) {
-        console.error("[Wovely] Starter import-job POST failed:", jobRes.status, await jobRes.text().catch(()=>""));
-        setStarterError(true);
-        return;
-      }
-      const { job_id } = await jobRes.json();
-      try { sessionStorage.setItem(STARTER_JOB_KEY, job_id); } catch {}
-      setActiveImportJob(job_id); // pill is hidden while the modal is open; this survives a mid-import reload
-      try { posthog.capture("starter_import_started", { starter: STARTER.storagePath }); } catch {}
-      // Open the full modal in its loading state — identical to a user upload
-      // post-submit. Same handoff handlePillResume uses: PDFUploadForm mounts
-      // straight into the extracting stage polling this job, and
-      // initialIsStarter resolves true via isStarterJobId(pendingResumeJobId).
-      // Closing the modal mid-import re-arms the corner pill through the
-      // existing unmount handoff, same as a real import. firstRunMode resets
-      // so the fork (not the stale gallery) sits behind the modal.
-      setPendingExtractedHandoff(null);
-      setPendingResumeJobId({ jobId: job_id, fileType: 'pdf' });
-      setPendingMethod('pdf');
-      setFirstRunMode("fork");
-      setAddOpen(true);
-    } catch (e) {
-      console.error("[Wovely] Starter import error:", e?.message);
-      setStarterError(true);
+      const p = await insertStarterPattern();
+      if (!p) { setStarterError(true); return; }
+      try { posthog.capture("starter_import_started", { starter: STARTER.storagePath, source: "fixture" }); } catch {}
+      startAndOpenPattern(p);
     } finally {
       setStarterImporting(false);
     }
   };
 
-  // Pick handler from the starter gallery. gateImport runs first — guests get
-  // the anonymous sign-in (so the starter survives anon→signup identity
-  // linking) and cap checks behave exactly as they do for a real import.
+  // Pick handler from the first-run fork. gateImport runs first, so a logged-out
+  // visitor gets the anonymous sign-in (so the starter survives anon to signup
+  // identity linking) and cap checks behave exactly as they do for an import.
   const handlePickStarter = () => gateImport("starter_pick", startStarterImport);
 
   // Zero-friction collection creation: open the standard PDF picker but
@@ -4080,7 +4142,7 @@ export default function Wovely() {
           </div>
         </div>
         <div style={{flex:1,padding:"0 32px",minHeight:"100vh"}}>
-          {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>openAddModal()} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG} firstName={greetName}/>)}
+          {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>openAddModal()} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={openAddModal} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG} firstName={greetName}/>)}
           {view==="wip"&&<div style={{padding:"24px 0 80px"}}><button onClick={()=>navigateToView("collection")} style={{background:"none",border:"none",color:T.terra,cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:20,display:"flex",alignItems:"center",gap:6}}>← Back</button>{inProgress.length===0?<div style={{textAlign:"center",padding:"80px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:20,fontWeight:600,color:"#2E2748",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#726A92",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:20}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
           {view==="detail"&&selected&&<div style={{margin:"0 -40px"}}><Detail key={selected._supabaseId||selected.id} p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selected?.collection_id ?? null)} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>{setPaywallRecommend(requiredTier('collections'));setShowProModal(true);}} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/></div>}
           {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
@@ -4089,7 +4151,7 @@ export default function Wovely() {
           {view==="stitch-check"&&<div style={{paddingTop:24}}><StitchCheck gateAction={gateAction} tier={tier} isAnonymous={!authed || isAnonymous} onUpgrade={()=>setShowProModal(true)}/></div>}
           {view==="shopping"&&<div style={{paddingTop:24}}><ShoppingList gateAction={gateAction}/></div>}
           {view==="community"&&<div style={{paddingTop:24}}><YarnCircle isDesktop={isDesktop} isTablet={isTablet} authed={authed} isAnonymous={!authed||isAnonymous} onShare={()=>openAddModal()} onOpenPattern={(pid)=>navigate("/pattern/"+encodeURIComponent(pid))} onSignIn={openNavAuthWall}/></div>}
-          {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} onSignIn={openNavSignIn} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
+          {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onAccountDeleted={handleAccountDeleted} onCreateAccount={openNavAuthWall} onSignIn={openNavSignIn} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
           {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
           {view==="privacy"&&<PrivacyPolicy/>}
@@ -4145,7 +4207,7 @@ export default function Wovely() {
       </div>
       {addMenuOpen&&<><div onClick={()=>setAddMenuOpen(false)} style={{position:"fixed",inset:0,zIndex:49,background:"rgba(28,23,20,.4)"}}/><div style={{position:"fixed",bottom:0,left:0,right:0,zIndex:50,background:"#fff",borderRadius:"20px 20px 0 0",padding:"12px 0 24px",boxShadow:"0 -8px 32px rgba(45,45,78,.12)",fontFamily:"Nunito,sans-serif"}}><div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 16px"}}/>{[{icon:"📄",label:"Add PDF",sub:"Upload & extract",action:()=>{setAddMenuOpen(false);openAddModal("pdf");}},{icon:"📸",label:"Add from photos",sub:"Screenshots, scans, photos",action:()=>{setAddMenuOpen(false);openImageImport();}},{icon:"🔗",label:"Paste a URL",sub:"Any pattern link",action:()=>{setAddMenuOpen(false);openAddModal("url");}},...(tier===TIER_CRAFT?[{icon:"📚",label:"Start a Collection",sub:"MKAL, bundle, or pattern set",action:()=>{setAddMenuOpen(false);handleStartCollectionImport();}}]:[]),{icon:"🌐",label:"Explore free patterns",sub:"AllFreeCrochet, Drops & more",action:()=>{setAddMenuOpen(false);navigateToView("browse");}}].map(item=>(<div key={item.label} onClick={item.action} style={{display:"flex",alignItems:"center",gap:14,padding:"12px 22px",cursor:"pointer"}}><span style={{fontSize:22,width:28,textAlign:"center"}}>{item.icon}</span><div><div style={{fontSize:14,fontWeight:600,color:T.ink}}>{item.label}</div><div style={{fontSize:12,color:T.ink3}}>{item.sub}</div></div></div>))}</div></>}
       <div ref={mainScrollRef} style={{flex:1,overflowX:"hidden",overflowY:"auto",paddingBottom:"calc(110px + env(safe-area-inset-bottom, 0px))",minHeight:"100vh"}}>
-        {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork mode={firstRunMode} starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>openAddModal()} onShowGallery={openStarterGallery} onBack={()=>setFirstRunMode("fork")} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>openAddModal()} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG} firstName={greetName}/>)}
+        {view==="collection"&&(userPatterns.length===0&&(patternsFetched||anonymousMode)?<FirstRunFork starter={STARTER} busy={starterImporting} error={starterError} isMobile={!isDesktop} onImportOwn={()=>openAddModal()} onPickStarter={handlePickStarter}/>:<CollectionView userPatterns={userPatterns} starterPatterns={starterPatterns} cat={cat} setCat={setCat} search={search} setSearch={setSearch} openDetail={openDetail} onAddPattern={()=>openAddModal()} isPro={isPro} tier={tierGate} isAnonymous={!authed || isAnonymous} onOpenCollection={(c)=>{setSelectedCollection(c);navigate("/collections/"+c.id);}} onCreateCollection={()=>handleStartCollectionImport()} onStartCollectionImport={handleStartCollectionImport} onOpenUpgrade={()=>setShowProModal(true)} onCollectionDeletedLocal={releaseCollectionPatternsLocally} onNavigate={navigateToView} onPark={handleParkPattern} onUnpark={handleUnparkPattern} onDelete={handleDeletePattern} onCoverChange={handleCoverChange} onRename={handleRenamePattern} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars} CATS={CATS} TIER_CONFIG={TIER_CONFIG} firstName={greetName}/>)}
         {view==="wip"&&<div style={{padding:"16px 18px 80px"}}>{inProgress.length===0?<div style={{textAlign:"center",padding:"60px 20px"}}><div style={{fontSize:48,marginBottom:14}}>🪡</div><div style={{fontFamily:T.serif,fontSize:18,fontWeight:600,color:"#2E2748",marginBottom:8}}>Your builds in progress</div><div style={{fontSize:14,color:"#726A92",lineHeight:1.6}}>They'll show up here once you start crocheting a pattern.</div></div>:<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>{inProgress.map((p,i)=><PatternCard key={p.id} p={p} delay={i*.06} onClick={()=>openDetail(p)} pct={pct} catFallbackPhoto={catFallbackPhoto} Photo={Photo} Bar={Bar} Stars={Stars}/>)}</div>}</div>}
         {view==="detail"&&selected&&<Detail key={selected._supabaseId||selected.id} p={selected} onBack={()=>{setPendingScrollToRow(null);detailOnBack();}} onSave={detailOnSave} pct={pct} estYards={estYards} estSkeins={estSkeins} pdfThumbUrl={pdfThumbUrl} CSS={CSS} Bar={Bar} Photo={Photo} Stars={Stars} WireframeViewer={WireframeViewer} Btn={Btn} scrollToRow={pendingScrollToRow} isAnonymous={isAnonymous} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selected?.collection_id ?? null)} onSignUp={()=>{setAuthWallContext({title:"You're just getting started",subtitle:"Create a free account to see the full pattern.",intent:"guest_preview_cta",requiresPro:false,onSuccess:()=>{}});setAuthWallOpen(true);}} collectionUpgrade={(collectionUpgradeBanner && (collectionUpgradeBanner.patternId===(selected._supabaseId||selected.id))) ? collectionUpgradeBanner.meta : null} onCollectionUpgrade={()=>{setPaywallRecommend(requiredTier('collections'));setShowProModal(true);}} onCollectionUpgradeDismiss={()=>setCollectionUpgradeBanner(null)}/>}
         {view==="browse"&&<BrowseSitesView onImportUrl={handleImportUrl}/>}
@@ -4154,7 +4216,7 @@ export default function Wovely() {
         {view==="stitch-check"&&<div style={{paddingTop:18}}><StitchCheck gateAction={gateAction} tier={tier} isAnonymous={!authed || isAnonymous} onUpgrade={()=>setShowProModal(true)}/></div>}
         {view==="shopping"&&<div style={{paddingTop:18}}><ShoppingList gateAction={gateAction}/></div>}
         {view==="community"&&<div style={{paddingTop:18}}><YarnCircle isDesktop={isDesktop} isTablet={isTablet} authed={authed} isAnonymous={!authed||isAnonymous} onShare={()=>openAddModal()} onOpenPattern={(pid)=>navigate("/pattern/"+encodeURIComponent(pid))} onSignIn={openNavAuthWall}/></div>}
-        {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onCreateAccount={openNavAuthWall} onSignIn={openNavSignIn} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
+        {view==="profile"&&<ProfileSettingsView isPro={isPro} tier={tier} authed={authed} patterns={userPatterns} isAnonymous={!authed || isAnonymous} onSignOut={handleSignOut} onAccountDeleted={handleAccountDeleted} onCreateAccount={openNavAuthWall} onSignIn={openNavSignIn} gateAction={gateAction} onOpenProModal={()=>openProGate("profile_upgrade_pill")} onGoHome={()=>navigate("/")}/>}
         {view==="collection-detail"&&selectedCollection&&<CollectionDetailView collection={selectedCollection} onBack={()=>{setSelectedCollection(null);navigate("/");}} onOpenPattern={(p)=>{const pid=p._supabaseId||p.id;setSelected(p);navigate("/pattern/"+encodeURIComponent(pid));}} onImportClue={(c,order)=>{setCollectionContext({...c,_targetOrder:order});setPendingMethod("pdf");setAddOpen(true);}} onAddPattern={(c)=>{setCollectionContext(c);setPendingMethod("pdf");setAddOpen(true);}} onCollectionChanged={(c)=>setSelectedCollection(c)} tier={tier} onShowUpgrade={()=>setShowProModal(true)} pinnedImageId={pinnedImage?.image?.id||null} onTogglePin={(img)=>togglePin(img, selectedCollection?.id ?? null)} onCollectionDeleted={(deletedId)=>{releaseCollectionPatternsLocally(deletedId);setSelectedCollection(null);setCollectionsRefreshNonce(n=>n+1);navigate("/");}}/>}
           {view==="collection-detail"&&!selectedCollection&&<div style={{padding:"80px 0",textAlign:"center"}}><div className="spinner" style={{width:28,height:28,border:"3px solid #ECE6F8",borderTopColor:"#7B6AD4",borderRadius:"50%",margin:"0 auto"}}/></div>}
         {view==="privacy"&&<PrivacyPolicy/>}
