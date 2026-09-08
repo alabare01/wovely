@@ -274,7 +274,7 @@ Be thorough — extract every component, every round, every material. Ensure the
 
 async function callGeminiExtract({ prompt, pdfText, geminiKey, maxTokens }) {
   const controller = new AbortController();
-  const geminiTimeout = setTimeout(() => controller.abort(), 4000);
+  const geminiTimeout = setTimeout(() => controller.abort(), 30000);
   let r;
   try {
     r = await fetch(

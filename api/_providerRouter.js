@@ -30,7 +30,7 @@ async function probeGemini(geminiKey) {
       }
     );
     clearTimeout(timeout);
-    return r.status < 500;
+    return r.ok;
   } catch {
     clearTimeout(timeout);
     return false;
