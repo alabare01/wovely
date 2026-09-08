@@ -32,6 +32,6 @@
     { "source": "/crochet-pattern-scale-calculator", "destination": "/crochet-pattern-scale-calculator.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/((?!api/|.*\\.).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|.*\\.).*)", "destination": "/app.html" }
   ]
 }

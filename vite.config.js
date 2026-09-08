@@ -113,6 +113,46 @@ const seoHeadPrerender = () => ({
       'utf8',
     )
 
+    // ─── THE APP SHELL, SPLIT OFF FROM THE HOMEPAGE ──────────────────────────
+    //
+    // Added 2026-09-08, the same day the homepage was prerendered, because the
+    // two changes are the same change. index.html was both the homepage AND the
+    // catch-all destination in vercel.json, so the moment real landing-page copy
+    // went into it, every URL that does not exist started answering 200 with a
+    // full copy of the homepage. wovely.app/anything-at-all was a duplicate of
+    // wovely.app. On a site with two URLs indexed, an infinite space of
+    // indexable near-duplicates is worse than the empty div it replaced.
+    //
+    // So the catch-all now points here instead: the same shell, the same bundle,
+    // an empty #root, and noindex. A signed-in user opening /hive or a shared
+    // /pattern/:id link gets exactly what they got before. A crawler gets told
+    // not to index a page that is not a page.
+    //
+    // This does NOT make an unknown path return 404 — Vercel rewrites cannot set
+    // a status, and returning a real 404 would mean enumerating every client
+    // route in vercel.json, where one missed path is a hard 404 for a person
+    // holding a shared link. That trade is not worth it. noindex removes the
+    // indexing harm, which was the part that cost anything.
+    const appShell = template
+      .replace(/<link rel="canonical"[^>]*>\s*/, '')
+      .replace(/<link rel="alternate"[^>]*hreflang="en"[^>]*>\s*/, '')
+      .replace('</head>', '  <meta name="robots" content="noindex, follow" />\n  </head>')
+    fs.writeFileSync(path.join(outDir, 'app.html'), appShell, 'utf8')
+
+    // The rewrite and the file have to agree, and nothing else checks that. If
+    // this destination is ever renamed, every path that is not one of the ten
+    // public routes becomes a hard 404 for a real user, which is the failure
+    // this whole build step exists to avoid causing.
+    const vercelCfg = JSON.parse(fs.readFileSync(path.resolve('vercel.json'), 'utf8'))
+    const fallback = (vercelCfg.rewrites || []).at(-1)
+    if (!fallback || fallback.destination !== '/app.html') {
+      this.error(
+        `[seo] the last rewrite in vercel.json must be the catch-all pointing at /app.html, found: ${fallback ? fallback.destination : 'nothing'}`
+      )
+    }
+
+    // eslint-disable-next-line no-console
+    console.log(`[seo] wrote app.html (noindex shell) for the catch-all rewrite`)
     // eslint-disable-next-line no-console
     console.log(`[seo] wrote per-route heads: ${written.join(', ')}`)
     // eslint-disable-next-line no-console
