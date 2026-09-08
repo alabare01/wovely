@@ -18,7 +18,13 @@
 // browser keeps posting and the server keeps ignoring, which is the right way
 // round: the switch has to work without shipping new client code.
 
-import { normalizeEvent, recordPulse, looksLikeBot, monitorConfig } from './_monitor.js';
+// SYNTHETIC PROBES: a request carrying the correct PROBE_HEADER token is still
+// recorded, on the synthetic prefix, and is invisible to every interrupt, push
+// and heartbeat count. It also skips the bot screen, because a probe SHOULD be
+// recorded, and curl is exactly what the bot screen is built to reject. An
+// unmarked request is a real person in every failure mode. See api/_monitor.js.
+
+import { normalizeEvent, recordPulse, looksLikeBot, monitorConfig, isSyntheticRequest } from './_monitor.js';
 
 // Second belt behind the throttle. Per warm instance, so it is a speed bump
 // rather than a wall, and the real ceiling on cost is the send throttle.
@@ -59,7 +65,8 @@ export default async function handler(req, res) {
 
   try {
     if (!monitorConfig().enabled) return ok();
-    if (looksLikeBot(req.headers['user-agent'])) return ok();
+    const synthetic = isSyntheticRequest(req.headers);
+    if (!synthetic && looksLikeBot(req.headers['user-agent'])) return ok();
     if (overBurst(Date.now())) return ok();
 
     const supabaseUrl = process.env.VITE_SUPABASE_URL;
@@ -76,7 +83,7 @@ export default async function handler(req, res) {
     const events = raw.map((e) => normalizeEvent(e)).filter(Boolean);
     if (events.length === 0) return ok();
 
-    await recordPulse({ supabaseUrl, serviceKey, events });
+    await recordPulse({ supabaseUrl, serviceKey, events, synthetic });
     return ok();
   } catch {
     return ok();

@@ -12,7 +12,7 @@
 // later.
 
 import Stripe from 'stripe';
-import { recordPulse } from './_monitor.js';
+import { recordPulse, isSyntheticRequest } from './_monitor.js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -106,6 +106,11 @@ export default async function handler(req, res) {
     await recordPulse({
       supabaseUrl: _url,
       serviceKey: _key,
+      // checkout_started is the loudest interrupt this system has: priority 1
+      // in the subject line and high priority through Do Not Disturb. This
+      // endpoint is public, so a marked probe of it must not page Adam either.
+      // Unmarked is a real person, always.
+      synthetic: isSyntheticRequest(req.headers),
       events: [{
         kind: 'checkout_started',
         path: '/checkout',

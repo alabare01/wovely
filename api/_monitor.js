@@ -48,6 +48,13 @@
 // The existing vercel_logs table on reserved request_paths, exactly as
 // _alert.js does it. No migration for Adam to run.
 //
+// ── SYNTHETIC TRAFFIC ───────────────────────────────────────────────────────
+// A health probe must never wake a human. A request carrying the correct
+// PROBE_HEADER token is still recorded, on SYNTHETIC_PATH_PREFIX, where no
+// interrupt, no push and no heartbeat count reads it. UNMARKED TRAFFIC IS
+// REAL, in every failure mode, without exception. Full reasoning at the
+// marker itself, below. Probe with `npm run probe`, never with a bare curl.
+//
 // ── PRIVACY ─────────────────────────────────────────────────────────────────
 // A path, a referring hostname, an opaque per-tab session id, and a Supabase
 // uid. Nothing else crosses the wire from a browser: no user agent, no IP, no
@@ -60,10 +67,19 @@
 //      MONITOR_MAX_INTERRUPTS_PER_DAY (default 40),
 //      MONITOR_QUIET_HOURS (default off), MONITOR_TZ (default America/New_York)
 
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { sendMail, FROM_APP, OWNER_INBOX } from './_mail.js';
 
 // ── Reserved paths in vercel_logs. None of these is a real route. ───────────
 export const PULSE_PATH_PREFIX = '/internal/pulse/';
+/**
+ * Where a MARKED HEALTH PROBE lands. A separate prefix, not a flag on the pulse
+ * prefix, because every read path in this file selects on
+ * `request_path=like./internal/pulse/*`. Putting synthetic rows somewhere else
+ * entirely means no query has to remember to exclude them, and a future reader
+ * added by somebody who never read this comment still cannot see them.
+ */
+export const SYNTHETIC_PATH_PREFIX = '/internal/synthetic/';
 export const SENT_PATH_PREFIX = '/internal/monitor/sent/';
 export const HEARTBEAT_MARKER_PATH = '/internal/monitor/heartbeat';
 export const DAILY_MARKER_PATH = '/internal/monitor/daily';
@@ -71,6 +87,91 @@ export const DAILY_MARKER_PATH = '/internal/monitor/daily';
 // Never look back further than this when no marker exists. Without it a cold
 // start would mail every event in the table.
 export const MONITOR_MAX_LOOKBACK_MS = 60 * 60 * 1000;
+
+// ── THE SYNTHETIC MARKER ────────────────────────────────────────────────────
+//
+// THE DEFECT THIS FIXES, on the record because it is the whole reason the
+// mechanism exists. On 2026-09-08 an agent curled /api/client-error twice to
+// confirm the endpoint had stopped returning 500:
+//   {"kind":"user_error","detail":"deploy verification probe"} at 16:07 UTC
+//   {"kind":"user_error","detail":"post-deploy probe"}         at 18:15 UTC
+// Both were recorded as a real person hitting a real error. Both woke Adam's
+// phone and his inbox. No real visitor has ever errored on wovely.app. A
+// monitor that cannot tell its own health check from a customer will cry wolf,
+// and a channel that cries wolf gets muted, which is strictly worse than
+// having no channel at all.
+//
+// THE DESIGN, and the properties it has to have:
+//
+//   1. IT FAILS SAFE IN ONE DIRECTION ONLY. Unmarked traffic is REAL. A missing
+//      header is a real user, an unverifiable header is a real user, a wrong
+//      header is a real user. There is no input that turns an unmarked request
+//      synthetic, which is the property that keeps a bug or an attacker from
+//      silencing a genuine alert.
+//
+//   2. IT IS NOT A GUESSABLE HEADER NAME. Knowing `x-wovely-probe` exists buys
+//      nothing; the value has to be right. The value is derived from
+//      CRON_SECRET, which is already in the environment, so this ships with no
+//      new credential for Adam to create, rotate or lose.
+//
+//   3. IT DERIVES RATHER THAN ECHOES. The header carries a SHA-256 of the
+//      secret, never the secret. So the token is safe to put in a verification
+//      script, a log line or a comment: it cannot be walked back to
+//      CRON_SECRET, and it cannot be replayed against /api/cron/* which wants
+//      the real bearer token.
+//
+//   4. THE WORST A LEAK DOES IS BOUNDED. Someone who learns the token can mark
+//      their OWN requests synthetic. That silences alerts about themselves,
+//      which is a thing they could already achieve by not sending the request.
+//      It gives them no way to touch anybody else's traffic, and every real
+//      visitor's browser keeps sending unmarked requests that keep alerting.
+//
+// A marked request is still WRITTEN to vercel_logs, on SYNTHETIC_PATH_PREFIX,
+// because the point of a health probe is a record that the endpoint worked. It
+// simply lands somewhere no interrupt, no push and no heartbeat count reads.
+
+export const PROBE_HEADER = 'x-wovely-probe';
+
+/**
+ * The value a probe must send. One-way, so publishing the token never
+ * publishes CRON_SECRET. Null when there is no secret to derive from.
+ */
+export function probeToken(secret) {
+  const s = String(secret ?? '').trim();
+  if (!s) return null;
+  return createHash('sha256').update(`wovely-synthetic-probe:${s}`).digest('hex').slice(0, 32);
+}
+
+/** Headers arrive lowercased on Vercel, but not on every runtime, and a repeated header arrives as an array. */
+function headerValue(headers, name) {
+  if (!headers || typeof headers !== 'object') return '';
+  const direct = headers[name] ?? headers[name.toLowerCase()] ?? headers[name.toUpperCase()];
+  const v = direct !== undefined
+    ? direct
+    : Object.entries(headers).find(([k]) => String(k).toLowerCase() === name)?.[1];
+  if (Array.isArray(v)) return String(v[0] ?? '');
+  return v === undefined || v === null ? '' : String(v);
+}
+
+/**
+ * THE FAIL-SAFE. Returns true ONLY for a request that carries the correct
+ * derived token. Every other answer, including every error, is false, which
+ * means "a real person did this".
+ */
+export function isSyntheticRequest(headers, env = process.env) {
+  const supplied = headerValue(headers, PROBE_HEADER).trim();
+  if (!supplied) return false;                    // unmarked is real, always
+  const expected = probeToken(env?.CRON_SECRET);
+  if (!expected) return false;                    // nothing to verify against is real
+  const a = Buffer.from(supplied, 'utf8');
+  const b = Buffer.from(expected, 'utf8');
+  if (a.length !== b.length) return false;        // wrong shape is real
+  try {
+    return timingSafeEqual(a, b);
+  } catch {
+    return false;                                 // anything thrown is real
+  }
+}
 
 const MIN = 60 * 1000;
 
@@ -235,17 +336,40 @@ export async function pushAlert({ title, body, priority = 'default', config = mo
 }
 
 /**
- * What the phone is allowed to say. Counts and labels, never who.
- * Kept pure so the privacy rule above is a test rather than a comment.
+ * What the phone is allowed to say.
+ *
+ * THE RULE, NARROWED RATHER THAN WIDENED, 2026-09-08. It used to be counts and
+ * labels only, which produced "Someone saw an error" and nothing else, and
+ * Adam's complaint about the whole alert channel was precisely "nothing after
+ * that". The rule was aimed at the wrong thing. What must never ride an ntfy
+ * topic is WHO: a uid, a session id, an email address. A path on a public
+ * website and a message our own JavaScript threw identify nobody, and they are
+ * the two facts that turn a push from an anxiety generator into something he
+ * can act on from a phone.
+ *
+ * So, still banned and asserted in the tests: uid, sid, referrer, and anything
+ * a person typed. Now allowed, for user_error only: the error head, the path,
+ * and how many times it happened to how many sessions.
  */
 export function buildPushLine(groups) {
   const lead = groups[0];
   const total = groups.reduce((n, g) => n + g.events.length, 0);
   const label = EVENT_KINDS[lead.kind]?.label || lead.kind;
-  const head = lead.events.length === 1 ? `Someone ${label}` : `${lead.events.length} people ${label}`;
   const rest = total - lead.events.length;
+
+  let head;
+  if (lead.kind === 'user_error') {
+    const es = summarizeErrorGroup(lead.events);
+    const sig = es.signatures[0];
+    const who = es.people === 1 ? '1 session' : es.people ? `${es.people} sessions` : 'unattributed';
+    const times = es.occurrences === 1 ? 'once' : `x${es.occurrences}`;
+    head = `Error on ${sig?.paths[0] || '/'} ${times}, ${who}: ${String(sig?.signature || 'unknown').slice(0, 90)}`;
+  } else {
+    head = lead.events.length === 1 ? `Someone ${label}` : `${lead.events.length} people ${label}`;
+  }
+
   return {
-    title: 'Wovely',
+    title: lead.kind === 'user_error' ? 'Wovely error' : 'Wovely',
     body: rest > 0 ? `${head}, and ${rest} more thing${rest === 1 ? '' : 's'} happened` : head,
     // Money and breakage get through Do Not Disturb. Arrivals do not.
     priority: lead.kind === 'checkout_started' || lead.kind === 'user_error' ? 'high' : 'default',
@@ -437,19 +561,19 @@ export const SERVER_META_KEYS = new Set([...BEACON_META_KEYS, 'detail']);
  * normalizeEvent, because server-side callers build their events directly and
  * would otherwise have no sanitiser between them and the database.
  */
-export function eventRow(ev) {
+export function eventRow(ev, { synthetic = false } = {}) {
   const meta = cleanMeta(ev.meta, SERVER_META_KEYS);
   return {
     timestamp: ev.at,
     level: 'info',
-    message: `[pulse] ${ev.kind} ${ev.path}`,
-    source: 'monitor',
-    request_path: `${PULSE_PATH_PREFIX}${ev.kind}`,
+    message: `[${synthetic ? 'synthetic' : 'pulse'}] ${ev.kind} ${ev.path}`,
+    source: synthetic ? 'synthetic' : 'monitor',
+    request_path: `${synthetic ? SYNTHETIC_PATH_PREFIX : PULSE_PATH_PREFIX}${ev.kind}`,
     request_method: 'PULSE',
     status_code: 200,
     project_id: 'wovely',
     user_id: ev.uid,
-    context: { kind: ev.kind, path: ev.path, ref: ev.ref, sid: ev.sid, ...meta },
+    context: { kind: ev.kind, path: ev.path, ref: ev.ref, sid: ev.sid, ...meta, ...(synthetic ? { synthetic: true } : {}) },
   };
 }
 
@@ -464,7 +588,7 @@ function supaHeaders(serviceKey) {
  * something the browser cannot be trusted to report (a completed import, a
  * created Stripe session). Never throws.
  */
-export async function recordPulse({ supabaseUrl, serviceKey, events }) {
+export async function recordPulse({ supabaseUrl, serviceKey, events, synthetic = false }) {
   const list = (Array.isArray(events) ? events : [events]).filter(Boolean);
   if (!supabaseUrl || !serviceKey || list.length === 0) return { ok: false, reason: 'noop' };
   if (!monitorConfig().enabled) return { ok: false, reason: 'monitor_disabled' };
@@ -472,7 +596,7 @@ export async function recordPulse({ supabaseUrl, serviceKey, events }) {
     const res = await fetch(`${supabaseUrl}/rest/v1/vercel_logs`, {
       method: 'POST',
       headers: { ...supaHeaders(serviceKey), 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify(list.map(eventRow)),
+      body: JSON.stringify(list.map((e) => eventRow(e, { synthetic }))),
       signal: AbortSignal.timeout(5000),
     });
     return res.ok ? { ok: true, count: list.length } : { ok: false, reason: `http_${res.status}` };
@@ -535,15 +659,85 @@ async function readPulses({ supabaseUrl, serviceKey, since, limit = 500 }) {
     );
     if (!res.ok) return [];
     const rows = await res.json();
+    return (Array.isArray(rows) ? rows : [])
+      // Second belt behind SYNTHETIC_PATH_PREFIX. The query above cannot return
+      // a synthetic row, so this only catches a row written before the marker
+      // existed and relabelled by hand, or one a future writer puts on the
+      // wrong prefix. It costs nothing and it cannot be the thing that fails.
+      .filter((r) => !(r.context && typeof r.context === 'object' && r.context.synthetic))
+      .map((r) => ({
+        at: new Date(r.timestamp),
+        kind: String(r.request_path || '').slice(PULSE_PATH_PREFIX.length),
+        uid: r.user_id || null,
+        ...(r.context && typeof r.context === 'object' ? r.context : {}),
+      }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The diagnostic rows api/client-error.js writes, which hold the full message
+ * and the stack. Read only when a user_error alert is actually being composed,
+ * so the common case costs no extra query.
+ */
+async function readClientErrorRows({ supabaseUrl, serviceKey, since, limit = 100 }) {
+  try {
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/vercel_logs?source=eq.client` +
+        `&timestamp=gte.${encodeURIComponent(new Date(since).toISOString())}` +
+        `&order=timestamp.desc&limit=${limit}&select=timestamp,message,context`,
+      { headers: supaHeaders(serviceKey), signal: AbortSignal.timeout(6000) }
+    );
+    if (!res.ok) return [];
+    const rows = await res.json();
     return (Array.isArray(rows) ? rows : []).map((r) => ({
       at: new Date(r.timestamp),
-      kind: String(r.request_path || '').slice(PULSE_PATH_PREFIX.length),
-      uid: r.user_id || null,
-      ...(r.context && typeof r.context === 'object' ? r.context : {}),
+      // The row is written as `CLIENT ERROR: <message> @ <source>`. The prefix
+      // is ours; the part after it is what has to line up with the signature.
+      message: String(r.message || '').replace(/^CLIENT ERROR:\s*/, ''),
+      stack: r.context && typeof r.context === 'object' ? r.context.stack || null : null,
     }));
   } catch {
     return [];
   }
+}
+
+/** Earlier occurrences of a user_error, so "is this new" has an answer. */
+async function readErrorHistoryRows({ supabaseUrl, serviceKey, before, limit = 300 }) {
+  try {
+    const res = await fetch(
+      `${supabaseUrl}/rest/v1/vercel_logs?request_path=eq.${encodeURIComponent(PULSE_PATH_PREFIX + 'user_error')}` +
+        `&timestamp=lt.${encodeURIComponent(new Date(before).toISOString())}` +
+        `&order=timestamp.desc&limit=${limit}&select=timestamp,context`,
+      { headers: supaHeaders(serviceKey), signal: AbortSignal.timeout(6000) }
+    );
+    if (!res.ok) return [];
+    const rows = await res.json();
+    return (Array.isArray(rows) ? rows : [])
+      .filter((r) => !(r.context && typeof r.context === 'object' && r.context.synthetic))
+      .map((r) => ({ at: new Date(r.timestamp), detail: r.context?.detail || null }));
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * Everything buildErrorLines needs that is not already in hand. One extra pair
+ * of queries, made only when a user_error is in the message being composed.
+ */
+async function buildErrorContext({ supabaseUrl, serviceKey, group, rows, now }) {
+  const s = summarizeErrorGroup(group.events);
+  const sigs = s.signatures.map((x) => x.signature);
+  const oldest = s.signatures.reduce((min, x) => (x.first.at < min ? x.first.at : min), now);
+  const [clientRows, historyRows] = await Promise.all([
+    readClientErrorRows({ supabaseUrl, serviceKey, since: new Date(new Date(oldest).getTime() - 60000) }),
+    readErrorHistoryRows({ supabaseUrl, serviceKey, before: oldest }),
+  ]);
+  const { messages, stacks } = matchClientErrorRows(sigs, clientRows);
+  const history = {};
+  for (const sig of sigs) history[sig] = signatureHistory(historyRows, sig);
+  return { rows, messages, stacks, history };
 }
 
 async function writeMarker({ supabaseUrl, serviceKey, path, message, now }) {
@@ -582,31 +776,215 @@ function timeOf(e, tz) {
   }
 }
 
+// ── WHAT A user_error ALERT HAS TO SAY ──────────────────────────────────────
+//
+// Adam's words about the version this replaces: "i'm getting random emails
+// saying someone saw an error yet nothing after that". He is describing an
+// anxiety generator, not a monitor. "Someone saw an error" with no error, no
+// path, no count and no outcome cannot be acted on without opening a
+// dashboard, which is the thing the alert exists to save him.
+//
+// So a user_error block answers five questions, in this order:
+//   1. WHAT broke. The real message, and in the email the stack under it.
+//   2. WHERE. The path.
+//   3. HOW BAD. One person or many, and how many times.
+//   4. WHAT HAPPENED NEXT, which is the single most useful line in the alert.
+//      An error a visitor shrugged off and kept browsing through is a bug.
+//      An error that was the last thing that session ever did is a lost
+//      customer, and those two need different reactions on a Sunday evening.
+//   5. IS THIS NEW. Same signature seen before, how often, and when.
+//
+// PRIVACY, unchanged and deliberately not widened. Nothing here adds a meta
+// key: the signature is the existing `detail`, the session is the existing
+// `sid`, and the stack is READ AT FLUSH TIME off the diagnostic row that
+// api/client-error.js already writes, so no new content is ever carried
+// through the beacon or stored in a pulse row. Still no pattern contents, no
+// tokens, no passwords, no email addresses.
+
+/** Below this, "nothing since the error" means the visit is still in progress. */
+export const ERROR_RECOVERY_GRACE_MS = 2 * 60 * 1000;
+
+/** The thing two occurrences of the same bug have in common. */
+export function errorSignature(e) {
+  return String(e?.detail || 'unknown error').slice(0, 80);
+}
+
+/** How many, how often, and how many distinct people. */
+export function summarizeErrorGroup(events) {
+  const list = Array.isArray(events) ? events : [];
+  const bySig = new Map();
+  const people = new Set();
+  for (const e of list) {
+    const who = e.uid || e.sid || null;
+    if (who) people.add(who);
+    const sig = errorSignature(e);
+    if (!bySig.has(sig)) bySig.set(sig, { signature: sig, count: 0, paths: new Set(), people: new Set(), first: e, last: e });
+    const s = bySig.get(sig);
+    s.count += 1;
+    if (e.path) s.paths.add(e.path);
+    if (who) s.people.add(who);
+    if (e.at < s.first.at) s.first = e;
+    if (e.at > s.last.at) s.last = e;
+  }
+  return {
+    occurrences: list.length,
+    people: people.size,
+    // An error with no sid and no uid is one we cannot attribute, which is not
+    // the same as zero people. Reported as unknown rather than counted as none.
+    unattributed: list.filter((e) => !e.uid && !e.sid).length,
+    signatures: [...bySig.values()]
+      .map((s) => ({ ...s, paths: [...s.paths], people: s.people.size }))
+      .sort((a, b) => b.count - a.count),
+  };
+}
+
+/**
+ * What that session did after the error. `rows` is every pulse row in the
+ * lookback window, which is what flushInterrupts already has in hand.
+ */
+export function sessionOutcome({ sid, uid, errorAt, rows = [], now = new Date(), graceMs = ERROR_RECOVERY_GRACE_MS }) {
+  const key = uid || sid;
+  if (!key) return { status: 'unattributed', next: [] };
+  const t = errorAt instanceof Date ? errorAt.getTime() : new Date(errorAt).getTime();
+  const after = rows
+    .filter((r) => (uid ? r.uid === uid : r.sid === sid))
+    .filter((r) => r.kind !== 'user_error')
+    .filter((r) => (r.at instanceof Date ? r.at.getTime() : new Date(r.at).getTime()) > t)
+    .sort((a, b) => a.at - b.at);
+  if (after.length) {
+    return { status: 'continued', next: after.slice(0, 4).map((r) => ({ kind: r.kind, path: r.path || '/' })), more: Math.max(0, after.length - 4) };
+  }
+  const quietMs = (now instanceof Date ? now.getTime() : Number(now)) - t;
+  // Inside the grace window the visit may simply still be happening. Saying
+  // "they left" about someone still reading the page is the kind of wrong that
+  // teaches Adam to stop believing the alert.
+  return { status: quietMs < graceMs ? 'pending' : 'ended', next: [], quietMs };
+}
+
+/** Prior sightings of a signature, out of pulse rows older than this window. */
+export function signatureHistory(rows, signature) {
+  const hits = (Array.isArray(rows) ? rows : [])
+    .filter((r) => errorSignature(r) === signature)
+    .map((r) => (r.at instanceof Date ? r.at : new Date(r.at)))
+    .sort((a, b) => a - b);
+  if (!hits.length) return { count: 0 };
+  return { count: hits.length, firstAt: hits[0], lastAt: hits[hits.length - 1] };
+}
+
+/**
+ * Pair each signature with the full message and stack from the diagnostic row
+ * api/client-error.js wrote alongside it. The pulse row carries an 80
+ * character head; the fix needs the whole thing.
+ */
+export function matchClientErrorRows(signatures, rows) {
+  const messages = {};
+  const stacks = {};
+  const list = Array.isArray(rows) ? rows : [];
+  for (const sig of signatures) {
+    const hit = list.find((r) => String(r.message || '').startsWith(sig));
+    if (!hit) continue;
+    messages[sig] = String(hit.message || '').slice(0, 500);
+    if (hit.stack) stacks[sig] = String(hit.stack);
+  }
+  return { messages, stacks };
+}
+
+/** The user_error block of the email. Pure, so every claim above is a test. */
+export function buildErrorLines(group, ctx = {}, { tz = 'America/New_York', now = new Date(), stackLines = 6 } = {}) {
+  const { rows = [], messages = {}, stacks = {}, history = {} } = ctx;
+  const s = summarizeErrorGroup(group.events);
+  const lines = [];
+
+  const who = s.people === 1 ? '1 person' : `${s.people} people`;
+  const times = s.occurrences === 1 ? 'once' : `${s.occurrences} times`;
+  lines.push(
+    s.people
+      ? `  ${who}, ${times}, across ${s.signatures.length} distinct error${s.signatures.length === 1 ? '' : 's'}.`
+      : `  ${times}, across ${s.signatures.length} distinct error${s.signatures.length === 1 ? '' : 's'}. No session id on any of them, so this could be one person or several.`
+  );
+  if (s.people && s.unattributed) {
+    lines.push(`  ${s.unattributed} of the ${s.occurrences} carried no session id and are not counted in that head count.`);
+  }
+  lines.push('');
+
+  for (const sig of s.signatures.slice(0, 5)) {
+    const e = sig.last;
+    lines.push(`  ${messages[sig.signature] || sig.signature}`);
+    lines.push(`    where: ${sig.paths.join(', ') || '/'}`);
+    lines.push(`    when:  ${timeOf(e, tz)}${sig.count > 1 ? `, and ${sig.count - 1} more time${sig.count === 2 ? '' : 's'} in this window` : ''}`);
+    lines.push(`    who:   ${sig.people ? `${sig.people} session${sig.people === 1 ? '' : 's'}` : 'no session id'} (${WHO(e)})`);
+
+    const out = sessionOutcome({ sid: e.sid, uid: e.uid, errorAt: e.at, rows, now });
+    if (out.status === 'continued') {
+      const trail = out.next.map((n) => `${EVENT_KINDS[n.kind]?.label || n.kind} ${n.path}`).join(' then ');
+      lines.push(`    next:  they kept going. ${trail}${out.more ? `, and ${out.more} more` : ''}`);
+    } else if (out.status === 'ended') {
+      lines.push(`    next:  NOTHING. That error was the last thing this session did.`);
+    } else if (out.status === 'pending') {
+      lines.push(`    next:  nothing yet, but it only happened ${Math.max(1, Math.round((out.quietMs || 0) / 1000))}s ago, so the visit may still be running.`);
+    } else {
+      lines.push(`    next:  unknown, no session id on this one.`);
+    }
+
+    const h = history[sig.signature];
+    if (h && h.count > 0) {
+      lines.push(`    seen:  ${h.count} time${h.count === 1 ? '' : 's'} before this window, first ${timeOf({ at: h.firstAt }, tz)}, last ${timeOf({ at: h.lastAt }, tz)}`);
+    } else {
+      lines.push(`    seen:  first time. No earlier occurrence of this signature.`);
+    }
+
+    const stack = stacks[sig.signature];
+    if (stack) {
+      lines.push('    stack:');
+      for (const l of String(stack).split('\n').slice(0, stackLines)) lines.push(`      ${l.trim().slice(0, 160)}`);
+    }
+    lines.push('');
+  }
+  if (s.signatures.length > 5) lines.push(`  and ${s.signatures.length - 5} more distinct errors`);
+  return lines;
+}
+
 /**
  * One message covering every kind that came due on this flush.
  * `groups` is [{ kind, events }] already ordered by priority.
  */
-export function buildInterruptEmail(groups, { now, tz = 'America/New_York', sentToday = 0, maxPerDay = 40 } = {}) {
+export function buildInterruptEmail(groups, { now = new Date(), tz = 'America/New_York', sentToday = 0, maxPerDay = 40, errorContext = null } = {}) {
   const total = groups.reduce((n, g) => n + g.events.length, 0);
   const lead = groups[0];
   const spec = EVENT_KINDS[lead.kind];
 
-  const headline =
-    lead.events.length === 1
-      ? `Wovely: ${WHO(lead.events[0])} ${spec.label}`
-      : `Wovely: ${lead.events.length} ${spec.label}`;
+  // A subject that says what broke is worth more than one that says something
+  // broke. Everything else keeps the shape it had.
+  let headline;
+  if (lead.kind === 'user_error') {
+    const es = summarizeErrorGroup(lead.events);
+    const sig = es.signatures[0];
+    const head = sig ? `: ${sig.signature.slice(0, 60)}` : '';
+    headline = es.occurrences === 1
+      ? `Wovely error on ${sig?.paths[0] || '/'}${head}`
+      : `Wovely error x${es.occurrences} on ${sig?.paths[0] || '/'}${head}`;
+  } else {
+    headline =
+      lead.events.length === 1
+        ? `Wovely: ${WHO(lead.events[0])} ${spec.label}`
+        : `Wovely: ${lead.events.length} ${spec.label}`;
+  }
   const subject = groups.length > 1 ? `${headline}, +${total - lead.events.length} more` : headline;
 
   const lines = [];
   for (const g of groups) {
     const s = EVENT_KINDS[g.kind];
     lines.push(`${g.kind.toUpperCase().replace(/_/g, ' ')}  (${g.events.length})`);
-    for (const e of g.events.slice(0, 12)) {
-      const bits = [timeOf(e, tz), WHO(e), e.path || '/'];
-      if (e.ref) bits.push(`from ${e.ref}`);
-      lines.push(`  ${bits.join('  ·  ')}`);
+    if (g.kind === 'user_error') {
+      lines.push(...buildErrorLines(g, errorContext || {}, { tz, now }));
+    } else {
+      for (const e of g.events.slice(0, 12)) {
+        const bits = [timeOf(e, tz), WHO(e), e.path || '/'];
+        if (e.ref) bits.push(`from ${e.ref}`);
+        lines.push(`  ${bits.join('  ·  ')}`);
+      }
+      if (g.events.length > 12) lines.push(`  and ${g.events.length - 12} more`);
     }
-    if (g.events.length > 12) lines.push(`  and ${g.events.length - 12} more`);
     lines.push(`  next message about this no sooner than ${Math.round(s.windowMs / 60000)} min from now`);
     lines.push('');
   }
@@ -736,8 +1114,15 @@ export async function flushInterrupts({ supabaseUrl, serviceKey, now = new Date(
 
     groups.sort((a, b) => EVENT_KINDS[a.kind].priority - EVENT_KINDS[b.kind].priority);
 
+    // Only a user_error alert pays for the enrichment queries, and only when
+    // one is actually going out.
+    const errorGroup = groups.find((g) => g.kind === 'user_error');
+    const errorContext = errorGroup
+      ? await buildErrorContext({ supabaseUrl, serviceKey, group: errorGroup, rows, now })
+      : null;
+
     const { subject, text } = buildInterruptEmail(groups, {
-      now, tz: config.tz, sentToday, maxPerDay: config.maxPerDay,
+      now, tz: config.tz, sentToday, maxPerDay: config.maxPerDay, errorContext,
     });
     const result = await sendMail({
       from: FROM_APP,

@@ -41,6 +41,17 @@ function newSid() {
 }
 
 let _sid = null;
+/**
+ * Exported so api/client-error.js can be told WHICH session saw an error. That
+ * is what lets the monitor answer the question Adam actually cares about, which
+ * is whether the person carried on browsing or whether the error was the last
+ * thing they ever did here. It is the same opaque per-tab id described above:
+ * not an identity, gone when the tab closes.
+ */
+export function pulseSessionId() {
+  return sessionId();
+}
+
 function sessionId() {
   if (_sid) return _sid;
   try {

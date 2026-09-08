@@ -1,7 +1,27 @@
+// src/utils/errorReporter.js
+// Where a JavaScript error a real person saw is reported from.
+//
+// It sends the pulse session id along with the error. That single field is
+// what lets the monitor tell Adam whether the visitor shrugged the error off
+// and kept browsing or whether it ended their visit, which are two very
+// different pieces of news. It is the same opaque per-tab id the beacon uses:
+// not an identity, and gone when the tab closes.
+
+import { pulseSessionId } from './pulse.js';
+
 let _userId = null;
 
 export function setErrorReporterUser(id) {
   _userId = id;
+}
+
+/** Never let the reporter be the thing that throws. */
+function safeSid() {
+  try {
+    return pulseSessionId();
+  } catch {
+    return null;
+  }
 }
 
 function report(message, source, stack, extra = {}) {
@@ -17,6 +37,7 @@ function report(message, source, stack, extra = {}) {
       context: {
         url: window.location.href,
         userAgent: navigator.userAgent,
+        sid: safeSid(),
         ...extra
       }
     })
