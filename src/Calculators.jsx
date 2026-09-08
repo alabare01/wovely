@@ -160,8 +160,14 @@ const Calculators = ({embedded=false,initialTab="gauge"}) => {
   const myStPerIn  = parseFloat(mySt)/parseFloat(mySwatchIn)||0;
   const patRowPerIn= parseFloat(patRows)/parseFloat(patSwatchIn)||0;
   const myRowPerIn = parseFloat(myRows)/parseFloat(mySwatchIn)||0;
-  const stScale = (patStPerIn>0&&myStPerIn>0) ? patStPerIn/myStPerIn : 1;
-  const rowScale= (patRowPerIn>0&&myRowPerIn>0) ? patRowPerIn/myRowPerIn : 1;
+  // To keep the FINISHED SIZE the pattern intends, a count scales by MY stitches
+  // per inch over the PATTERN's, not the reverse. This was inverted, so every
+  // number on the Scale tab came out backwards: a looser gauge was told to add
+  // stitches when it needed fewer. Worked example, pattern 18 sts/4in and mine
+  // 14 sts/4in: the pattern's 24 sts span 5.33in, and at 3.5 sts/in that is 19
+  // stitches. The page printed 31, which finishes 66% too wide.
+  const stScale = (patStPerIn>0&&myStPerIn>0) ? myStPerIn/patStPerIn : 1;
+  const rowScale= (patRowPerIn>0&&myRowPerIn>0) ? myRowPerIn/patRowPerIn : 1;
   const sizeChangeW = stScale>0 ? (1/stScale) : 1;
   const sizeChangeH = rowScale>0 ? (1/rowScale) : 1;
 
@@ -341,7 +347,7 @@ const Calculators = ({embedded=false,initialTab="gauge"}) => {
             <ResultCard isMobile={isMobile} label="yardage mult." val={`${(sizeChangeW*sizeChangeH*100).toFixed(0)}%`}/>
           </div>
           {Math.abs(stScale-1)<0.03&&<div style={{marginTop:12,fontSize:12,color:T.sage,fontWeight:600,textAlign:"center"}}>Gauges match, so no scaling is needed</div>}
-          {stScale!==1&&<div style={{marginTop:12,fontSize:12,color:T.ink2,lineHeight:1.6,textAlign:"center"}}>
+          {Math.abs(stScale-1)>=0.03&&<div style={{marginTop:12,fontSize:12,color:T.ink2,lineHeight:1.6,textAlign:"center"}}>
             {stScale>1?"Your gauge is tighter, so multiply stitch counts to match.":"Your gauge is looser, so reduce stitch counts to match."}
           </div>}
         </div>
@@ -390,7 +396,7 @@ const Calculators = ({embedded=false,initialTab="gauge"}) => {
             {repeatResult&&<div style={{marginTop:12,textAlign:"center",padding:"12px 0"}}>
               <div style={LABEL}>scaled instruction</div>
               <div style={{fontSize:15,fontWeight:600,color:T.ink,fontFamily:T.serif,marginTop:4}}>{repeatResult.newDesc}</div>
-              <div style={{fontSize:11,color:T.ink3,marginTop:6}}>{repeatResult.origRepeat} repeats \u2192 {repeatResult.scaledRepeat} repeats</div>
+              <div style={{fontSize:11,color:T.ink3,marginTop:6}}>{repeatResult.origRepeat} repeats {"\u2192"} {repeatResult.scaledRepeat} repeats</div>
             </div>}
             {showRepeat&&!repeatResult&&origDesc.length>3&&<div style={{marginTop:8,fontSize:11,color:T.ink3}}>Couldn't parse that pattern. Try: (4 sc, inc) x 4</div>}
           </>}
