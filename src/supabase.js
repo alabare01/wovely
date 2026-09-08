@@ -87,6 +87,12 @@ export const refreshSession = () => {
   return inFlightRefresh;
 };
 
+// Overrides the OAuth launch strategy. Set once at startup by
+// src/utils/native.js when running inside Capacitor; null everywhere else, so
+// the web path below is untouched.
+let oauthHandler = null;
+export const setOAuthHandler = (fn) => { oauthHandler = fn; };
+
 export const supabaseAuth = {
   // Native Supabase anonymous sign-in. Requires "Allow anonymous sign-ins"
   // toggle in the Supabase Dashboard (Authentication > Settings > User
@@ -252,7 +258,14 @@ export const supabaseAuth = {
     if(!res.ok) return {error: data};
     return {data};
   },
+  // Redirecting the whole window is correct on the web and WRONG inside a
+  // native shell: Google returns 403 disallowed_useragent to an embedded
+  // WebView rather than a login form. src/utils/native.js registers a handler
+  // that opens the system browser instead. The hook lives here, rather than
+  // this file importing Capacitor, so that supabase.js has no native
+  // dependency and the two modules import in one direction only.
   signInWithOAuth: async (provider) => {
+    if (oauthHandler) return oauthHandler(provider);
     const redirectTo = APP_ORIGIN;
     window.location.href = `${SUPABASE_URL}/auth/v1/authorize?provider=${provider}&redirect_to=${encodeURIComponent(redirectTo)}`;
   },

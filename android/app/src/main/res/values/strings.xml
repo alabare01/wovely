@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Wovely</string>
+    <string name="title_activity_main">Wovely</string>
+    <string name="package_name">app.wovely</string>
+    <string name="custom_url_scheme">app.wovely</string>
+</resources>

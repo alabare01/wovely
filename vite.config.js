@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import fs from 'node:fs'
 import path from 'node:path'
+import crypto from 'node:crypto'
 import { PUBLIC_ROUTES, SITEMAP_PRIORITY } from './src/utils/seo.js'
 import { checkFirstRunInvariant } from './scripts/first-run-invariant.mjs'
 
@@ -160,8 +161,136 @@ const seoHeadPrerender = () => ({
   },
 })
 
+// ─── SERVICE WORKER ──────────────────────────────────────────────────────────
+//
+// Compiles src/service-worker.js into dist/sw.js, substituting the build id and
+// the precache list. The worker itself explains its caching strategy; this only
+// explains why it is generated rather than written by hand.
+//
+// Two things have to be true at build time and cannot be hard-coded:
+//
+// 1. THE PRECACHE LIST HAS TO NAME REAL, CURRENT FILES. Vite content-hashes
+//    every chunk, so the names change on each build. A hand-kept list would be
+//    wrong the first time anyone edited a component.
+//
+// 2. THE FILE'S BYTES HAVE TO CHANGE WHEN THE BUILD CHANGES. A browser decides
+//    whether to install a new worker by byte-comparing sw.js against the one it
+//    has. A worker that is byte-identical across deploys is never reinstalled,
+//    so its caches are never rebuilt and its precache keeps serving the
+//    previous build's assets. The build id below is a hash of the emitted asset
+//    names plus the worker source, which means it changes exactly when
+//    something it caches changed, and does not change when nothing did.
+//
+// It runs after seoHeadPrerender because the precache list includes the public
+// route URLs, and that plugin is what writes their HTML.
+const pwaServiceWorker = () => ({
+  name: 'wovely-pwa-service-worker',
+  apply: 'build',
+  closeBundle() {
+    const outDir = path.resolve('dist')
+    const assetsDir = path.join(outDir, 'assets')
+    if (!fs.existsSync(assetsDir)) return
+
+    const templatePath = path.resolve('src/service-worker.js')
+    const template = fs.readFileSync(templatePath, 'utf8')
+
+    // Each token must appear exactly once. Merely checking `includes` is not
+    // enough: the first cut of this plugin used String.replace with a string
+    // pattern (first match only) while the token was also mentioned in the
+    // template's header comment, so the substitution landed in the prose and
+    // the real assignment shipped as `PRECACHE_URLS = __PRECACHE__`, an
+    // undeclared identifier that throws on registration. The build still
+    // printed "wrote sw.js". Count, then substitute, then verify.
+    const TOKENS = ['__BUILD_ID__', '__PRECACHE__']
+    for (const token of TOKENS) {
+      const n = template.split(token).length - 1
+      if (n !== 1) {
+        this.error(
+          `[pwa] src/service-worker.js must contain ${token} exactly once, found ${n}`
+        )
+      }
+    }
+
+    // Only the hashed JS and CSS. Anything else in /assets (an inlined image,
+    // say) is fetched on demand rather than paid for up front on every install.
+    const hashedAssets = fs
+      .readdirSync(assetsDir)
+      .filter((f) => /-[A-Za-z0-9_-]{8,}\.(js|css)$/.test(f))
+      .map((f) => `/assets/${f}`)
+      .sort()
+
+    // Route URLs, not filenames: /tools is a rewrite to /tools.html, and the
+    // browser asks for /tools. Caching the filename would cache a URL nobody
+    // ever requests. /app.html is the exception, because it is the offline
+    // fallback and is fetched by that literal path.
+    const routeUrls = Object.keys(PUBLIC_ROUTES)
+    const precache = [
+      ...routeUrls,
+      '/app.html',
+      '/manifest.webmanifest',
+      '/icons/icon-192.png',
+      '/icons/icon-512.png',
+      '/icons/maskable-192.png',
+      '/icons/maskable-512.png',
+      // The header logo on every public page. Verified offline with the server
+      // stopped: without this the calculators rendered and computed correctly
+      // but the brand mark in the top-left was a broken-image icon, which
+      // reads as "the app is broken" rather than "you are offline".
+      // NOTE: this file is 237 kB and is displayed at 34 px. That is a
+      // pre-existing weight problem on every page load, not something this
+      // plugin introduced, and it is worth fixing at the markup level rather
+      // than here.
+      '/bev_neutral.png',
+      ...hashedAssets,
+    ]
+
+    const buildId = crypto
+      .createHash('sha256')
+      .update(hashedAssets.join('|'))
+      .update(template)
+      .digest('hex')
+      .slice(0, 12)
+
+    const sw = template
+      .replaceAll('__BUILD_ID__', buildId)
+      .replaceAll('__PRECACHE__', JSON.stringify(precache, null, 2))
+
+    // The check that would have caught the bug described above. A worker that
+    // still carries a placeholder is not a worker, it is a syntax error that
+    // silently disables offline mode, and the only symptom is a console
+    // warning on someone else's phone.
+    const survivors = TOKENS.filter((t) => sw.includes(t))
+    if (survivors.length) {
+      this.error(`[pwa] placeholders survived substitution into dist/sw.js: ${survivors.join(', ')}`)
+    }
+
+    fs.writeFileSync(path.join(outDir, 'sw.js'), sw, 'utf8')
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `[pwa] wrote sw.js (build ${buildId}) precaching ${routeUrls.length} routes and ${hashedAssets.length} hashed assets`
+    )
+
+    // A manifest that 404s makes the install prompt silently never appear, and
+    // there is nothing in the browser UI that says why. Fail the build instead.
+    const manifest = path.join(outDir, 'manifest.webmanifest')
+    if (!fs.existsSync(manifest)) {
+      this.error('[pwa] dist/manifest.webmanifest is missing — the app is not installable')
+    }
+    const icons = JSON.parse(fs.readFileSync(manifest, 'utf8')).icons || []
+    const missingIcons = icons
+      .map((i) => i.src)
+      .filter((src) => !fs.existsSync(path.join(outDir, src.replace(/^\//, ''))))
+    if (missingIcons.length) {
+      this.error(`[pwa] manifest names icons that were not built: ${missingIcons.join(', ')}`)
+    }
+    // eslint-disable-next-line no-console
+    console.log(`[pwa] manifest present with ${icons.length} icons, all files exist`)
+  },
+})
+
 export default defineConfig({
-  plugins: [react(), firstRunGate(), routeReachabilityGate(), seoHeadPrerender()],
+  plugins: [react(), firstRunGate(), routeReachabilityGate(), seoHeadPrerender(), pwaServiceWorker()],
   server: {
     historyApiFallback: true
   },

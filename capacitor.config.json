@@ -1,0 +1,15 @@
+{
+  "appId": "app.wovely",
+  "appName": "Wovely",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "never",
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "android": {
+    "backgroundColor": "#FBF9FFFF"
+  }
+}

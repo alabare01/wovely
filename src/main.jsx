@@ -6,6 +6,8 @@ import App from './App.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import { isNoReplayPath } from './utils/analytics.js'
 import { startPulseSession } from './utils/pulse.js'
+import { registerServiceWorker } from './utils/serviceWorker.js'
+import { initNative } from './utils/native.js'
 import './index.css'
 
 // Prevent browser from restoring scroll position on back/forward (iOS bfcache)
@@ -31,6 +33,11 @@ posthog.init('phc_CgK3ydJGk6XRtRPLQ8cnXxkqSroQBsuYrV9VsWk2r76Y', {
 // See src/utils/pulse.js and api/_monitor.js.
 startPulseSession();
 
+// Native shell setup: safe-area viewport, deep links, Android back button and
+// the system-browser OAuth handler. No-ops in a browser. Runs BEFORE mount so
+// the viewport and the wv-native class are in place for the first paint.
+initNative()
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -39,3 +46,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>
 )
+
+// Installable / offline support. Production web only: it no-ops in dev and
+// inside the Capacitor native shell. See src/utils/serviceWorker.js.
+registerServiceWorker()

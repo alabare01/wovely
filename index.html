@@ -8,9 +8,35 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=2" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=2" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
+    <!-- v=3: this file was regenerated opaque. It had shipped with a fully
+         transparent background, and iOS composites an apple-touch-icon onto
+         BLACK rather than white, so every iPhone that added Wovely to its home
+         screen got a black tile with a lavender snake on it. -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
     <link rel="shortcut icon" href="/favicon.ico?v=2" />
     <meta name="theme-color" content="#7B6AD4" />
+
+    <!-- ─── INSTALLABLE (PWA) ──────────────────────────────────────────────
+         Wovely gets used phone-in-hand with a hook in the other one, so being
+         on the home screen and surviving a lock screen is worth more here than
+         on most sites.
+
+         `mobile-web-app-capable` is the standard name; the `apple-` twin is
+         the one iOS actually honours on versions that ignore the manifest's
+         display mode, so both are present on purpose.
+
+         Status bar style is `default`, NOT `black-translucent`. Translucent
+         runs the page content up under the clock, which is only safe once
+         every screen carries safe-area padding. `default` keeps iOS reserving
+         the status bar, which is why there is deliberately no
+         `viewport-fit=cover` on the viewport tag above: adding it would change
+         landscape layout on notched iPhones in the ordinary browser, and this
+         is a live site. The native shell sets it at runtime instead. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Wovely" />
     <meta name="description" content="Save every crochet pattern, track every row, and keep your projects in one place. The home for your hooks, yarn, and works in progress." />
     <!-- No canonical here on purpose. This file is the template every route was
          served, so a hard-coded canonical of "https://wovely.app" told the

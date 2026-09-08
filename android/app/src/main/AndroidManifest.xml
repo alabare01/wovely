@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- OAUTH RETURN. Google refuses to render a sign-in form inside an
+                 embedded WebView (403 disallowed_useragent), so "Continue with
+                 Google" opens a Chrome Custom Tab and Supabase redirects back
+                 to this custom scheme. Without this filter the redirect has
+                 nowhere to land and sign-in dead-ends on a blank tab.
+                 @string/custom_url_scheme is "app.wovely"; the same value is
+                 hard-coded as NATIVE_AUTH_REDIRECT in src/utils/native.js and
+                 must be on the Redirect URLs allow-list in Supabase. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="@string/custom_url_scheme" />
+            </intent-filter>
+
+            <!-- APP LINKS, scoped to /pattern only. A shared pattern link opens
+                 the app instead of the browser; every other wovely.app URL
+                 (the landing page, the calculators, privacy) keeps opening in
+                 the browser, which is what a person tapping a search result
+                 expects and what keeps the indexed pages working as pages.
+
+                 autoVerify makes Android fetch
+                 https://wovely.app/.well-known/assetlinks.json and check the
+                 app's signing fingerprint. THAT FILE DOES NOT EXIST YET and
+                 cannot be written until the app has a signing key, so
+                 verification currently fails and these links simply open in
+                 the browser as they do today. That is the correct failure
+                 mode: nothing breaks, the feature is just dormant. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="wovely.app" android:pathPrefix="/pattern" />
+                <data android:scheme="https" android:host="www.wovely.app" android:pathPrefix="/pattern" />
+            </intent-filter>
+
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+    </application>
+
+    <!-- Permissions -->
+
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>

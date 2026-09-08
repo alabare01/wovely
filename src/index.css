@@ -119,3 +119,34 @@ body::after {
    The scrollbar was rendering right over/beside the cord, making it look broken. */
 .wv-noscroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
 .wv-noscroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ─── NATIVE SHELL SAFE AREAS ────────────────────────────────────────────────
+   Scoped entirely behind `html.wv-native`, a class set at runtime by
+   src/utils/native.js and applied ONLY when Capacitor reports a native
+   platform. Nothing here can reach a browser visitor.
+
+   That scoping is the point. index.html deliberately ships without
+   `viewport-fit=cover`, because switching it on changes landscape layout on
+   notched iPhones for every ordinary visitor to a live site, and the
+   standalone PWA does not need it (apple-mobile-web-app-status-bar-style is
+   `default`, so iOS keeps reserving the status bar). The native shell is the
+   one context where the WebView really is edge to edge, so native.js sets the
+   viewport meta and this class together — the meta without this padding runs
+   content under the clock, and this padding without the meta is a no-op,
+   because env(safe-area-inset-*) is 0 unless the viewport opts in.
+
+   The bottom inset is deliberately absent here: App.jsx already pads the
+   fixed bottom nav and the mobile scroll container with
+   env(safe-area-inset-bottom). Those were written for exactly this and have
+   been evaluating to 0 all along for want of the viewport opt-in. Adding a
+   second bottom inset at this level would double it.
+
+   min-height is restated because index.html's inline style sets #root to
+   100vh; without subtracting the top inset the document would be taller than
+   the screen by exactly that inset and scroll for no reason. */
+html.wv-native #root {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  min-height: calc(100vh - env(safe-area-inset-top, 0px));
+}
