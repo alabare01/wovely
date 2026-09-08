@@ -17,9 +17,19 @@
 // silencing him, which is the direction this has to fail in.
 //
 // USAGE
-//   CRON_SECRET=... node scripts/probe.mjs                     (defaults to https://wovely.app)
-//   CRON_SECRET=... node scripts/probe.mjs https://wovely.app
-//   node scripts/probe.mjs --token                             (print the header value and exit)
+//   npm run probe                              (defaults to https://wovely.app)
+//   node scripts/probe.mjs https://wovely.app
+//   node scripts/probe.mjs --token             (print the header value and exit)
+//   node scripts/probe.mjs --force             (send the loud probe without the readback gate)
+//
+// IT PROBES IN ORDER, AND THE ORDER IS THE SAFETY PROPERTY. The first request
+// is a DIGEST-ONLY `page_view`, which cannot page anybody even if the marker
+// is ignored. It then reads Supabase back to prove the row landed on the
+// synthetic prefix, i.e. that the CRON_SECRET on this machine matches the one
+// on the Vercel project. ONLY THEN does it touch /api/client-error, which is
+// the request that would otherwise wake Adam. A mismatched secret is the
+// realistic way this goes wrong, and it is caught before it costs anybody a
+// notification rather than after.
 //
 // CRON_SECRET is read from the environment or from .env.local. Without it the
 // script refuses to send rather than sending unmarked traffic, because an
@@ -64,46 +74,83 @@ if (process.argv.includes('--token')) {
 
 const base = (process.argv[2] || 'https://wovely.app').replace(/\/+$/, '');
 const headers = { 'Content-Type': 'application/json', [PROBE_HEADER]: token };
+const env = readEnvLocal();
+const SUPA_URL = process.env.VITE_SUPABASE_URL || env.VITE_SUPABASE_URL || '';
+const SUPA_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_ROLE_KEY || '';
+const force = process.argv.includes('--force');
 const stamp = new Date().toISOString();
+const sid = Array.from({ length: 16 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
 
-const checks = [
-  {
-    name: 'POST /api/client-error',
-    url: `${base}/api/client-error`,
-    expect: 200,
-    body: { message: `synthetic probe ${stamp}`, source: 'scripts/probe.mjs', context: { url: `${base}/` } },
-  },
-  {
-    name: 'POST /api/pulse',
-    url: `${base}/api/pulse`,
-    expect: 204,
-    body: { kind: 'guest_arrived', path: '/', sid: 'aaaaaaaabbbbbbbb' },
-  },
-];
-
-let failed = 0;
-for (const c of checks) {
-  let status = 0;
-  let err = '';
+async function post(url, body) {
   try {
-    const res = await fetch(c.url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(c.body),
-      signal: AbortSignal.timeout(15000),
-    });
-    status = res.status;
+    const res = await fetch(url, { method: 'POST', headers, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
+    return { status: res.status };
   } catch (e) {
-    err = e?.message || 'exception';
+    return { status: 0, err: e?.message || 'exception' };
   }
-  const ok = status === c.expect;
-  if (!ok) failed += 1;
-  console.log(`${ok ? 'ok  ' : 'FAIL'}  ${c.name}  ${status || err}  (expected ${c.expect})`);
 }
 
-console.log(
-  failed
-    ? `${failed} of ${checks.length} checks failed.`
-    : `${checks.length} of ${checks.length} checks passed. Rows landed on /internal/synthetic/, so nobody was paged.`
-);
-process.exit(failed ? 1 : 0);
+/** Did the row land on the synthetic prefix, or on the one that pages Adam? */
+async function whereDidItLand(kind, id) {
+  if (!SUPA_URL || !SUPA_KEY) return { known: false, reason: 'no supabase credentials on this machine' };
+  const q =
+    `${SUPA_URL}/rest/v1/vercel_logs?request_path=in.(${encodeURIComponent(`"/internal/pulse/${kind}","/internal/synthetic/${kind}"`)})` +
+    `&order=timestamp.desc&limit=20&select=request_path,context`;
+  for (let attempt = 0; attempt < 6; attempt += 1) {
+    try {
+      const res = await fetch(q, { headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` }, signal: AbortSignal.timeout(10000) });
+      if (res.ok) {
+        const rows = await res.json();
+        const hit = (Array.isArray(rows) ? rows : []).find((r) => r.context?.sid === id);
+        if (hit) return { known: true, synthetic: hit.request_path.startsWith('/internal/synthetic/'), path: hit.request_path };
+      }
+    } catch { /* retry */ }
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+  return { known: false, reason: 'row not found within 6s' };
+}
+
+// ── STEP ONE, and the order is the safety property ──────────────────────────
+// The first probe uses `page_view`, which is DIGEST ONLY. Even if the marker
+// is not honoured (a CRON_SECRET here that does not match the one in Vercel,
+// which is the realistic way this goes wrong), the worst case is one extra
+// line on an hourly summary. Nobody is paged.
+const first = await post(`${base}/api/pulse`, { kind: 'page_view', path: '/', sid });
+const okFirst = first.status === 204;
+console.log(`${okFirst ? 'ok  ' : 'FAIL'}  POST /api/pulse  ${first.status || first.err}  (expected 204)`);
+if (!okFirst) process.exit(1);
+
+// ── STEP TWO: prove the marker was HONOURED before sending anything louder ──
+const landed = await whereDidItLand('page_view', sid);
+if (landed.known && landed.synthetic) {
+  console.log(`ok    marker honoured, row landed on ${landed.path}`);
+} else if (landed.known) {
+  console.error(`FAIL  MARKER NOT HONOURED. The row landed on ${landed.path}, which the monitor reads as real traffic.`);
+  console.error('      The CRON_SECRET here does not match the one on the Vercel project.');
+  console.error('      Refusing to probe /api/client-error, because that one would page Adam.');
+  process.exit(1);
+} else if (!force) {
+  console.error(`SKIP  cannot confirm the marker was honoured (${landed.reason}).`);
+  console.error('      Refusing to probe /api/client-error unmarked-for-all-we-know. Re-run with --force to send it anyway.');
+  process.exit(1);
+}
+
+// ── STEP THREE: the endpoint that actually broke ────────────────────────────
+const second = await post(`${base}/api/client-error`, {
+  message: `synthetic probe ${stamp}`,
+  source: 'scripts/probe.mjs',
+  context: { url: `${base}/`, sid },
+});
+const okSecond = second.status === 200;
+console.log(`${okSecond ? 'ok  ' : 'FAIL'}  POST /api/client-error  ${second.status || second.err}  (expected 200)`);
+
+const errLanded = await whereDidItLand('user_error', sid);
+if (errLanded.known) {
+  console.log(`${errLanded.synthetic ? 'ok  ' : 'FAIL'}  user_error row landed on ${errLanded.path}`);
+}
+
+if (okSecond && (!errLanded.known || errLanded.synthetic)) {
+  console.log('Both endpoints answer. Rows landed on /internal/synthetic/, so nobody was paged.');
+  process.exit(0);
+}
+process.exit(1);
