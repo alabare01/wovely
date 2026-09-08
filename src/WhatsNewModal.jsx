@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { isOwner } from "./utils/owner.js";
 import { createPortal } from "react-dom";
 import { supabaseAuth } from "./supabase.js";
 import { CHANGELOG } from "./changelog.js";
@@ -58,7 +59,7 @@ export default function WhatsNewModal() {
     const handleKey = (e) => {
       if (e.key !== "W") return;
       const user = supabaseAuth.getUser();
-      if (user?.email !== "alabare@gmail.com") return;
+      if (!isOwner(user)) return;
       localStorage.removeItem(LS_KEY);
       setVisible(true);
       setTimeout(() => setEntered(true), 50);

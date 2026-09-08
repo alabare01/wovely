@@ -20,6 +20,7 @@ import DeleteAccountSection from "./DeleteAccountSection.jsx";
 import { starterPatternRow } from "./data/starterPattern.js";
 import { CollectionDetailView } from "./Collections.jsx";
 import { linkPatternToCollection, listPatternsInCollection, createCollection } from "./utils/collections.js";
+import { isOwner } from "./utils/owner.js";
 import Detail, { CoverImagePicker, DeleteConfirmModal, ReadyToBuildPrompt, PatternCreatedOverlay } from "./PatternDetail.jsx";
 import { ChartLightbox, PinnedThumbnail } from "./components/ChartStrip.jsx";
 import ImageImportModal from "./ImageImportModal.jsx";
@@ -2527,7 +2528,7 @@ export default function Wovely() {
 
   // 5-tap Wovely logo easter egg (adam only)
   const handleLogoTap = useWovelySuperTap(triggerWhatsNew);
-  const isAdam = supabaseAuth.getUser()?.email === "alabare@gmail.com";
+  const isAdam = isOwner(supabaseAuth.getUser());
 
   // Central gate — hierarchy: anonymous → AuthWall, authed-non-Pro on Pro action → ProInfoModal, else proceed.
   // proceedCallback is re-invoked after successful signup/signin so the action the user intended can resume.
