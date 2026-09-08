@@ -17,6 +17,9 @@
 import { StaticRouter } from "react-router";
 import { renderToStaticMarkup } from "react-dom/server";
 
+import Auth from "./Auth.jsx";
+import PrivacyPolicy from "./PrivacyPolicy.jsx";
+import TermsOfService from "./TermsOfService.jsx";
 import UkUsConverter, { PAGE_SCHEMA as UK_US_SCHEMA } from "./UkUsConverter.jsx";
 import CrochetAbbreviations, { PAGE_SCHEMA as ABBR_SCHEMA } from "./CrochetAbbreviations.jsx";
 import StitchCounter, { PAGE_SCHEMA as COUNTER_SCHEMA } from "./StitchCounter.jsx";
@@ -26,7 +29,28 @@ import {
   GAUGE_SCHEMA, YARDAGE_SCHEMA, SCALE_SCHEMA,
 } from "./CalculatorPages.jsx";
 
+// ─── THE HOMEPAGE ────────────────────────────────────────────────────────────
+//
+// Added 2026-09-08. The seven tool pages below were prerendered on 2026-09-07
+// and the homepage was not, so the most-linked URL on the property, priority
+// 1.0 in the sitemap, was still serving a crawler an empty div while every
+// smaller page underneath it read fine.
+//
+// App.jsx renders <Auth/> at "/" for a signed-out visitor, and that component
+// IS the landing page: hero, what the app does, the three prices, footer. So
+// the same rule the tool pages follow applies here. Render the component the
+// browser renders, never a hand-written summary of it, because a summary is a
+// second copy of the marketing that can drift from the first one silently.
+//
+// Every prop Auth takes is a click handler and renderToStaticMarkup drops
+// handlers, so the no-ops below change nothing in the markup.
+const noop = () => {};
+const Home = () => <Auth onEnter={noop} onEnterAsNew={noop} onTryAnonymous={noop} />;
+
 export const PRERENDER_ROUTES = {
+  "/": Home,
+  "/privacy": PrivacyPolicy,
+  "/terms": TermsOfService,
   "/uk-us-crochet-terms": UkUsConverter,
   "/crochet-abbreviations": CrochetAbbreviations,
   "/crochet-stitch-counter": StitchCounter,

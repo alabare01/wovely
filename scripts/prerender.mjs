@@ -52,9 +52,25 @@ const jsonLdTag = (obj) =>
   `  <script type="application/ld+json" data-wovely-jsonld="build">${JSON.stringify(obj)
     .replace(/</g, "\\u003c")}</script>\n`;
 
+// ─── THE INDEX.HTML SPECIAL CASE ─────────────────────────────────────────────
+//
+// Every other route owns a file nothing else is served from. "/" does not:
+// dist/index.html is also the destination of the catch-all rewrite in
+// vercel.json, so it answers /hive, /pattern/:id, /profile and every URL that
+// does not exist. Dropping the landing page markup into it without a guard
+// would flash marketing copy at a signed-in user opening their own project.
+//
+// This script runs synchronously while the browser is still parsing body, so
+// it empties #root before anything paints anywhere the landing page is not the
+// right answer. It is a no-op for a crawler reading raw HTML, and a no-op for a
+// signed-out visitor on "/", who is the only person the markup is for. A hash
+// means either a deep-link (#signup, #try) or a Supabase auth callback, and
+// neither of those wants the landing page either.
+const HOME_GUARD = `<script>(function(){try{var l=location;var home=l.pathname==="/"&&!l.hash&&!/(^|;\\s*)wovely_authed=1/.test(document.cookie);if(!home){var r=document.getElementById("root");if(r)r.textContent="";}}catch(e){}})();</script>`;
+
 let failures = 0;
 for (const pathname of Object.keys(mod.PRERENDER_ROUTES)) {
-  const file = path.join(OUT, pathname.replace(/^\//, "") + ".html");
+  const file = path.join(OUT, pathname === "/" ? "index.html" : pathname.replace(/^\//, "") + ".html");
   if (!fs.existsSync(file)) {
     console.error(`[prerender] no head file for ${pathname} - run the seo plugin first`);
     failures++;
@@ -101,7 +117,10 @@ for (const pathname of Object.keys(mod.PRERENDER_ROUTES)) {
 
   const after = before
     .replace("</head>", head + "  </head>")
-    .replace('<div id="root"></div>', `<div id="root">${body}</div>`);
+    .replace(
+      '<div id="root"></div>',
+      `<div id="root">${body}</div>` + (pathname === "/" ? HOME_GUARD : "")
+    );
 
   fs.writeFileSync(file, after, "utf8");
   const text = stripTags(body.replace(/<script[\s\S]*?<\/script>/g, " "));
