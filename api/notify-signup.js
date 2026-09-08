@@ -1,8 +1,111 @@
 // api/notify-signup.js
-// Called by Supabase webhook on new user signup — sends email notification to Adam
-// Env vars: WEBHOOK_SECRET, SUPABASE_SERVICE_ROLE_KEY, VITE_SUPABASE_URL, RESEND_API_KEY
+// Called by Supabase webhook on new user signup.
+//
+// TWO messages now leave this handler, and they are not the same thing:
+//   1. the operator notification to Adam. Always on. Unchanged behaviour.
+//   2. the WELCOME EMAIL to the person who just signed up. New, and gated
+//      behind WELCOME_EMAIL_ENABLED, default OFF.
+//
+// Until 2026-09-08 only (1) existed, so 32 registered users had received
+// exactly zero email from Wovely. A person signed up and heard nothing, ever.
+//
+// THE GATE. WELCOME_EMAIL_ENABLED must be one of 1/true/yes/on for a welcome
+// note to go out. It is wired end to end otherwise: flipping that one env var
+// on the Vercel project is the entire remaining step. It defaults off because
+// nothing goes out under Adam's name that Adam has not read.
+//
+// ON THE SUBJECT LINE OF (1), which carries a real user's address:
+// `to` is hardcoded to adam@wovely.app and the handler refuses any request
+// without the shared x-webhook-secret, so that subject is only ever delivered
+// to Adam's own inbox. Nothing in any response body echoes the address, and
+// the vercel_logs rows written below carry no address either. Checked
+// 2026-09-08: this is the only handler in api/ that reads a signup payload,
+// and it is not reachable in any other context. The address stays.
+//
+// Env vars: WEBHOOK_SECRET, SUPABASE_SERVICE_ROLE_KEY, VITE_SUPABASE_URL,
+//           RESEND_API_KEY, WELCOME_EMAIL_ENABLED (default off)
 
 import { createClient } from '@supabase/supabase-js';
+import {
+  sendMail,
+  isOptedOut,
+  unsubscribeUrl,
+  unsubscribeHeaders,
+  FROM_ADAM,
+  FROM_APP,
+  OWNER_INBOX,
+  HUMAN_REPLY_TO,
+  SITE_ORIGIN,
+} from './_mail.js';
+import { buildWelcomeEmail } from './_welcomeEmail.js';
+
+const TRUTHY = new Set(['1', 'true', 'yes', 'on']);
+export function welcomeEmailEnabled(env = process.env) {
+  return TRUTHY.has(String(env.WELCOME_EMAIL_ENABLED ?? '').trim().toLowerCase());
+}
+
+/** Header-safe subject. Resend JSON-encodes, but a CR/LF in a subject is never wanted. */
+function safeSubject(s) {
+  return String(s).replace(/[\r\n]+/g, ' ').slice(0, 200);
+}
+
+/**
+ * A one-click sign-in link, so the button in the welcome email works on the
+ * phone the person is reading it on and not only the browser they signed up in.
+ * Best effort: any failure falls back to the plain site URL.
+ */
+async function mintCtaLink(supabase, email) {
+  try {
+    const { data, error } = await supabase.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo: `${SITE_ORIGIN}/` },
+    });
+    if (error) throw new Error(error.message || 'generateLink failed');
+    return data?.properties?.action_link || SITE_ORIGIN;
+  } catch (e) {
+    console.warn('[notify-signup] magic link mint failed, using plain link:', e.message);
+    return SITE_ORIGIN;
+  }
+}
+
+/**
+ * Send the welcome note. Never throws: a welcome that fails must not fail the
+ * webhook, or Supabase retries the signup notification forever.
+ */
+async function sendWelcome({ supabase, supabaseUrl, serviceKey, id, email }) {
+  if (!welcomeEmailEnabled()) {
+    console.log('[notify-signup] welcome email wired but WELCOME_EMAIL_ENABLED is off, skipping');
+    return { sent: false, reason: 'flag_off' };
+  }
+  try {
+    if (await isOptedOut({ supabaseUrl, serviceKey, userId: id })) {
+      return { sent: false, reason: 'opted_out' };
+    }
+    const ctaUrl = await mintCtaLink(supabase, email);
+    const unsubUrl = unsubscribeUrl(id);
+    const { subject, html, text } = buildWelcomeEmail({ ctaUrl, unsubUrl });
+    const result = await sendMail({
+      from: FROM_ADAM,
+      to: email,
+      subject,
+      html,
+      text,
+      replyTo: HUMAN_REPLY_TO,
+      headers: unsubscribeHeaders(unsubUrl),
+      tags: [{ name: 'kind', value: 'welcome' }],
+    });
+    if (!result.ok) {
+      console.error('[notify-signup] welcome send failed:', result.error);
+      return { sent: false, reason: 'send_failed', error: result.error };
+    }
+    console.log('[notify-signup] welcome sent, resend id:', result.id);
+    return { sent: true, id: result.id };
+  } catch (err) {
+    console.error('[notify-signup] welcome unexpected error:', err?.message || err);
+    return { sent: false, reason: 'exception', error: err?.message || String(err) };
+  }
+}
 
 let _supabase = null;
 function getSupabase() {
@@ -80,27 +183,29 @@ export default async function handler(req, res) {
       ? new Date(created_at).toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })
       : 'just now';
 
-    // Send email notification
-    const emailRes = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: 'Wovely App <support@wovely.app>',
-        to: 'adam@wovely.app',
-        subject: `🎉 New Wovely signup: ${email}`,
-        text: `New user just signed up for Wovely!\n\nEmail: ${email}\nUser ID: ${id}\nSigned up: ${signedUp}\n\nYou now have ${userCount} users.\n\n— Wovely`
-      })
+    // 1. Operator notification to Adam. Same message, same addresses, now
+    //    through the one shared mail path in api/_mail.js.
+    const opsResult = await sendMail({
+      from: FROM_APP,
+      to: OWNER_INBOX,
+      subject: safeSubject(`🎉 New Wovely signup: ${email}`),
+      text: `New user just signed up for Wovely.\n\nEmail: ${email}\nUser ID: ${id}\nSigned up: ${signedUp}\n\nYou now have ${userCount} users.\n\nWovely`,
+      tags: [{ name: 'kind', value: 'signup_ops' }],
     });
-
-    if (!emailRes.ok) {
-      const errBody = await emailRes.text();
-      console.error('[notify-signup] Resend error:', emailRes.status, errBody);
+    if (!opsResult.ok) {
+      console.error('[notify-signup] Resend error:', opsResult.status, opsResult.error);
     }
 
-    console.log('[notify-signup] Notification sent for:', email);
+    // 2. Welcome note to the person who just signed up. Gated, default off.
+    const welcome = await sendWelcome({
+      supabase,
+      supabaseUrl: _url,
+      serviceKey: _key,
+      id,
+      email,
+    });
+
+    console.log('[notify-signup] Notification sent for:', email, '| welcome:', welcome.sent ? 'sent' : welcome.reason);
     if (_url && _key) {
       await fetch(`${_url}/rest/v1/vercel_logs`, {
         method: 'POST',
@@ -108,7 +213,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({ timestamp: new Date().toISOString(), level: 'info', message: `POST /api/notify-signup → 200 (${Date.now() - _t0}ms)`, source: 'serverless', request_path: '/api/notify-signup', request_method: 'POST', status_code: 200, project_id: 'wovely' })
       }).catch(() => {});
     }
-    return res.status(200).json({ success: true });
+    return res.status(200).json({ success: true, welcome: welcome.sent ? 'sent' : welcome.reason });
   } catch (err) {
     console.error('[notify-signup] Unexpected error:', err);
     if (_url && _key) {

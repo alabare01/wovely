@@ -9,7 +9,8 @@
     "api/stripe-webhook.js": { "maxDuration": 30 },
     "api/stitch-vision.js": { "maxDuration": 30 },
     "api/send-feedback.js": { "maxDuration": 10 },
-    "api/notify-signup.js": { "maxDuration": 10 }
+    "api/notify-signup.js": { "maxDuration": 20 },
+    "api/email-prefs.js": { "maxDuration": 10 }
   },
   "crons": [
     { "path": "/api/cron/process-queue", "schedule": "* * * * *" }

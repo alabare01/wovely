@@ -17,6 +17,7 @@
 
 import { runPdfExtraction, runBevCheck, MATERIALS_SECTION_KEYWORDS, ABBREVIATIONS_SECTION_KEYWORDS } from '../extract-pattern.js';
 import { runVisionExtraction } from '../extract-pattern-vision.js';
+import { alertImportFailures } from '../_alert.js';
 
 export const config = { maxDuration: 300 };
 
@@ -347,7 +348,10 @@ export default async function handler(req, res) {
   }
   const pending = await listRes.json();
   if (!Array.isArray(pending) || pending.length === 0) {
-    return res.status(200).json({ ok: true, processed: 0, idle: true });
+    // Nothing to run does not mean nothing to report. The sweeps above may have
+    // just marked rows failed, so the alert is evaluated on every tick.
+    const alert = await alertImportFailures({ supabaseUrl, serviceKey });
+    return res.status(200).json({ ok: true, processed: 0, idle: true, alert: alert.reason });
   }
 
   console.log(`[process-queue] Found ${pending.length} pending jobs`);
@@ -668,5 +672,9 @@ export default async function handler(req, res) {
     summary.completed++;
   }
 
-  return res.status(200).json({ ok: true, ...summary, total_elapsed_ms: Date.now() - t0 });
+  // Page Adam when the core action broke. Windowed digest, at most one message
+  // per ALERT_WINDOW_MS, covering every job that failed since the last one.
+  const alert = await alertImportFailures({ supabaseUrl, serviceKey });
+
+  return res.status(200).json({ ok: true, ...summary, alert: alert.reason, total_elapsed_ms: Date.now() - t0 });
 }
