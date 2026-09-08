@@ -102,6 +102,11 @@ const { users = [] } = await r.json();
 const cutoff = Date.now() - 7 * 864e5;
 const cohort = users.filter(u =>
   u.email && !EXCLUDE_IDS.has(u.id) && !u.is_anonymous &&
+  // Adam's own plus-addressed aliases. On 2026-07-16 these were left in
+  // deliberately as deliverability canaries for emails 1 and 2. Sixty-nine
+  // delivered messages have since proven the domain sends, so the canaries now
+  // only inflate the count and put a letter from Adam into Adam's own inbox.
+  !/^alabare\+/i.test(u.email) && u.email.toLowerCase() !== 'alabare@gmail.com' &&
   !/^qc-/.test(u.email) && !u.email.endsWith('@wovely.app') &&
   !(u.last_sign_in_at && new Date(u.last_sign_in_at).getTime() > cutoff)
 );
