@@ -3,6 +3,14 @@ import posthog from "posthog-js";
 
 import { supabaseAuth, getSession } from "./supabase.js";
 import GuestDemo from "./GuestDemo.jsx";
+import ResetPassword, { RESET_PASSWORD_PATH } from "./ResetPassword.jsx";
+import {
+  readPendingUpgrade, writePendingUpgrade, clearPendingUpgrade,
+} from "./utils/pendingUpgrade.js";
+
+// Pricing Canon (locked): $6.99/mo, or $54.99/yr which works out at $4.58/mo.
+export const CRAFT_PRICE = { annual: "4.58", monthly: "6.99" };
+export const CRAFT_ANNUAL_TOTAL = "54.99";
 
 // Mirror AuthWallModal's guard: after signUp, confirm a real session actually
 // landed before entering the app shell. Without this, a failed session setup
@@ -38,8 +46,8 @@ const LANDING_CSS = `
    app shell's horizontal-overflow guard. On iOS Safari that combination
    turns BODY into the scroll container, which breaks position:sticky and
    stops tiles painting mid-scroll (t1/t4 device bisect, 2026-07-07). Relax
-   the root rules only while the landing is mounted — the landing carries
-   its own overflow-x guard below — and restore them on unmount. */
+   the root rules only while the landing is mounted (the landing carries
+   its own overflow-x guard below) and restore them on unmount. */
 html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visible; }
 .wv-land{--bg:#FBF9FF;--panel:#fff;--ink:#2E2748;--muted:#726A92;--accent:#7B6AD4;--accentD:#6E5AC8;--line:#ECE6F8;--coral:#FF8A73;--sun:#FFC24B;--mint:#5EC9AE;--disp:'Fredoka',sans-serif;--body:'Nunito',sans-serif;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--body);position:relative;background-image:repeating-linear-gradient(45deg,rgba(123,106,212,.03) 0 1.5px,transparent 1.5px 9px);overflow-x:hidden;overflow-x:clip}
 .wv-land *{box-sizing:border-box}
@@ -195,7 +203,7 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 @media (max-width:640px){.wv-land .forkrow{grid-template-columns:1fr}.wv-land .authcard{padding:32px 24px}.wv-land .h1{font-size:36px}.wv-land .pcard.hot{order:-1}.wv-land .stats{grid-template-columns:1fr}.wv-land .vizbev{width:180px;left:-14px}.wv-land .vizcard{margin-left:30px;height:280px}.wv-land .statfoot{flex-direction:column;text-align:center}.wv-land .howimg{height:180px}.wv-land .uline{white-space:normal;background-size:100% 9px;padding-bottom:10px}.wv-land .hero{padding:34px 22px 6px;gap:30px}.wv-land .top{padding:14px 18px;gap:12px}.wv-land .tlink.hidem{display:none}.wv-land .sect{padding:44px 22px 0}.wv-land .how{grid-template-columns:1fr;gap:20px}.wv-land .toolgrid{grid-template-columns:1fr}.wv-land .plans{grid-template-columns:1fr}.wv-land .craftband,.wv-land .endband{padding-left:22px;padding-right:22px}.wv-land .craftlist{grid-template-columns:1fr}.wv-land .foot{padding:0 22px 36px}.wv-land .vizcard{height:300px}}
 #__ph_survey_widget, div[class*="PostHog"], div[id*="posthog"], .__ph_toolbar { display: none !important; }
 /* iOS Safari only (-webkit-touch-callout is iOS-specific): live filter layers
-   break the tile compositor on real devices — sections stop painting mid-
+   break the tile compositor on real devices: sections stop painting mid-
    scroll and the page goes blank. Swap the sticky bar's backdrop blur for a
    near-opaque fill and drop the cf-bg runtime blur (its 32px thumbnail
    sources upscale soft anyway). Desktop keeps the exact mockup treatment. */
@@ -204,7 +212,7 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
   .wv-land .cf-bg{filter:saturate(1.15)}
 }
 /* The app shell's fixed background photo (body::before/::after in index.css)
-   stays intact for the logged-in app — but the landing is an opaque surface,
+   stays intact for the logged-in app, but the landing is an opaque surface,
    and on iOS the photo bleeds through during overscroll / URL-bar resize.
    Hidden only while the landing is mounted (class toggled in Auth). */
 body.wv-landing-active::before, body.wv-landing-active::after { display: none; }
@@ -260,7 +268,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
     <div className="hero">
       <div className="heroviz">
         <img className="vizbev" src="/bev-hero.png" alt="Bev, your Wovely guide" />
-        <CoverFill src="/landing-dragons.jpg" bgSrc="/landing-dragons-blur.jpg" alt="Two crocheted dragons — a real Wovely maker's project" className="vizcard">
+        <CoverFill src="/landing-dragons.jpg" bgSrc="/landing-dragons-blur.jpg" alt="Two crocheted dragons, a real Wovely maker's project" className="vizcard">
           <div className="vizbadge">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z" /><path d="M9 12l2 2 4-4" /></svg>
             BevCheck · 99.7% certified
@@ -269,9 +277,9 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
         </CoverFill>
       </div>
       <div>
-        <div className="eyebrow">Meet Bev — she runs your craft life</div>
+        <div className="eyebrow">Meet Bev, she runs your craft life</div>
         <h1 className="h1">More making. <span className="uline">Less managing.</span></h1>
-        <p className="sub">Patterns, progress, yarn and supplies — Bev keeps all of it organized, checked and ready, so the hours you spend hunting and re-counting go back into actually crocheting.</p>
+        <p className="sub">Bev keeps your patterns, progress, yarn and supplies organized, checked and ready, so the hours you spend hunting and re-counting go back into actually crocheting.</p>
         <div className="ctarow">
           <button className="cta big" onClick={onStartFree}>Try Wovely free</button>
           <div className="micro"><b>✓</b> No account needed · 5 free patterns</div>
@@ -301,22 +309,22 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
             </span>
           </div>
           <div className="statk">more hook time, every week</div>
-          <div className="stats-s">Disorganized crafters get 2.5 hours of actual making a week. Organized ones get 6.5. <b>That’s four found hours — yours to crochet.</b></div>
+          <div className="stats-s">Disorganized crafters get 2.5 hours of actual making a week. Organized ones get 6.5. <b>That’s four found hours, yours to crochet.</b></div>
         </div>
         <div className="stat">
           <div className="statrow"><div className="statn">60<span className="statu">%</span></div></div>
           <div className="statk">back in your yarn budget</div>
-          <div className="stats-s">Untracked stashes re-buy yarn they already own. <b>Bev knows yours to the skein</b> — so that money buys new projects instead.</div>
+          <div className="stats-s">Untracked stashes re-buy yarn they already own. <b>Bev knows yours to the skein</b>, so that money buys new projects instead.</div>
         </div>
         <div className="stat">
           <div className="statrow"><div className="statn">1,000<span className="statu">+</span></div></div>
           <div className="statk">patterns, three seconds away</div>
-          <div className="stats-s">Serious makers hold four-digit libraries across binders, tabs and screenshots. <b>Yours are always right there — search, tap, hook.</b></div>
+          <div className="stats-s">Serious makers hold four-digit libraries across binders, tabs and screenshots. <b>Yours are always right there. Search, tap, hook.</b></div>
         </div>
       </div>
       <div className="statfoot">
         <img src="/bev-sm.png" alt="Bev" />
-        <div>That's the job Bev took: the organizing, the counting, the checking — even the supply math. <b>Every found hour goes where it belongs: on your hook.</b></div>
+        <div>That's the job Bev took: the organizing, the counting, the checking, even the supply math. <b>Every found hour goes where it belongs: on your hook.</b></div>
       </div>
     </div>
 
@@ -333,7 +341,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 3.5H7.5A1.5 1.5 0 006 5v14a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0018 19V8z" /><path d="M13.5 3.5V8H18" /></svg>
             </div>
             <h3 className="how-t">Hand her anything</h3>
-            <div className="how-s">A bought PDF, photos of a paper pattern, a Ravelry link, or a blog URL. Bev reads them all — the original goes safely into your Vault.</div>
+            <div className="how-s">A bought PDF, photos of a paper pattern, a Ravelry link, or a blog URL. Bev reads them all, and the original goes safely into your Vault.</div>
           </div>
         </div>
         <div className="howc">
@@ -344,7 +352,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z" /><path d="M9 12l2 2 4-4.2" /></svg>
             </div>
             <h3 className="how-t">She checks the math</h3>
-            <div className="how-s">BevCheck verifies every row's stitch counts before you start. Errors get flagged on the exact row — no more discovering them at round 40.</div>
+            <div className="how-s">BevCheck verifies every row's stitch counts before you start. Errors get flagged on the exact row, so you stop finding them at round 40.</div>
           </div>
         </div>
         <div className="howc">
@@ -355,7 +363,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 19V9M10 19V5M16 19v-8M22 19H2" /></svg>
             </div>
             <h3 className="how-t">You just crochet</h3>
-            <div className="how-s">Tick rows as you go — your place kept on every device. Running low? Bev already counted your yardage and can order the difference.</div>
+            <div className="how-s">Tick rows as you go, with your place kept on every device. Running low? Bev already counted your yardage and can order the difference.</div>
           </div>
         </div>
       </div>
@@ -365,16 +373,16 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
     <div className="craftband" id="craft">
       <div className="craftin">
         <div>
-          <div className="craftbadge">✦ Craft — $6.99/mo</div>
+          <div className="craftbadge">✦ Craft, $6.99/mo</div>
           <h2 className="craft-h">For the patterns that deserve better than a binder</h2>
           <div className="craft-s">Everything in Free, plus the deep tools: Bev's best work for your most ambitious makes.</div>
           <button className="cta gold" style={{ marginTop: 22 }} onClick={onGoCraft}>Try Craft</button>
         </div>
         <div className="craftlist">
-          <div className="craftit"><Check size={15} />A large pattern library — room for 100 makes</div>
-          <div className="craftit"><Check size={15} />Advanced imports — multi-file, charts &amp; schematics</div>
+          <div className="craftit"><Check size={15} />A large pattern library, room for 100 makes</div>
+          <div className="craftit"><Check size={15} />Advanced imports for multi-file patterns, charts &amp; schematics</div>
           <div className="craftit"><Check size={15} />Collections for MCALs &amp; MKALs, clue calendar included</div>
-          <div className="craftit"><Check size={15} />The Vault — every original, backed up</div>
+          <div className="craftit"><Check size={15} />The Vault, with every original backed up</div>
           <div className="craftit"><Check size={15} />Gauge, yardage &amp; scale calculators</div>
           <div className="craftit"><Check size={15} />Live chat that reaches a real person, plus Bev in the app</div>
         </div>
@@ -390,7 +398,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
           <button className={annual ? "" : "on"} onClick={() => setAnnual(false)}>Monthly</button>
           <button className={annual ? "on" : ""} onClick={() => setAnnual(true)}>Annual</button>
         </div>
-        <div className="save">{annual ? "Saving 34% — $4.58/mo" : "Annual saves 34%"}</div>
+        <div className="save">{annual ? "Saving 34%, $4.58/mo" : "Annual saves 34%"}</div>
       </div>
       <div className="plans">
         <div className="pcard">
@@ -545,7 +553,7 @@ const GuestForkRow = ({ onDemo, onImport }) => (
         <div className="impgo"><ArrowIcon /></div>
       </div>
       <div className="fork-t">Import your own</div>
-      <div className="fork-s">A PDF, photos of a paper pattern, or a link — Bev reads it, checks every stitch count, and sets it up to track.</div>
+      <div className="fork-s">A PDF, photos of a paper pattern, or a link. Bev reads it, checks every stitch count, and sets it up to track.</div>
       <div className="fork-p">Import a pattern →</div>
     </button>
   </div>
@@ -564,7 +572,7 @@ const TryScreen = ({ onDemo, onImport, onSignIn }) => {
         <div className="auth-h">Start wherever you like</div>
         <div className="auth-s">No account, no card, either way. If you would rather just watch it work first, take the demo.</div>
         <GuestForkRow onDemo={onDemo} onImport={onImport} />
-        <div className="authmicro">Sign up whenever you like — everything you make carries over. Already have an account? <a className="authlink" onClick={onSignIn} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onSignIn(e);}}}>Sign in</a></div>
+        <div className="authmicro">Sign up whenever you like, and everything you make carries over. Already have an account? <a className="authlink" onClick={onSignIn} role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onSignIn(e);}}}>Sign in</a></div>
       </div>
     </div>
   );
@@ -573,7 +581,7 @@ const TryScreen = ({ onDemo, onImport, onSignIn }) => {
 /* ── Signup / signin card (mockup "Sign up") — same Supabase plumbing as
      before: signUp/signIn/signInWithOAuth. Successful signup hands control
      to onSignedUp (fork screen or straight into pending-upgrade checkout). ── */
-const AuthCard = ({ mode, onSwitchMode, onSignedIn, onSignedUp, pulseKey }) => {
+const AuthCard = ({ mode, onSwitchMode, onSignedIn, onSignedUp, pulseKey, onForgotPassword, pendingTier = null, pendingCadence = "annual" }) => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [showPass, setShowPass] = useState(false);
@@ -604,18 +612,41 @@ const AuthCard = ({ mode, onSwitchMode, onSignedIn, onSignedUp, pulseKey }) => {
         if (!user) { setAuthError("Account created, but sign-in didn't finish. Please sign in with your email and password."); setLoading(false); return; }
         onSignedUp();
       }
-    } catch { setAuthError("Network error — please try again."); }
+    } catch { setAuthError("Network error. Please try again."); }
     setLoading(false);
   };
 
   const onKey = e => { if (e.key === "Enter" && !loading) submit(); };
 
+  // ── The screen must say what the visitor just chose ───────────────────────
+  // FIXED 2026-09-08. "Go Craft" on the pricing card stashed a paid intent and
+  // then showed this card saying "Free means free, 5 patterns, no card" over a
+  // button reading "Create my account". The machinery underneath was right:
+  // the account is created and Stripe checkout opens immediately after. So the
+  // person was one click from a card form, told by the screen in front of them
+  // that there was no card. This is the money path and it was lying on it.
+  const paidIntent = !isSignIn && pendingTier === "craft";
+  const annualPick = pendingCadence !== "monthly";
+  const craftLine = annualPick
+    ? `$${CRAFT_PRICE.annual} a month, billed yearly at $${CRAFT_ANNUAL_TOTAL}`
+    : `$${CRAFT_PRICE.monthly} a month`;
+
+  const heading = isSignIn ? "Welcome back" : (paidIntent ? "You picked Wovely Craft" : "Let's get you set up");
+  const subline = isSignIn
+    ? "Bev kept everything right where you left it."
+    : (paidIntent
+      ? <>Craft is {craftLine}. Create your account and we take you straight to secure checkout. <b>Cancel anytime.</b></>
+      : <>Bev's ready when you are. Free means free: <b>5 patterns, no card.</b></>);
+  const submitLabel = isSignIn
+    ? "Sign me in"
+    : (paidIntent ? "Create account and continue to checkout" : "Create my account");
+
   return (
     <div className="authwrap">
       <div className={`authcard${pulseKey ? " pulse" : ""}`} key={pulseKey}>
         <img className="bevimg" src="/bev-hero.png" alt="Bev" />
-        <div className="auth-h">{isSignIn ? "Welcome back" : "Let's get you set up"}</div>
-        <div className="auth-s">{isSignIn ? "Bev kept everything right where you left it." : <>Bev's ready when you are. Free means free — <b>5 patterns, no card.</b></>}</div>
+        <div className="auth-h">{heading}</div>
+        <div className="auth-s">{subline}</div>
         <button className="gbtn" onClick={() => supabaseAuth.signInWithOAuth("google")}><GoogleG />Continue with Google</button>
         <div className="orrow">or with email</div>
         <div onKeyDown={onKey}>
@@ -627,9 +658,24 @@ const AuthCard = ({ mode, onSwitchMode, onSignedIn, onSignedUp, pulseKey }) => {
             <input className="fin" value={pass} onChange={e => setPass(e.target.value)} placeholder={isSignIn ? "Password" : "Choose a password"} type={showPass ? "text" : "password"} autoComplete={isSignIn ? "current-password" : "new-password"} style={{ paddingRight: 60 }} />
             <button type="button" onClick={() => setShowPass(v => !v)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: 0, color: "var(--muted)", fontFamily: "var(--body)", fontWeight: 800, fontSize: 12.5, cursor: "pointer", padding: 4 }}>{showPass ? "Hide" : "Show"}</button>
           </div>
+          {/* FORGOT PASSWORD. Added 2026-09-08. There was no reset of any kind
+              anywhere in Wovely before this: no control, no call to Supabase's
+              recover endpoint, no route, and recovery tokens were discarded on
+              arrival. Anyone on email and password who forgot it was locked
+              out for good. */}
+          {isSignIn && (
+            <div style={{ textAlign: "right", marginTop: 8 }}>
+              <a
+                className="authlink"
+                href={RESET_PASSWORD_PATH}
+                style={{ fontSize: 12.5 }}
+                onClick={e => { if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; e.preventDefault(); onForgotPassword && onForgotPassword(); }}
+              >Forgot password?</a>
+            </div>
+          )}
           {authError && <div className="autherr">{authError}</div>}
           <button className="cta authbtn" onClick={submit} disabled={loading} style={loading ? { opacity: 0.6 } : undefined}>
-            {loading ? "Please wait..." : (isSignIn ? "Sign me in" : "Create my account")}
+            {loading ? "Please wait..." : submitLabel}
           </button>
         </div>
         <div className="authmicro">
@@ -650,7 +696,7 @@ const ForkScreen = ({ annual, onFree, onCraft }) => (
   <div className="authwrap">
     <div className="authcard" style={{ width: 560 }}>
       <img src="/bev-sm.png" alt="Bev" style={{ width: 72, borderRadius: "50%" }} />
-      <div className="auth-h">Welcome in! How do you want to start?</div>
+      <div className="auth-h">Welcome in. How do you want to start?</div>
       <div className="auth-s">Either way, your first pattern is two minutes from now.</div>
       <div className="forkrow">
         <button className="fork" onClick={onFree}>
@@ -668,7 +714,7 @@ const ForkScreen = ({ annual, onFree, onCraft }) => (
           <div className="fork-p">${annual ? "4.58" : "6.99"}/mo · cancel anytime →</div>
         </button>
       </div>
-      <div className="authmicro">Not sure? Start free — Craft is one tap away whenever a pattern needs it.</div>
+      <div className="authmicro">Not sure? Start free, and Craft is one tap away whenever a pattern needs it.</div>
     </div>
   </div>
 );
@@ -689,9 +735,10 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
     const h = (typeof location !== "undefined" && location.hash) || "";
     if (h === "#try") return "try";
     if (h === "#demo") return "demo";
+    if (h === "#reset") return "reset";
     if (h === "#signup" || h === "#signin") return "auth";
     return "landing";
-  }); // 'landing' | 'try' | 'demo' | 'auth' | 'fork'
+  }); // 'landing' | 'try' | 'demo' | 'auth' | 'reset' | 'fork'
   const [authMode, setAuthMode] = useState(() =>
     startAt === "signin" || (typeof location !== "undefined" && location.hash === "#signin") ? "signin" : "signup");
   const [pulseKey, setPulseKey] = useState(0);
@@ -716,12 +763,30 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
     };
   }, []);
 
+  // ── The abandoned paid intent, and why clearing it is not optional ────────
+  // FIXED 2026-09-08. Reproduced live: click "Go Craft", which writes
+  // wovely_pending_upgrade_tier=craft and cadence=annual, then walk off that
+  // screen by any route other than a close control and take the free path
+  // instead. The keys survived, and App.jsx's post-signup handler reads them
+  // and opens Stripe. Someone who chose free could be sent to a paid checkout.
+  //
+  // The clear existed only on AuthWallModal's onClose. The full-page Auth
+  // screen has no close control at all: the ways out are the logo, "Start
+  // free", the try screen and the demo. So every one of those clears it, and
+  // so does actually taking a free route. An intent is kept only while the
+  // visitor is still walking the path they picked it on.
+  const [pendingTier, setPendingTier] = useState(() => readPendingUpgrade().tier);
+  const [pendingCadence, setPendingCadence] = useState(() => readPendingUpgrade().cadence || "annual");
+  const dropPendingUpgrade = () => { clearPendingUpgrade(); setPendingTier(null); };
+
   const toTop = () => { try { window.scrollTo(0, 0); } catch {} };
-  const goLanding = () => { setScreen("landing"); toTop(); };
-  const goTry = () => { setScreen("try"); toTop(); };
+  const goLanding = () => { dropPendingUpgrade(); setScreen("landing"); toTop(); };
+  const goTry = () => { dropPendingUpgrade(); setScreen("try"); toTop(); };
+  const goReset = () => { setScreen("reset"); toTop(); };
   // The zero-commitment path. Costs nothing and creates nothing: no session,
   // no anonymous sign-in, no import job, no storage write. See GuestDemo.jsx.
   const goDemo = () => {
+    dropPendingUpgrade();
     try { posthog.capture("guest_fork_path_chosen", { path: "demo" }); } catch {}
     setScreen("demo"); toTop();
   };
@@ -733,10 +798,11 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
   };
 
   const stashPendingCraft = () => {
-    try {
-      sessionStorage.setItem("wovely_pending_upgrade_tier", "craft");
-      sessionStorage.setItem("wovely_pending_upgrade_cadence", annual ? "annual" : "monthly");
-    } catch {}
+    const cad = annual ? "annual" : "monthly";
+    writePendingUpgrade("craft", cad);
+    // Mirrored into state so the auth card can say out loud what was picked.
+    setPendingTier("craft");
+    setPendingCadence(cad);
   };
 
   // "Go Craft" from the landing: stash the picked tier + cadence exactly like
@@ -752,6 +818,9 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
   // enterAnonymousMode fires anonymous_mode_entered, so the pair
   // guest_fork_path_chosen → anonymous_mode_entered is the funnel step.
   const tryFork = (intent) => {
+    // Taking a guest route IS taking the free route. Anything stashed from a
+    // paid card the visitor walked away from dies here.
+    dropPendingUpgrade();
     try { posthog.capture("guest_fork_path_chosen", { path: intent }); } catch {}
     try { sessionStorage.setItem("wovely_first_run_intent", intent); } catch {}
     onTryAnonymous();
@@ -760,9 +829,7 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
   // Email signup success: if a Craft pick is already stashed, go straight in
   // (auto-checkout fires); otherwise offer the mockup's free/Craft fork.
   const handleSignedUp = () => {
-    let pending = null;
-    try { pending = sessionStorage.getItem("wovely_pending_upgrade_tier"); } catch {}
-    if (pending) { onEnterAsNew(); return; }
+    if (readPendingUpgrade().tier) { onEnterAsNew(); return; }
     setScreen("fork"); toTop();
   };
 
@@ -803,12 +870,21 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
           onSwitchMode={() => { setAuthMode(m => (m === "signin" ? "signup" : "signin")); setPulseKey(k => k + 1); }}
           onSignedIn={onEnter}
           onSignedUp={handleSignedUp}
+          onForgotPassword={goReset}
+          pendingTier={pendingTier}
+          pendingCadence={pendingCadence}
         />
+      )}
+      {/* The reset request step, in place, so "Forgot password?" costs no
+          route change from the landing. The /reset-password route renders the
+          same component and is what the emailed link lands on. */}
+      {screen === "reset" && (
+        <ResetPassword standalone={false} onBack={() => goAuth("signin")} onDone={() => goAuth("signin")} />
       )}
       {screen === "fork" && (
         <ForkScreen
           annual={annual}
-          onFree={onEnterAsNew}
+          onFree={() => { dropPendingUpgrade(); onEnterAsNew(); }}
           onCraft={() => { stashPendingCraft(); onEnterAsNew(); }}
         />
       )}

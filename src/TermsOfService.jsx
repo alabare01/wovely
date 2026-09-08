@@ -1,12 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { LegalTopNav, LegalBottomNav } from "./components/LegalPageNav.jsx";
 
 const S = { page:{maxWidth:800,margin:"0 auto",padding:"40px 24px 80px",fontFamily:"Nunito,sans-serif",color:"#595959",fontSize:14,lineHeight:1.8},title:{fontFamily:"'Fredoka',Georgia,serif",fontSize:28,fontWeight:700,color:"#2E2748",marginBottom:6},sub:{fontSize:13,color:"#726A92",marginBottom:32},h2:{fontSize:16,fontWeight:600,color:"#2E2748",margin:"28px 0 8px"},p:{margin:"0 0 14px"},back:{background:"none",border:"none",color:"#7B6AD4",cursor:"pointer",fontSize:13,fontWeight:600,padding:0,marginBottom:24,display:"inline-flex",alignItems:"center",gap:4} };
 
 export default function TermsOfService() {
-  const navigate = useNavigate();
   return (
     <div style={S.page}>
-      <button onClick={() => navigate(-1)} style={S.back}>← Back</button>
+      <LegalTopNav />
       <h1 style={S.title}>Terms of Service</h1>
       <div style={S.sub}>Last updated July 14, 2026</div>
 
@@ -64,6 +63,7 @@ export default function TermsOfService() {
 
       <h2 style={S.h2}>Contact Us</h2>
       <p style={S.p}>WOVELY LLC<br/>487 S Aberdeenshire Dr<br/>Saint Johns, FL 32259<br/>United States<br/>Email: bev@wovely.app</p>
+      <LegalBottomNav other="privacy" />
     </div>
   );
 }

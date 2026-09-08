@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import posthog from "posthog-js";
-import { supabaseAuth, getSession } from "./supabase.js";
+import { supabaseAuth, getSession, RESET_PASSWORD_PATH } from "./supabase.js";
 
 // Wait for the session and user to be readable from localStorage after signUp/signIn.
 // Supabase writes synchronously, but slower browsers/devices occasionally leave one of them
@@ -206,6 +206,17 @@ const AuthWallModal = ({
               onFocus={focusBorder}
               onBlur={blurBorder}
             />
+          )}
+          {/* The in-app sign-in surface needs the same escape hatch the
+              landing card got on 2026-09-08. A modal cannot own a route, so
+              this is a plain link out to /reset-password. */}
+          {mode === "signin" && (
+            <div style={{ textAlign: "right", marginTop: 8 }}>
+              <a
+                href={RESET_PASSWORD_PATH}
+                style={{ fontSize: 12.5, fontWeight: 800, color: "#7B6AD4", textDecoration: "none", fontFamily: "Nunito,sans-serif" }}
+              >Forgot password?</a>
+            </div>
           )}
         </div>
 

@@ -4,6 +4,12 @@ export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const APP_ORIGIN = typeof window !== "undefined" ? window.location.origin : "https://wovely.app";
 
+// The one place the reset route is named. App.jsx routes it, Auth.jsx links to
+// it and supabaseAuth.resetPasswordForEmail sends Supabase here as the
+// redirect target, so a rename cannot leave a recovery email pointing at a
+// path the router does not know.
+export const RESET_PASSWORD_PATH = "/reset-password";
+
 export const saveSession = (s) => { try { if(s) localStorage.setItem("yh_session",JSON.stringify(s)); else localStorage.removeItem("yh_session"); } catch{} };
 export const getSession = () => { try { const r=localStorage.getItem("yh_session"); return r?JSON.parse(r):null; } catch{return null;} };
 
@@ -181,6 +187,62 @@ export const supabaseAuth = {
     }
     saveSession(null);
   },
+  // ─── PASSWORD RESET ────────────────────────────────────────────────────────
+  // Until 2026-09-08 Wovely had no reset of any kind: no "Forgot password?"
+  // control, no call to this endpoint anywhere in the tree, and App.jsx threw
+  // recovery tokens away on arrival. An email/password user who forgot their
+  // password was locked out permanently with no self-service route, which for
+  // a paying customer is a refund and a support thread.
+  //
+  // Supabase never reveals whether an address has an account here: the
+  // response is 200 either way. That is correct (it blocks account
+  // enumeration) and the caller must show the same confirmation for both
+  // outcomes rather than trying to be helpful about it.
+  resetPasswordForEmail: async (email, redirectTo = `${APP_ORIGIN}${RESET_PASSWORD_PATH}`) => {
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/recover?redirect_to=${encodeURIComponent(redirectTo)}`, {
+        method: "POST",
+        headers: { "apikey": SUPABASE_ANON_KEY, "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        let data = {};
+        try { data = await res.json(); } catch {}
+        // Rate limiting is the one failure worth naming: Supabase returns 429
+        // when the same address asks repeatedly, and "nothing happened" reads
+        // as a broken button.
+        return { error: { ...data, status: res.status } };
+      }
+      return { data: {} };
+    } catch {
+      return { error: { message: "network" } };
+    }
+  },
+
+  // Set a new password on the session currently in localStorage. The recovery
+  // link puts a real, short-lived session there, and that session is what
+  // authorizes this PUT.
+  updatePassword: async (password) => {
+    const s = getSession();
+    if (!s?.access_token) return { error: { message: "No active session" } };
+    try {
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+        method: "PUT",
+        headers: {
+          "apikey": SUPABASE_ANON_KEY,
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${s.access_token}`,
+        },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+      if (!res.ok) return { error: data };
+      return { data };
+    } catch {
+      return { error: { message: "network" } };
+    }
+  },
+
   signInWithOtp: async (email) => {
     const res = await fetch(`${SUPABASE_URL}/auth/v1/otp`, {
       method:"POST", headers:{"apikey":SUPABASE_ANON_KEY,"Content-Type":"application/json"},

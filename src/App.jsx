@@ -3,7 +3,7 @@ import { initErrorReporter, setErrorReporterUser } from './utils/errorReporter.j
 import { useNavigate, useLocation, useParams, Routes, Route, Navigate } from "react-router-dom";
 import posthog from "posthog-js";
 import { T, useBreakpoint, Field } from "./theme.jsx";
-import { SUPABASE_URL, SUPABASE_ANON_KEY, APP_ORIGIN, saveSession, getSession, supabaseAuth, isAnonymousSession, refreshSession, millisUntilExpiry } from "./supabase.js";
+import { SUPABASE_URL, SUPABASE_ANON_KEY, APP_ORIGIN, RESET_PASSWORD_PATH, saveSession, getSession, supabaseAuth, isAnonymousSession, refreshSession, millisUntilExpiry } from "./supabase.js";
 import { PHOTOS, PILL, APP_VERSION } from "./constants.js";
 import Calculators from "./Calculators.jsx";
 import StitchCheck from "./StitchCheck.jsx";
@@ -25,6 +25,8 @@ import ImageImportModal from "./ImageImportModal.jsx";
 import ImportPill, { setActiveImportJob } from "./components/ImportPill.jsx";
 import PrivacyPolicy from "./PrivacyPolicy.jsx";
 import TermsOfService from "./TermsOfService.jsx";
+import ResetPassword, { RECOVERY_FLAG, clearRecoveryFlag } from "./ResetPassword.jsx";
+import SharedLinkGate from "./SharedLinkGate.jsx";
 import PublicCalculators from "./PublicCalculators.jsx";
 import UkUsConverter from "./UkUsConverter.jsx";
 import CrochetAbbreviations from "./CrochetAbbreviations.jsx";
@@ -43,6 +45,7 @@ import {
   readCachedIsAnonymous, writeCachedIsAnonymous, clearCachedIsAnonymous,
 } from "./utils/tierUtils.js";
 import { canAccess, requiredTier, ANON_PATTERN_CAP } from "./utils/featureGates.js";
+import { readPendingUpgrade, writePendingUpgrade, clearPendingUpgrade, shouldOpenCheckout } from "./utils/pendingUpgrade.js";
 import { countActivePatterns } from "./utils/patternCounts.js";
 import { DOC_TYPES, importRouteMismatch, resolveChildSourceUrl } from "./utils/docType.js";
 import { markImagesPending } from "./utils/patternImages.js";
@@ -68,11 +71,6 @@ import {
     const refresh_token = params.get("refresh_token");
     if (!access_token || !refresh_token) return;
     const type = params.get("type");
-    if (type === "recovery") {
-      // TODO(password reset): route recovery tokens to /reset-password flow.
-      // Out of scope for this fix — leave hash intact so a future handler can claim it.
-      return;
-    }
     const token_type = params.get("token_type") || "bearer";
     const expires_at_raw = params.get("expires_at");
     const expires_in_raw = params.get("expires_in");
@@ -88,6 +86,18 @@ import {
       expires_in,
       user: { id: payload.sub, email: payload.email },
     });
+    // A recovery link is NOT an ordinary sign-in. It carries a short-lived
+    // session whose only job is to authorize one PUT /auth/v1/user, so the
+    // arrival is flagged and the URL is rewritten to the reset route rather
+    // than dropping the user into the app on a token they did not choose to
+    // spend. Before 2026-09-08 this branch returned early and threw the token
+    // away, which meant even a recovery link issued by hand from the Supabase
+    // dashboard landed on the logged-out landing page and did nothing.
+    if (type === "recovery") {
+      try { sessionStorage.setItem(RECOVERY_FLAG, "1"); } catch {}
+      window.history.replaceState({}, "", RESET_PASSWORD_PATH + window.location.search);
+      return;
+    }
     window.history.replaceState({}, "", window.location.pathname + window.location.search);
     if (type === "signup") {
       // posthog.init() runs in main.jsx AFTER App.jsx imports, so defer one tick.
@@ -146,14 +156,15 @@ const mapDbPatternRow = (r) => ({
   collection_id:r.collection_id||null,is_collection_part:!!r.is_collection_part,collection_order:r.collection_order||0,
 });
 
-// sessionStorage key for the tier picked from TieredUpgradeModal before
-// signup. Survives remounts (OAuth round-trip, page reload during the
-// auth flow) so the post-signup auto-checkout finds the right tier.
-const PENDING_UPGRADE_KEY = "wovely_pending_upgrade_tier";
-// Mirrors the picked billing cadence alongside PENDING_UPGRADE_KEY so an
-// anonymous user who picks Annual is charged annually after signup, not the
-// monthly default. Survives OAuth round-trips / remounts the same way.
-const PENDING_UPGRADE_CADENCE_KEY = "wovely_pending_upgrade_cadence";
+// The tier and cadence picked before signup live in sessionStorage so they
+// survive remounts (OAuth round-trip, reload mid-auth-flow) and the
+// post-signup auto-checkout finds them. Read/write/clear moved to
+// utils/pendingUpgrade.js on 2026-09-08: they used to be open-coded
+// sessionStorage calls at seven sites here plus more in Auth.jsx, and "clear
+// it when the visitor backs out of the paid flow" was something each site had
+// to remember separately. The full-page Auth screen never did, which is how an
+// abandoned Craft intent could follow someone into a free signup and open a
+// paid checkout.
 
 // PHOTOS, PILL imported from ./constants.js
 
@@ -1533,10 +1544,13 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
         </div>
       </div>
 
+      {/* Real anchors, not <span onClick>. Same fix and same reason as
+          LegalFooter: a control with no href cannot be opened in a new tab and
+          is not announced as a link. */}
       <div style={{textAlign:"center",padding:"20px 0 8px",fontSize:12,color:"#726A92"}}>
-        <span onClick={()=>profileNav("/privacy")} style={{color:"#726A92",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Privacy Policy</span>
+        <a href="/privacy" onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();profileNav("/privacy");}} style={{color:"#726A92",textDecoration:"none",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Privacy Policy</a>
         <span style={{margin:"0 8px",opacity:.5}}>|</span>
-        <span onClick={()=>profileNav("/terms")} style={{color:"#726A92",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Terms of Service</span>
+        <a href="/terms" onClick={e=>{if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();profileNav("/terms");}} style={{color:"#726A92",textDecoration:"none",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Terms of Service</a>
       </div>
       </div>)}
     </div>
@@ -1785,28 +1799,61 @@ const ShoppingList = ({gateAction}) => {
 
 const STARTER_PHOTO_MAP = {Blankets:PHOTOS.blanket,Amigurumi:PHOTOS.granny,Wearables:PHOTOS.cardigan,Accessories:PHOTOS.tote,Home:PHOTOS.pillow};
 
+// FIXED 2026-09-08. These two controls were <span onClick> and the audit found
+// /privacy and /terms carrying literally zero anchors: not crawlable, not
+// middle-clickable, not openable in a new tab, and invisible to a screen
+// reader's link list. They are real anchors now with real hrefs, and the
+// onClick keeps the client router in charge so nothing does a full reload.
 const LegalFooter = () => {
   const legalNav=useNavigate();
+  const go=(e,path)=>{
+    // Let the browser handle a deliberate new-tab / new-window click.
+    if(e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||e.button!==0) return;
+    e.preventDefault();
+    legalNav(path);
+  };
+  const linkStyle={color:"#726A92",textDecoration:"none",cursor:"pointer"};
   return (
     <div style={{textAlign:"center",padding:"24px 16px 32px",fontSize:12,color:"#726A92"}}>
-      <span onClick={()=>legalNav("/privacy")} style={{color:"#726A92",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Privacy Policy</span>
+      <a href="/privacy" onClick={e=>go(e,"/privacy")} style={linkStyle} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Privacy Policy</a>
       <span style={{margin:"0 8px",opacity:.5}}>|</span>
-      <span onClick={()=>legalNav("/terms")} style={{color:"#726A92",cursor:"pointer"}} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Terms of Service</span>
+      <a href="/terms" onClick={e=>go(e,"/terms")} style={linkStyle} onMouseEnter={e=>e.target.style.color="#7B6AD4"} onMouseLeave={e=>e.target.style.color="#726A92"}>Terms of Service</a>
     </div>
   );
 };
 
-const WelcomeToast = ({visible}) => (
-  <div style={{position:"fixed",top:16,right:16,zIndex:900,background:T.terra,color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(123,106,212,.4)",display:"flex",alignItems:"center",gap:8,opacity:visible?1:0,transform:visible?"translateX(0)":"translateX(20px)",transition:"opacity .4s ease, transform .4s ease",pointerEvents:"none"}}>
-    <span style={{fontSize:18}}>🧶</span> Welcome back! Your Wovely is ready.
-  </div>
-);
+// FIXED 2026-09-08, two faults in one place.
+//
+// 1. Both of these used to render unconditionally and hide themselves with
+//    opacity, so "Welcome back. Your Wovely is ready." and "Welcome to Wovely.
+//    Bev's got a space ready for your first pattern." were BOTH in the DOM of
+//    every app-shell page at once, including the shell a signed-out stranger
+//    was being handed. Read by a crawler, a screen reader or anything that
+//    scrapes text, the page greeted a first-time visitor as a returning one
+//    and a returning one as brand new, simultaneously. They mount only when
+//    they have something to say now.
+// 2. The greeting is no longer hardcoded to "Welcome back". `returning` is
+//    passed by the caller that actually knows, so a first-time visitor gets
+//    first-time copy.
+//
+// The 🧶 stays. Bev is a crocheted snake and she is in the hero photo.
+const WelcomeToast = ({visible, returning = true}) => {
+  if (!visible) return null;
+  return (
+    <div style={{position:"fixed",top:16,right:16,zIndex:900,background:T.terra,color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(123,106,212,.4)",display:"flex",alignItems:"center",gap:8,opacity:1,transform:"translateX(0)",transition:"opacity .4s ease, transform .4s ease",pointerEvents:"none"}}>
+      <span style={{fontSize:18}}>🧶</span> {returning ? "Welcome back. Your Wovely is ready." : "Welcome to Wovely. Your space is ready."}
+    </div>
+  );
+};
 
-const WelcomeBanner = ({visible}) => (
-  <div style={{background:T.terra,padding:"10px 16px",display:"flex",alignItems:"center",gap:8,opacity:visible?1:0,maxHeight:visible?50:0,overflow:"hidden",transition:"opacity .4s ease, max-height .4s ease"}}>
-    <span style={{fontSize:13,color:"#fff",fontWeight:500,lineHeight:1.4}}>Welcome to Wovely. 🐍 Bev&apos;s got a space ready for your first pattern.</span>
-  </div>
-);
+const WelcomeBanner = ({visible}) => {
+  if (!visible) return null;
+  return (
+    <div style={{background:T.terra,padding:"10px 16px",display:"flex",alignItems:"center",gap:8,opacity:1,maxHeight:50,overflow:"hidden",transition:"opacity .4s ease, max-height .4s ease"}}>
+      <span style={{fontSize:13,color:"#fff",fontWeight:500,lineHeight:1.4}}>Welcome to Wovely. 🐍 Bev&apos;s got a space ready for your first pattern.</span>
+    </div>
+  );
+};
 
 const InfoTooltip = ({text}) => {
   const [show,setShow]=useState(false);
@@ -2325,6 +2372,10 @@ export default function Wovely() {
   const [selected,setSelected]=useState(null),[navOpen,setNavOpen]=useState(false),[addOpen,setAddOpen]=useState(false),[imageImportOpen,setImageImportOpen]=useState(false),[addMenuOpen,setAddMenuOpen]=useState(false),[menuAnchor,setMenuAnchor]=useState(null),[showPaywall,setShowPaywall]=useState(false),[showFairUseWall,setShowFairUseWall]=useState(false),[cat,setCat]=useState("All"),[search,setSearch]=useState("");
   const [showWelcomeBanner,setShowWelcomeBanner]=useState(false);
   const [showWelcomeToast,setShowWelcomeToast]=useState(false);
+  // Which greeting the toast carries. Set alongside the toast itself by
+  // whoever raises it, so "Welcome back" is only ever said to someone who has
+  // actually been here before.
+  const [welcomeIsReturning,setWelcomeIsReturning]=useState(true);
   const [showProModal,setShowProModal]=useState(false);
   const [chatOpen,setChatOpen]=useState(false);
   const [pendingMethod,setPendingMethod]=useState(null);
@@ -2393,6 +2444,11 @@ export default function Wovely() {
   // null when the picked tier was Free (signup-only, no Stripe step).
   // Mirrored to sessionStorage (PENDING_UPGRADE_KEY) so OAuth or any
   // full-page redirect path that remounts the React tree doesn't lose it.
+  // A deep link that resolved to no row for a signed-in viewer. Set only after
+  // an authenticated fetch comes back empty, which is the one place existence
+  // is actually knowable. Before 2026-09-08 that case navigated silently to
+  // "/" and the click read as having done nothing at all.
+  const [deepLinkNotFound,setDeepLinkNotFound]=useState(null); // null | "pattern" | "collection"
   const [pendingUpgradeTier,setPendingUpgradeTier]=useState(null);
   // Billing cadence the user picked alongside pendingUpgradeTier (see
   // PENDING_UPGRADE_CADENCE_KEY). Defaults to monthly when absent.
@@ -2555,15 +2611,9 @@ export default function Wovely() {
     // Mirror to sessionStorage so the tier survives any remount path —
     // most importantly OAuth, which round-trips through the provider and
     // returns to a fresh app instance with no React state to read from.
-    try {
-      if (tierKey) {
-        sessionStorage.setItem(PENDING_UPGRADE_KEY, tierKey);
-        sessionStorage.setItem(PENDING_UPGRADE_CADENCE_KEY, cadence || 'monthly');
-      } else {
-        sessionStorage.removeItem(PENDING_UPGRADE_KEY);
-        sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);
-      }
-    } catch {}
+    // A falsy tierKey means the visitor picked Free, and writePendingUpgrade
+    // treats that as an explicit clear rather than an empty intent.
+    writePendingUpgrade(tierKey, cadence);
     setAuthWallContext({
       title: tierKey ? `Create your account to subscribe` : "Create your free account",
       subtitle: tierKey
@@ -2615,16 +2665,13 @@ export default function Wovely() {
     // a no-op — they wanted the free account and now they have one.
     // Read from sessionStorage first so we don't lose the picked tier
     // across an OAuth round-trip or other remount; fall back to state.
-    let tierKey = null;
-    try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
-    if (!tierKey) tierKey = pendingUpgradeTier;
-    let pendingCadence = null;
-    try { pendingCadence = sessionStorage.getItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
-    if (!pendingCadence) pendingCadence = pendingUpgradeCadence;
-    if (tierKey) {
+    const stashed = readPendingUpgrade();
+    let tierKey = stashed.tier || pendingUpgradeTier;
+    let pendingCadence = stashed.cadence || pendingUpgradeCadence;
+    if (shouldOpenCheckout({ tier: tierKey })) {
       // Clear both stores immediately so a failed Stripe call doesn't
       // produce a redirect loop on the next mount.
-      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
+      clearPendingUpgrade();
       setPendingUpgradeTier(null);
       setPendingUpgradeCadence(null);
       // 500ms gives the rotated JWT + profile fetch enough headroom to
@@ -2649,19 +2696,15 @@ export default function Wovely() {
   // or already paid (no Stripe call needed in either state).
   useEffect(() => {
     if (!authChecked || !authed || isAnonymous) return;
-    if (isPaidTier(tier)) {
-      // User already has a paid plan — drop any stale pending tier on
-      // the floor rather than redirecting them to Stripe for a second
-      // subscription.
-      try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {}
+    const { tier: tierKey, cadence: pendingCadence } = readPendingUpgrade();
+    if (!shouldOpenCheckout({ tier: tierKey, isAnonymous, alreadyPaid: isPaidTier(tier) })) {
+      // Nothing stashed, or the visitor already has a paid plan: drop any
+      // stale intent on the floor rather than redirecting them to Stripe for
+      // a second subscription.
+      if (tierKey) clearPendingUpgrade();
       return;
     }
-    let tierKey = null;
-    try { tierKey = sessionStorage.getItem(PENDING_UPGRADE_KEY); } catch {}
-    if (!tierKey) return;
-    let pendingCadence = null;
-    try { pendingCadence = sessionStorage.getItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
-    try { sessionStorage.removeItem(PENDING_UPGRADE_KEY); sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY); } catch {}
+    clearPendingUpgrade();
     setPendingUpgradeTier(null);
     setPendingUpgradeCadence(null);
     // Same 100ms settle delay as the AuthWall path for JWT + profile
@@ -2886,7 +2929,7 @@ export default function Wovely() {
     }
   },[]);
 
-  const handleSignOut = async () => { posthog.reset(); await supabaseAuth.signOut(); setAuthed(false); setTier(TIER_FREE); setUserPatterns([]); clearCachedTier(); setIsAnonymous(false); clearCachedIsAnonymous(); setPendingUpgradeTier(null); try { sessionStorage.removeItem("wovely_redirect_intent"); sessionStorage.removeItem("wovely_anonymous_mode"); sessionStorage.removeItem(PENDING_UPGRADE_KEY); } catch {} setAnonymousMode(false); document.cookie="wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; navigate("/"); };
+  const handleSignOut = async () => { posthog.reset(); await supabaseAuth.signOut(); setAuthed(false); setTier(TIER_FREE); setUserPatterns([]); clearCachedTier(); setIsAnonymous(false); clearCachedIsAnonymous(); setPendingUpgradeTier(null); clearPendingUpgrade(); try { sessionStorage.removeItem("wovely_redirect_intent"); sessionStorage.removeItem("wovely_anonymous_mode"); } catch {} setAnonymousMode(false); document.cookie="wovely_authed=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; navigate("/"); };
 
   // The account is gone server-side. Tear the client down the same way a sign
   // out does, then send them to the landing page. The stored session is a key
@@ -3047,11 +3090,17 @@ export default function Wovely() {
             return;
           }
         }
-        navigate("/",{replace:true});
+        // Authenticated, fetched, and the row genuinely is not there: say so
+        // rather than bouncing to the dashboard, which reads as a dead click.
+        setDeepLinkNotFound("pattern");
       }catch{ if(!cancelled) navigate("/",{replace:true}); }
     })();
     return ()=>{cancelled=true;};
   },[view,location.pathname,userPatterns,starterPatterns,authed,authChecked,patternsFetched]);
+
+  // Any navigation clears the not-found screen, so it can never outlive the
+  // URL that produced it.
+  useEffect(()=>{ setDeepLinkNotFound(null); },[location.pathname]);
 
   // Last URL memory: save pattern detail URLs to sessionStorage with timestamp
   useEffect(()=>{
@@ -3083,7 +3132,7 @@ export default function Wovely() {
         if (!res.ok) { navigate("/", { replace: true }); return; }
         const rows = await res.json();
         if (rows[0]) setSelectedCollection(rows[0]);
-        else navigate("/", { replace: true });
+        else setDeepLinkNotFound("collection");
       } catch { navigate("/", { replace: true }); }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -3187,6 +3236,11 @@ export default function Wovely() {
       }
     } catch {}
     navigate(postLoginPath);
+    // This handler only ever runs on a real sign-in, so "Welcome back" is the
+    // truthful greeting here. It is passed explicitly rather than assumed,
+    // because it was assumed before and the assumption was wrong on the shell
+    // a first-time visitor saw.
+    setWelcomeIsReturning(true);
     setShowWelcomeToast(true);
     setTimeout(()=>setShowWelcomeToast(false),3000);
     checkUpgradeIntent();
@@ -3250,6 +3304,64 @@ export default function Wovely() {
     return <><CSS/><PublicCalculators/></>;
   }
 
+  // ── Password reset ────────────────────────────────────────────────────────
+  // Rendered ahead of the auth check on purpose, and for signed-in visitors as
+  // well as signed-out ones. A recovery link puts a real (short-lived) session
+  // in localStorage before React mounts — that session is what authorizes the
+  // password change — so gating this route on `!authed` would hide the screen
+  // from precisely the person who came to use it. It is also correct for the
+  // signed-out request step, which is where the sign-in card sends people.
+  // The route is NOT in seo.js PUBLIC_ROUTES: it falls into the app.html
+  // catch-all in vercel.json and inherits its noindex, which is right.
+  if(location.pathname===RESET_PASSWORD_PATH) {
+    return <><CSS/><ResetPassword
+      standalone
+      onBack={()=>{clearRecoveryFlag();navigate({pathname:"/",hash:"#signin"});}}
+      onDone={()=>{clearRecoveryFlag();navigate("/",{replace:true});}}
+    /></>;
+  }
+
+  // ── Shared links from a signed-out stranger ───────────────────────────────
+  // Before 2026-09-08 these paths fell through to the app shell, so someone
+  // opening a friend's shared pattern saw "Welcome back. Your Wovely is ready"
+  // over an empty dashboard belonging to nobody, with no mention of the thing
+  // they had been sent. That is the growth loop, and it read as broken.
+  //
+  // A cold visitor is one with no session AND no guest mode: an anonymous
+  // guest keeps the old fall-through, because their own local patterns live on
+  // these paths. Existence is deliberately NOT probed here. RLS hides a real
+  // private pattern and a made-up id identically, and a screen that could tell
+  // them apart would be an oracle for enumerating other people's pattern ids.
+  if(!authed&&!anonymousMode&&(location.pathname.startsWith("/pattern/")||location.pathname.startsWith("/hive/")||location.pathname.startsWith("/collections/"))) {
+    const sharedKind = location.pathname.startsWith("/collections/") ? "collection" : "pattern";
+    // Remember where they were headed so signing in lands on the shared item
+    // rather than on the dashboard. Same key and same shape the authed
+    // last-URL memory uses, so handleSignIn already knows how to spend it.
+    const intentPath = location.pathname.replace("/hive/","/pattern/");
+    if(sharedKind==="pattern"){
+      try { sessionStorage.setItem("wovely_redirect_intent",JSON.stringify({url:intentPath,storedAt:Date.now()})); } catch {}
+    }
+    return <><CSS/><SharedLinkGate
+      kind={sharedKind}
+      reason="signed-out"
+      onSignIn={()=>navigate({pathname:"/",hash:"#signin"})}
+      onStartFree={()=>navigate("/")}
+    /></>;
+  }
+
+  // A deep link a signed-in viewer followed to a row that is not there. Same
+  // screen as the shared-link gate, different reason, so the two cases the
+  // audit named ("the id does not exist" and "the viewer is not signed in")
+  // both land somewhere honest instead of on an empty dashboard.
+  if(deepLinkNotFound) {
+    return <><CSS/><SharedLinkGate
+      kind={deepLinkNotFound}
+      reason="not-found"
+      onStartFree={()=>{setDeepLinkNotFound(null);navigate("/",{replace:true});}}
+      onSignIn={()=>{setDeepLinkNotFound(null);navigate("/",{replace:true});}}
+    /></>;
+  }
+
   // App-level checkout failure surface. Built before every return path so a
   // checkout that dies outside the plans modal (post-signup, post-OAuth, the
   // legacy upgrade-intent replay) still has somewhere to say so.
@@ -3299,7 +3411,7 @@ export default function Wovely() {
   // listed anyway so that if that early return is ever moved or refactored they
   // degrade to "renders the app shell" rather than "silently redirects to /",
   // which would drop three indexed URLs without anything failing loudly.
-  const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/circle","/hive-vision","/master-doc","/privacy","/terms","/collections",...Object.keys(PUBLIC_TOOL_PAGES)];
+  const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/circle","/hive-vision","/master-doc","/privacy","/terms","/collections",RESET_PASSWORD_PATH,...Object.keys(PUBLIC_TOOL_PAGES)];
   if(!knownPaths.some(p=>location.pathname===p||location.pathname.startsWith("/pattern/")||location.pathname.startsWith("/hive/")||location.pathname.startsWith("/collections/"))) return <Navigate to="/" replace/>;
   const detailOnSave=u=>{
     const withTimestamp={...u,updated_at:new Date().toISOString()};
@@ -4101,7 +4213,7 @@ export default function Wovely() {
     <div style={{display:"flex",minHeight:"100vh",width:"100%",background:`${T.crosshatch},${T.bg}`,fontFamily:T.sans,position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous} initialMode={authWallMode}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);clearPendingUpgrade();}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous} initialMode={authWallMode}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}
@@ -4121,7 +4233,7 @@ export default function Wovely() {
       {readyPromptPattern&&<ReadyToBuildPrompt pattern={readyPromptPattern} onStartBuilding={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);startAndOpenPattern(p);}} onViewDetails={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);setSelected(p);navigateToView("detail",p._supabaseId||p.id);}} onDismiss={()=>setReadyPromptPattern(null)}/>}
       {deleteTarget&&<DeleteConfirmModal pattern={deleteTarget} isPro={isPro} onCancel={()=>setDeleteTarget(null)} onDelete={confirmDelete} onPark={parkInsteadOfDelete} onGoPro={()=>{setDeleteTarget(null);setShowProModal(true);}}/>}
       {coverPickerTarget&&<CoverImagePicker pattern={coverPickerTarget} onConfirm={handleCoverConfirm} onClose={()=>setCoverPickerTarget(null)} pdfThumbUrl={pdfThumbUrl} CAT_IMG={CAT_IMG} ALL_CAT_ENTRIES={ALL_CAT_ENTRIES}/>}
-      <WelcomeToast visible={showWelcomeToast}/>
+      <WelcomeToast visible={showWelcomeToast} returning={welcomeIsReturning}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
       {/* onSignOut is gated on `authed`: SidebarNav renders the button whenever
           the prop is present, so a signed-out visitor was being offered a "Sign
@@ -4166,10 +4278,10 @@ export default function Wovely() {
     <div style={{fontFamily:T.sans,background:`${T.crosshatch},${T.bg}`,minHeight:"100vh",maxWidth:isTablet?680:430,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative"}}>
       <CSS/>
       <WhatsNewModal/>
-      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);try{sessionStorage.removeItem(PENDING_UPGRADE_KEY);sessionStorage.removeItem(PENDING_UPGRADE_CADENCE_KEY);}catch{}}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous} initialMode={authWallMode}/>
+      <AuthWallModal isOpen={authWallOpen} onClose={()=>{setAuthWallOpen(false);setAuthWallContext(null);setPendingUpgradeTier(null);setPendingUpgradeCadence(null);clearPendingUpgrade();}} onSuccess={handleAuthWallSuccess} title={authWallContext?.title} subtitle={authWallContext?.subtitle} intent={authWallContext?.intent} isAnonymous={isAnonymous} initialMode={authWallMode}/>
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
-      <WelcomeToast visible={showWelcomeToast}/>
+      <WelcomeToast visible={showWelcomeToast} returning={welcomeIsReturning}/>
       {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
       {/* Hamburger drawer (NavPanel) retired — the 2b mobile shell navigates
           via the fixed bottom nav below, per Wovely App 2b.dc.html ≤640px. */}
@@ -4188,7 +4300,7 @@ export default function Wovely() {
       {pinnedLightboxOpen && pinnedImage?.image && <ChartLightbox images={[pinnedImage.image]} startIndex={0} onClose={()=>setPinnedLightboxOpen(false)} canPin={true} pinnedImageId={pinnedImage.image.id} onTogglePin={(img)=>{togglePin(img,pinnedImage.collectionId);setPinnedLightboxOpen(false);}} />}
       {readyPromptPattern&&<ReadyToBuildPrompt pattern={readyPromptPattern} onStartBuilding={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);startAndOpenPattern(p);}} onViewDetails={()=>{const p=readyPromptPattern;setReadyPromptPattern(null);setSelected(p);navigateToView("detail",p._supabaseId||p.id);}} onDismiss={()=>setReadyPromptPattern(null)}/>}
       {deleteTarget&&<DeleteConfirmModal pattern={deleteTarget} isPro={isPro} onCancel={()=>setDeleteTarget(null)} onDelete={confirmDelete} onPark={parkInsteadOfDelete} onGoPro={()=>{setDeleteTarget(null);setShowProModal(true);}}/>}
-      {showWelcomeBanner&&<WelcomeBanner onDismiss={()=>setShowWelcomeBanner(false)}/>}
+      {showWelcomeBanner&&<WelcomeBanner visible={showWelcomeBanner}/>}
       {/* 2b mobile topbar (Wovely App 2b.dc.html ≤640px): brand moves up here
           (.tbbrand), profile becomes the round .tbprof button — nav lives in
           the fixed bottom bar, so no hamburger. */}
