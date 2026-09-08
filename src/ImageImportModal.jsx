@@ -337,7 +337,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, tier, isAnon
     <div style={{ paddingBottom: 8 }}>
       <div style={{ fontFamily: T.serif, fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 6 }}>Import from photos</div>
       <div style={{ fontSize: 13, color: T.ink2, lineHeight: 1.7, marginBottom: 18 }}>
-        Select one or more photos of your pattern — screenshots, scans, or photos all work
+        Select one or more photos of your pattern. Screenshots, scans, or photos all work.
       </div>
 
       <div
@@ -438,7 +438,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, tier, isAnon
     const gaugePhase = validationReport ? "done" : (bevCheckFailed ? "idle" : (activeStep >= 2 ? "checking" : "idle"));
     const gaugeNote = validationReport
       ? (gaugeScore != null ? "Stitch counts verified, row by row" : "Bev finished her once-over")
-      : bevCheckFailed ? "Bev got tangled on the check — she'll retry after import"
+      : bevCheckFailed ? "Bev got tangled on the check. She'll retry after import."
       : activeStep >= 2 ? "Checking every row's stitch counts…" : "Warming up the needle…";
     return (
       <div style={{ padding: "18px 20px 28px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", position: "relative" }}>
@@ -454,7 +454,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, tier, isAnon
         <div style={{ width: "100%", maxWidth: 390, marginTop: 22, display: "flex", justifyContent: "center" }}>
           <ScanGauge phase={gaugePhase} score={gaugeScore} state={validationReport ? deriveState(validationReport) : null} note={gaugeNote} />
         </div>
-        <ProcSteps steps={["Reading the source", "Finding parts, rows & materials", "BevCheck — validating accuracy", "Tucking the original into your Vault"]} activeStep={activeStep} />
+        <ProcSteps steps={["Reading the source", "Finding parts, rows & materials", "BevCheck: validating accuracy", "Tucking the original into your Vault"]} activeStep={activeStep} />
       </div>
     );
   })();
@@ -573,7 +573,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, tier, isAnon
             </div>
           ):bevCheckFailed?(
             <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
-              <div style={{fontSize:11,color:"#726A92",marginBottom:10}}>Bev couldn't check this one — try again</div>
+              <div style={{fontSize:11,color:"#726A92",marginBottom:10}}>Bev couldn't check this one. Try again.</div>
               <button onClick={()=>{setBevCheckFailed(false);setValidating(true);const valText=bevCheckTextRef.current;if(!valText){setBevCheckFailed(true);setValidating(false);return;}(async()=>{try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),90000);const vr=await fetch("/api/extract-pattern",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"bevcheck",patternText:valText}),signal:controller.signal});clearTimeout(timeout);const data=await vr.json();if(vr.ok&&!data.error){setValidationReport(data);}else{setBevCheckFailed(true);}}catch(e){console.warn("[ImageImport] BevCheck retry failed:",e);setBevCheckFailed(true);}setValidating(false);})();}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"6px 16px",fontSize:11,fontWeight:600,cursor:"pointer"}}>Retry BevCheck</button>
             </div>
           ):validationReport?(()=>{const scState=deriveState(validationReport);const allChecks=Array.isArray(validationReport.checks)?validationReport.checks:[];const scFailed=allChecks.filter(c=>c&&c.status&&c.status!=="pass").slice(0,3);return isPro?(
@@ -619,7 +619,7 @@ const ImageImportModal = ({ onClose, onPatternSaved, userId, isPro, tier, isAnon
         </div>
       )}
       <div style={{height:20}}/>
-      <button onClick={handleSave} style={{width:"100%",background:`linear-gradient(135deg,${T.terra},#7B5FB5)`,color:"#fff",border:"none",borderRadius:99,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 8px 28px rgba(123,106,212,.5)",marginBottom:8}}>Looks good — save pattern</button>
+      <button onClick={handleSave} style={{width:"100%",background:`linear-gradient(135deg,${T.terra},#7B5FB5)`,color:"#fff",border:"none",borderRadius:99,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 8px 28px rgba(123,106,212,.5)",marginBottom:8}}>Looks good, save pattern</button>
       <button onClick={()=>{setStage("pick");setItems([]);setExtracted(null);}} style={{width:"100%",background:"transparent",color:T.ink3,border:"none",borderRadius:99,padding:"10px",fontSize:13,cursor:"pointer"}}>Try different photos</button>
     </div>
   ) : null;

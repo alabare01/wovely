@@ -31,7 +31,7 @@ export const PHASE_COPY_POOLS = {
   ],
 };
 
-export const REASSURANCE_LINE = "Bev's working in the background. Feel free to navigate away — I'll let you know when she's done.";
+export const REASSURANCE_LINE = "Bev's working in the background. Feel free to navigate away, and I'll let you know when she's done.";
 
 export function pickPhaseCopy(phase) {
   const pool = phase && PHASE_COPY_POOLS[phase];

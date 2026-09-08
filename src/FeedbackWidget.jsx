@@ -264,7 +264,7 @@ export default function FeedbackWidget({ user }) {
       <SeverityPills value={bugSeverity} onChange={setBugSeverity} />
       <div>
         <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 4, fontFamily: T.sans }}>Attach a file (optional)</div>
-        <div style={{ fontSize: 11, color: C.sub, marginBottom: 8, fontFamily: T.sans }}>Screenshot, PDF, or pattern file — helps us fix it faster</div>
+        <div style={{ fontSize: 11, color: C.sub, marginBottom: 8, fontFamily: T.sans }}>A screenshot, PDF, or pattern file helps us fix it faster</div>
         <input ref={fileInputRef} type="file" accept="image/*,application/pdf,.pdf" onChange={handleFileSelect} onClick={e=>e.stopPropagation()} style={{ display: "none" }} />
         {attachedFile ? (
           <div style={{
@@ -301,7 +301,7 @@ export default function FeedbackWidget({ user }) {
       </div>
       <div>
         <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 6, fontFamily: T.sans }}>How would this help you?</div>
-        <Input rows={2} placeholder="Optional — but it helps us prioritize!" value={ideaWhy} onChange={setIdeaWhy} />
+        <Input rows={2} placeholder="Optional, but it helps us prioritize" value={ideaWhy} onChange={setIdeaWhy} />
       </div>
     </div>
   );

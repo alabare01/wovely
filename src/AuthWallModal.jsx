@@ -88,7 +88,7 @@ const AuthWallModal = ({
         onClose();
       }
     } catch {
-      setError("Network error — please try again.");
+      setError("Network error. Please try again.");
       setLoading(false);
     }
   };

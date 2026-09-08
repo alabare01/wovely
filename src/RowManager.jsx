@@ -42,7 +42,7 @@ const SubCounter = ({row, globalIdx, onDotTap, onRepeatDone}) => {
   if (!rb) return null;
   if (row.repeat_done) return (
     <div style={{paddingTop:8}} onClick={e => e.stopPropagation()}>
-      <div style={{fontSize:11, color:T.ink3, marginBottom:6}}>Repeat complete — finish remaining stitches</div>
+      <div style={{fontSize:11, color:T.ink3, marginBottom:6}}>Repeat complete. Finish remaining stitches.</div>
       <button onClick={() => onRepeatDone(globalIdx)} style={{background:T.terra, color:"#fff", border:"none", borderRadius:8, padding:"6px 14px", fontSize:12, fontWeight:600, cursor:"pointer"}}>Tap to finish row</button>
     </div>
   );
@@ -298,7 +298,7 @@ const RowManager = ({
     </div>
   );
   const focusLabel=`Round ${Math.min(activeDone+1,activeTotal)} of ${activeTotal}`;
-  const partLabel=activePartNo?`Part ${activePartNo} — ${activePartName}`:activePartName;
+  const partLabel=activePartNo?`Part ${activePartNo}: ${activePartName}`:activePartName;
   return (
     <>
       {/* ── 2b NOW card — central counter over the same row data ── */}
@@ -307,7 +307,7 @@ const RowManager = ({
           <div style={{flex:"1 1 260px",minWidth:0}}>
             <div style={{fontWeight:800,fontSize:12,letterSpacing:".12em",textTransform:"uppercase",color:T.terra}}>{activeCurRow?`Now working · ${focusLabel}`:"Part complete"}</div>
             <div style={{fontFamily:T.serif,fontWeight:600,fontSize:24,color:T.ink,marginTop:3,lineHeight:1.15}}>{partLabel}</div>
-            <div style={{fontWeight:700,fontSize:14,color:T.ink3,marginTop:2,maxWidth:420,lineHeight:1.5}}>Tap ＋ for each finished round — or tick rows in the list below. Same counter, always in step.</div>
+            <div style={{fontWeight:700,fontSize:14,color:T.ink3,marginTop:2,maxWidth:420,lineHeight:1.5}}>Tap ＋ for each finished round, or tick rows in the list below. Same counter, always in step.</div>
             <div style={{fontFamily:T.serif,fontWeight:600,fontSize:15,color:T.terra,background:T.surface,padding:"6px 14px",borderRadius:999,marginTop:10,display:"inline-block"}}>{activePct}% complete · Bev saved your spot</div>
           </div>
           <CounterCluster/>
@@ -315,7 +315,7 @@ const RowManager = ({
       )}
       {showCounter&&(
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,margin:"0 0 14px"}}>
-          <div style={{fontWeight:700,fontSize:13,color:T.ink3,lineHeight:1.5}}>Tap the round you just finished — the counter follows along. Finished rounds fade out.</div>
+          <div style={{fontWeight:700,fontSize:13,color:T.ink3,lineHeight:1.5}}>Tap the round you just finished and the counter follows along. Finished rounds fade out.</div>
           <button onClick={()=>setFocusOn(true)} style={{display:"inline-flex",alignItems:"center",gap:8,border:`1.5px solid ${T.border}`,borderRadius:12,background:"#fff",padding:"10px 16px",fontFamily:T.sans,fontWeight:800,fontSize:13.5,color:T.terra,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H4.5A1.5 1.5 0 003 4.5V8M16 3h3.5A1.5 1.5 0 0121 4.5V8M8 21H4.5A1.5 1.5 0 013 19.5V16M16 21h3.5a1.5 1.5 0 001.5-1.5V16"/></svg>
             Focus mode
@@ -342,7 +342,7 @@ const RowManager = ({
           belongs to My Notes, not here. No fallback between the two. */}
       {!focusHeaderId&&p.pattern_notes&&<div style={{marginBottom:12}}>
         <button onClick={()=>setNoteEdit(noteEdit==="pnotes"?null:"pnotes")} style={{width:"100%",background:T.linen,border:`1px solid ${T.border}`,borderRadius:10,padding:"10px 14px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <span style={{fontSize:13,color:T.ink2,fontWeight:500}}>📋 Pattern Notes — tap to expand</span>
+          <span style={{fontSize:13,color:T.ink2,fontWeight:500}}>📋 Pattern Notes (tap to expand)</span>
           <span style={{fontSize:12,color:T.ink3}}>{noteEdit==="pnotes"?"▼":"▶"}</span>
         </button>
         {noteEdit==="pnotes"&&<div style={{background:T.linen,border:`1px solid ${T.border}`,borderTop:"none",borderRadius:"0 0 10px 10px",padding:"12px 14px",fontSize:13,color:T.ink2,lineHeight:1.7,whiteSpace:"pre-wrap"}}>{p.pattern_notes}</div>}
@@ -429,7 +429,7 @@ const RowManager = ({
           {!isAnonymous&&!r.done&&!rowLocked&&((r.repeat_brackets||[]).some(b=>b.count>1)||r.repeat_done)&&<div style={{padding:"0 18px 12px 62px"}}><SubCounter row={r} globalIdx={globalIdx} onDotTap={handleDotTap} onRepeatDone={handleRepeatDone}/></div>}
           {r.note&&noteEdit!==r.id&&!rowLocked&&<div onClick={e=>{e.stopPropagation();setNoteEdit(r.id);}} style={{padding:"0 18px 12px 62px",fontSize:12,color:T.ink3,lineHeight:1.5,cursor:"pointer"}}><span style={{fontSize:11}}>📌</span> <span style={{fontStyle:"italic"}}>{r.note}</span></div>}
           {newAbbr.length>0&&!rowLocked&&<div style={{padding:"0 18px 12px 62px"}} onClick={e=>e.stopPropagation()}>
-            <div style={{fontFamily:T.sans,fontSize:11,color:T.ink3,marginBottom:6}}>New stitch — tap for a video</div>
+            <div style={{fontFamily:T.sans,fontSize:11,color:T.ink3,marginBottom:6}}>New stitch (tap for a video)</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:6}}>{newAbbr.map(a=><button key={a.raw} type="button" onClick={e=>{e.stopPropagation();window.open("https://www.youtube.com/results?search_query=" + encodeURIComponent(a.full + " crochet tutorial"),"_blank","noopener,noreferrer");}} onMouseEnter={e=>{e.currentTarget.style.background="#E7DFF8";}} onMouseLeave={e=>{e.currentTarget.style.background=T.surface;}} style={{display:"inline-flex",alignItems:"center",gap:5,background:T.surface,color:T.terra,border:"none",borderRadius:999,padding:"5px 10px",fontFamily:T.sans,fontSize:11.5,fontWeight:800,cursor:"pointer",whiteSpace:"nowrap",transition:"background .15s"}}><svg width="11" height="11" viewBox="0 0 12 12" aria-hidden="true" style={{flexShrink:0,display:"block"}}><path d="M3 2.2 L10 6 L3 9.8 Z" fill={T.terra}/></svg>{a.raw}</button>)}</div>
           </div>}
           {noteEdit===r.id&&!rowLocked&&<div style={{padding:"0 18px 14px 62px",display:"flex",alignItems:"center",gap:8}}><input value={r.note} onChange={e=>updateNote(r.id,e.target.value)} placeholder="Add a note for this row…" style={{flex:1,padding:"9px 12px",background:T.linen,border:`1.5px solid ${T.terra}`,borderRadius:9,fontSize:13,color:T.ink,outline:"none"}}/>{noteSaved&&<span style={{fontSize:11,color:T.sage,fontWeight:600,flexShrink:0}}>Note saved</span>}</div>}

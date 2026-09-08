@@ -86,7 +86,7 @@ function buildNotices(posts) {
   items.push({
     icon: "clock",
     t: `Bev's weekly theme: ${WEEKLY_THEME.title}`,
-    s: week > 0 ? `${plural(week, "make", "makes")} in so far · pick is Monday` : `${WEEKLY_THEME.blurb} Nothing in yet — go first.`,
+    s: week > 0 ? `${plural(week, "make", "makes")} in so far · pick is Monday` : `${WEEKLY_THEME.blurb} Nothing in yet. Go first.`,
   });
 
   return items;
@@ -186,7 +186,7 @@ function PostCard({ post, onOpenPattern, canInteract, onSignIn, onLove, onCommen
         : <div style={{ height: 330, background: `linear-gradient(135deg, ${(post.tint || tintFor(post.id))[0]}, ${(post.tint || tintFor(post.id))[1]})`, position: "relative" }}><div style={{ position: "absolute", inset: 0, background: "repeating-linear-gradient(45deg,rgba(255,255,255,.06) 0 2px,transparent 2px 11px)" }} /></div>}
       <div style={{ padding: "15px 18px 17px" }}>
         <div style={{ fontSize: 15, fontWeight: 600, color: T.ink, lineHeight: 1.5, fontFamily: T.body }}>
-          {post.pattern_title && <b style={{ fontWeight: 800 }}>{post.pattern_title}</b>}{post.pattern_title ? " — " : ""}{post.caption}
+          {post.pattern_title && <b style={{ fontWeight: 800 }}>{post.pattern_title}</b>}{post.pattern_title ? ": " : ""}{post.caption}
         </div>
         <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
           {post.pattern_id && <PatternChip title={post.pattern_title || "a pattern"} onClick={() => onOpenPattern && onOpenPattern(post.pattern_id)} />}

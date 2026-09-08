@@ -104,7 +104,7 @@ const StitchVision = ({ isPro, tier, isAnon, onUpgrade, onRequireAccount, onImpo
       });
       const uploadBody = await uploadRes.text();
       console.log("[StitchVision] Step 2 done: upload status:", uploadRes.status, "body:", uploadBody.substring(0, 200));
-      if (!uploadRes.ok) throw new Error("Image upload failed: " + uploadRes.status + " — " + uploadBody.substring(0, 100));
+      if (!uploadRes.ok) throw new Error("Image upload failed: " + uploadRes.status + ": " + uploadBody.substring(0, 100));
       const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/pattern-files/${filePath}`;
       console.log("[StitchVision] Step 3: Calling API — imageUrl:", publicUrl);
 
@@ -195,7 +195,7 @@ const StitchVision = ({ isPro, tier, isAnon, onUpgrade, onRequireAccount, onImpo
         <img src="/bev_neutral.png" alt="Bev" style={{ width: 110, height: "auto", margin: "0 auto 16px", display: "block", filter: "drop-shadow(0 4px 16px rgba(123,106,212,0.3))" }} />
         <div style={{ fontFamily: "'Fredoka',serif", fontSize: 22, fontWeight: 700, color: T.ink, marginBottom: 8 }}>That looks like a pattern, not a stitch</div>
         <div style={{ fontSize: 13, color: "#726A92", lineHeight: 1.7, marginBottom: 20 }}>
-          Stitch-O-Vision identifies stitches from photos of actual fabric. Looks like you uploaded a pattern page — Bev can import that for you instead.
+          Stitch-O-Vision identifies stitches from photos of actual fabric. Looks like you uploaded a pattern page. Bev can import that for you instead.
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {onImportAsPattern && (
@@ -244,7 +244,7 @@ const StitchVision = ({ isPro, tier, isAnon, onUpgrade, onRequireAccount, onImpo
         {result.stitch_name && <div style={{ fontSize: 14, color: "#726A92", marginBottom: 16 }}>This might be a <span style={{ fontWeight: 600, color: "#7B6AD4" }}>{result.stitch_name}</span></div>}
         {result.base_stitch && <div style={{ display: "inline-block", background: "#7B6AD4", color: "#fff", borderRadius: 99, padding: "3px 10px", fontSize: 11, fontWeight: 600, marginBottom: 16 }}>Base stitch: {result.base_stitch}</div>}
         <div style={{ background: "#F5F2FF", border: "1px solid #ECE6F8", borderRadius: 12, padding: "14px 16px", marginBottom: 20, textAlign: "left" }}>
-          <div style={{ fontSize: 13, color: "#2E2748", lineHeight: 1.6 }}>💡 Try a closer shot focusing just on the stitch texture — Bev gets more confident with detail shots!</div>
+          <div style={{ fontSize: 13, color: "#2E2748", lineHeight: 1.6 }}>💡 Try a closer shot focusing just on the stitch texture. Bev gets more confident with detail shots.</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {shareId && result.stitch_name && (
@@ -341,7 +341,7 @@ const StitchVision = ({ isPro, tier, isAnon, onUpgrade, onRequireAccount, onImpo
         <div style={{ fontFamily: "'Fredoka',serif", fontSize: 26, fontWeight: 700, color: T.ink }}>Stitch-O-Vision</div>
         <img src="/bev_neutral.png" alt="Bev" style={{ width: 20, height: 20, objectFit: "contain" }} />
       </div>
-      <div style={{ fontSize: 14, color: T.ink2, lineHeight: 1.7, marginBottom: 24 }}>Photograph any stitch — we'll tell you what it is</div>
+      <div style={{ fontSize: 14, color: T.ink2, lineHeight: 1.7, marginBottom: 24 }}>Photograph any stitch and we'll tell you what it is</div>
 
       <label style={{ display: "block", cursor: "pointer" }}>
         <div style={{ border: `2px dashed ${T.border}`, borderRadius: 16, padding: "48px 20px", background: T.linen, transition: "border-color .2s" }} onMouseEnter={e => e.currentTarget.style.borderColor = T.terra} onMouseLeave={e => e.currentTarget.style.borderColor = T.border}>

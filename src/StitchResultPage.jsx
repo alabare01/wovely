@@ -22,7 +22,7 @@ const StitchResultPage = () => {
         const rows = await res.json();
         if (!rows.length) throw new Error("Not found");
         setData(rows[0]);
-        document.title = `${rows[0].result?.stitch_name || "Stitch"} — Wovely Stitch-O-Vision`;
+        document.title = `${rows[0].result?.stitch_name || "Stitch"} | Wovely Stitch-O-Vision`;
       } catch (e) { setError(e.message); }
       setLoading(false);
     })();
@@ -158,7 +158,7 @@ const StitchResultPage = () => {
 
             {r.confidence === "low" && (
               <div style={{ background: "#F5F2FF", border: "1px solid #ECE6F8", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
-                <div style={{ fontSize: 13, color: "#2E2748", lineHeight: 1.6 }}>💡 Try a closer shot focusing just on the stitch texture — Bev gets more confident with detail shots!</div>
+                <div style={{ fontSize: 13, color: "#2E2748", lineHeight: 1.6 }}>💡 Try a closer shot focusing just on the stitch texture. Bev gets more confident with detail shots.</div>
               </div>
             )}
 

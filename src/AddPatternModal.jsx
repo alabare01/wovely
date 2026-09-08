@@ -405,15 +405,15 @@ const calculateConfidence = (analysis) => {
 };
 
 const confidenceLabel = (score) => {
-  if(score>=90) return{text:"Strong match — we're confident in this pattern",color:T.sage,emoji:"✅"};
-  if(score>=75) return{text:"Good match — review highlighted components",color:T.terra,emoji:"🎯"};
-  if(score>=60) return{text:"Partial match — a few pieces need your input",color:T.gold,emoji:"⚠️"};
-  return{text:"Rough estimate — use this as a starting point and adjust",color:T.ink3,emoji:"🔍"};
+  if(score>=90) return{text:"Strong match. We're confident in this pattern",color:T.sage,emoji:"✅"};
+  if(score>=75) return{text:"Good match. Review the highlighted components",color:T.terra,emoji:"🎯"};
+  if(score>=60) return{text:"Partial match. A few pieces need your input",color:T.gold,emoji:"⚠️"};
+  return{text:"Rough estimate. Use this as a starting point and adjust",color:T.ink3,emoji:"🔍"};
 };
 
 const buildComponentRows = (comp,rowIdStart) => {
   const rows=[]; let id=rowIdStart;
-  const c=comp.construction||{}, label=comp.label||comp.role||"Part", color=comp.color?" — "+comp.color+" yarn":"";
+  const c=comp.construction||{}, label=comp.label||comp.role||"Part", color=comp.color?", "+comp.color+" yarn":"";
   const technique=c.technique||"worked_in_the_round", stitch=c.stitch||"single_crochet";
   const stitchAbbr=stitch==="single_crochet"?"sc":stitch==="half_double_crochet"?"hdc":stitch==="double_crochet"?"dc":"sc";
   const incTo=c.increase_to||24, evenRnds=c.even_rounds||6, decFrom=c.decrease_from||incTo, finalSts=c.final_sts||6, stuffed=c.stuffed!==false;
@@ -436,7 +436,7 @@ const buildComponentRows = (comp,rowIdStart) => {
       let cur=decFrom;
       for(let r=0;r<Math.ceil((decFrom-finalSts)/6)&&cur>finalSts;r++){
         const next=Math.max(cur-6,finalSts);
-        if(next<=6) rows.push({id:id++,text:"Final dec: [sc2tog] x"+(cur/2)+". ("+next+") — fasten off, leave tail.",done:false,note:""});
+        if(next<=6) rows.push({id:id++,text:"Final dec: [sc2tog] x"+(cur/2)+". ("+next+"). Fasten off, leave tail.",done:false,note:""});
         else rows.push({id:id++,text:"Dec rnd "+(r+1)+": ["+(cur/6-1)+" sc, sc2tog] x6. ("+next+")",done:false,note:""});
         cur=next;
       }
@@ -452,7 +452,7 @@ const buildComponentRows = (comp,rowIdStart) => {
 };
 
 const buildStarterPattern = (analysis) => {
-  if(!analysis?.components?.length) return {title:"Snap & Stitch — Review Needed",hook:"5.0mm",weight:"Worsted",yardage:200,notes:"Pattern needs more information. Try a clearer photo.",materials:[{id:1,name:"Worsted weight yarn",amount:"~200 yds",yardage:200},{id:2,name:"5.0mm crochet hook",amount:"1"}],rows:[{id:1,text:"Retake photo with better lighting for best results.",done:false,note:""}]};
+  if(!analysis?.components?.length) return {title:"Snap & Stitch: Review Needed",hook:"5.0mm",weight:"Worsted",yardage:200,notes:"Pattern needs more information. Try a clearer photo.",materials:[{id:1,name:"Worsted weight yarn",amount:"~200 yds",yardage:200},{id:2,name:"5.0mm crochet hook",amount:"1"}],rows:[{id:1,text:"Retake photo with better lighting for best results.",done:false,note:""}]};
   const components=analysis.components, isAmigurumi=analysis.object_category==="amigurumi";
   const objectName=analysis.object_name||analysis.object_category||"Crochet Object";
   const colorInfo=analysis.color_structure?.primary_color||"your chosen color";
@@ -466,9 +466,9 @@ const buildStarterPattern = (analysis) => {
   else { ordered.forEach(comp=>{ if(comp.join_to&&comp.join_method) allRows.push({id:rowId++,text:(comp.label||comp.role)+": "+comp.join_method.replace(/_/g," ")+" to "+comp.join_to+".",done:false,note:""}); }); if(isAmigurumi) allRows.push({id:rowId++,text:"Sew all pieces firmly. Weave in all ends. Add safety eyes if not already attached.",done:false,note:""}); }
   const totalYards=components.reduce((sum,c)=>{ const i=c.construction?.increase_to||24, e=c.construction?.even_rounds||6; return sum+Math.round(i*(e+i/6)*0.025); },0);
   const colorMap={}; components.forEach(c=>{ const col=c.color||colorInfo; if(!colorMap[col]) colorMap[col]=0; colorMap[col]+=Math.round((c.construction?.increase_to||24)*((c.construction?.even_rounds||6)+4)*0.025); });
-  const yarnMaterials=Object.entries(colorMap).map(([color,yds],i)=>({id:i+1,name:"Worsted yarn — "+color,amount:"~"+Math.max(20,yds)+" yds",yardage:Math.max(20,yds)}));
+  const yarnMaterials=Object.entries(colorMap).map(([color,yds],i)=>({id:i+1,name:"Worsted yarn, "+color,amount:"~"+Math.max(20,yds)+" yds",yardage:Math.max(20,yds)}));
   const materials=[...yarnMaterials,{id:yarnMaterials.length+1,name:"5.0mm crochet hook",amount:"1"},{id:yarnMaterials.length+2,name:"Yarn needle",amount:"1"},...(isAmigurumi?[{id:yarnMaterials.length+3,name:"Safety eyes (9mm)",amount:"2"},{id:yarnMaterials.length+4,name:"Polyfill stuffing",amount:"small bag"}]:[])];
-  return {title:"Snap & Stitch — "+objectName.charAt(0).toUpperCase()+objectName.slice(1),hook:"5.0mm",weight:"Worsted",yardage:Math.max(150,totalYards),notes:["Scanned from photo of a "+objectName+".",colorCount>1?colorCount+" colors: "+(analysis.color_structure?.accent_colors||[]).concat([colorInfo]).join(", ")+".":"Primary color: "+colorInfo+".","Stitch counts estimated from photo proportions — adjust to match your gauge.",components.length+" components identified."].join(" "),materials,rows:allRows};
+  return {title:"Snap & Stitch: "+objectName.charAt(0).toUpperCase()+objectName.slice(1),hook:"5.0mm",weight:"Worsted",yardage:Math.max(150,totalYards),notes:["Scanned from photo of a "+objectName+".",colorCount>1?colorCount+" colors: "+(analysis.color_structure?.accent_colors||[]).concat([colorInfo]).join(", ")+".":"Primary color: "+colorInfo+".","Stitch counts estimated from photo proportions. Adjust to match your gauge.",components.length+" components identified."].join(" "),materials,rows:allRows};
 };
 
 const useSnapProgress = (active) => {
@@ -601,7 +601,7 @@ const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer,tier,onUpgrade}) => {
             <div style={{fontFamily:T.serif,fontSize:52,fontWeight:700,color:confInfo?.color,lineHeight:1,marginBottom:4}}>{confidence}%</div>
             <div style={{fontSize:12,color:T.ink2,marginBottom:10}}>{confInfo?.emoji} {confInfo?.text}</div>
             <Bar val={confidence} color={confInfo?.color} h={5}/>
-            <div style={{fontSize:11,color:T.ink3,marginTop:8,lineHeight:1.5}}>Tap either panel to view fullscreen. Stitch counts are estimated — adjust after saving.</div>
+            <div style={{fontSize:11,color:T.ink3,marginTop:8,lineHeight:1.5}}>Tap either panel to view fullscreen. Stitch counts are estimated. Adjust after saving.</div>
           </div>
           <div style={{marginBottom:10}}>
             <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:8}}>
@@ -640,7 +640,7 @@ const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer,tier,onUpgrade}) => {
                       <div style={{width:22,height:22,borderRadius:99,background:conf?T.sage:T.terra,color:"#fff",fontSize:11,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
                       <div style={{flex:1,minWidth:0}}>
                         <div style={{fontSize:11,fontWeight:700,color:conf?T.sage:T.terra,textTransform:"uppercase",marginBottom:2}}>{label} <span style={{fontWeight:400,opacity:.6}}>({c.primitive_type})</span></div>
-                        <div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>{notes||"—"}</div>
+                        <div style={{fontSize:11,color:T.ink2,lineHeight:1.5}}>{notes||"No notes"}</div>
                         {c.join_to&&<div style={{fontSize:10,color:T.ink3,marginTop:2}}>→ Joins to: {c.join_to}</div>}
                       </div>
                       <div style={{fontSize:10,color:T.ink3,flexShrink:0,marginTop:1}}>{c.confidence}%</div>
@@ -654,7 +654,7 @@ const HiveVisionForm = ({onSave,Btn,Bar,WireframeViewer,tier,onUpgrade}) => {
             <div style={{fontFamily:T.serif,fontSize:16,color:T.ink,marginBottom:4}}>{preview.title}</div>
             <div style={{fontSize:12,color:T.ink3,marginBottom:10}}>Hook {preview.hook} · {preview.weight} · ~{preview.yardage} yds · {preview.rows.length} steps</div>
             <div style={{fontSize:12,color:T.ink2,lineHeight:1.6,marginBottom:12}}>{preview.notes}</div>
-            <div style={{fontSize:11,color:T.ink3,fontStyle:"italic",marginBottom:12}}>Review the steps after saving — adjust stitch counts to match your gauge and yarn weight.</div>
+            <div style={{fontSize:11,color:T.ink3,fontStyle:"italic",marginBottom:12}}>Review the steps after saving. Adjust stitch counts to match your gauge and yarn weight.</div>
             <Btn onClick={()=>onSave({id:Date.now(),photo:imgSrc||PILL[0],source:"Snap & Stitch",cat:analysis.object_category==="amigurumi"?"Amigurumi":"Uncategorized",rating:0,skeins:2,skeinYards:200,gauge:{stitches:16,rows:20,size:4},dimensions:{width:20,height:20},snapConfidence:confidence,snapComponents:analysis.components||[],snapObjectName:analysis.object_name||"",...preview})}>Save to My Wovely</Btn>
             <div style={{marginTop:8}}><Btn variant="ghost" onClick={reset}>Try different photo</Btn></div>
           </div>
@@ -718,7 +718,7 @@ const ManualEntryForm = ({onSave,Btn}) => {
       </div>
       <div style={{marginBottom:18}}>
         <div style={{fontSize:11,color:T.ink3,textTransform:"uppercase",letterSpacing:".08em",marginBottom:5}}>Attach source pattern (optional)</div>
-        <div style={{fontSize:12,color:T.ink3,marginBottom:8}}>PDF, JPG, or PNG — we'll keep it handy while you build</div>
+        <div style={{fontSize:12,color:T.ink3,marginBottom:8}}>PDF, JPG, or PNG. We'll keep it handy while you build.</div>
         {fileUrl?(
           <div style={{display:"flex",alignItems:"center",gap:8,background:T.linen,borderRadius:10,padding:"10px 14px",border:`1px solid ${T.border}`}}>
             <span style={{color:T.sage,fontSize:14}}>✓</span>
@@ -902,7 +902,7 @@ const URLImportForm = ({onSave,Btn,Photo,initialUrl,onExtractionStart,onExtracti
             {preview.qualityNote&&<div style={{background:"#FFF8EC",borderRadius:8,padding:"8px 12px",marginBottom:12,border:"1px solid #F0D9A8",display:"flex",gap:8,alignItems:"flex-start"}}><span style={{fontSize:13,flexShrink:0}}>⚠️</span><span style={{fontSize:11,color:"#8B6914",lineHeight:1.6}}>{preview.qualityNote}</span></div>}
             {validating&&<div style={{background:T.card,borderRadius:10,padding:"12px",marginBottom:12,display:"flex",alignItems:"center",gap:10}}><div className="spinner" style={{width:16,height:16,border:`2px solid ${T.border}`,borderTopColor:T.terra,borderRadius:"50%",flexShrink:0}}/><span style={{fontSize:12,color:T.ink2}}>Running BevCheck...</span></div>}
             {validationReport&&<div style={{background:T.sageLt,borderRadius:10,padding:"10px 12px",marginBottom:12,display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:14}}>{(validationReport.checks||[]).every(c=>c.status==="pass")?"✅":"⚠️"}</span><span style={{fontSize:12,fontWeight:600,color:T.sage}}>BevCheck: {deriveState(validationReport)==="pass"?"Looks good":deriveState(validationReport)==="issues"?"Issues found":"Heads up"}</span></div>}
-            {preview.rows?.length>0&&<div style={{background:T.surface,borderRadius:10,padding:"10px 12px",marginBottom:12,maxHeight:160,overflowY:"auto",border:`1px solid ${T.border}`}}><div style={{fontSize:10,color:T.ink3,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8,fontWeight:600}}>Preview — {preview.rows.length} steps</div>{preview.rows.slice(0,5).map((r,i)=><div key={i} style={{fontSize:12,color:T.ink2,padding:"4px 0",borderBottom:i<4?`1px solid ${T.border}`:"none",lineHeight:1.5}}>{r.text}</div>)}{preview.rows.length>5&&<div style={{fontSize:11,color:T.ink3,marginTop:6}}>+{preview.rows.length-5} more steps…</div>}</div>}
+            {preview.rows?.length>0&&<div style={{background:T.surface,borderRadius:10,padding:"10px 12px",marginBottom:12,maxHeight:160,overflowY:"auto",border:`1px solid ${T.border}`}}><div style={{fontSize:10,color:T.ink3,textTransform:"uppercase",letterSpacing:".07em",marginBottom:8,fontWeight:600}}>Preview: {preview.rows.length} steps</div>{preview.rows.slice(0,5).map((r,i)=><div key={i} style={{fontSize:12,color:T.ink2,padding:"4px 0",borderBottom:i<4?`1px solid ${T.border}`:"none",lineHeight:1.5}}>{r.text}</div>)}{preview.rows.length>5&&<div style={{fontSize:11,color:T.ink3,marginTop:6}}>+{preview.rows.length-5} more steps…</div>}</div>}
             <Btn onClick={()=>onSave({id:Date.now(),rating:0,skeins:0,skeinYards:200,gauge:{stitches:12,rows:16,size:4},dimensions:{width:50,height:60},...preview,source_file_type:'url',validation_report:validationReport||null})}>Save to My Wovely</Btn>
             <div style={{marginTop:8}}><Btn variant="ghost" onClick={()=>{setPreview(null);setUrl("");setValidationReport(null);}}>Try different URL</Btn></div>
           </div>
@@ -1107,7 +1107,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
         isPDF ? renderPDFCoverImage(f) : Promise.resolve(null)
       ]);
       clearInterval(intv1);
-      if(!uploaded){onExtractionEnd?.();setStage("error");setErrorMsg("Upload failed — check your connection and try again.");return;}
+      if(!uploaded){onExtractionEnd?.();setStage("error");setErrorMsg("Upload failed. Check your connection and try again.");return;}
       // Upload PDF cover image to Cloudinary using yarnhive_patterns preset
       let coverCloudinaryUrl=null;
       if(pdfCoverDataUrl){
@@ -1401,12 +1401,12 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
     // collection), the language shifts to "your first clue" / collection
     // framing so the flow reads as one continuous collection workflow.
     const intro = isCollectionImport
-      ? "Upload your first clue — PDF or photo. Bev will read it and set up your collection."
-      : "Upload your pattern — PDF or photo. We'll read it and set up your workspace.";
+      ? "Upload your first clue, a PDF or a photo. Bev will read it and set up your collection."
+      : "Upload your pattern as a PDF or a photo. We'll read it and set up your workspace.";
     const dropHeadline = isCollectionImport ? "Upload your first clue" : "Upload your pattern";
     const dropSub = isCollectionImport
-      ? "PDF or photo — Bev will read it and set up your collection"
-      : "PDF or photo — we'll read it and set up your workspace";
+      ? "PDF or photo. Bev will read it and set up your collection"
+      : "PDF or photo. We'll read it and set up your workspace";
     return (
       <div style={{paddingBottom:8}}>
         <div style={{fontSize:13,color:T.ink2,lineHeight:1.7,marginBottom:14}}>{intro}</div>
@@ -1419,9 +1419,9 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
   // tracks the worker. Subtitle is the navigate-away reassurance line
   // while extracting; complexity hints take precedence when set.
   const complexityMsg = complexity==="complex"
-    ? {emoji:"🧶🧶🧶", headline:"Big pattern. Bev is going all in.", sub:`${complexityStats?.pages||"Many"} pages of pure craft. Every round, every stitch, every note. Grab your hook — this might take a minute.`, barSpeed:80}
+    ? {emoji:"🧶🧶🧶", headline:"Big pattern. Bev is going all in.", sub:`${complexityStats?.pages||"Many"} pages of pure craft. Every round, every stitch, every note. Grab your hook. This might take a minute.`, barSpeed:80}
     : complexity==="detailed"
-    ? {emoji:"🧶🧶", headline:"This one's detailed.", sub:`Reading carefully through ${complexityStats?.pages||"all"} pages. Hang tight — about 30–60 seconds.`, barSpeed:200}
+    ? {emoji:"🧶🧶", headline:"This one's detailed.", sub:`Reading carefully through ${complexityStats?.pages||"all"} pages. Hang tight, about 30–60 seconds.`, barSpeed:200}
     : {emoji:"🔎", headline:stageText, sub:stage==="extracting"?REASSURANCE_LINE:null, barSpeed:300};
   const loadingInfo = (stage==="extracting"&&complexity) ? complexityMsg : {emoji:stage==="building"?"✓":"🔎", headline:stageText, sub:stage==="extracting"?REASSURANCE_LINE:null, barSpeed:300};
   if(stage==="uploading"||stage==="extracting"||stage==="building") {
@@ -1446,7 +1446,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
     const activeStep = (pollingJobId && polling.currentPhase != null)
       ? (PHASE_STEP[polling.currentPhase] ?? 0)
       : (STEP_STAGE[stage] ?? 0);
-    const STEPS = ["Reading the source","Finding parts, rows & materials","BevCheck — validating accuracy","Tucking the original into your Vault"];
+    const STEPS = ["Reading the source","Finding parts, rows & materials","BevCheck: validating accuracy","Tucking the original into your Vault"];
     // Say who is holding the work, and say it truthfully.
     //   preparing → this tab is reading the file. Moving around the app is
     //               safe (the pill follows you), closing the tab is not.
@@ -1463,7 +1463,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
     const gaugePhase = validationReport ? "done" : (bevCheckFailed ? "idle" : (activeStep >= 2 ? "checking" : "idle"));
     const gaugeNote = validationReport
       ? (gaugeScore != null ? "Stitch counts verified, row by row" : "Bev finished her once-over")
-      : bevCheckFailed ? "Bev got tangled on the check — she'll retry after import"
+      : bevCheckFailed ? "Bev got tangled on the check. She'll retry after import."
       : activeStep >= 2 ? "Checking every row's stitch counts…" : "Warming up the needle…";
     return (
     <div style={{padding:"18px 20px 28px",display:"flex",flexDirection:"column",alignItems:"center",textAlign:"center",maxWidth:480,margin:"0 auto",position:"relative"}}>
@@ -1540,7 +1540,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
             </div>
           </div>
         )}
-        {!isHiccup&&fileInfo&&<Btn onClick={handleFallbackSave}>Start building — view PDF as I go</Btn>}
+        {!isHiccup&&fileInfo&&<Btn onClick={handleFallbackSave}>Start building, view PDF as I go</Btn>}
         <div style={{marginTop:8}}><Btn variant="ghost" onClick={()=>{setStage("pick");setProgress(0);setErrorMsg("");setErrorType("");setComplexity(null);setComplexityStats(null);setAutoRetried(false);}}>{swapLabel}</Btn></div>
       </div>
     );
@@ -1592,7 +1592,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
           {/* Materials — collapsible single line */}
           {matList.length>0&&<div style={{marginBottom:16}}>
             <div style={{fontSize:9,color:T.ink3,textTransform:"uppercase",letterSpacing:".1em",marginBottom:6}}>Materials</div>
-            {matExpanded?<div>{matList.map((m,i)=><div key={i} style={{fontSize:12,color:T.ink2,padding:"3px 0"}}>{m.name}{m.amount?" — "+m.amount:""}</div>)}<button onClick={()=>setMatExpanded(false)} style={{background:"none",border:"none",color:T.terra,fontSize:11,cursor:"pointer",padding:0,marginTop:4}}>Show less</button></div>
+            {matExpanded?<div>{matList.map((m,i)=><div key={i} style={{fontSize:12,color:T.ink2,padding:"3px 0"}}>{m.name}{m.amount?", "+m.amount:""}</div>)}<button onClick={()=>setMatExpanded(false)} style={{background:"none",border:"none",color:T.terra,fontSize:11,cursor:"pointer",padding:0,marginTop:4}}>Show less</button></div>
             :<div style={{display:"flex",alignItems:"center",gap:6}}><span style={{fontSize:12,color:T.ink2,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{matSummary}</span>{matList.length>3&&<button onClick={()=>setMatExpanded(true)} style={{background:"none",border:"none",color:T.terra,fontSize:11,cursor:"pointer",padding:0,flexShrink:0}}>Show all</button>}</div>}
           </div>}
           {/* Components — accordion */}
@@ -1629,7 +1629,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
             </div>
           ):bevCheckFailed?(
             <div style={{background:T.surface,borderRadius:16,padding:20,boxShadow:"0 4px 20px rgba(123,106,212,.08)",border:`1px solid ${T.border}`,textAlign:"center"}}>
-              <div style={{fontSize:11,color:"#726A92",marginBottom:10}}>Bev couldn't check this one — try again</div>
+              <div style={{fontSize:11,color:"#726A92",marginBottom:10}}>Bev couldn't check this one. Try again.</div>
               <button onClick={()=>{setBevCheckFailed(false);setValidating(true);const valText=bevCheckTextRef.current;if(!valText){setBevCheckFailed(true);setValidating(false);return;}(async()=>{try{const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),90000);const vr=await fetch("/api/extract-pattern",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode:"bevcheck",patternText:valText}),signal:controller.signal});clearTimeout(timeout);const data=await vr.json();if(vr.ok&&!data.error){setValidationReport(data);}else{setBevCheckFailed(true);}}catch(e){console.warn("[Wovely] BevCheck retry failed:",e);setBevCheckFailed(true);}setValidating(false);})();}} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"6px 16px",fontSize:11,fontWeight:600,cursor:"pointer"}}>Retry BevCheck</button>
             </div>
           ):validationReport?(()=>{const scState=deriveState(validationReport);const allChecks=Array.isArray(validationReport.checks)?validationReport.checks:[];const scFailed=allChecks.filter(c=>c&&c.status&&c.status!=="pass").slice(0,3);
@@ -1689,7 +1689,7 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
       {/* Section spacing */}
       <div style={{height:20}}/>
       {/* Accept/Save — full width terracotta */}
-      <button onClick={handleSave} style={{width:"100%",background:`linear-gradient(135deg,${T.terra},#7B5FB5)`,color:"#fff",border:"none",borderRadius:99,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 8px 28px rgba(123,106,212,.5)",marginBottom:8}}>Looks good — save pattern</button>
+      <button onClick={handleSave} style={{width:"100%",background:`linear-gradient(135deg,${T.terra},#7B5FB5)`,color:"#fff",border:"none",borderRadius:99,padding:"15px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 8px 28px rgba(123,106,212,.5)",marginBottom:8}}>Looks good, save pattern</button>
       <button onClick={()=>{setStage("pick");setProgress(0);setExtracted(null);}} style={{width:"100%",background:"transparent",color:T.ink3,border:"none",borderRadius:99,padding:"10px",fontSize:13,cursor:"pointer"}}>Try a different file</button>
     </div>
   );
@@ -1708,7 +1708,7 @@ const BrowserImport = ({onSave,Btn,Photo}) => {
         </div>
         <div style={{padding:"16px"}}>
           <div style={{background:T.sageLt,borderRadius:8,padding:"8px 12px",marginBottom:12,display:"flex",gap:8}}><span>ℹ️</span><span style={{fontSize:12,color:T.sage}}>{active.note}</span></div>
-          <div style={{fontSize:13,color:T.ink2,lineHeight:1.7,marginBottom:14}}>In the full version, an in-app browser opens {active.name} directly. Browse and tap Save — we handle the rest.</div>
+          <div style={{fontSize:13,color:T.ink2,lineHeight:1.7,marginBottom:14}}>In the full version, an in-app browser opens {active.name} directly. Browse and tap Save. We handle the rest.</div>
           <Btn onClick={()=>doSave(active)} disabled={saving}>{saving?"Saving…":"Save from "+active.name}</Btn>
         </div>
       </div>

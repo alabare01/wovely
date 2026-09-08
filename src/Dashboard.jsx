@@ -110,7 +110,7 @@ const PatternCard = ({p,onClick,onPark,onUnpark,onDelete,onCoverChange,onRename,
         <div style={{fontFamily:PF,fontSize:20,fontWeight:600,color:NAVY,lineHeight:1.1,margin:"0 0 6px",overflow:"hidden",textOverflow:"ellipsis",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",whiteSpace:"normal"}}>{p.title}</div>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}><Stars val={p.rating} ro/><span style={{fontFamily:INTER,fontSize:12,fontWeight:700,color:MUTED}}>{p.source}</span></div>
         {done>0&&<div style={{height:9,borderRadius:999,background:"#ECE6F8",marginTop:13,overflow:"hidden"}}><span style={{display:"block",height:"100%",width:`${done}%`,borderRadius:999,background:"linear-gradient(90deg,#7B6AD4,#C98BE0)"}}/></div>}
-        {p.isStarter&&<div style={{fontSize:12,color:MUTED,opacity:.6,marginTop:8,fontStyle:"italic"}}>A gift from Wovely — yours to keep</div>}
+        {p.isStarter&&<div style={{fontSize:12,color:MUTED,opacity:.6,marginTop:8,fontStyle:"italic"}}>A gift from Wovely, yours to keep</div>}
       </div>
     </div>
   );
@@ -221,7 +221,7 @@ const BevCorner = ({ patterns, isMobile, isPro }) => {
       "Not all heroes carry hooks. But the best ones do. 💜",
       "Bev has opinions about gauge swatching. She will share them when the time is right.",
       "Whatever you're making, Bev thinks it's going to be incredible. She has a feeling.",
-      "Big shoutout to turttlesong — our most active beta tester. Bev sees you. 💜"
+      "Big shoutout to turttlesong, our most active beta tester. Bev sees you. 💜"
     ]);
 
     if (pool.length === 0) pool.push("Your craft room is ready. What are we making today? 🧶");
@@ -309,7 +309,7 @@ const BevCorner = ({ patterns, isMobile, isPro }) => {
 export const OnTheHookHeader = () => (
   <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
     <span style={{ fontFamily: PF, fontSize: 20, fontWeight: 600, color: NAVY }}>On the Hook</span>
-    <InfoTooltip text="Your most recently touched pattern — pick up right where you left off." />
+    <InfoTooltip text="Your most recently touched pattern. Pick up right where you left off." />
   </div>
 );
 
@@ -893,7 +893,7 @@ const CollectionsSection = ({tier, isAnonymous, onOpenCollection, onCreateCollec
     <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
       <span style={{fontFamily:PF,fontSize:20,fontWeight:600,color:NAVY}}>Collections</span>
       {!isCraft && <LockIcon size={16} color={ACCENT} />}
-      <InfoTooltip text={isCraft ? "Group related patterns — MKALs, designer bundles, or pattern sets — into a single shared progress view." : "Craft members organize MKALs and bundled patterns here. Tap to see what's inside."} />
+      <InfoTooltip text={isCraft ? "Group related patterns (MKALs, designer bundles, or pattern sets) into a single shared progress view." : "Craft members organize MKALs and bundled patterns here. Tap to see what's inside."} />
     </div>
   );
 
@@ -1050,7 +1050,7 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
             <img src="/bev_neutral.png" alt="Bev" style={{ width: 56, height: 56, borderRadius: "50%", flexShrink: 0, border: "3px solid #fff", background: "#F2EEFB", objectFit: "cover", boxShadow: "0 8px 18px -8px rgba(90,66,160,.5)" }} />
             <div style={{ minWidth: 0, flex: "1 1 200px" }}>
               <div style={{ fontFamily: PF, fontWeight: 600, fontSize: 19, color: INK }}>You've filled all {TIER_CONFIG.free.patternCap} free patterns</div>
-              <div style={{ fontFamily: INTER, fontWeight: 700, fontSize: 14, color: MUTED, marginTop: 1 }}>Starters never count — and Craft gives you room for 100.</div>
+              <div style={{ fontFamily: INTER, fontWeight: 700, fontSize: 14, color: MUTED, marginTop: 1 }}>Starters never count, and Craft gives you room for 100.</div>
             </div>
             <button onClick={onOpenUpgrade} style={{ marginLeft: isMobile ? 0 : "auto", border: 0, borderRadius: 13, padding: "13px 22px", background: ACCENT, color: "#fff", fontFamily: INTER, fontWeight: 800, fontSize: 15, cursor: "pointer", whiteSpace: "nowrap", boxShadow: `0 12px 24px -12px ${ACCENT}` }}>Upgrade to Craft</button>
           </div>
@@ -1110,7 +1110,7 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
         <div>
           {/* Your Library — full width */}
           <div id="your-library" style={{ marginTop: 32 }}>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}><span style={{ fontFamily: PF, fontSize: 20, fontWeight: 600, color: NAVY }}>Your Library</span><InfoTooltip text="Every pattern you've saved — search, filter, and dive in anytime." /></div>
+            <div style={{ display: "flex", alignItems: "center", marginBottom: 12 }}><span style={{ fontFamily: PF, fontSize: 20, fontWeight: 600, color: NAVY }}>Your Library</span><InfoTooltip text="Every pattern you've saved. Search, filter, and dive in anytime." /></div>
             {/* Search bar — glass */}
             <div style={{ marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", background: GLASS.bg, backdropFilter: GLASS.blur, WebkitBackdropFilter: GLASS.blur, border: GLASS.border, borderRadius: 12, padding: "10px 14px", gap: 9, boxShadow: GLASS.shadow }}>

@@ -179,7 +179,7 @@ export default function BevChat({ open, onClose, onPaywall, onCircle }) {
     el.value = "";
     const cur = CHAT_TREE[node];
     setMsgs(m => [...m, { isMsg: true, cls: "me", txt: v }]);
-    dataRef.current = { ...dataRef.current, note: dataRef.current.note ? dataRef.current.note + " — " + v : v };
+    dataRef.current = { ...dataRef.current, note: dataRef.current.note ? dataRef.current.note + ", " + v : v };
     scrollDown();
     if (cur && cur.next) go(cur.next);
   }, [node, go, scrollDown]);

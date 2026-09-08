@@ -1,6 +1,6 @@
 // ScanGauge — the 2b "BevCheck accuracy" meter for import processing screens
 // (Wovely App 2b.dc.html .gauge/.g-needle/.g-dial). Three phases:
-//   idle      — needle parked left, pct "—"
+//   idle      - needle parked left, pct "ready"
 //   checking  — needle scans back and forth (gscan), pct "checking…"
 //   done      — needle settles onto the real score (gsettle) with a stamp.
 // Score is REAL BevCheck output only — when a report has no numeric score the
@@ -34,12 +34,12 @@ const ScanGauge = ({ phase = "checking", score = null, state = null, note }) => 
     : -86;
   const stamp = done
     ? (hasScore
-        ? (score >= 97 ? "Certified" : score >= 85 ? "Passed — with notes" : "Needs a look")
-        : (state === "pass" ? "Passed" : state === "warning" ? "Passed — with notes" : "Needs a look"))
+        ? (score >= 97 ? "Certified" : score >= 85 ? "Passed with notes" : "Needs a look")
+        : (state === "pass" ? "Passed" : state === "warning" ? "Passed with notes" : "Needs a look"))
     : null;
   const pct = done
     ? (hasScore ? `${Math.round(score * 10) / 10}%` : STATE_LABEL[state] || "Checked")
-    : phase === "checking" ? "checking…" : "—";
+    : phase === "checking" ? "checking…" : "ready";
   const pctColor = done ? PCT_COLOR[zone] : "#726A92";
   const stampColor = zone === "ok" ? { border: "#5EC9AE", text: "#1E8A63" }
     : zone === "warn" ? { border: "#F5B93E", text: "#B07B1E" }

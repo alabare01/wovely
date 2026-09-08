@@ -155,7 +155,7 @@ export default function ImportPill({ onTapReview, onTapTryAgain, onTapResume }) 
     // and the standard reassurance is honest again.
     title = isClientOwned ? "Reading your file..." : (phaseCopy || "Bev's on it...");
     sub = isClientOwned
-      ? "Keep this tab open — Bev's still reading. Wander the app all you like."
+      ? "Keep this tab open while Bev is still reading. Wander the app all you like."
       : REASSURANCE_LINE;
     subAllowsWrap = true;
     ringSpinning = true;

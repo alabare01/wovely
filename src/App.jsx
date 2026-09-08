@@ -284,7 +284,7 @@ const makeStarterPatterns = () => DEFAULT_STARTERS.map(p=>({...p,rows:p.rows.map
 // Nothing to fetch, nothing to parse, nothing to fail.
 const STARTER = {
   title: "Button the Mushroom",
-  blurb: "A friendly little toadstool to learn the round on. A Wovely original — on the house.",
+  blurb: "A friendly little toadstool to learn the round on. A Wovely original, on the house.",
   coverUrl: "https://res.cloudinary.com/dmaupzhcx/image/upload/v1781136378/covers/zqo1rink0r0rbt7jvi1x.jpg",
   storagePath: "starters/button-the-mushroom-v1.pdf",
 };
@@ -1363,8 +1363,8 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
         <div style={GOAL_CARD}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
             <div>
-              <div style={{fontWeight:800,fontSize:13,color:T.ink}}>{goalYear} goal — {GOAL_TARGET} finished makes</div>
-              <div style={{fontWeight:700,fontSize:11.5,color:T.muted,marginTop:2}}>{finishedMakes>=GOAL_TARGET?"Goal met — Bev is beside herself":`${finishedMakes} down, ${GOAL_TARGET-finishedMakes} to go — Bev believes in you`}</div>
+              <div style={{fontWeight:800,fontSize:13,color:T.ink}}>{goalYear} goal: {GOAL_TARGET} finished makes</div>
+              <div style={{fontWeight:700,fontSize:11.5,color:T.muted,marginTop:2}}>{finishedMakes>=GOAL_TARGET?"Goal met. Bev is beside herself":`${finishedMakes} down, ${GOAL_TARGET-finishedMakes} to go. Bev believes in you`}</div>
             </div>
           </div>
           <div style={{height:9,borderRadius:999,background:T.line,marginTop:12,overflow:"hidden"}}>
@@ -1487,7 +1487,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
         <div style={SECTION_TITLE}>Account</div>
         <div style={{marginBottom:14}}>
           <div style={{...SC_LABEL,marginBottom:6}}>Email</div>
-          <div style={{padding:"13px 16px",background:T.soft,borderRadius:14,color:T.ink2,fontSize:15,fontWeight:600}}>{user?.email||"—"}</div>
+          <div style={{padding:"13px 16px",background:T.soft,borderRadius:14,color:T.ink2,fontSize:15,fontWeight:600}}>{user?.email||"Not set"}</div>
         </div>
         <div style={{borderTop:`1px solid ${T.line}`,paddingTop:20}}>
           <div style={{...SC_LABEL,marginBottom:14}}>Change password</div>
@@ -1625,7 +1625,7 @@ const BrowseSitesView = ({onImportUrl}) => {
         <div style={{flex:1}}>
           <div style={{marginBottom:10}}><img src="/bev_neutral.png" alt="Bev" style={{width:48,height:48,objectFit:"contain"}} onError={e=>{e.target.style.display="none";e.target.parentElement.innerHTML="🐍";}}/></div>
           <div style={{fontFamily:"'Fredoka',Georgia,serif",fontSize:18,fontWeight:700,color:"#2E2748",marginBottom:8}}>Seamless browsing is coming.</div>
-          <div style={{fontSize:14,color:"#726A92",lineHeight:1.7}}>The Wovely app will let you browse any crochet site and save patterns with a single tap — no copying, no pasting.</div>
+          <div style={{fontSize:14,color:"#726A92",lineHeight:1.7}}>The Wovely app will let you browse any crochet site and save patterns with a single tap. No copying, no pasting.</div>
         </div>
         <div style={{display:"flex",gap:12,flexDirection:isMobile?"column":"row",alignItems:"center",flexShrink:0}}>
           <div style={{background:"#1C1C1E",borderRadius:12,padding:"12px 20px",display:"flex",alignItems:"center",gap:10,opacity:.7,cursor:"default",minWidth:120}}>
@@ -1673,7 +1673,7 @@ const YarnStash = ({gateAction}) => {
       <div style={{...CARD,textAlign:"center",padding:"60px 32px"}}>
         <div style={{fontSize:48,marginBottom:16}}>🧶</div>
         <div style={{fontFamily:T.serif,fontSize:22,fontWeight:700,color:T.ink,marginBottom:8}}>Your stash lives here</div>
-        <div style={{fontSize:14,color:T.ink3,lineHeight:1.6,marginBottom:24,maxWidth:320,margin:"0 auto 24px"}}>Add your first yarn to get started — track every skein so you always know what you have before you buy.</div>
+        <div style={{fontSize:14,color:T.ink3,lineHeight:1.6,marginBottom:24,maxWidth:320,margin:"0 auto 24px"}}>Add your first yarn to get started. Track every skein so you always know what you have before you buy.</div>
         <button onClick={gateOpenAdd} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"14px 32px",fontSize:15,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>+ Add Your First Yarn</button>
       </div>
     </div>
@@ -1710,7 +1710,7 @@ const YarnStash = ({gateAction}) => {
         <div key={y.id} style={{...CARD,padding:"16px 20px",marginBottom:12,display:"flex",gap:16,alignItems:"center"}}>
           <div style={{width:48,height:48,borderRadius:"50%",background:y.colorCode,flexShrink:0,boxShadow:"inset 0 2px 6px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06)"}}/>
           <div style={{flex:1,minWidth:0}}>
-            <div style={{fontSize:14,fontWeight:600,color:T.ink}}>{y.brand} — {y.name}</div>
+            <div style={{fontSize:14,fontWeight:600,color:T.ink}}>{y.brand}, {y.name}</div>
             <div style={{display:"flex",gap:6,marginTop:6,flexWrap:"wrap"}}>
               <span style={{background:T.terraLt,color:T.terra,borderRadius:99,padding:"3px 10px",fontSize:10,fontWeight:600}}>{y.weight}</span>
               {y.color&&<span style={{background:T.linen,color:T.ink3,borderRadius:99,padding:"3px 10px",fontSize:10,fontWeight:500}}>{y.color}</span>}
@@ -1726,11 +1726,11 @@ const YarnStash = ({gateAction}) => {
 };
 
 const SEED_SHOPPING=[
-  {id:1,name:"Lion Brand Pound of Love — Antique White",qty:2,unit:"skeins",checked:false},
-  {id:2,name:"Clover Amour Crochet Hook Set — 5 sizes",qty:1,unit:"set",checked:false},
-  {id:3,name:"Poly-Fil Premium Fiber Fill — 10oz bag",qty:1,unit:"bag",checked:false},
-  {id:4,name:"Stitch Markers (locking) — pack of 50",qty:1,unit:"pack",checked:false},
-  {id:5,name:"Yarn needle set — tapestry needles",qty:1,unit:"set",checked:false},
+  {id:1,name:"Lion Brand Pound of Love, Antique White",qty:2,unit:"skeins",checked:false},
+  {id:2,name:"Clover Amour Crochet Hook Set, 5 sizes",qty:1,unit:"set",checked:false},
+  {id:3,name:"Poly-Fil Premium Fiber Fill, 10oz bag",qty:1,unit:"bag",checked:false},
+  {id:4,name:"Stitch Markers (locking), pack of 50",qty:1,unit:"pack",checked:false},
+  {id:5,name:"Yarn needle set, tapestry needles",qty:1,unit:"set",checked:false},
 ];
 const ShoppingList = ({gateAction}) => {
   const [items,setItems]=useState(SEED_SHOPPING);
@@ -1752,7 +1752,7 @@ const ShoppingList = ({gateAction}) => {
       <div style={{...CARD,textAlign:"center",padding:"60px 32px"}}>
         <div style={{fontSize:48,marginBottom:16}}>🛒</div>
         <div style={{fontFamily:T.serif,fontSize:22,fontWeight:700,color:T.ink,marginBottom:8}}>Your supply list</div>
-        <div style={{fontSize:14,color:T.ink3,lineHeight:1.6,maxWidth:320,margin:"0 auto 24px"}}>Add items as you plan your next project — yarn, hooks, and notions all in one place.</div>
+        <div style={{fontSize:14,color:T.ink3,lineHeight:1.6,maxWidth:320,margin:"0 auto 24px"}}>Add items as you plan your next project. Yarn, hooks, and notions all in one place.</div>
         <div style={{display:"flex",gap:8,maxWidth:380,margin:"0 auto"}}>
           <input value={newItem} onChange={e=>setNewItem(e.target.value)} onKeyDown={e=>e.key==="Enter"&&gateAddItem()} placeholder="Add an item..." style={{flex:1,padding:"13px 16px",background:"transparent",border:"none",borderBottom:`1.5px solid ${T.border}`,color:T.ink,fontSize:14,outline:"none",transition:"border-color .2s"}} onFocus={e=>e.target.style.borderBottomColor=T.terra} onBlur={e=>e.target.style.borderBottomColor=T.border}/>
           <button onClick={gateAddItem} style={{background:T.terra,color:"#fff",border:"none",borderRadius:99,padding:"12px 24px",fontSize:14,fontWeight:600,cursor:"pointer",boxShadow:"0 4px 16px rgba(123,106,212,.3)"}}>Add</button>
@@ -2141,7 +2141,7 @@ const CHANGELOG_ENTRIES = [
         "🌀 Stitch Vision is now Stitch-O-Vision",
         "💜 BevCheck replaces old Stitch Check in nav",
         "📊 Structured API logging to Supabase vercel_logs table",
-        "🚨 Client-side error reporting — captures unhandled JS errors and promise rejections",
+        "🚨 Client-side error reporting: captures unhandled JS errors and promise rejections",
         "🧠 Stitch-O-Vision prompt now distinguishes stitches from construction techniques",
       ],
       "Fixed": [
@@ -2162,12 +2162,12 @@ const CHANGELOG_ENTRIES = [
       ],
       "Improved": [
         "RND vs ROW labeling now detects construction type",
-        "Multi-round expansion — RND 10-23 becomes 14 individual rows",
+        "Multi-round expansion: RND 10-23 becomes 14 individual rows",
         "View Source Pattern pill in row manager",
       ],
       "Fixed": [
         "Starter patterns always show 5 in nav count",
-        "Pattern sort order — newest first, starters below",
+        "Pattern sort order: newest first, starters below",
       ],
     },
   },
@@ -2175,7 +2175,7 @@ const CHANGELOG_ENTRIES = [
     version: "v1.4.x", date: "March 22, 2026", major: false,
     changes: {
       "New": [
-        "Real Supabase auth — signup, signin, signout, session persistence",
+        "Real Supabase auth: signup, signin, signout, session persistence",
         "Three-step onboarding flow",
         "Profile & Settings view",
         "Builds in Progress with live count in nav",
@@ -2191,12 +2191,12 @@ const CHANGELOG_ENTRIES = [
     version: "v1.3.x", date: "March 20, 2026", major: true,
     changes: {
       "New": [
-        "Wovely brand launch — retired Stitch Box",
+        "Wovely brand launch: retired Stitch Box",
         "Smart Import URL pipeline with og:image extraction",
         "Snap & Stitch (Snap to Pattern) with Gemini Vision",
         "Social sharing with milestone banners and share cards",
         "Welcome screen with illustrated world background",
-        "Yarn animation (pure CSS — mobile Safari safe)",
+        "Yarn animation (pure CSS, mobile Safari safe)",
         "Free/Pro/App Store modals",
         "Waitlist email capture live in Supabase",
       ],
@@ -4246,7 +4246,7 @@ export default function Wovely() {
       {deleteTarget&&<DeleteConfirmModal pattern={deleteTarget} isPro={isPro} onCancel={()=>setDeleteTarget(null)} onDelete={confirmDelete} onPark={parkInsteadOfDelete} onGoPro={()=>{setDeleteTarget(null);setShowProModal(true);}}/>}
       {coverPickerTarget&&<CoverImagePicker pattern={coverPickerTarget} onConfirm={handleCoverConfirm} onClose={()=>setCoverPickerTarget(null)} pdfThumbUrl={pdfThumbUrl} CAT_IMG={CAT_IMG} ALL_CAT_ENTRIES={ALL_CAT_ENTRIES}/>}
       <WelcomeToast visible={showWelcomeToast} returning={welcomeIsReturning}/>
-      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
+      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}`:"No worries, you can upgrade anytime"}</div>}
       {/* onSignOut is gated on `authed`: SidebarNav renders the button whenever
           the prop is present, so a signed-out visitor was being offered a "Sign
           out" control for a session they never had. Signed out, the sidebar
@@ -4294,7 +4294,7 @@ export default function Wovely() {
       {!addOpen&&!imageImportOpen&&<ImportPill onTapReview={handlePillReview} onTapTryAgain={handlePillTryAgain} onTapResume={handlePillResume}/>}
       {showOnboarding&&<OnboardingScreen onComplete={()=>{setShowOnboarding(false);setJustCompletedOnboarding(true);navigate("/profile");}} onBackToAuth={async()=>{setShowOnboarding(false);await supabaseAuth.signOut();setAuthed(false);setTier(TIER_FREE);clearCachedTier();setUserPatterns([]);}}/>}
       <WelcomeToast visible={showWelcomeToast} returning={welcomeIsReturning}/>
-      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}!`:"No worries — you can upgrade anytime"}</div>}
+      {upgradeToast&&<div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",zIndex:999,background:upgradeToast==="success"?"#1E8A63":"#726A92",color:"#fff",borderRadius:14,padding:"12px 24px",fontSize:14,fontWeight:600,boxShadow:"0 8px 32px rgba(0,0,0,.2)",animation:"modalPop .3s ease both",textAlign:"center"}}>{upgradeToast==="success"?`Welcome to Wovely ${tierLabel(tier)}`:"No worries, you can upgrade anytime"}</div>}
       {/* Hamburger drawer (NavPanel) retired — the 2b mobile shell navigates
           via the fixed bottom nav below, per Wovely App 2b.dc.html ≤640px. */}
       {showPaywall&&<TieredUpgradeModal currentTier={tier} reason="paywall" onClose={()=>{setShowPaywall(false);setPaywallRecommend(null);}} isAnonymous={!authed || isAnonymous} onSignupRequired={handleUpgradeSignupRequired} recommendedTier={paywallRecommend}/>}

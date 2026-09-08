@@ -22,7 +22,7 @@ export const CHANGELOG = [
     version: "Session 78",
     date: "2026-07-07",
     updates: [
-      { emoji: "🎨", text: "Wovely has a fresh new look — warmer lavender, playful rounded headings, and a cozy woven texture throughout" },
+      { emoji: "🎨", text: "Wovely has a fresh new look. Warmer lavender, playful rounded headings, and a cozy woven texture throughout" },
       { emoji: "🧶", text: "Every screen now matches: cards, buttons, and Bev's gauge all wear the new palette" },
     ]
   },
@@ -30,7 +30,7 @@ export const CHANGELOG = [
     version: "Session 77",
     date: "2026-05-30",
     updates: [
-      { emoji: "🔑", text: "Started a pattern as a guest? You can now create an account right from the menu and keep everything you've made — or sign out to switch accounts" },
+      { emoji: "🔑", text: "Started a pattern as a guest? You can now create an account right from the menu and keep everything you've made, or sign out to switch accounts" },
       { emoji: "⬆️", text: "My Wovely now opens right at the top after you sign in" },
       { emoji: "✨", text: "When a project needs Craft, Bev now points you to the right plan" },
     ]
@@ -48,9 +48,9 @@ export const CHANGELOG = [
     version: "Session 42",
     date: "2026-04-09",
     updates: [
-      { emoji: "🛡️", text: "Import is now bulletproof — if our servers hiccup, Bev untangles it and keeps you moving" },
-      { emoji: "⚡", text: "Faster failure recovery — server timeouts now cut off in 4 seconds instead of waiting" },
-      { emoji: "🎨", text: "Landing page updated — better pattern images, app store badges coming soon" },
+      { emoji: "🛡️", text: "Import is now bulletproof. If our servers hiccup, Bev untangles it and keeps you moving" },
+      { emoji: "⚡", text: "Faster failure recovery: server timeouts now cut off in 4 seconds instead of waiting" },
+      { emoji: "🎨", text: "Landing page updated with better pattern images, and app store badges are coming soon" },
     ]
   },
   {
@@ -58,7 +58,7 @@ export const CHANGELOG = [
     date: "2026-04-08",
     updates: [
       { emoji: "🧶", text: "Import hiccups now show a friendly retry screen instead of a dead end" },
-      { emoji: "🔁", text: "One-tap retry on failed imports — no need to start over from scratch" },
+      { emoji: "🔁", text: "One-tap retry on failed imports, so there is no need to start over from scratch" },
     ]
   },
   {
@@ -67,20 +67,20 @@ export const CHANGELOG = [
     updates: [
       { emoji: "🔧", text: "Fixed: import spinner now clears correctly when a pattern upload fails" },
       { emoji: "📝", text: "Improved: \"Rows\" tab renamed to \"Instructions/Rows\" for all pattern types" },
-      { emoji: "🏠", text: "Redesigned landing page — product preview, Bev typewriter, magic link + Apple sign-in" },
+      { emoji: "🏠", text: "Redesigned landing page: product preview, Bev typewriter, magic link and Apple sign-in" },
     ]
   },
   {
     version: "37",
     date: "2026-04-05",
     updates: [
-      { emoji: "🏠", text: "My Wovely feels like home now — warm craft room background, glass cards, the whole vibe" },
-      { emoji: "🐍", text: "Bev actually talks to you now — she types out personalized messages and rotates them as you work" },
-      { emoji: "🎯", text: "On the Hook always shows your most recently worked pattern — jump right back in" },
-      { emoji: "📊", text: "Your Wovely stats are real and accurate — patterns saved, rows tracked, stitches found" },
-      { emoji: "💜", text: "Bev is now the Wovely logo in the sidebar — she lives here" },
-      { emoji: "ℹ️", text: "Little info tooltips on every section — hover or tap to learn what each area does" },
-      { emoji: "📱", text: "Mobile nav shows all your tools — nothing hidden, everything one tap away" },
+      { emoji: "🏠", text: "My Wovely feels like home now. Warm craft room background, glass cards, the whole vibe" },
+      { emoji: "🐍", text: "Bev actually talks to you now. She types out personalized messages and rotates them as you work" },
+      { emoji: "🎯", text: "On the Hook always shows your most recently worked pattern, so you can jump right back in" },
+      { emoji: "📊", text: "Your Wovely stats are real and accurate: patterns saved, rows tracked, stitches found" },
+      { emoji: "💜", text: "Bev is now the Wovely logo in the sidebar. She lives here" },
+      { emoji: "ℹ️", text: "Little info tooltips on every section. Hover or tap to learn what each area does" },
+      { emoji: "📱", text: "Mobile nav shows all your tools. Nothing hidden, everything one tap away" },
       { emoji: "🐛", text: "Fixed: last worked pattern now updates correctly when you track rows" },
     ]
   },
@@ -88,50 +88,50 @@ export const CHANGELOG = [
     version: "36",
     date: "2026-04-04",
     updates: [
-      { emoji: "🌀", text: "Stitch Vision is now Stitch-O-Vision — same magic, way better name" },
+      { emoji: "🌀", text: "Stitch Vision is now Stitch-O-Vision. Same magic, way better name" },
       { emoji: "💜", text: "Stitch Check is now BevCheck in the nav" },
-      { emoji: "🔗", text: "Stitch-O-Vision share links now work — send your results to the whole group chat" },
+      { emoji: "🔗", text: "Stitch-O-Vision share links now work, so you can send your results to the whole group chat" },
       { emoji: "🐛", text: "Fixed: feedback heart now properly floats above everything on iOS" },
-      { emoji: "🧠", text: "Stitch-O-Vision is smarter — no longer confuses construction techniques with stitches" },
-      { emoji: "📊", text: "Full error logging added behind the scenes — we can squash bugs faster than ever" },
+      { emoji: "🧠", text: "Stitch-O-Vision is smarter and no longer confuses construction techniques with stitches" },
+      { emoji: "📊", text: "Full error logging added behind the scenes, so we can squash bugs faster than ever" },
     ]
   },
   {
     version: "35",
     date: "2026-04-03",
     updates: [
-      { emoji: "🔍", text: "Full observability stack added — Bev is watching everything behind the scenes" },
-      { emoji: "📱", text: "Client-side error reporting live — app errors are captured automatically" },
+      { emoji: "🔍", text: "Full observability stack added. Bev is watching everything behind the scenes" },
+      { emoji: "📱", text: "Client-side error reporting live. App errors are captured automatically" },
     ]
   },
   {
     version: "34",
     date: "2026-03-31",
     updates: [
-      { emoji: "💌", text: "Talk To Us heart button — tap anytime to send feedback, report bugs, or share love" },
+      { emoji: "💌", text: "Talk To Us heart button. Tap anytime to send feedback, report bugs, or share love" },
       { emoji: "📎", text: "Bug reports now support photo attachments" },
-      { emoji: "📧", text: "Google Workspace live — adam@wovely.app + support@wovely.app active" },
-      { emoji: "👤", text: "New user email alerts added — we know the moment someone new joins Wovely" },
+      { emoji: "📧", text: "Google Workspace live, with adam@wovely.app and support@wovely.app active" },
+      { emoji: "👤", text: "New user email alerts added, so we know the moment someone new joins Wovely" },
     ]
   },
   {
     version: "33",
     date: "2026-03-30",
     updates: [
-      { emoji: "🐍", text: "Bev is now everywhere — replaces spinner emoji across the whole app" },
-      { emoji: "📄", text: "PDF size limit raised to 50MB — bring your chunky patterns" },
-      { emoji: "📸", text: "iOS file picker restored — full photo library access back on iPhone" },
-      { emoji: "✂️", text: "Code splitting added — app loads significantly faster" },
-      { emoji: "🔢", text: "Nav pattern count now accurate — deleted and parked patterns no longer counted" },
+      { emoji: "🐍", text: "Bev is now everywhere, replacing the spinner emoji across the whole app" },
+      { emoji: "📄", text: "PDF size limit raised to 50MB, so bring your chunky patterns" },
+      { emoji: "📸", text: "iOS file picker restored, with full photo library access back on iPhone" },
+      { emoji: "✂️", text: "Code splitting added, so the app loads significantly faster" },
+      { emoji: "🔢", text: "Nav pattern count now accurate. Deleted and parked patterns are no longer counted" },
     ]
   },
   {
     version: "32",
     date: "2026-03-29",
     updates: [
-      { emoji: "🌀", text: "Stitch-O-Vision launched — identify any crochet stitch instantly from a photo" },
-      { emoji: "🔗", text: "Shareable stitch result pages — send your Stitch-O-Vision results to anyone" },
-      { emoji: "📥", text: "Floating import modal — minimize while your pattern loads and keep browsing" },
+      { emoji: "🌀", text: "Stitch-O-Vision launched. Identify any crochet stitch instantly from a photo" },
+      { emoji: "🔗", text: "Shareable stitch result pages. Send your Stitch-O-Vision results to anyone" },
+      { emoji: "📥", text: "Floating import modal. Minimize while your pattern loads and keep browsing" },
       { emoji: "📱", text: "Mobile import now shows a slim banner so you never lose your place" },
     ]
   },
@@ -139,19 +139,19 @@ export const CHANGELOG = [
     version: "31",
     date: "2026-03-28",
     updates: [
-      { emoji: "🖼️", text: "Image-based PDF import — Apple Notes exports and scanned patterns now work" },
+      { emoji: "🖼️", text: "Image-based PDF import. Apple Notes exports and scanned patterns now work" },
       { emoji: "📋", text: "Paste a URL to import patterns directly from the web" },
       { emoji: "🧹", text: "App fully rebranded from YarnHive to Wovely everywhere" },
-      { emoji: "💳", text: "Stripe payments live — Pro subscriptions are real and working" },
+      { emoji: "💳", text: "Stripe payments live. Pro subscriptions are real and working" },
     ]
   },
   {
     version: "30",
     date: "2026-03-27",
     updates: [
-      { emoji: "🎨", text: "Full design system locked — lavender, navy, white, Fredoka everywhere" },
-      { emoji: "🐍", text: "Bev is official — hyper-realistic lavender snake mascot live across the app" },
-      { emoji: "📊", text: "PostHog analytics wired — we track what matters, nothing creepy" },
+      { emoji: "🎨", text: "Full design system locked: lavender, navy, white, Fredoka everywhere" },
+      { emoji: "🐍", text: "Bev is official. The hyper-realistic lavender snake mascot is live across the app" },
+      { emoji: "📊", text: "PostHog analytics wired. We track what matters, nothing creepy" },
       { emoji: "⚖️", text: "Privacy Policy and Terms of Service live" },
     ]
   },

@@ -142,7 +142,7 @@ const CoverImagePicker = ({pattern, onConfirm, onClose, pdfThumbUrl, CAT_IMG, AL
           )}
           {tab==="photo"&&(
             <div style={{textAlign:"center",padding:"16px 0"}}>
-              <div style={{fontSize:13,color:T.ink3,lineHeight:1.6,marginBottom:16}}>Show off your work — use a photo of your finished object or your pattern cover</div>
+              <div style={{fontSize:13,color:T.ink3,lineHeight:1.6,marginBottom:16}}>Show off your work. Use a photo of your finished object or your pattern cover.</div>
               {selected&&!PILL.includes(selected)&&selected!==importUrl&&!Object.values(CAT_IMG).includes(selected)
                 ?<div style={{marginBottom:16}}>
                   <div style={{borderRadius:12,overflow:"hidden",border:`3px solid ${T.terra}`,display:"inline-block",position:"relative"}}>
@@ -241,7 +241,7 @@ const ScaleModal = ({pattern,onClose,Btn}) => {
 
 const ShareCardModal = ({pattern,onClose,pct,Btn}) => {
   const done=pct(pattern),isComplete=done===100;
-  const [caption,setCaption]=useState(isComplete?"Just finished \""+pattern.title+"\"! 🧶 So happy with how this turned out.":"Working on \""+pattern.title+"\" — "+done+"% done! 🪡 Making progress!");
+  const [caption,setCaption]=useState(isComplete?"Just finished \""+pattern.title+"\"! 🧶 So happy with how this turned out.":"Working on \""+pattern.title+"\", "+done+"% done! 🪡 Making progress!");
   const [shared,setShared]=useState(false);
   const shareText=caption+"\n\nMade with Wovely 📱 #crochet #wovely #crochetlife";
   const doShare=async(platformId)=>{
@@ -255,7 +255,7 @@ const ShareCardModal = ({pattern,onClose,pct,Btn}) => {
         <div style={{width:36,height:3,background:T.border,borderRadius:99,margin:"0 auto 20px"}}/>
         <div style={{background:`linear-gradient(135deg,${T.terra},#6B2A10)`,borderRadius:18,padding:"20px",marginBottom:16,position:"relative",overflow:"hidden"}}>
           <div style={{position:"relative"}}>
-            <div style={{fontSize:11,color:"rgba(255,255,255,.6)",textTransform:"uppercase",letterSpacing:".1em",marginBottom:6}}>{isComplete?"🎉 Finished Object":"🪡 Build in Progress — "+done+"%"}</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.6)",textTransform:"uppercase",letterSpacing:".1em",marginBottom:6}}>{isComplete?"🎉 Finished Object":"🪡 Build in Progress: "+done+"%"}</div>
             <div style={{fontFamily:T.serif,fontSize:22,fontWeight:700,color:"#fff",marginBottom:4,lineHeight:1.2}}>{pattern.title}</div>
             <div style={{fontSize:12,color:"rgba(255,255,255,.65)",marginBottom:12}}>{[pattern.hook&&"Hook "+pattern.hook,pattern.weight,pattern.cat].filter(Boolean).join(" · ")}</div>
             {!isComplete&&<div style={{background:"rgba(255,255,255,.15)",borderRadius:99,height:6,overflow:"hidden",marginBottom:10}}><div style={{width:done+"%",height:"100%",background:"#fff",borderRadius:99}}/></div>}
@@ -337,7 +337,7 @@ const ChartsAndImagesSection = ({ pattern, tier, isAnonymous, onShowUpgrade, pin
               },
               onError: ({ stage }) => {
                 if (cancelled) return;
-                setRenderNote(`Some charts couldn't be prepared (${stage}) — Bev logged the details.`);
+                setRenderNote(`Some charts couldn't be prepared (${stage}). Bev logged the details.`);
               },
             });
             if (!cancelled) setImages(updated);
@@ -771,7 +771,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
                 Bev found {collectionUpgrade.expected_part_count ? `${collectionUpgrade.expected_part_count} ${(collectionUpgrade.part_label || "part").toLowerCase()}s` : `multiple ${(collectionUpgrade.part_label || "part").toLowerCase()}s`} in this pattern
               </div>
               <div style={{ fontSize: 12, color: T.ink2, lineHeight: 1.55 }}>
-                Upgrade to Craft to organize them as a collection — Bev keeps the materials and progress in one place.
+                Upgrade to Craft to organize them as a collection. Bev keeps the materials and progress in one place.
               </div>
             </div>
             <div style={{ display: "flex", gap: 8, alignItems: "center", flexShrink: 0 }}>
@@ -800,7 +800,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
           ))}
           {editing&&<button onClick={()=>setDraft({...draft,materials:[...draft.materials,{id:Date.now(),name:"",amount:"",yardage:0}]})} style={{marginTop:14,width:"100%",border:`1.5px dashed ${T.border}`,background:"none",borderRadius:11,padding:"10px",color:T.ink3,cursor:"pointer",fontSize:13}}>+ Add material</button>}
           {showYarnTip&&<div style={{marginTop:16,background:T.linen,borderRadius:12,padding:"12px 14px",border:`1px solid ${T.border}`,display:"flex",alignItems:"flex-start",gap:10}}>
-            <div style={{flex:1,fontSize:12,color:T.ink2,lineHeight:1.6}}>Using different yarn or hooks? Tap any card to log what you're actually using — we'll remember it every time you come back.</div>
+            <div style={{flex:1,fontSize:12,color:T.ink2,lineHeight:1.6}}>Using different yarn or hooks? Tap any card to log what you're actually using. We'll remember it every time you come back.</div>
             <button onClick={()=>{setShowYarnTip(false);localStorage.setItem("yh_yarn_summary_tip_seen","1");}} style={{background:"none",border:"none",color:T.ink3,cursor:"pointer",fontSize:16,padding:"0 2px",flexShrink:0,lineHeight:1,opacity:.6}}>×</button>
           </div>}
           <div style={{marginTop:showYarnTip?12:20,background:`linear-gradient(135deg,${T.terraLt},${T.card})`,borderRadius:14,padding:"14px 16px",border:`1px solid ${T.border}`}}>

@@ -12,4 +12,4 @@ export const PHOTOS = {
 
 export const PILL = [PHOTOS.blanket, PHOTOS.cardigan, PHOTOS.granny, PHOTOS.tote, PHOTOS.pillow, PHOTOS.market];
 
-export const APP_VERSION = "v1.4.0 — Mar 22 2026";
+export const APP_VERSION = "v1.4.0 (Mar 22 2026)";
