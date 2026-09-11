@@ -81,9 +81,9 @@ https://wovely.app
 Adam${FOOTER}` },
   3: { subject: 'Last note from me', body: (n) => `Hi ${n},
 
-This is the last email I will send about the rebuild, so I will keep it to two things.
+This is the last email I will send about the rebuild, so I will keep it to two things, and the second one is the real reason I am writing.
 
-One. Wovely is live and it is good now. Patterns read and checked, your place kept row by row, your yarn and hooks tracked, and a Circle of makers sharing finished work. Free to use, and your account is still sitting there.
+One. Wovely is live. Patterns read and checked, your place kept row by row, your yarn and hooks tracked, and a Circle of makers sharing finished work. Your account is still sitting there. To be straight with you about what it costs now, since it changed after you signed up: five patterns are free and stay free, and if you keep more than that it is $6.99 a month. I would rather you heard that from me than found it at the wrong moment.
 
 https://wovely.app
 
@@ -99,7 +99,11 @@ const H = { apikey: SVC, Authorization: `Bearer ${SVC}` };
 const r = await fetch(`${SB}/auth/v1/admin/users?per_page=200`, { headers: H });
 const { users = [] } = await r.json();
 
-const cutoff = Date.now() - 7 * 864e5;
+// 30 days, not 7. The cohort is defined everywhere else (Live Metrics, the
+// dry-run pack) as users who have not signed in for 30+ days. On 2026-09-10
+// a real user came back on their own after five months; with a 7-day window
+// they would have received "Last note from me" a week later.
+const cutoff = Date.now() - 30 * 864e5;
 const cohort = users.filter(u =>
   u.email && !EXCLUDE_IDS.has(u.id) && !u.is_anonymous &&
   // Adam's own plus-addressed aliases. On 2026-07-16 these were left in
@@ -122,7 +126,7 @@ const firstName = (u) => {
 };
 
 console.log(`TOTAL USERS: ${users.length}`);
-console.log(`COHORT (lapsed, excluding Adam/Danielle/last-7-day actives): ${cohort.length}`);
+console.log(`COHORT (lapsed, excluding Adam/Danielle/last-30-day actives): ${cohort.length}`);
 console.log(`EMAIL ${N}: "${EMAILS[N].subject}"`);
 console.log('---');
 cohort.forEach(u => console.log(`  ${u.email}  (${firstName(u)})  last_sign_in=${u.last_sign_in_at || 'never'}`));
