@@ -527,6 +527,47 @@ export function looksLikeBot(userAgent) {
   return BOT_RE.test(s);
 }
 
+// ERRORS THAT ARE NOT ERRORS. Added 2026-09-11 after a day's report told Adam
+// "564 saw an error" and he reasonably read it as an outage.
+//
+// WHAT ACTUALLY HAPPENED: one non-human visitor hit /tools once and threw the
+// same rejection 500 times in a single session. 564 of that day's 584 events
+// were that one session. The site returned 200 the whole time.
+//
+// The signature was `Object Not Found Matching Id:N, MethodName:update,
+// ParamCount:4`, which is CefSharp, the .NET Chromium wrapper used by link
+// scanners. In practice it is usually Microsoft Outlook SafeLinks opening a
+// URL somebody emailed. Ironically it fires because a Wovely link got SHARED.
+//
+// looksLikeBot did not catch it because that reads the USER AGENT, and these
+// scanners present a plausible Chrome UA. The error signature is the reliable
+// tell, so this screens on the message instead.
+//
+// These are DROPPED rather than counted, because a number nobody should act on
+// is worse on a daily report than no number: it trains him to ignore the whole
+// channel, which is exactly what the monitor exists to prevent.
+const NOT_REAL_ERROR_RE = new RegExp([
+  // CefSharp / SafeLinks / Outlook link scanning
+  'Object Not Found Matching Id',
+  // Browser extensions injecting into the page, not our code
+  'ResizeObserver loop',
+  'Non-Error promise rejection captured',
+  'chrome-extension://',
+  'moz-extension://',
+  'safari-extension://',
+  // Network noise from the visitor's side
+  'Load failed',
+  'Failed to fetch',
+  'NetworkError when attempting to fetch',
+  'The operation was aborted',
+].join('|'), 'i');
+
+export function isRealUserError(message) {
+  const s = String(message ?? '').trim();
+  if (!s) return false;
+  return !NOT_REAL_ERROR_RE.test(s);
+}
+
 /**
  * Turn a raw beacon body into a row payload, or null when it is not a real
  * event. Never throws.
@@ -535,6 +576,15 @@ export function normalizeEvent(body, { now = new Date() } = {}) {
   if (!body || typeof body !== 'object') return null;
   const kind = String(body.kind ?? '').trim();
   if (!Object.prototype.hasOwnProperty.call(EVENT_KINDS, kind)) return null;
+
+  // A user_error carrying a scanner or extension signature is dropped here, at
+  // the door, rather than counted and filtered later. Returning null means it
+  // never reaches a row, a count, a push or the daily report. See
+  // isRealUserError for what happened on 2026-09-10 and why this exists.
+  if (kind === 'user_error') {
+    const msg = body?.meta?.message ?? body?.meta?.detail ?? body?.detail ?? '';
+    if (msg && !isRealUserError(msg)) return null;
+  }
 
   const sid = SID_RE.test(String(body.sid ?? '')) ? String(body.sid).toLowerCase() : null;
   const uid = UUID_RE.test(String(body.uid ?? '')) ? String(body.uid).toLowerCase() : null;
