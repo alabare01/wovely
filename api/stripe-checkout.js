@@ -29,6 +29,21 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  if (req.method !== 'POST') return res.status(405).end();
+
+  const _url = process.env.VITE_SUPABASE_URL;
+  const _key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const _t0 = Date.now();
+
+  const { userId, email, tier: rawTier, cadence: rawCadence } = req.body || {};
+
+  // Every failure response carries BOTH a machine-readable `error` code and a
+  // `message` the client is allowed to show a customer verbatim. Raw Stripe
+  // exception text never goes in `message` — it lands in the logs instead.
+  // The client falls back to its own generic copy if `message` is ever absent,
+  // so no failure can reach a user as silence.
+  const fail = (status, code, message) => res.status(status).json({ error: code, message });
+
   // GET ?promo=CODE: the grand-opening banner reads the offer from Stripe so
   // no price or date is ever typed into the page from memory. Folded into
   // this function because the project sits at the Hobby function limit.
@@ -38,7 +53,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     const code = String((req.query && req.query.promo) || '').trim().toUpperCase();
-    if (!code || code.length > 32) return res.status(400).json({ active: false, error: 'missing_code' });
+    if (!code || code.length > 32) return fail(400, 'missing_code', 'No promotion code was given.');
     try {
       const found = await stripe.promotionCodes.list({ code, active: true, limit: 1 });
       const pc = found.data && found.data[0];
@@ -64,24 +79,10 @@ export default async function handler(req, res) {
       });
     } catch (err) {
       console.error('[stripe-checkout] promo read failed:', err.message);
-      return res.status(502).json({ active: false, error: 'promo_read_failed' });
+      return fail(502, 'promo_read_failed', 'The offer could not be read just now. The code still works at checkout.');
     }
   }
 
-  if (req.method !== 'POST') return res.status(405).end();
-
-  const _url = process.env.VITE_SUPABASE_URL;
-  const _key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const _t0 = Date.now();
-
-  const { userId, email, tier: rawTier, cadence: rawCadence } = req.body || {};
-
-  // Every failure response carries BOTH a machine-readable `error` code and a
-  // `message` the client is allowed to show a customer verbatim. Raw Stripe
-  // exception text never goes in `message` — it lands in the logs instead.
-  // The client falls back to its own generic copy if `message` is ever absent,
-  // so no failure can reach a user as silence.
-  const fail = (status, code, message) => res.status(status).json({ error: code, message });
 
   if (!userId || !email) {
     return fail(400, 'missing_identity', 'We could not confirm your account, so checkout did not open. Nothing has been charged. Sign out, sign back in, and try again.');
