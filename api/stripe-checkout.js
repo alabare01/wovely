@@ -57,7 +57,15 @@ export default async function handler(req, res) {
       const found = await stripe.promotionCodes.list({ code, active: true, limit: 1 });
       const pc = found.data && found.data[0];
       const exp = pc && pc.expires_at ? pc.expires_at * 1000 : null;
-      if (!pc || (exp && exp <= Date.now()) || !pc.coupon || !pc.coupon.valid) {
+      // Newer API versions return promotion.coupon as an id rather than an
+      // expanded coupon object (verified 2026-09-14 against the live key), so
+      // resolve whichever shape arrived.
+      let coupon = pc && (pc.coupon && typeof pc.coupon === 'object' ? pc.coupon : null);
+      if (pc && !coupon) {
+        const couponId = (typeof pc.coupon === 'string' && pc.coupon) || (pc.promotion && pc.promotion.coupon) || null;
+        if (couponId) coupon = await stripe.coupons.retrieve(couponId);
+      }
+      if (!pc || (exp && exp <= Date.now()) || !coupon || !coupon.valid) {
         res.setHeader('Cache-Control', 'public, s-maxage=300');
         return res.json({ active: false });
       }
@@ -66,10 +74,10 @@ export default async function handler(req, res) {
       return res.json({
         active: true,
         code: pc.code,
-        percent_off: pc.coupon.percent_off ?? null,
-        amount_off: pc.coupon.amount_off ?? null,
-        duration: pc.coupon.duration,
-        duration_in_months: pc.coupon.duration_in_months ?? null,
+        percent_off: coupon.percent_off ?? null,
+        amount_off: coupon.amount_off ?? null,
+        duration: coupon.duration,
+        duration_in_months: coupon.duration_in_months ?? null,
         expires_at: exp ? new Date(exp).toISOString() : null,
         price_cents: price.unit_amount,
         currency: price.currency,
