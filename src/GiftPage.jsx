@@ -27,7 +27,7 @@ export const PAGE_SCHEMA = {
 };
 
 const STEPS = [
-  ["You pay for the year", `One payment, $${CRAFT_ANNUAL_TOTAL}, on a secure Stripe page. Put their email in the box marked for it, and yours as the buyer.`],
+  ["You pay for the year", `$${CRAFT_ANNUAL_TOTAL} for the year, on a secure Stripe page. Put their email in the box marked for it, and yours as the buyer.`],
   ["Bev writes to them", "Within a business day their Wovely account is on Craft for a full year, and they get a note from Bev saying who it is from. If they do not have an account yet, the note walks them through making one, free."],
   ["They open it and go", "A hundred patterns, Bev checking each one, the counter and the repeat dots on every row, and every project's place kept on every device they own. The year is billed to you, not to them, and it renews on your card a year from now unless you cancel first: one click from the receipt Stripe sends you, any time."],
 ];
