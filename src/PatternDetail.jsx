@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import GuestEmailAsk from "./GuestEmailAsk.jsx";
 import { useNavigate } from "react-router-dom";
 import { T, useBreakpoint, Field } from "./theme.jsx";
 import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseAuth, getSession } from "./supabase.js";
@@ -911,36 +912,25 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
               Bev is keeping your place on this device
             </div>
             <div style={{
-              fontSize: isDesktop ? 14 : 13,
+              fontSize: isDesktop ? 13.5 : 12.5,
               color:"#726A92",
-              lineHeight:1.55,
-              marginBottom:14,
+              lineHeight:1.5,
+              marginBottom:10,
             }}>
-              A free account keeps it on every device and makes room for five patterns.
+              Leave an email and Bev sends you the code that halves your first three months of Craft.
             </div>
-            <button
-              onClick={()=>onSignUp&&onSignUp()}
-              style={{
-                background:"#7B6AD4",
-                color:"#fff",
-                border:"none",
-                borderRadius:12,
-                padding: isDesktop ? "12px 28px" : "12px 16px",
-                fontSize:14,
-                fontWeight:600,
-                cursor:"pointer",
-                boxShadow:"0 4px 16px rgba(123,106,212,0.3)",
-                width: isDesktop ? "auto" : "100%",
-                minWidth: isDesktop ? 220 : undefined,
-                marginBottom:10,
-              }}
-            >Keep my place everywhere</button>
-            <div style={{fontSize:13,color:"#726A92"}}>
-              Already have an account?{" "}
+            <GuestEmailAsk compact={!isDesktop} where="guest_bar"/>
+            <div style={{fontSize:12.5,color:"#726A92",marginTop:10}}>
+              Want it on every device?{" "}
               <span
                 onClick={()=>onSignUp&&onSignUp()}
                 style={{color:"#7B6AD4",cursor:"pointer",fontWeight:600}}
-              >Sign in</span>
+              >Create a free account</span>
+              {" "}or{" "}
+              <span
+                onClick={()=>onSignUp&&onSignUp()}
+                style={{color:"#7B6AD4",cursor:"pointer",fontWeight:600}}
+              >sign in</span>.
             </div>
           </div>
         </div>
