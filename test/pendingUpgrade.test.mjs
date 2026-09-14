@@ -39,7 +39,9 @@ import {
   shouldOpenCheckout,
 } from '../src/utils/pendingUpgrade.js';
 
-const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8');
+// Normalised to LF: a Windows checkout with autocrlf hands back CRLF and the
+// paid-branch slice below looks for a bare newline, which then never matches.
+const read = (rel) => readFileSync(fileURLToPath(new URL(rel, import.meta.url)), 'utf8').replace(/\r\n/g, '\n');
 
 const APP = read('../src/App.jsx');
 const AUTH = read('../src/Auth.jsx');

@@ -6,6 +6,7 @@ import App from './App.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import { isNoReplayPath } from './utils/analytics.js'
 import { startPulseSession } from './utils/pulse.js'
+import { captureSource } from './utils/source.js'
 import { registerServiceWorker } from './utils/serviceWorker.js'
 import { initNative } from './utils/native.js'
 import './index.css'
@@ -32,6 +33,9 @@ posthog.init('phc_CgK3ydJGk6XRtRPLQ8cnXxkqSroQBsuYrV9VsWk2r76Y', {
 // path and a referring hostname and nothing else, and cannot throw.
 // See src/utils/pulse.js and api/_monitor.js.
 startPulseSession();
+
+// Keep the ?s= channel the person arrived through. First touch wins.
+captureSource();
 
 // Native shell setup: safe-area viewport, deep links, Android back button and
 // the system-browser OAuth handler. No-ops in a browser. Runs BEFORE mount so

@@ -1,4 +1,5 @@
 // ─── SUPABASE AUTH (no package needed) ───────────────────────────────────────
+import { getSource } from "./utils/source.js";
 export const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 export const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
@@ -100,10 +101,14 @@ export const supabaseAuth = {
   // signup — sending it with no email/password creates an anonymous user
   // whose JWT carries is_anonymous: true.
   signInAnonymously: async () => {
+    // signup_source is the ?s= channel the person arrived through (see
+    // utils/source.js). It lives on user_metadata so the read side can group
+    // guests, waitlist emails and signups by channel without a new table.
+    const signup_source = getSource();
     const res = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
       method: "POST",
       headers: { "apikey": SUPABASE_ANON_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ data: {} }),
+      body: JSON.stringify({ data: signup_source ? { signup_source } : {} }),
     });
     const data = await res.json();
     if (!res.ok) return { error: data };
@@ -116,6 +121,30 @@ export const supabaseAuth = {
       user: data.user,
     } : null);
     if (session) saveSession(session);
+    return { data };
+  },
+  // A guest leaves one email and nothing else. It goes on the anonymous
+  // user's own metadata (waitlist_email) through the same PUT /auth/v1/user
+  // that conversion uses, minus the password, so there is no new table and
+  // no auth change: the JWT stays anonymous. Read with scripts/waitlist-read.mjs.
+  saveGuestEmail: async (email) => {
+    const s = getSession();
+    if (!s?.access_token) return { error: { message: "No active session" } };
+    const res = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
+      method: "PUT",
+      headers: {
+        "apikey": SUPABASE_ANON_KEY,
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${s.access_token}`,
+      },
+      body: JSON.stringify({ data: {
+        waitlist_email: String(email).trim().toLowerCase(),
+        waitlist_at: new Date().toISOString(),
+        signup_source: getSource() || undefined,
+      } }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return { error: data };
     return { data };
   },
   // Convert the current anonymous user into a real email/password account.

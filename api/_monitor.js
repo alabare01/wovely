@@ -185,6 +185,7 @@ const MIN = 60 * 1000;
  */
 export const EVENT_KINDS = {
   checkout_started: { interrupt: true, windowMs: 2 * MIN, priority: 1, label: 'started checkout' },
+  email_captured: { interrupt: true, windowMs: 2 * MIN, priority: 2, label: 'left an email' },
   import_succeeded: { interrupt: true, windowMs: 5 * MIN, priority: 2, label: 'imported a pattern' },
   paywall_hit: { interrupt: true, windowMs: 10 * MIN, priority: 3, label: 'hit the wall' },
   demo_started: { interrupt: true, windowMs: 10 * MIN, priority: 4, label: 'started the demo' },
