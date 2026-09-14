@@ -76,6 +76,11 @@ export default async function handler(req, res) {
       payment_method_types: ['card'],
       customer_email: email,
       line_items: [{ price: priceId, quantity: 1 }],
+      // Grand opening, 2026-09-15 to 2026-11-30: the code COZY (50 percent
+      // off Craft for three months) only works if Checkout shows the field.
+      // Harmless outside the window: Stripe rejects an expired or unknown
+      // code on its own page and the price is unchanged.
+      allow_promotion_codes: true,
       metadata: { userId, tier, cadence },
       // Second carrier for the same id. metadata is the primary channel, but
       // the webhook has already logged "missing metadata.userId" in the wild,
