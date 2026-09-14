@@ -31,6 +31,7 @@ import ResetPassword, { RECOVERY_FLAG, clearRecoveryFlag } from "./ResetPassword
 import SharedLinkGate from "./SharedLinkGate.jsx";
 import PublicCalculators from "./PublicCalculators.jsx";
 import UkUsConverter from "./UkUsConverter.jsx";
+import GiftPage from "./GiftPage.jsx";
 import CrochetAbbreviations from "./CrochetAbbreviations.jsx";
 import StitchCounter from "./StitchCounter.jsx";
 import { GaugeCalculatorPage, YardageCalculatorPage, ScaleCalculatorPage } from "./CalculatorPages.jsx";
@@ -118,6 +119,7 @@ import {
 // they have no in-app view to map to, and adding them there would let the shell
 // try to render them as one.
 const PUBLIC_TOOL_PAGES = {
+  "/gift": GiftPage,
   "/uk-us-crochet-terms": UkUsConverter,
   "/crochet-abbreviations": CrochetAbbreviations,
   "/crochet-stitch-counter": StitchCounter,

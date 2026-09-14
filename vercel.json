@@ -132,6 +132,10 @@
       "destination": "/crochet-pattern-scale-calculator.html"
     },
     {
+      "source": "/gift",
+      "destination": "/gift.html"
+    },
+    {
       "source": "/privacy",
       "destination": "/privacy.html"
     },

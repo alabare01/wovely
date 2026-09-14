@@ -21,6 +21,7 @@ import Auth from "./Auth.jsx";
 import PrivacyPolicy from "./PrivacyPolicy.jsx";
 import TermsOfService from "./TermsOfService.jsx";
 import UkUsConverter, { PAGE_SCHEMA as UK_US_SCHEMA } from "./UkUsConverter.jsx";
+import GiftPage, { PAGE_SCHEMA as GIFT_SCHEMA } from "./GiftPage.jsx";
 import CrochetAbbreviations, { PAGE_SCHEMA as ABBR_SCHEMA } from "./CrochetAbbreviations.jsx";
 import StitchCounter, { PAGE_SCHEMA as COUNTER_SCHEMA } from "./StitchCounter.jsx";
 import PublicCalculators, { PAGE_SCHEMA as TOOLS_SCHEMA } from "./PublicCalculators.jsx";
@@ -51,6 +52,7 @@ export const PRERENDER_ROUTES = {
   "/": Home,
   "/privacy": PrivacyPolicy,
   "/terms": TermsOfService,
+  "/gift": GiftPage,
   "/uk-us-crochet-terms": UkUsConverter,
   "/crochet-abbreviations": CrochetAbbreviations,
   "/crochet-stitch-counter": StitchCounter,
@@ -62,6 +64,7 @@ export const PRERENDER_ROUTES = {
 
 /** The per-page WebApplication block, so the raw-HTML pass carries it too. */
 export const PAGE_SCHEMAS = {
+  "/gift": GIFT_SCHEMA,
   "/uk-us-crochet-terms": UK_US_SCHEMA,
   "/crochet-abbreviations": ABBR_SCHEMA,
   "/crochet-stitch-counter": COUNTER_SCHEMA,

@@ -30,6 +30,11 @@ export const PUBLIC_ROUTES = {
     description: DEFAULT_DESC,
     canonical: SITE + "/",
   },
+  "/gift": {
+    title: "Give Wovely for a Year | A Gift for a Crocheter",
+    description: "A year of Wovely Craft as a gift: a hundred patterns in one place, Bev checking every one, and every row counted. Sent with a note from Bev, ready within a business day.",
+    canonical: SITE + "/gift",
+  },
   "/privacy": {
     title: "Privacy Policy | Wovely",
     description: "How Wovely collects, uses, and protects your information, including patterns you upload, payment data handled by Stripe, and your rights over your data.",
@@ -179,6 +184,7 @@ export const SITEMAP_PRIORITY = {
   "/crochet-pattern-scale-calculator": "0.8",
   "/tools": "0.8",
   "/crochet-stitch-counter": "0.8",
+  "/gift": "0.7",
   "/privacy": "0.3",
   "/terms": "0.3",
 };
