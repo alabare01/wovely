@@ -28,6 +28,8 @@ for (let page = 1; page <= 50; page++) {
   const { users = [] } = await r.json();
   for (const u of users) {
     const m = u.user_metadata || {};
+    // The desk's own production walks leave product-desk-*@wovely.app behind.
+    if (/^product-desk-.*@wovely\.app$/.test(String(m.waitlist_email || ''))) continue;
     if (m.waitlist_email) rows.push({
       email: m.waitlist_email,
       source: m.signup_source || 'direct',
