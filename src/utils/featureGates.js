@@ -40,7 +40,10 @@ export const FEATURE_GATES = {
 // via ANON_PATTERN_CAP). Every gate call site that has the anonymous flag
 // available should short-circuit on it before consulting the tier map.
 export const ANON_PATTERN_CAP = 1;
-export const ANON_PREVIEW_FRACTION = 0.25;
+// Retired 2026-09-14 (apr-20260911-3k73jsa7): a guest sees and ticks every
+// row of the one pattern they started. Kept at 1 so any stale import reads as
+// "show everything" rather than throwing.
+export const ANON_PREVIEW_FRACTION = 1;
 
 export const canAccess = (feature, tier, isAnonymous = false) => {
   if (isAnonymous) return false;

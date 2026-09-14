@@ -204,7 +204,7 @@ const RowManager = ({
   const activePartName=activeSec.header?activeSec.header.text.replace(/──/g,"").trim():(p.title||"Your rounds");
   const incRow=()=>{if(activeCurRow)toggle(activeCurRow.id);};
   const decRow=()=>{const last=[...activeSec.rows].reverse().find(r=>r.done);if(last)toggle(last.id);};
-  const showCounter=!isAnonymous&&activeTotal>0;
+  const showCounter=activeTotal>0;
 
   const handleDotTap=(globalIdx,dotIdx)=>{
     const row=rows[globalIdx];if(!row)return;
@@ -377,13 +377,13 @@ const RowManager = ({
           const defaultOpen=sec.rows.some(r=>!r.done)||!sec.header||hasBody;
           const open=expandedSections[secKey]!==undefined?expandedSections[secKey]:defaultOpen;
           const toggleSec=()=>setExpandedSections(prev=>({...prev,[secKey]:!open}));
-          // Guest preview: show only the first 25% of rows in each section.
-          // Per-section truncation gives a tease of every component instead
-          // of cutting off the first component partway through and leaving
-          // later components invisible.
-          const previewLimit = isAnonymous ? Math.max(1, Math.ceil(sec.rows.length * 0.25)) : sec.rows.length;
-          const visibleRows = sec.rows.slice(0, previewLimit);
-          const hiddenRowCount = sec.rows.length - visibleRows.length;
+          // Guests see and tick every row of the one pattern they started.
+          // The 25 percent preview wall (2026-08) was where the funnel died:
+          // the demo let a visitor tick rounds, then the real pattern did
+          // less. Ruled 2026-09-14, apr-20260911-3k73jsa7. The account ask
+          // now sits under the rows and on the sticky bar, tied to keeping
+          // the place on another device and to a second pattern.
+          const visibleRows = sec.rows;
           return (<div key={secKey} style={{marginBottom:8}}>
             {sec.header&&!focusHeaderId&&<button onClick={toggleSec} style={{width:"100%",background:secComplete?T.sageLt:T.linen,border:`1px solid ${secComplete?"rgba(92,122,94,.3)":T.border}`,borderRadius:open?"10px 10px 0 0":10,padding:"12px 14px",cursor:"pointer",display:"flex",alignItems:"center",gap:10,textAlign:"left"}}>
               <span style={{fontSize:12,color:T.ink3}}>{open?"▼":"▶"}</span>
@@ -393,20 +393,20 @@ const RowManager = ({
                     "Overview, Sizing, Materials") have no progress to track.
                     Label them "Reference" and drop the 0-of-0 line + empty bar
                     instead of showing a misleading "0 of 0 complete" (S76 bug 2). */}
-                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{secTotal===0?"Read this part":isAnonymous?`Showing ${visibleRows.length} of ${sec.rows.length} rows`:`${secDone} of ${secTotal} complete`}</div>
+                <div style={{fontSize:11,color:T.ink3,marginTop:2}}>{secTotal===0?"Read this part":`${secDone} of ${secTotal} complete`}</div>
               </div>
               {sec.header.makeCount>1&&<div style={{background:T.gold,color:"#fff",borderRadius:99,padding:"2px 8px",fontSize:10,fontWeight:700}}>×{sec.header.makeCount}</div>}
               {secTotal>0&&<div style={{width:60}}><Bar val={secDone/secTotal*100} color={secComplete?T.sage:T.terra} h={3}/></div>}
             </button>}
             {(open||!sec.header||focusHeaderId)&&<div style={{display:"flex",flexDirection:"column",gap:10,padding:sec.header&&!focusHeaderId?"10px 0 2px":0,position:"relative"}}>
               {hasBody&&<div style={{padding:"12px 14px",fontSize:13,color:T.ink2,lineHeight:1.7,whiteSpace:"pre-wrap",background:"#fff",border:`1px solid ${T.border}`,borderRadius:14}}>{sec.header.body}</div>}
-              {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;const isCur=isCurrent&&!rowLocked&&!isAnonymous;return(
+              {visibleRows.map((r,i)=>{const globalIdx=r._gi;const isCurrent=globalIdx===currentRowIdx;const rowLocked=!r.done&&!isRowCheckable(globalIdx,sec,si);const newAbbr=r.done?[]:findNewAbbr(r.text,seenAbbr);const rowNumFromId=r.id?parseInt((String(r.id).match(/\d+$/)||[])[0],10):null;const flagStatus=flaggedRowMap&&rowNumFromId?flaggedRowMap[rowNumFromId]:null;const isCur=isCurrent&&!rowLocked;return(
         // 2b .step card — same toggle/lock/flag/dots logic, card presentation.
         // Done rounds fade (.step.done opacity .55); BevCheck flags keep their
         // coral/amber left border + tinted fill (.ffail/.fwarn).
         <div key={r.id} id={`row-${i + 1}`} data-row={i + 1} style={{background:flagStatus==="fail"?"#FFF6F4":flagStatus==="warning"?"#FFFBF2":"#fff",border:`1px solid ${isCur?T.terra:T.border}`,borderLeft:flagStatus==="fail"?"4px solid #FF8A73":flagStatus==="warning"?"4px solid #F5B93E":undefined,borderRadius:14,boxShadow:isCur?`0 10px 22px -16px ${T.terra}`:"none",opacity:r.done?.55:rowLocked?.45:1,transition:"opacity .15s, border-color .15s"}}>
-          <div onClick={()=>{if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:14,alignItems:"center",cursor:isAnonymous||rowLocked?"default":"pointer",padding:"14px 18px"}}>
-            <button type="button" aria-label={r.done?"Mark row incomplete":"Mark row complete"} disabled={isAnonymous||rowLocked} onClick={e=>{e.stopPropagation();if(isAnonymous||rowLocked)return;toggle(r.id);}} style={{position:"relative",overflow:"visible",width:30,height:30,borderRadius:9,flexShrink:0,padding:0,border:"none",background:r.done?T.sage:isCur?T.terra:T.surface,color:r.done||isCur?"#fff":T.terra,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.sans,fontWeight:800,fontSize:14,transition:"all .2s",cursor:isAnonymous||rowLocked?"default":"pointer"}}>
+          <div onClick={()=>{if(rowLocked)return;toggle(r.id);}} style={{display:"flex",gap:14,alignItems:"center",cursor:rowLocked?"default":"pointer",padding:"14px 18px"}}>
+            <button type="button" aria-label={r.done?"Mark row incomplete":"Mark row complete"} disabled={rowLocked} onClick={e=>{e.stopPropagation();if(rowLocked)return;toggle(r.id);}} style={{position:"relative",overflow:"visible",width:30,height:30,borderRadius:9,flexShrink:0,padding:0,border:"none",background:r.done?T.sage:isCur?T.terra:T.surface,color:r.done||isCur?"#fff":T.terra,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:T.sans,fontWeight:800,fontSize:14,transition:"all .2s",cursor:rowLocked?"default":"pointer"}}>
               <span aria-hidden="true" style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:44,height:44}}/>
               {r.done?"✓":i+1}
             </button>
@@ -426,7 +426,7 @@ const RowManager = ({
               <button onClick={e=>{e.stopPropagation();setNoteEdit(noteEdit===r.id?null:r.id);}} style={{background:"none",border:"none",fontSize:14,cursor:"pointer",padding:"4px"}}><span style={{color:r.note?T.terra:T.ink3,opacity:r.note?1:.5}}>📝</span></button>
             </div>}
           </div>
-          {!isAnonymous&&!r.done&&!rowLocked&&((r.repeat_brackets||[]).some(b=>b.count>1)||r.repeat_done)&&<div style={{padding:"0 18px 12px 62px"}}><SubCounter row={r} globalIdx={globalIdx} onDotTap={handleDotTap} onRepeatDone={handleRepeatDone}/></div>}
+          {!r.done&&!rowLocked&&((r.repeat_brackets||[]).some(b=>b.count>1)||r.repeat_done)&&<div style={{padding:"0 18px 12px 62px"}}><SubCounter row={r} globalIdx={globalIdx} onDotTap={handleDotTap} onRepeatDone={handleRepeatDone}/></div>}
           {r.note&&noteEdit!==r.id&&!rowLocked&&<div onClick={e=>{e.stopPropagation();setNoteEdit(r.id);}} style={{padding:"0 18px 12px 62px",fontSize:12,color:T.ink3,lineHeight:1.5,cursor:"pointer"}}><span style={{fontSize:11}}>📌</span> <span style={{fontStyle:"italic"}}>{r.note}</span></div>}
           {newAbbr.length>0&&!rowLocked&&<div style={{padding:"0 18px 12px 62px"}} onClick={e=>e.stopPropagation()}>
             <div style={{fontFamily:T.sans,fontSize:11,color:T.ink3,marginBottom:6}}>New stitch (tap for a video)</div>
@@ -435,21 +435,16 @@ const RowManager = ({
           {noteEdit===r.id&&!rowLocked&&<div style={{padding:"0 18px 14px 62px",display:"flex",alignItems:"center",gap:8}}><input value={r.note} onChange={e=>updateNote(r.id,e.target.value)} placeholder="Add a note for this row…" style={{flex:1,padding:"9px 12px",background:T.linen,border:`1.5px solid ${T.terra}`,borderRadius:9,fontSize:13,color:T.ink,outline:"none"}}/>{noteSaved&&<span style={{fontSize:11,color:T.sage,fontWeight:600,flexShrink:0}}>Note saved</span>}</div>}
         </div>
       );})}
-              {isAnonymous && hiddenRowCount > 0 && (
-                <div style={{padding:"12px 14px 4px",fontSize:12,color:T.ink3,textAlign:"center",fontStyle:"italic"}}>
-                  {hiddenRowCount} more {hiddenRowCount===1?"row":"rows"} after the preview
-                </div>
-              )}
             </div>}
           </div>);
         });
       })()}
       {!focusHeaderId && (isAnonymous ? (
-        // Guest preview wall — fade overlay above a glass CTA card. Renders
-        // after the truncated rows so the page reads "first taste, then a
-        // gentle nudge to convert". onSignUp opens the AuthWallModal in
-        // convert-anonymous-to-real mode so the same UUID + pattern carries
-        // forward without a reimport.
+        // Guest card under the rows. The rows above are fully usable; this
+        // asks for the account at the moment it earns one: keeping the place
+        // on another device, or starting a second pattern. onSignUp opens the
+        // AuthWallModal in convert-anonymous-to-real mode so the same UUID and
+        // pattern carry forward without a reimport.
         <div style={{position:"relative",marginTop:8}}>
           <div style={{
             position:"absolute",
@@ -478,7 +473,7 @@ const RowManager = ({
               lineHeight:1.25,
               marginBottom:8,
             }}>
-              You're just getting started
+              Bev is keeping your place on this device
             </div>
             <div style={{
               fontFamily:"Nunito,sans-serif",
@@ -489,7 +484,7 @@ const RowManager = ({
               maxWidth:360,
               margin:"0 auto 20px",
             }}>
-              Create a free account to see the full pattern, save your progress, and let Bev help you craft with confidence.
+              Tick your rows here as you go. A free account keeps this place on every device you own and gives you room for five patterns.
             </div>
             <button
               onClick={()=>onSignUp&&onSignUp()}
@@ -505,7 +500,7 @@ const RowManager = ({
                 boxShadow:"0 4px 16px rgba(123,106,212,0.3)",
                 marginBottom:12,
               }}
-            >Create Free Account</button>
+            >Keep my place everywhere</button>
             <div style={{fontSize:12.5,color:"#726A92"}}>
               Already have an account?{" "}
               <span

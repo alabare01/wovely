@@ -749,7 +749,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             ))}
           </div>
         </div>
-        <div style={{padding:`4px 20px ${isAnonymous?220:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
+        <div style={{padding:`4px 20px ${isAnonymous?132:36}px`,maxWidth:isDesktop?760:undefined,margin:isDesktop?"0 auto":undefined,width:"100%"}}>
         {collectionUpgrade && (
           // Contextual upgrade banner for Free/Pro users whose just-imported
           // pattern looks like part of a larger project. Inline + dismissible
@@ -880,11 +880,10 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
       </div>
       {/* Floating source pill now rendered inside RowManager */}
       {isAnonymous && (
-        // Always-visible conversion surface for guests. Renders on every
-        // tab (Materials / Instructions / Notes) so the CTA is on screen
-        // without scrolling. Mirrors the inline glass card so the styling
-        // language stays consistent — same heading, body copy, primary
-        // button, and "Already have an account?" link.
+        // Always-visible account ask for guests, kept short so it never covers
+        // the counter now that a guest can tick rows (2026-09-14). Same copy
+        // as the inline card: the place is kept here, an account keeps it
+        // everywhere.
         <div style={{
           position:"fixed",
           left:0,
@@ -909,7 +908,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
               lineHeight:1.25,
               marginBottom:6,
             }}>
-              You're just getting started
+              Bev is keeping your place on this device
             </div>
             <div style={{
               fontSize: isDesktop ? 14 : 13,
@@ -917,7 +916,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
               lineHeight:1.55,
               marginBottom:14,
             }}>
-              Create a free account to see the full pattern, save your progress, and let Bev help you craft with confidence.
+              A free account keeps it on every device and makes room for five patterns.
             </div>
             <button
               onClick={()=>onSignUp&&onSignUp()}
@@ -935,7 +934,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
                 minWidth: isDesktop ? 220 : undefined,
                 marginBottom:10,
               }}
-            >Create Free Account</button>
+            >Keep my place everywhere</button>
             <div style={{fontSize:13,color:"#726A92"}}>
               Already have an account?{" "}
               <span
