@@ -262,8 +262,49 @@ const TopNav = ({ onLanding, onSignIn, onStartFree, showLinks }) => (
   </div>
 );
 
+// Grand opening strip, 2026-09-15 to 2026-11-30. Everything in it is read
+// from Stripe through GET /api/stripe-checkout?promo=COZY: the percent, the
+// months, the monthly price and the close date. If that read fails the strip
+// does not render, so the page can never show a number Stripe did not give.
+// Palette is the campaign's fall set (cream, cinnamon, deep brown), on purpose
+// distinct from the app's lavender so it reads as a season, not a redesign.
+const PROMO_CODE = "COZY";
+const money = (cents, currency) => {
+  try { return new Intl.NumberFormat("en-US", { style: "currency", currency: (currency || "usd").toUpperCase() }).format(cents / 100); }
+  catch { return "$" + (cents / 100).toFixed(2); }
+};
+const closeDate = iso => {
+  try { return new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "America/New_York" }); }
+  catch { return null; }
+};
+const OpeningStrip = ({ onGoCraft }) => {
+  const [offer, setOffer] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    fetch(`/api/stripe-checkout?promo=${PROMO_CODE}`)
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => { if (alive && j && j.active && j.percent_off && j.price_cents) setOffer(j); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+  if (!offer) return null;
+  const months = offer.duration === "repeating" && offer.duration_in_months ? offer.duration_in_months : null;
+  const closes = offer.expires_at ? closeDate(offer.expires_at) : null;
+  const half = offer.percent_off === 50;
+  return (
+    <div style={{ background: "#FFF7EC", borderBottom: "1px solid #EAD3BC", color: "#2B1D16", fontFamily: "Nunito,sans-serif", padding: "12px 22px", textAlign: "center", fontSize: 14.5, lineHeight: 1.5 }}>
+      <span style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 700, color: "#C96A3B", marginRight: 8 }}>The doors are open.</span>
+      Craft is {half ? "half price" : `${offer.percent_off}% off`}{months ? ` for ${months} months` : ""}: the code{" "}
+      <b style={{ background: "#FFFFFF", border: "1px dashed #C96A3B", borderRadius: 8, padding: "1px 8px", letterSpacing: ".08em", fontFamily: "monospace" }}>{offer.code}</b>{" "}
+      at checkout takes {offer.percent_off}% off {money(offer.price_cents, offer.currency)} a {offer.interval || "month"}{closes ? `, through ${closes}` : ""}.{" "}
+      <a onClick={onGoCraft} role="button" tabIndex={0} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onGoCraft(e); } }} style={{ color: "#C96A3B", fontWeight: 800, textDecoration: "underline", cursor: "pointer", whiteSpace: "nowrap" }}>See Craft</a>
+    </div>
+  );
+};
+
 const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
   <>
+    <OpeningStrip onGoCraft={onGoCraft} />
     {/* ── Hero ── */}
     <div className="hero">
       <div className="heroviz">

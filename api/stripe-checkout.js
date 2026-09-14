@@ -28,6 +28,46 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  // GET ?promo=CODE: the grand-opening banner reads the offer from Stripe so
+  // no price or date is ever typed into the page from memory. Folded into
+  // this function because the project sits at the Hobby function limit.
+  // Answers { active:false } for an unknown, inactive or expired code, and
+  // never throws to the client: a banner that cannot read Stripe does not
+  // render, which is the correct failure.
+  if (req.method === 'GET') {
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    const code = String((req.query && req.query.promo) || '').trim().toUpperCase();
+    if (!code || code.length > 32) return res.status(400).json({ active: false, error: 'missing_code' });
+    try {
+      const found = await stripe.promotionCodes.list({ code, active: true, limit: 1 });
+      const pc = found.data && found.data[0];
+      const exp = pc && pc.expires_at ? pc.expires_at * 1000 : null;
+      if (!pc || (exp && exp <= Date.now()) || !pc.coupon || !pc.coupon.valid) {
+        res.setHeader('Cache-Control', 'public, s-maxage=300');
+        return res.json({ active: false });
+      }
+      const price = await stripe.prices.retrieve(process.env[PRICE_ENV.craft.monthly]);
+      res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+      return res.json({
+        active: true,
+        code: pc.code,
+        percent_off: pc.coupon.percent_off ?? null,
+        amount_off: pc.coupon.amount_off ?? null,
+        duration: pc.coupon.duration,
+        duration_in_months: pc.coupon.duration_in_months ?? null,
+        expires_at: exp ? new Date(exp).toISOString() : null,
+        price_cents: price.unit_amount,
+        currency: price.currency,
+        interval: price.recurring && price.recurring.interval,
+        read_at: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error('[stripe-checkout] promo read failed:', err.message);
+      return res.status(502).json({ active: false, error: 'promo_read_failed' });
+    }
+  }
+
   if (req.method !== 'POST') return res.status(405).end();
 
   const _url = process.env.VITE_SUPABASE_URL;
