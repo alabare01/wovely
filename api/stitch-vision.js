@@ -52,7 +52,7 @@ async function handleSnap(req, res, key) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: SNAP_PROMPT }, { inline_data: { mime_type: mimeType, data } }] }],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 8192 },
+          generationConfig: { temperature: 0.1, maxOutputTokens: 16384, thinkingConfig: { thinkingBudget: 0 }, responseMimeType: "application/json" },
         }),
         signal: AbortSignal.timeout(110_000),
       }
