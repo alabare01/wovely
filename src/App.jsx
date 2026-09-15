@@ -175,7 +175,6 @@ const mapDbPatternRow = (r) => ({
 // Supabase auth imported from ./supabase.js
 
 // APP_VERSION imported from ./constants.js
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 
 // Two-tier pricing. patternCap is the only cap that varies between tiers
 // today; per-feature gating lives in src/utils/featureGates.js. Craft has a

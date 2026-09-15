@@ -13,7 +13,6 @@ import { bevCheckScope, visibleBevCheckChecks, withheldBevCheckCount, BEVCHECK_S
 import { FREE_SCANS_PER_MONTH, SCAN_SNAP_STITCH, canScan, recordScan, scansLeft } from "./utils/scanQuota.js";
 import { handleImportFailure, friendlyImportError, IMPORT_FAILED_HEADLINE, IMPORT_FAILED_BODY } from "./utils/importErrors.js";
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || "";
 
 // Strip authoring-tool file extensions left on extracted titles (e.g. ".cdr"
 // from CorelDraw exports). Mirrors sanitizeTitle in api/extract-pattern.js;
@@ -241,138 +240,19 @@ const renderPDFCoverImage = async (file) => {
 
 const extractPatternFromPDF = async (textOrBase64, filename, mimeType, isTextMode) => {
   console.log("[Wovely] Gemini extraction starting, mode:", isTextMode ? "text" : "base64", "mime:", mimeType);
-  if (!GEMINI_API_KEY) { console.error("[Wovely] No Gemini API key"); throw new Error("Gemini API key not configured"); }
-
-  const prompt = `You are a crochet pattern extraction specialist. You will analyze this pattern using a strict 4-step process. Return ONLY valid JSON with no markdown, no backticks, no explanation.
-
-═══ STEP 1 — STRUCTURE ANALYSIS ═══
-Before extracting anything, silently determine:
-• Is this pattern round-based (worked in the round) or row-based (worked flat)? Or mixed per component?
-• Does it contain an abbreviations table, legend, or definition section?
-• Are there cross-references like "Repeat R32", "work same as Round 5", or "work into ch3 on R9"?
-• Are there branching instructions by size, color variation, or optional sections?
-• How many distinct components exist (e.g. body, head, arms, border)?
-Use these answers to guide the remaining steps. Do not output this analysis — it is internal context only.
-
-═══ STEP 2 — ABBREVIATIONS FIRST ═══
-Extract the COMPLETE abbreviations map from any table, legend, glossary, or definition section BEFORE touching pattern instructions.
-• Populate abbreviations_map as a flat key-value object: {"mr":"magic ring","sc":"single crochet","inc":"increase","dec":"invisible decrease","fpdc":"front post double crochet"}
-• Include EVERY abbreviation defined in the pattern, even uncommon ones
-• If the pattern defines no abbreviations, use standard crochet abbreviations found in the instructions: sc, dc, hdc, tr, sl st, ch, inc, dec, mr, fo, blo, flo, yo, pm, sm, sc2tog
-• This map is your reference for all subsequent extraction — use it to interpret shorthand in round/row instructions
-
-═══ STEP 3 — ROUND/ROW EXTRACTION ═══
-Extract every round or row as its own entry. Apply these rules strictly:
-
-LABEL PREFIX: Use 'RND' for rounds (worked in the round) or 'ROW' for rows (worked flat). Detect from context which applies per component.
-
-EXPAND RANGES: For any instruction covering multiple rounds like 'RND 10-23: sc in each st (40)' or 'Rows 5-12: repeat Row 4', expand into individual entries: RND 10, RND 11, RND 12... each with the same instruction text. Never leave a range as a single row. Every round the user needs to complete must be its own checkable row.
-
-EXPAND CROSS-REFERENCES INLINE: If a round says "Repeat R32" or "Work same as Round 5", look up what Round 5 / R32 actually says and output the FULL instruction text for that round. Never output "Repeat R32" as a row — always resolve the reference to the actual stitch instructions.
-
-PRESERVE BRACKET NOTATION: Keep bracket/parenthetical repeats exactly as written in the pattern. Examples: "(sc, inc) x 6", "[dc5, (ch1, skip 1) x 3] x 10", "*(2 sc, inc)* repeat 6 times". Do not simplify or expand these — the app tracks them as sub-counters.
-
-EXTRACT repeat_brackets: For each row/round, extract bracket repeat patterns into repeat_brackets array. Example: "Round 16: (6 sc, inc) x 2 -- 16 sts" produces repeat_brackets: [{"sequence":"6 sc, inc","count":2}]. Match patterns like (sequence) x N, [sequence] x N, *sequence* repeat N times. If no bracket repeats, set repeat_brackets: [].
-
-OPEN-ENDED REPEATS: For instructions like "repeat rounds X-Y until desired length" or "work even for as many rounds as you want", extract the repeating block ONCE as individual rounds, then add a note in pattern_notes explaining the open-ended nature. Do not generate infinite rounds.
-
-SIZE/COLOR BRANCHING: If the pattern offers multiple sizes or color variations, extract the primary/default version as the main rows. Note all variations (stitch count differences, alternate colors) in pattern_notes.
-
-ACTION ITEMS: For mid-pattern instructions that are not stitch rows (examples: 'Place the eyes now', 'Begin stuffing', 'Change to Color B', 'See page 7 for details') — include these as rows with label 'NOTE' and set action_item: true.
-
-NEVER SKIP ROUNDS: Even if consecutive rounds have identical instructions, each must be its own entry. A round that says "sc in each st around (40)" repeated 8 times means 8 separate row entries.
-
-═══ STEP 4 — CONFIDENCE ═══
-After extraction, assess quality:
-• If fewer than 3 rounds/rows were extracted OR title is missing, set "confidence": "low"
-• If all major sections were found and 10+ rounds extracted, set "confidence": "high"
-• Otherwise set "confidence": "medium"
-
-═══ OUTPUT FORMAT ═══
-Return this exact JSON structure:
-{"title":"string","designer":"string","source_url":null,"finished_size":"string","difficulty":"Beginner or Intermediate or Advanced","yarn_weight":"string","hook_size":"string","gauge":"string or null","confidence":"low or medium or high","materials":[{"name":"string","amount":"string","notes":"string"}],"abbreviations":[{"abbr":"string","meaning":"string"}],"abbreviations_map":{"mr":"magic ring","sc":"single crochet"},"suggested_resources":[{"label":"string","url":"string"}],"pattern_notes":"string","components":[{"name":"string","make_count":1,"independent":false,"rows":[{"id":"rnd-1","label":"RND 1","text":"full instruction text with all references resolved","stitch_count":null,"action_item":false,"repeat_brackets":[{"sequence":"string","count":2}]}]}],"assembly_notes":"string","image_description":"string"}
-
-COMPONENT RULES:
-• For components like 'FLIPPER (MAKE 2)', set make_count: 2. Default 1 if not specified.
-• Set independent: true ONLY when the pattern explicitly says a component can be made separately — e.g. "make 2 separately", "work independently". Default false.
-• After all construction components, extract assembly/finishing as a final component named 'ASSEMBLY & FINISHING' with label: 'STEP' and action_item: true for all rows.
-
-PATTERN NOTES: Extract as a single string containing all special technique notes, tension guidance, construction tips, size variations, and open-ended repeat instructions.
-
-SUGGESTED RESOURCES: Extract {label, url} objects from any "Tutorials", "Resources", or hyperlink sections. Default to [] if none found.
-
-Be thorough — extract every component, every round, every material. Ensure the JSON is complete and valid. Do not truncate.`;
-
-  // Text mode: send extracted text directly (PDFs) — tiny payload, fast, reliable
-  // Base64 mode: send raw file data (images like jpg/png)
-  const parts = isTextMode
-    ? [{ text: prompt + "\n\nPATTERN TEXT:\n" + textOrBase64 }]
-    : [{ text: prompt }, { inline_data: { mime_type: mimeType || "image/jpeg", data: textOrBase64 } }];
-
-  const body = {
-    contents: [{ parts }],
-    generationConfig: { temperature: 0.1, maxOutputTokens: 65536 }
-  };
-
-  const geminiCall = async (model, requestBody) => {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 45000);
-    try {
-      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
-      clearTimeout(timeout);
-      return r;
-    } catch (e) {
-      clearTimeout(timeout);
-      throw e;
-    }
-  };
-
-  const parseGeminiResponse = async (r) => {
-    const rawText = await r.text();
-    console.log("[Wovely] Gemini raw response body:", rawText.substring(0, 500));
-    if (!r.ok) throw new Error("Gemini API error: " + r.status);
-    const data = JSON.parse(rawText);
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-    const cleaned = text.replace(/```json/g, "").replace(/```/g, "").trim();
-    return JSON.parse(cleaned);
-  };
-
-  // Attempt 1: full structured prompt
-  console.log("[Wovely] Sending Gemini request, parts:", body.contents[0].parts.length, "model: gemini-2.5-flash");
-  try {
-    const res = await geminiCall("gemini-2.5-flash", body);
-    const parsed = await parseGeminiResponse(res);
+  // Image mode goes through the server, which holds the only Gemini key
+  // (2026-09-15: the client key was in the public bundle). Same result shape.
+  if (!isTextMode) {
+    const r = await fetch("/api/extract-pattern-vision", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ images: [`data:${mimeType || "image/jpeg"};base64,${textOrBase64}`], pageCount: 1, fileName: filename }),
+      signal: AbortSignal.timeout(280_000),
+    });
+    if (!r.ok) { const e = new Error("Server extraction failed: " + r.status); e.httpStatus = r.status; throw e; }
+    const parsed = await r.json();
     console.log("[Wovely] Extraction successful:", parsed.title, "—", (parsed.components||[]).length, "components");
     return parsed;
-  } catch (e) {
-    console.error("[Wovely] Gemini first attempt failed:", e.name === "AbortError" ? "timeout (45s)" : e.message);
-  }
-
-  // Attempt 2: simplified prompt — flat rows, no components, faster response
-  console.log("[Wovely] Retrying with simplified prompt...");
-  const simplePrompt = `Extract this crochet pattern. Return ONLY valid JSON, no markdown, no backticks.
-{"title":"string","hook_size":"string","yarn_weight":"string","difficulty":"string","designer":"string","materials":[{"name":"string","amount":"string"}],"components":[{"name":"Main","make_count":1,"independent":false,"rows":[{"id":"row-1","label":"ROW 1","text":"instruction text","stitch_count":null,"action_item":false,"repeat_brackets":[]}]}],"pattern_notes":"string","assembly_notes":"string","confidence":"low"}
-Extract every row/round as its own entry. Keep instruction text exactly as written. Do not truncate.`;
-  const simpleParts = isTextMode
-    ? [{ text: simplePrompt + "\n\nPATTERN TEXT:\n" + textOrBase64 }]
-    : [{ text: simplePrompt }, { inline_data: { mime_type: mimeType || "image/jpeg", data: textOrBase64 } }];
-  const simpleBody = {
-    contents: [{ parts: simpleParts }],
-    generationConfig: { temperature: 0.1, maxOutputTokens: 32768 }
-  };
-  try {
-    const res2 = await geminiCall("gemini-2.5-flash", simpleBody);
-    const parsed2 = await parseGeminiResponse(res2);
-    console.log("[Wovely] Simplified extraction successful:", parsed2.title);
-    return parsed2;
-  } catch (e2) {
-    console.error("[Wovely] Simplified retry also failed:", e2.name === "AbortError" ? "timeout (45s)" : e2.message);
-    throw new Error("Pattern extraction failed after 2 attempts");
   }
 };
 
@@ -394,45 +274,15 @@ const buildRowsFromComponents = (components) => {
   });
   return rows;
 };
-const GEMINI_PROMPT = `You are an expert crochet pattern designer with deep knowledge of amigurumi, garment construction, blankets, and all crochet techniques. Analyze this photograph of a finished crochet object.
-
-Your task: identify every distinct visible component, determine the exact crochet construction technique that produces each shape, and provide enough detail that a crocheter could recreate the object from scratch.
-
-Return ONLY valid raw JSON. No markdown. No explanation. No backticks. Just the JSON object.
-
-{
-  "object_name": "the actual name of what this is",
-  "object_category": "amigurumi or blanket or garment or accessory or home_goods or unknown",
-  "confidence_overall": 85,
-  "size_class": "tiny_under5cm or small_5to10cm or medium_10to20cm or large_over20cm",
-  "color_structure": { "primary_color": "red", "accent_colors": ["cream","brown"], "color_count": 3 },
-  "components": [
-    {
-      "id": "body", "role": "body", "label": "Body",
-      "primitive_type": "cylinder or sphere or oval or cone or tapered_cylinder or flat_disc or flat_square or flat_circle",
-      "size_relative": "dominant or large or medium or small",
-      "size_ratio_to_dominant": 1.0, "color": "main color", "confidence": 90,
-      "construction": { "technique": "worked_in_the_round or worked_flat or joined_granny_squares", "stitch": "single_crochet or half_double_crochet or double_crochet or bobble or ribbed", "start": "magic_ring or chain_foundation or chain_ring", "increase_to": 36, "even_rounds": 10, "decrease_from": 36, "final_sts": 6, "stuffed": true, "notes": "detailed note" },
-      "join_to": "head", "join_method": "sew_flat_to_bottom_of_head or sew_side_to_body or worked_as_extension or no_join"
-    }
-  ],
-  "assembly_order": ["list component ids in order"],
-  "assembly_notes": "Specific assembly instructions"
-}
-
-CRITICAL RULES: Identify EVERY distinct visible part. Use real part names for role (hat, head, beard, body, arm, leg, ear, tail, nose, eye, base). size_ratio_to_dominant: body=1.0, head=0.7-0.9, arm=0.3, nose=0.08-0.15. Be specific with stitch counts.`;
 
 const callGeminiVision = async (base64Image) => {
-  const mediaType=base64Image.split(";")[0].split(":")[1]||"image/jpeg";
-  const imageData=base64Image.split(",")[1];
-  const response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key="+GEMINI_API_KEY,{
+  // Server-side since 2026-09-15; the prompt and the key live in api/stitch-vision.js (mode: snap).
+  const response=await fetch("/api/stitch-vision",{
     method:"POST", headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({contents:[{parts:[{text:GEMINI_PROMPT},{inline_data:{mime_type:mediaType,data:imageData}}]}],generationConfig:{temperature:0.1,maxOutputTokens:8192}})
+    body:JSON.stringify({mode:"snap",image:base64Image}),
   });
-  if(!response.ok) throw new Error("Gemini API error: "+response.status);
-  const data=await response.json();
-  const text=data.candidates?.[0]?.content?.parts?.[0]?.text||"";
-  return JSON.parse(text.replace(/```json|```/g,"").trim());
+  if(!response.ok) throw new Error("Snap API error: "+response.status);
+  return await response.json();
 };
 
 const calculateConfidence = (analysis) => {

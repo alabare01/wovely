@@ -19,9 +19,10 @@
 // Stitch-O-Vision limit already had; this change closes the "no limit at all"
 // hole, it does not make the limit tamper-proof. A tamper-proof limit has to
 // be counted server-side on the request that spends the quota, and neither
-// surface can do that today: Snap & Stitch calls Gemini directly from the
-// browser with VITE_GEMINI_API_KEY and never touches our backend, and
-// api/stitch-vision.js takes no auth. Closing that properly means routing
+// surface can do that today: Snap & Stitch goes through api/stitch-vision.js
+// (mode: snap, since 2026-09-15; before that it called Gemini from the
+// browser with a key in the public bundle), and api/stitch-vision.js takes
+// no auth. Closing that properly means routing
 // both through an authenticated endpoint that counts before it spends, and
 // CLAUDE.md pins the deploy at the Vercel Hobby 17-function ceiling, so it is
 // a consolidation job rather than a new file. Tracked, not done here.
