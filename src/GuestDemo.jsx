@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import GuestEmailAsk from "./GuestEmailAsk.jsx";
 import posthog from "posthog-js";
 import { T } from "./theme.jsx";
 import { pulse } from "./utils/pulse.js";
@@ -272,6 +273,9 @@ export default function GuestDemo({ onBack, onStartReal, onImportOwn, onSignIn }
             ? "Ticking rows here is a demo, so it resets when you leave. Start it for real and your place is kept, on every device you pick up."
             : "Nothing on this screen is saved. Start it for real and your place is kept, on every device you pick up."}
         </p>
+        <div style={{ margin: "0 0 16px" }}>
+          <GuestEmailAsk compact where="demo_end" align="left" />
+        </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
           <button
             type="button"

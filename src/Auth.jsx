@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import GuestEmailAsk from "./GuestEmailAsk.jsx";
 import posthog from "posthog-js";
 
 import { supabaseAuth, getSession } from "./supabase.js";
@@ -74,6 +75,7 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 .wv-land .ctarow{display:flex;align-items:center;gap:16px;margin-top:22px;flex-wrap:wrap}
 .wv-land .micro{font-weight:800;font-size:13px;color:var(--muted)}
 .wv-land .micro b{color:var(--mint)}
+.wv-land .heroask{margin-top:18px;max-width:420px}
 .wv-land .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:18px}
 .wv-land .chip{display:inline-flex;align-items:center;gap:7px;font-weight:800;font-size:13px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px 14px}
 .wv-land .chip svg{color:var(--mint);flex:none}
@@ -363,6 +365,9 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => {
         <div className="ctarow">
           <button className="cta big" onClick={onStartFree}>Try Wovely free</button>
           <div className="micro"><b>✓</b> No account needed · 5 free patterns</div>
+        </div>
+        <div className="heroask">
+          <GuestEmailAsk compact where="landing" align="left" reason={fall ? "One note from Bev, and the code that halves your first three months. Nothing else." : "One note from Bev with the code. Nothing else, ever."} />
         </div>
         <div className="chips">
           <div className="chip"><Check />Every pattern checked for accuracy</div>
