@@ -26,6 +26,7 @@
 //           RESEND_API_KEY, WELCOME_EMAIL_ENABLED (default off)
 
 import { createClient } from '@supabase/supabase-js';
+import { celebrate } from './_celebrate.js';
 import {
   sendMail,
   isOptedOut,
@@ -195,6 +196,12 @@ export default async function handler(req, res) {
     if (!opsResult.ok) {
       console.error('[notify-signup] Resend error:', opsResult.status, opsResult.error);
     }
+
+    // 1b. The office hears it. Adam, 2026-09-15: "Same for new members."
+    //     The core-path probe creates and deletes a probe-*@wovely.app user
+    //     every six hours; that is ours and never a member.
+    const probeSignup = /^probe-[^@]*@wovely\.app$/i.test(String(email));
+    await celebrate({ kind: 'member', what: 'a new member', who: 'a new member', id: 'user:' + id, synthetic: probeSignup });
 
     // 2. Welcome note to the person who just signed up. Gated, default off.
     const welcome = await sendWelcome({

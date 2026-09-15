@@ -452,7 +452,7 @@ describe('the heartbeat email', () => {
     assert.equal(s.guests, 2);
     assert.equal(s.members, 0);
     assert.equal(s.total, 4);
-    assert.ok(subject.includes('2 on the site'));
+    assert.ok(subject.includes('2 people'));
   });
 
   test('it says where they went and how they got here', () => {
@@ -464,8 +464,8 @@ describe('the heartbeat email', () => {
     // A monitor that only speaks when there is news is indistinguishable from
     // a broken one. This message is the proof of life.
     const { subject: s, text: t } = buildHeartbeatEmail([], { since: ago(DAY_MS), now: T0, daily: true, tz: 'UTC' });
-    assert.ok(s.includes('0 visitors'));
-    assert.ok(t.includes('Nobody came to wovely.app in the last 24 hours.'));
+    assert.ok(s.includes('nobody came'));
+    assert.ok(t.includes('Nobody came in the last 24 hours.'));
     assert.ok(t.includes('MONITOR_HEARTBEAT_ENABLED=0'));
   });
 

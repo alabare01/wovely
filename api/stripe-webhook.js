@@ -19,6 +19,7 @@
 export const config = { api: { bodyParser: false } };
 
 import Stripe from 'stripe';
+import { celebrate } from './_celebrate.js';
 import { createClient } from '@supabase/supabase-js';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -143,6 +144,24 @@ export default async function handler(req, res) {
       `💸 Wovely purchase: ${buyerEmail} (${amount})`,
       `Someone just paid for Wovely.\n\nEmail: ${buyerEmail}\nAmount: ${amount}\nTier: ${purchasedTier}\nSubscription: ${subscriptionId || 'n/a'}\nUser ID: ${userId || 'MISSING — no metadata.userId and no client_reference_id, this payment is NOT attached to an account'}\nCheckout session: ${session.id}\n\n— Wovely`
     );
+  }
+
+  // 1b. The office hears it, on every Echo and in the announcer voice.
+  //     Adam, 2026-09-15: "Same for paying customers. and my office set up of course."
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object;
+    const cents = typeof session.amount_total === 'number' ? session.amount_total : null;
+    const synthetic = !!session.livemode === false || /probe-[^@]*@wovely\.app$/i.test(String(session.customer_details?.email || session.customer_email || ''));
+    await celebrate({ kind: 'sale', what: 'Wovely ' + (session.metadata?.tier || 'plan'), who: 'a new customer', amount: cents != null ? cents / 100 : undefined, id: 'cs:' + session.id, synthetic });
+  }
+  if (event.type === 'invoice.paid') {
+    const inv = event.data.object;
+    const first = inv.billing_reason === 'subscription_create';
+    // The first invoice rides with checkout.session.completed above; a renewal is its own moment.
+    if (!first) {
+      const cents = typeof inv.amount_paid === 'number' ? inv.amount_paid : null;
+      await celebrate({ kind: 'sale', what: 'Wovely renewal', who: 'a returning customer', amount: cents != null ? cents / 100 : undefined, id: 'in:' + inv.id, synthetic: !!inv.livemode === false });
+    }
   }
 
   // 2. Plan change (Pro ↔ Craft) — update tier from the new price.

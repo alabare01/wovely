@@ -16,9 +16,23 @@
 //      - retry_count >= 1 (already retried once → bumped to 2): status='failed', error_message set
 
 import { runPdfExtraction, runBevCheck, MATERIALS_SECTION_KEYWORDS, ABBREVIATIONS_SECTION_KEYWORDS } from '../extract-pattern.js';
+import { celebrate } from '../_celebrate.js';
 import { runVisionExtraction } from '../extract-pattern-vision.js';
 import { alertImportFailures } from '../_alert.js';
 import { flushInterrupts, recordPulse } from '../_monitor.js';
+
+/** The member's own name for the announcement, or 'a member'. Never the email. Fails closed to 'a member'. */
+async function displayNameFor(supabaseUrl, serviceKey, userId) {
+  try {
+    if (!userId) return 'a member';
+    const r = await fetch(`${supabaseUrl}/rest/v1/user_profiles?select=display_name,first_name,username&id=eq.${encodeURIComponent(userId)}&limit=1`, {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` }, signal: AbortSignal.timeout(4000),
+    });
+    const [row] = r.ok ? await r.json() : [];
+    const name = row && (row.first_name || row.display_name || row.username);
+    return name && !/@/.test(name) ? String(name).slice(0, 60) : 'a member';
+  } catch { return 'a member'; }
+}
 
 /** True when the job's owner is one of our probe accounts (probe-*@wovely.app). Fails closed to false. */
 async function isProbeUser(supabaseUrl, serviceKey, userId) {
@@ -701,6 +715,15 @@ export default async function handler(req, res) {
         at: new Date().toISOString(),
       }],
     });
+
+    // The office hears it. Adam, 2026-09-15: "i want celebrations on alexa
+    // devices for every new pattern uploaded into wovely.app, including Dani."
+    // Never for the probe user: it is ours and it is not a pattern landing.
+    if (!probeUser) {
+      const title = String((result.data && (result.data.title || result.data.name)) || claimedJob.pdf_metadata_title || 'a new pattern').trim().slice(0, 120);
+      const who = await displayNameFor(supabaseUrl, serviceKey, claimedJob.user_id);
+      await celebrate({ kind: 'pattern', what: title, who, id: 'job:' + claimedJob.id, synthetic: probeUser });
+    }
 
     summary.processed++;
     summary.completed++;
