@@ -29,6 +29,10 @@ const URL_ = env.VITE_SUPABASE_URL, ANON = env.VITE_SUPABASE_ANON_KEY, SVC = env
 const svcH = { apikey: SVC, Authorization: `Bearer ${SVC}` };
 const BASE = process.env.QC_BASE || 'http://localhost:4173';
 const WINDOW_MS = Number(process.env.PROBE_WINDOW_MS || 90_000);
+// PROBE_PDF=<path> uses a real pattern file instead of the synthetic page, and
+// PROBE_FINISH=1 waits for the job to reach completed or failed, not just exist.
+const REAL_PDF = process.env.PROBE_PDF || null;
+const WAIT_FINISH = process.env.PROBE_FINISH === '1';
 
 const CHROME = [
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
@@ -56,7 +60,8 @@ const pdfBody = [
   'trailer<</Root 1 0 R>>',
   '%%EOF',
 ].join('\n');
-fs.writeFileSync(pdfPath, pdfBody);
+if (REAL_PDF) fs.copyFileSync(REAL_PDF, pdfPath); else fs.writeFileSync(pdfPath, pdfBody);
+console.log(stamp(), 'pdf', REAL_PDF || '(synthetic)', fs.statSync(pdfPath).size, 'bytes');
 
 const TEST_EMAIL = `probe-pdf-import@wovely.app`;
 const TEST_PW = 'Pr!' + Math.random().toString(36).slice(2) + 'A9';
@@ -132,18 +137,25 @@ try {
   await input.uploadFile(pdfPath);
   console.log(stamp(), 'file picked, watching for the server row');
 
-  // The proof is server-side: a job row for this user inside the window.
+  // The proof is server-side: a job row for this user inside the window, and
+  // with PROBE_FINISH=1 that row reaching completed (or failed, which is a
+  // truthful failure and still beats a hang).
+  let lastSeen = '';
   while (Date.now() - t0 < WINDOW_MS) {
-    const r = await fetch(`${URL_}/rest/v1/import_jobs?select=id,status,current_phase,created_at,error_message&user_id=eq.${userId}&order=created_at.desc&limit=1`, { headers: svcH });
+    const r = await fetch(`${URL_}/rest/v1/import_jobs?select=id,status,current_phase,created_at,updated_at,error_message,path_taken&user_id=eq.${userId}&order=created_at.desc&limit=1`, { headers: svcH });
     const rows = await r.json();
     if (Array.isArray(rows) && rows[0]) {
-      console.log(stamp(), 'JOB', JSON.stringify(rows[0]), `after ${Date.now() - t0}ms`);
-      ok = true; break;
+      const j = rows[0];
+      const sig = j.status + '/' + j.current_phase;
+      if (sig !== lastSeen) { lastSeen = sig; console.log(stamp(), 'JOB', sig, j.error_message ? 'err=' + String(j.error_message).slice(0, 160) : '', `+${Date.now() - t0}ms`); }
+      if (!WAIT_FINISH) { ok = true; break; }
+      if (j.status === 'completed') { ok = true; console.log(stamp(), 'COMPLETED path=' + j.path_taken); break; }
+      if (j.status === 'failed') { reason = 'job failed: ' + j.error_message; break; }
     }
     await wait(2000);
   }
+  if (!ok && !reason) reason = `no ${WAIT_FINISH ? 'finished' : ''} import_jobs row within ${WINDOW_MS}ms`;
   if (!ok) {
-    reason = `no import_jobs row within ${WINDOW_MS}ms`;
     const shot = path.join(process.env.TEMP || '.', 'wovely-probe-fail.png');
     await page.screenshot({ path: shot });
     console.log(stamp(), 'screenshot', shot);

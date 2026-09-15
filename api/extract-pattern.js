@@ -272,9 +272,16 @@ Be thorough — extract every component, every round, every material. Ensure the
 
 // ─── Provider call helpers (top-level, take keys as params) ──────────────────
 
+// 🔴 2026-09-15: the single-shot call asks Gemini for up to 65,536 output tokens
+// and then gave it 30 seconds. A six-page blanket pattern (Dani's Arrow Throw,
+// 5,303 chars of text) needs longer than that to write its JSON, so every real
+// pattern timed out here, fell through to Claude, and died on the dead Claude
+// key. The error text said "4s", a relic of an even older value. The worker
+// owns 300 s per job (EXTRACTION_TIMEOUT_MS), so Gemini gets 150 of them.
+const GEMINI_EXTRACT_TIMEOUT_MS = 150_000;
 async function callGeminiExtract({ prompt, pdfText, geminiKey, maxTokens }) {
   const controller = new AbortController();
-  const geminiTimeout = setTimeout(() => controller.abort(), 30000);
+  const geminiTimeout = setTimeout(() => controller.abort(), GEMINI_EXTRACT_TIMEOUT_MS);
   let r;
   try {
     r = await fetch(
@@ -291,7 +298,7 @@ async function callGeminiExtract({ prompt, pdfText, geminiKey, maxTokens }) {
     );
   } catch (fetchErr) {
     clearTimeout(geminiTimeout);
-    if (fetchErr.name === "AbortError") throw new Error("Gemini timeout after 4s");
+    if (fetchErr.name === "AbortError") throw new Error(`Gemini timeout after ${Math.floor(GEMINI_EXTRACT_TIMEOUT_MS / 1000)}s`);
     throw fetchErr;
   }
   clearTimeout(geminiTimeout);
