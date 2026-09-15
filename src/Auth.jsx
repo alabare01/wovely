@@ -104,12 +104,12 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 .wv-land .hero-fall .vizcard{border-color:#EAD3BC;box-shadow:0 40px 80px -40px rgba(43,29,22,.55)}
 .wv-land .hero-fall .vizbev{filter:drop-shadow(0 18px 26px rgba(43,29,22,.38));animation:wvbevbob 5.6s cubic-bezier(.45,0,.55,1) infinite;transform-origin:50% 100%}
 @keyframes wvbevbob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-9px) rotate(-1.4deg)}}
-.wv-land .leaf{position:absolute;top:-8%;z-index:2;pointer-events:none;opacity:0;animation:wvleaf linear infinite;will-change:transform,opacity}
+.wv-land .leaf{position:absolute;top:-8%;z-index:0;pointer-events:none;opacity:0;animation:wvleaf linear infinite;will-change:transform,opacity}
 .wv-land .leaf svg{display:block;width:100%;height:auto}
-.wv-land .leaf.l1{left:6%;width:26px;color:#C96A3B;animation-duration:13s;animation-delay:-2s}
-.wv-land .leaf.l2{left:44%;width:20px;color:#E0A458;animation-duration:16s;animation-delay:-9s}
-.wv-land .leaf.l3{left:78%;width:24px;color:#B5552E;animation-duration:14.5s;animation-delay:-5s}
-.wv-land .leaf.l4{left:92%;width:16px;color:#D9A35A;animation-duration:18s;animation-delay:-13s}
+.wv-land .leaf.l1{left:6%;width:34px;color:#C96A3B;animation-duration:13s;animation-delay:-2s}
+.wv-land .leaf.l2{left:44%;width:24px;color:#E0A458;animation-duration:16s;animation-delay:-9s}
+.wv-land .leaf.l3{left:78%;width:30px;color:#B5552E;animation-duration:14.5s;animation-delay:-5s}
+.wv-land .leaf.l4{left:92%;width:20px;color:#D9A35A;animation-duration:18s;animation-delay:-13s}
 @keyframes wvleaf{0%{transform:translate3d(0,0,0) rotate(0deg);opacity:0}8%{opacity:.85}50%{transform:translate3d(-22px,55vh,0) rotate(160deg)}92%{opacity:.6}100%{transform:translate3d(14px,112%,0) rotate(340deg);opacity:0}}
 @media (prefers-reduced-motion:reduce){.wv-land .hero-fall .vizbev{animation:none}.wv-land .leaf{display:none}}
 .wv-land .sect{max-width:1160px;margin:0 auto;padding:44px 54px 0}
