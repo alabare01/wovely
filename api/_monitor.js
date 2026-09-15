@@ -1073,47 +1073,87 @@ export function summarize(events) {
   };
 }
 
-export function buildHeartbeatEmail(events, { since, now, daily = false, tz = 'America/New_York', note = '' } = {}) {
+/**
+ * Resolve member uids to first names for the pulse email. Adam, 2026-09-15:
+ * "I need clarity on these reports." A count is not clarity; "Dani imported a
+ * pattern at 1:49 PM" is. One PostgREST call, fails to an empty map.
+ */
+export async function memberNames({ supabaseUrl, serviceKey, uids }) {
+  const ids = [...new Set((uids || []).filter(Boolean))];
+  if (!ids.length || !supabaseUrl || !serviceKey) return {};
+  try {
+    const r = await fetch(`${supabaseUrl}/rest/v1/user_profiles?select=id,display_name,first_name,username&id=in.(${ids.map(encodeURIComponent).join(',')})`, {
+      headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` },
+    });
+    if (!r.ok) return {};
+    const out = {};
+    for (const row of await r.json()) out[row.id] = row.first_name || row.display_name || row.username || null;
+    return out;
+  } catch { return {}; }
+}
+
+const KIND_SENTENCE = {
+  import_succeeded: 'imported a pattern',
+  email_captured: 'left an email',
+  guest_arrived: 'arrived',
+  page_view: 'looked around',
+  checkout_started: 'started checkout',
+  paywall_hit: 'hit the paywall',
+  demo_started: 'started the demo',
+  user_error: 'hit an error',
+  signup: 'signed up',
+};
+
+export function buildHeartbeatEmail(events, { since, now, daily = false, tz = 'America/New_York', note = '', names = {} } = {}) {
   const s = summarize(events);
   const span = daily ? 'the last 24 hours' : 'the last hour';
+  const people = s.guests + s.members;
+  const clock = (iso) => { try { return new Date(iso).toLocaleTimeString('en-US', { timeZone: tz, hour: 'numeric', minute: '2-digit' }); } catch { return ''; } };
+  const who = (e) => (e.uid ? (names[e.uid] || 'a member') : 'a guest');
 
-  const subject = daily
-    ? `Wovely daily: ${s.guests + s.members} visitor${s.guests + s.members === 1 ? '' : 's'}, ${s.total} event${s.total === 1 ? '' : 's'}`
-    : `Wovely pulse: ${s.guests + s.members} on the site in the last hour`;
+  // The headline is the one thing that mattered, in words, not the counts.
+  const imports = events.filter((e) => e.kind === 'import_succeeded');
+  const emails = events.filter((e) => e.kind === 'email_captured');
+  const money = events.filter((e) => e.kind === 'checkout_started');
+  let headline;
+  if (people === 0) headline = daily ? 'nobody came today' : 'nobody in the last hour';
+  else if (imports.length) headline = `${imports.length === 1 ? who(imports[0]) + ' imported a pattern' : imports.length + ' patterns imported'}`;
+  else if (emails.length) headline = `${emails.length} email${emails.length === 1 ? '' : 's'} captured`;
+  else if (money.length) headline = `${money.length} checkout${money.length === 1 ? '' : 's'} started`;
+  else headline = `${people} ${people === 1 ? 'person' : 'people'}, nobody imported or signed up`;
+
+  const subject = `${daily ? 'Wovely today' : 'Wovely, last hour'}: ${headline}`;
 
   const lines = [
-    daily
-      ? `The last 24 hours on wovely.app.`
-      : `The last hour on wovely.app.`,
-    `${since.toISOString()} to ${now.toISOString()}`,
-    '',
-    `Visitors: ${s.guests} guest${s.guests === 1 ? '' : 's'}, ${s.members} signed in`,
-    `Events: ${s.total}`,
+    `${daily ? 'Today' : 'The last hour'} on wovely.app, ${clock(since.toISOString())} to ${clock(now.toISOString())} ET.`,
     '',
   ];
 
   if (s.total === 0) {
-    lines.push(`Nobody came to wovely.app in ${span}.`);
-    lines.push('');
-    lines.push('This message is the proof the monitor is alive. It sends whether or not');
-    lines.push('anyone showed up, so silence never has to be interpreted.');
+    lines.push(`Nobody came in ${span}. This note is the proof the monitor is alive; it sends either way.`);
   } else {
-    lines.push('What happened');
-    for (const [kind, n] of Object.entries(s.byKind).sort((a, b) => b[1] - a[1])) {
-      lines.push(`  ${String(n).padStart(4)}  ${(EVENT_KINDS[kind]?.label) || kind}`);
-    }
+    lines.push(`${people} ${people === 1 ? 'person' : 'people'}: ${s.members} signed in, ${s.guests} guest${s.guests === 1 ? '' : 's'}.`);
     lines.push('');
-    if (s.topPaths.length) {
-      lines.push('Where they went');
-      for (const [p, n] of s.topPaths) lines.push(`  ${String(n).padStart(4)}  ${p}`);
-      lines.push('');
+    // One line per person, newest first, what they did and where they went.
+    const byActor = new Map();
+    for (const e of [...events].sort((a, b) => String(b.at || b.timestamp || '').localeCompare(String(a.at || a.timestamp || '')))) {
+      const key = e.uid ? 'u:' + e.uid : 's:' + (e.sid || 'anon');
+      if (!byActor.has(key)) byActor.set(key, { e, kinds: new Set(), paths: new Set(), first: e.at || e.timestamp, ref: e.ref });
+      const a = byActor.get(key);
+      a.kinds.add(e.kind); if (e.path) a.paths.add(e.path); a.first = e.at || e.timestamp || a.first;
     }
-    if (s.topRefs.length) {
-      lines.push('How they got here');
-      for (const [r, n] of s.topRefs) lines.push(`  ${String(n).padStart(4)}  ${r}`);
-      lines.push('');
+    for (const a of [...byActor.values()].slice(0, 12)) {
+      const did = [...a.kinds].filter((k) => k !== 'page_view' && !(k === 'guest_arrived' && a.kinds.size > 2)).map((k) => KIND_SENTENCE[k] || k);
+      const verbs = did.length ? did.join(', ') : 'looked around';
+      const where = [...a.paths].slice(0, 4).join(' ');
+      lines.push(`  ${clock(a.first)}  ${who(a.e)} ${verbs}${where ? '  (' + where + ')' : ''}${a.ref ? '  from ' + a.ref : ''}`);
     }
+    if (byActor.size > 12) lines.push(`  and ${byActor.size - 12} more`);
+    lines.push('');
   }
+
+  lines.push('Not counted above: our own probes and house traffic. They are recorded on the synthetic prefix and never in these numbers.');
+  lines.push('');
 
   if (note) {
     lines.push(note);
@@ -1293,7 +1333,8 @@ export async function runHeartbeat({ supabaseUrl, serviceKey, now = new Date() }
       if (d.due) {
         const since = new Date(now.getTime() - DAY_MS);
         const events = await readPulses({ supabaseUrl, serviceKey, since, limit: 1000 });
-        const { subject, text } = buildHeartbeatEmail(events, { since, now, daily: true, tz: config.tz });
+        const names = await memberNames({ supabaseUrl, serviceKey, uids: events.map((e) => e.uid) });
+        const { subject, text } = buildHeartbeatEmail(events, { since, now, daily: true, tz: config.tz, names });
         const r = await sendMail({
           from: FROM_APP, to: OWNER_INBOX, subject, text,
           tags: [{ name: 'kind', value: 'monitor_daily' }],
@@ -1320,7 +1361,8 @@ export async function runHeartbeat({ supabaseUrl, serviceKey, now = new Date() }
     const events = await readPulses({ supabaseUrl, serviceKey, since });
     if (events.length === 0) return { sent: false, reason: 'quiet_hour_no_events' };
 
-    const { subject, text } = buildHeartbeatEmail(events, { since, now, daily: false, tz: config.tz });
+    const names = await memberNames({ supabaseUrl, serviceKey, uids: events.map((e) => e.uid) });
+    const { subject, text } = buildHeartbeatEmail(events, { since, now, daily: false, tz: config.tz, names });
     const r = await sendMail({
       from: FROM_APP, to: OWNER_INBOX, subject, text,
       tags: [{ name: 'kind', value: 'monitor_heartbeat' }],

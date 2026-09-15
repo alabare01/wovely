@@ -20,6 +20,17 @@ import { runVisionExtraction } from '../extract-pattern-vision.js';
 import { alertImportFailures } from '../_alert.js';
 import { flushInterrupts, recordPulse } from '../_monitor.js';
 
+/** True when the job's owner is one of our probe accounts (probe-*@wovely.app). Fails closed to false. */
+async function isProbeUser(supabaseUrl, serviceKey, userId) {
+  if (!userId) return false;
+  try {
+    const r = await fetch(`${supabaseUrl}/auth/v1/admin/users/${userId}`, { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } });
+    if (!r.ok) return false;
+    const u = await r.json();
+    return /^probe-[^@]*@wovely\.app$/i.test(String(u?.email || ''));
+  } catch { return false; }
+}
+
 export const config = { maxDuration: 300 };
 
 // Phase order for the pill UI. The worker writes each as it advances and
@@ -674,15 +685,19 @@ export default async function handler(req, res) {
     // did it, and not from the browser. A tab that is closed the moment the
     // pill turns green would never have reported it, and "somebody imported a
     // pattern" is the single strongest signal this product has.
+    // 2026-09-15: the core-path probe imports a real PDF under a throwaway
+    // user every six hours. Those imports are ours and go on the synthetic
+    // prefix, or Adam reads "2 imported a pattern" and thinks it was people.
+    const probeUser = await isProbeUser(supabaseUrl, serviceKey, claimedJob.user_id);
     await recordPulse({
-      supabaseUrl, serviceKey,
+      supabaseUrl, serviceKey, synthetic: probeUser,
       events: [{
         kind: 'import_succeeded',
         path: '/import',
         ref: null,
         sid: null,
         uid: claimedJob.user_id || null,
-        meta: { file_type: String(claimedJob.file_type || 'unknown').slice(0, 40) },
+        meta: { file_type: String(claimedJob.file_type || 'unknown').slice(0, 40), probe: probeUser || undefined },
         at: new Date().toISOString(),
       }],
     });
