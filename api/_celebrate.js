@@ -22,7 +22,7 @@ export async function celebrate({ kind, what, who, amount, id, synthetic = false
   const secret = process.env.WOVELY_CELEBRATE_SECRET;
   if (!secret) return { ok: false, why: 'WOVELY_CELEBRATE_SECRET not set' };
   if (!['pattern', 'member', 'sale'].includes(kind)) return { ok: false, why: 'unknown kind ' + kind };
-  if (synthetic || SYNTHETIC.test(String(who || ''))) return { ok: false, why: 'synthetic, not celebrated' };
+  if (synthetic || SYNTHETIC.test(String(who || ''))) { console.log('[celebrate]', kind, 'skipped: synthetic'); return { ok: false, why: 'synthetic, not celebrated' }; }
   const body = {
     kind,
     what: String(what || '').slice(0, 120),
