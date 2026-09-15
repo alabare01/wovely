@@ -147,6 +147,9 @@ export default async function handler(req, res) {
   try {
     const record = req.body?.record || req.body;
     const { id, email, created_at } = record;
+    // 2026-09-15: the core-path probe creates probe-*@wovely.app every six hours. It is not a person, it must
+    // never email Adam "New Wovely signup" (it did, at 17:09, and he asked if it was real), and it gets no welcome.
+    if (/^probe-[^@]*@wovely\.app$/i.test(String(email || ''))) return res.status(200).json({ ok: true, skipped: 'probe user' });
 
     // Guest sessions INSERT an anonymous auth.users row (no email) — that is
     // normal, not an error. The real signup arrives later as the UPDATE that
