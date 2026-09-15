@@ -47,7 +47,7 @@ const COVER = "/cover-mushroom-photo.png";
 
 // The Cap, verbatim from the starter PDF (page 3). `count` is the stitch count
 // the pattern prints in parentheses at the end of the round.
-const DEMO_ROWS = [
+export const DEMO_ROWS = [
   { id: "mr", label: "Magic ring", text: "Make a magic ring with 6 sc", count: 6 },
   { id: "r1", label: "Rnd 1", text: "inc in each st around", count: 12 },
   { id: "r2", label: "Rnd 2", text: "(1 sc, inc) 6 times", count: 18 },

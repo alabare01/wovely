@@ -3,6 +3,7 @@ import posthog from "posthog-js";
 
 import { supabaseAuth, getSession } from "./supabase.js";
 import GuestDemo from "./GuestDemo.jsx";
+import HeroCounter from "./HeroCounter.jsx";
 import ResetPassword, { RESET_PASSWORD_PATH } from "./ResetPassword.jsx";
 import {
   readPendingUpgrade, writePendingUpgrade, clearPendingUpgrade,
@@ -87,6 +88,14 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 .wv-land .vizrow{position:absolute;bottom:16px;right:16px;z-index:3;display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.95);border-radius:14px;padding:11px 15px;font-weight:800;font-size:13px;box-shadow:0 10px 22px -12px rgba(46,39,72,.5)}
 .wv-land .vizrow .bar{width:110px;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
 .wv-land .vizrow .bar span{display:block;height:100%;width:64%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#C98BE0)}
+/* Live hero counter (2026-09-15): the card sizes to its rows instead of a fixed
+   photo height, and Bev moves to the top-left corner so she never covers a
+   tappable row. Remove .live from both nodes in Landing to go back to the photo. */
+.wv-land .vizcard.live{height:auto;min-height:330px;background:#fff;display:flex;flex-direction:column;justify-content:center}
+.wv-land .heroviz.live .vizbev{width:128px;left:-26px;bottom:auto;top:-46px;z-index:4}
+.wv-land .heroviz.live .vizcard{margin-top:26px}
+.wv-land .herocounter{padding-left:0}
+.wv-land .heroviz.live .herocounter>div:first-child{padding-left:96px}
 /* Fall hero (grand opening, 2026-09-15 to 11-30). The season lives in the
    ground and the accents: cream #FFF7EC, cinnamon #C96A3B, deep brown #2B1D16,
    the Wovely set in story/kit.mjs. The CTA stays lavender because that is the
@@ -225,7 +234,7 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 .wv-land .minipat{display:flex;align-items:center;gap:10px;margin-top:13px;background:var(--bg);border-radius:11px;padding:8px 10px;font-weight:700;font-size:12px;color:var(--muted);line-height:1.4;text-align:left}
 .wv-land .minipat img{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0}
 @media (max-width:1024px){.wv-land .hero{grid-template-columns:1fr;padding:34px 40px 10px;gap:64px}.wv-land .heroviz{order:0}.wv-land .stats{grid-template-columns:1fr 1fr}.wv-land .heroviz{max-width:560px}.wv-land .top{padding:16px 40px}.wv-land .sect{padding:54px 40px 0}.wv-land .craftin{grid-template-columns:1fr;padding:36px}.wv-land .endin{flex-direction:column;text-align:center;padding:44px 36px}.wv-land .end-s{margin-left:auto;margin-right:auto}.wv-land .pagecord{display:none}}
-@media (max-width:640px){.wv-land .forkrow{grid-template-columns:1fr}.wv-land .authcard{padding:32px 24px}.wv-land .h1{font-size:36px}.wv-land .pcard.hot{order:-1}.wv-land .stats{grid-template-columns:1fr}.wv-land .vizbev{width:180px;left:-14px}.wv-land .vizcard{margin-left:30px;height:280px}.wv-land .statfoot{flex-direction:column;text-align:center}.wv-land .howimg{height:180px}.wv-land .uline{white-space:normal;background-size:100% 9px;padding-bottom:10px}.wv-land .hero{padding:34px 22px 6px;gap:30px}.wv-land .top{padding:14px 18px;gap:12px}.wv-land .tlink.hidem{display:none}.wv-land .sect{padding:44px 22px 0}.wv-land .how{grid-template-columns:1fr;gap:20px}.wv-land .toolgrid{grid-template-columns:1fr}.wv-land .plans{grid-template-columns:1fr}.wv-land .craftband,.wv-land .endband{padding-left:22px;padding-right:22px}.wv-land .craftlist{grid-template-columns:1fr}.wv-land .foot{padding:0 22px 36px}.wv-land .vizcard{height:300px}}
+@media (max-width:640px){.wv-land .forkrow{grid-template-columns:1fr}.wv-land .heroviz.live .vizbev{width:96px;left:-10px;top:-36px}.wv-land .vizcard.live{margin-left:0;min-height:0;height:auto}.wv-land .heroviz.live .herocounter>div:first-child{padding-left:82px}.wv-land .authcard{padding:32px 24px}.wv-land .h1{font-size:36px}.wv-land .pcard.hot{order:-1}.wv-land .stats{grid-template-columns:1fr}.wv-land .vizbev{width:180px;left:-14px}.wv-land .vizcard{margin-left:30px;height:280px}.wv-land .statfoot{flex-direction:column;text-align:center}.wv-land .howimg{height:180px}.wv-land .uline{white-space:normal;background-size:100% 9px;padding-bottom:10px}.wv-land .hero{padding:34px 22px 6px;gap:30px}.wv-land .top{padding:14px 18px;gap:12px}.wv-land .tlink.hidem{display:none}.wv-land .sect{padding:44px 22px 0}.wv-land .how{grid-template-columns:1fr;gap:20px}.wv-land .toolgrid{grid-template-columns:1fr}.wv-land .plans{grid-template-columns:1fr}.wv-land .craftband,.wv-land .endband{padding-left:22px;padding-right:22px}.wv-land .craftlist{grid-template-columns:1fr}.wv-land .foot{padding:0 22px 36px}.wv-land .vizcard{height:300px}}
 #__ph_survey_widget, div[class*="PostHog"], div[id*="posthog"], .__ph_toolbar { display: none !important; }
 /* iOS Safari only (-webkit-touch-callout is iOS-specific): live filter layers
    break the tile compositor on real devices: sections stop painting mid-
@@ -336,7 +345,7 @@ const Leaf = ({ n }) => (
   </span>
 );
 
-const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => {
+const Landing = ({ annual, setAnnual, onStartFree, onGoCraft, onKeep, onImportOwn }) => {
   const offer = useOpeningOffer();
   const fall = !!offer;
   return (
@@ -346,15 +355,15 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => {
     <div className={fall ? "hero-fall" : undefined}>
     {fall && [1, 2, 3, 4].map(n => <Leaf key={n} n={n} />)}
     <div className="hero">
-      <div className="heroviz">
+      {/* The hero card IS the counter (2026-09-15). It used to be a photo with a
+          painted "Round 33 of 51" badge that did nothing when touched; 14 days
+          of PostHog showed zero strangers ever reaching the real demo two
+          clicks behind it. See HeroCounter.jsx for the numbers. */}
+      <div className="heroviz live">
         <img className="vizbev" src="/bev-hero.png" alt="Bev, your Wovely guide" />
-        <CoverFill src="/landing-dragons.jpg" bgSrc="/landing-dragons-blur.jpg" alt="Two crocheted dragons, a real Wovely maker's project" className="vizcard">
-          <div className="vizbadge">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z" /><path d="M9 12l2 2 4-4" /></svg>
-            BevCheck · 99.7% certified
-          </div>
-          <div className="vizrow">Round 33 of 51<div className="bar"><span /></div>64%</div>
-        </CoverFill>
+        <div className="vizcard live">
+          <HeroCounter fall={fall} onKeep={onKeep} onImportOwn={onImportOwn} />
+        </div>
       </div>
       <div>
         <div className="eyebrow">{fall ? <><span className="dot" />Cozy season. The doors are open.</> : "Meet Bev, she runs your craft life"}</div>
@@ -932,7 +941,7 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
         <div style={{ padding: "18px 20px 0" }}>{notice}</div>
       )}
       {screen === "landing" && (
-        <Landing annual={annual} setAnnual={setAnnual} onStartFree={goTry} onGoCraft={goCraft} />
+        <Landing annual={annual} setAnnual={setAnnual} onStartFree={goTry} onGoCraft={goCraft} onKeep={() => tryFork("starter")} onImportOwn={() => tryFork("import")} />
       )}
       {screen === "try" && (
         <TryScreen onDemo={goDemo} onImport={() => tryFork("import")} onSignIn={() => goAuth("signin")} />
