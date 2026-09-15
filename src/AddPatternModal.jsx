@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { T, useBreakpoint, Field } from "./theme.jsx";
 import { PILL } from "./constants.js";
-import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseAuth, getSession } from "./supabase.js";
+import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseAuth, getSession, refreshSession, millisUntilExpiry } from "./supabase.js";
+import { reportClientError } from "./utils/errorReporter.js";
 import { CHECK_ICON, extractFirstRowNumber } from "./StitchCheck.jsx";
 import BevGauge, { deriveState, sentenceCase, checkTier } from "./components/BevGauge.jsx";
 import ScanGauge, { ProcSteps } from "./components/ScanGauge.jsx";
@@ -32,22 +33,55 @@ const CAT_IMG = {
 };
 const ALL_CAT_ENTRIES = Object.entries(CAT_IMG);
 
-const uploadPatternFile = async (file, onProgress) => {
+// 🔴 2026-09-15: a PDF upload from an iPhone on cellular sat on "Reading the
+// source" for an hour with nothing moving and nothing logged. The old fetch()
+// had no timeout, no progress and no error report, so a stalled upload and a
+// dead hang were the same screen, and the server never heard about either
+// (zero import_jobs rows, zero client-error rows for the whole window). Now:
+// a fresh token before the send, an XHR so the bar reflects real bytes, a
+// deadline scaled to the file, and a report the moment it stalls.
+const UPLOAD_DEADLINE_MS = (bytes) => Math.min(5 * 60_000, 60_000 + Math.ceil(bytes / 1_048_576) * 4_000);
+
+const xhrUpload = (url, headers, body, deadlineMs, onPct) => new Promise((resolve, reject) => {
+  const xhr = new XMLHttpRequest();
+  let lastMoveAt = Date.now();
+  xhr.open("POST", url, true);
+  for (const [k, v] of Object.entries(headers)) xhr.setRequestHeader(k, v);
+  xhr.upload.onprogress = (e) => { lastMoveAt = Date.now(); if (e.lengthComputable && onPct) onPct(e.loaded / e.total); };
+  xhr.onload = () => (xhr.status >= 200 && xhr.status < 300) ? resolve(xhr.status) : reject(Object.assign(new Error("Supabase upload failed: " + xhr.status), { httpStatus: xhr.status, body: String(xhr.responseText || "").slice(0, 200) }));
+  xhr.onerror = () => reject(new Error("Supabase upload network error"));
+  xhr.onabort = () => reject(new Error("Supabase upload aborted"));
+  // Two clocks: a hard deadline for the whole send, and a stall clock that
+  // trips when no byte has moved for 45 s. A slow cellular link keeps the
+  // bar moving and stays under the deadline; a dead link trips the stall.
+  const hard = setTimeout(() => { xhr.abort(); reject(Object.assign(new Error("Upload timed out"), { timedOut: true })); }, deadlineMs);
+  const stall = setInterval(() => { if (Date.now() - lastMoveAt > 45_000) { clearInterval(stall); xhr.abort(); reject(Object.assign(new Error("Upload stalled"), { timedOut: true })); } }, 5_000);
+  xhr.onloadend = () => { clearTimeout(hard); clearInterval(stall); };
+  xhr.send(body);
+});
+
+let lastUploadError = null;
+const uploadPatternFile = async (file, onProgress, onPct) => {
+  lastUploadError = null;
   const isPdf=file.type==="application/pdf"||file.name?.toLowerCase().endsWith(".pdf");
   if(onProgress) onProgress("uploading");
   try {
     if(isPdf){
       // PDFs → Supabase Storage (public bucket, no ACL issues)
+      // A token that dies mid-send comes back as a 400 from storage that
+      // reads like a bad file. Renew first when it is inside two minutes.
+      if (millisUntilExpiry() < 2 * 60_000) { try { await refreshSession(); } catch {} }
       const session=getSession();
       const user=supabaseAuth.getUser();
       if(!session?.access_token||!user) throw new Error("Not authenticated");
       const filePath=`${user.id}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;
-      const res=await fetch(`${SUPABASE_URL}/storage/v1/object/pattern-files/${filePath}`,{
-        method:"POST",
-        headers:{"Authorization":`Bearer ${session.access_token}`,"Content-Type":file.type},
-        body:file,
-      });
-      if(!res.ok) throw new Error("Supabase upload failed: "+res.status);
+      const t0 = Date.now();
+      await xhrUpload(
+        `${SUPABASE_URL}/storage/v1/object/pattern-files/${filePath}`,
+        { "Authorization": `Bearer ${session.access_token}`, "Content-Type": file.type || "application/pdf" },
+        file, UPLOAD_DEADLINE_MS(file.size), onPct
+      );
+      console.log("[Wovely] PDF uploaded", (file.size/1024).toFixed(0)+"KB", (Date.now()-t0)+"ms");
       const publicUrl=`${SUPABASE_URL}/storage/v1/object/public/pattern-files/${filePath}`;
       if(onProgress) onProgress("done");
       return { url: publicUrl, filename: file.name, type: file.type };
@@ -65,8 +99,21 @@ const uploadPatternFile = async (file, onProgress) => {
   } catch (e) {
     if(onProgress) onProgress("error");
     console.error("[Wovely] File upload error:", e);
+    // A person just lost their pattern. That is one of the things allowed to
+    // reach Adam, and until today it never left the console.
+    reportClientError("pattern upload failed: " + (e?.message || e), { source: "upload", stage: "uploading", timedOut: !!e?.timedOut, httpStatus: e?.httpStatus || null, body: e?.body || null, bytes: file?.size || null, name: file?.name || null, online: typeof navigator !== "undefined" ? navigator.onLine : null });
+    lastUploadError = e;
     return null;
   }
+};
+
+// Nothing below may wait on a promise forever. The cover render pulls pdf.js
+// from a CDN and rasterises page one on the phone; when either stalls the
+// import goes on without a cover rather than never going on at all.
+const withDeadline = (promise, ms, fallback, label) => {
+  let timer = null;
+  const clock = new Promise((resolve) => { timer = setTimeout(() => { console.warn("[Wovely] " + label + " passed " + ms + "ms, continuing without it"); reportClientError(label + " timed out", { source: "upload", stage: "uploading", ms }); resolve(fallback); }, ms); });
+  return Promise.race([promise.finally(() => clearTimeout(timer)), clock]);
 };
 
 // Mark a reserved ('preparing') import job as failed. Used when the client
@@ -1100,14 +1147,16 @@ const PDFUploadForm = ({onSave,onClose,Btn,isPro,tier,isAnonymous=false,onUpgrad
       const isPDF=fileMime==="application/pdf"||f.name.toLowerCase().endsWith(".pdf");
       console.log("[Wovely] File:", f.name, f.type, (f.size/1024).toFixed(0)+"KB", "isPDF:", isPDF);
       // Stage 1: Upload to Cloudinary + render cover (parallel)
-      setStage("uploading");setStageText("Uploading your pattern...");setProgress(10);      const intv1=setInterval(()=>setProgress(p=>Math.min(p+3,30)),200);
+      setStage("uploading");setStageText("Uploading your pattern...");setProgress(10);      const intv1=setInterval(()=>setProgress(p=>Math.min(p+1,12)),400); // real bytes carry the bar from here; this only proves the screen is alive
       // Run upload and cover render in parallel
+      // The bar rides real bytes from 10 to 30 while the file goes up; the
+      // cover render gets 25 s and the import goes on without it past that.
       const [uploaded, pdfCoverDataUrl] = await Promise.all([
-        uploadPatternFile(f),
-        isPDF ? renderPDFCoverImage(f) : Promise.resolve(null)
+        uploadPatternFile(f, null, (pct) => setProgress(10 + Math.round(pct * 20))),
+        isPDF ? withDeadline(renderPDFCoverImage(f), 25_000, null, "PDF cover render") : Promise.resolve(null)
       ]);
       clearInterval(intv1);
-      if(!uploaded){onExtractionEnd?.();setStage("error");setErrorMsg("Upload failed. Check your connection and try again.");return;}
+      if(!uploaded){onExtractionEnd?.();setStage("error");setErrorMsg(lastUploadError?.timedOut?"The upload stalled before it finished. Check your signal and try again, or send it from a laptop on wifi.":lastUploadError?.httpStatus===400||lastUploadError?.httpStatus===401||lastUploadError?.httpStatus===403?"Your sign-in went stale mid-upload. Sign out, sign back in, and try again.":"Upload failed. Check your connection and try again.");return;}
       // Upload PDF cover image to Cloudinary using yarnhive_patterns preset
       let coverCloudinaryUrl=null;
       if(pdfCoverDataUrl){
