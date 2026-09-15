@@ -1,7 +1,82 @@
 // api/stitch-vision.js
 // Vercel serverless function — identifies crochet stitch from a photo via Gemini
 
-export const config = { maxDuration: 60, api: { bodyParser: { sizeLimit: "10mb" } } };
+export const config = { maxDuration: 120, api: { bodyParser: { sizeLimit: "10mb" } } };
+
+// ── SNAP & STITCH: a photo of a finished piece in, a starter pattern out ────
+// Consolidated here on 2026-09-15 rather than given its own file (CLAUDE.md:
+// 17 functions, do not add). Until then AddPatternModal ran this prompt
+// against Gemini straight from the browser with VITE_GEMINI_API_KEY, which
+// Vite inlines into the public bundle, so the key sat in view-source on
+// wovely.app for anyone to spend against. Same prompt, same output shape,
+// the key stays here. Client contract: POST { mode: "snap", image: dataUrl }.
+const SNAP_PROMPT = `You are an expert crochet pattern designer with deep knowledge of amigurumi, garment construction, blankets, and all crochet techniques. Analyze this photograph of a finished crochet object.
+
+Your task: identify every distinct visible component, determine the exact crochet construction technique that produces each shape, and provide enough detail that a crocheter could recreate the object from scratch.
+
+Return ONLY valid raw JSON. No markdown. No explanation. No backticks. Just the JSON object.
+
+{
+  "object_name": "the actual name of what this is",
+  "object_category": "amigurumi or blanket or garment or accessory or home_goods or unknown",
+  "confidence_overall": 85,
+  "size_class": "tiny_under5cm or small_5to10cm or medium_10to20cm or large_over20cm",
+  "color_structure": { "primary_color": "red", "accent_colors": ["cream","brown"], "color_count": 3 },
+  "components": [
+    {
+      "id": "body", "role": "body", "label": "Body",
+      "primitive_type": "cylinder or sphere or oval or cone or tapered_cylinder or flat_disc or flat_square or flat_circle",
+      "size_relative": "dominant or large or medium or small",
+      "size_ratio_to_dominant": 1.0, "color": "main color", "confidence": 90,
+      "construction": { "technique": "worked_in_the_round or worked_flat or joined_granny_squares", "stitch": "single_crochet or half_double_crochet or double_crochet or bobble or ribbed", "start": "magic_ring or chain_foundation or chain_ring", "increase_to": 36, "even_rounds": 10, "decrease_from": 36, "final_sts": 6, "stuffed": true, "notes": "detailed note" },
+      "join_to": "head", "join_method": "sew_flat_to_bottom_of_head or sew_side_to_body or worked_as_extension or no_join"
+    }
+  ],
+  "assembly_order": ["list component ids in order"],
+  "assembly_notes": "Specific assembly instructions"
+}
+
+CRITICAL RULES: Identify EVERY distinct visible part. Use real part names for role (hat, head, beard, body, arm, leg, ear, tail, nose, eye, base). size_ratio_to_dominant: body=1.0, head=0.7-0.9, arm=0.3, nose=0.08-0.15. Be specific with stitch counts.`;
+
+async function handleSnap(req, res, key) {
+  const image = String(req.body?.image || "");
+  if (!image.startsWith("data:image/")) return res.status(400).json({ error: "image data URL required" });
+  const mimeType = image.slice(5, image.indexOf(";")) || "image/jpeg";
+  const data = image.slice(image.indexOf(",") + 1);
+  if (!data || data.length > 9_000_000) return res.status(413).json({ error: "image too large" });
+  try {
+    const r = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + key,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: SNAP_PROMPT }, { inline_data: { mime_type: mimeType, data } }] }],
+          generationConfig: { temperature: 0.1, maxOutputTokens: 16384, thinkingConfig: { thinkingBudget: 0 }, responseMimeType: "application/json" },
+        }),
+        signal: AbortSignal.timeout(110_000),
+      }
+    );
+    if (!r.ok) {
+      console.error("[snap] Gemini", r.status, (await r.text().catch(() => "")).slice(0, 300));
+      return res.status(502).json({ error: "Gemini API error: " + r.status });
+    }
+    const body = await r.json();
+    const text = body.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const cleaned = text.replace(/```json/gi, "").replace(/```/g, "").trim();
+    let parsed;
+    try { parsed = JSON.parse(cleaned); }
+    catch {
+      const m = cleaned.match(/\{[\s\S]*\}/);
+      if (!m) return res.status(502).json({ error: "Gemini returned no JSON" });
+      parsed = JSON.parse(m[0]);
+    }
+    return res.status(200).json(parsed);
+  } catch (err) {
+    console.error("[snap] failed:", err?.message || err);
+    return res.status(502).json({ error: "Snap failed: " + (err?.message || "unknown") });
+  }
+}
 
 import sharp from "sharp";
 
@@ -144,6 +219,13 @@ export default async function handler(req, res) {
   const _url = process.env.VITE_SUPABASE_URL;
   const _key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const _t0 = Date.now();
+
+  // Snap & Stitch rides on this function; see handleSnap above.
+  if (req.body?.mode === "snap") {
+    const key = process.env.GEMINI_API_KEY;
+    if (!key) return res.status(500).json({ error: "API key not configured" });
+    return handleSnap(req, res, key);
+  }
 
   // ── STEP 1: Parse request body ──
   console.log("[STITCH-STEP-1] Parsing request body");
