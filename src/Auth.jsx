@@ -87,6 +87,31 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 .wv-land .vizrow{position:absolute;bottom:16px;right:16px;z-index:3;display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.95);border-radius:14px;padding:11px 15px;font-weight:800;font-size:13px;box-shadow:0 10px 22px -12px rgba(46,39,72,.5)}
 .wv-land .vizrow .bar{width:110px;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
 .wv-land .vizrow .bar span{display:block;height:100%;width:64%;border-radius:99px;background:linear-gradient(90deg,var(--accent),#C98BE0)}
+/* Fall hero (grand opening, 2026-09-15 to 11-30). The season lives in the
+   ground and the accents: cream #FFF7EC, cinnamon #C96A3B, deep brown #2B1D16,
+   the Wovely set in story/kit.mjs. The CTA stays lavender because that is the
+   brand's action colour, not a seasonal one. Remove .hero-fall to go back. */
+.wv-land .hero-fall{position:relative;overflow:hidden;background:linear-gradient(180deg,#FFF7EC 0%,#FFF7EC 58%,rgba(255,247,236,0) 100%)}
+.wv-land .hero-fall::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(520px 320px at 18% 30%,rgba(255,201,120,.38),transparent 70%),radial-gradient(460px 300px at 84% 18%,rgba(201,106,59,.16),transparent 70%)}
+.wv-land .hero-fall .hero{position:relative;z-index:1}
+.wv-land .hero-fall .eyebrow{color:#C96A3B}
+.wv-land .hero-fall .eyebrow .dot{width:8px;height:8px;border-radius:50%;background:#C96A3B;box-shadow:0 0 0 4px rgba(201,106,59,.18)}
+.wv-land .hero-fall .h1{color:#2B1D16}
+.wv-land .hero-fall .uline{color:#C96A3B;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'%3E%3Cpath d='M3 9 C 40 3, 80 13, 120 7 S 190 6, 197 8' fill='none' stroke='%23C96A3B' stroke-width='4' stroke-linecap='round' stroke-dasharray='7 6'/%3E%3C/svg%3E")}
+.wv-land .hero-fall .sub{color:#5C4A3D}
+.wv-land .hero-fall .chip{border-color:#EAD3BC;box-shadow:0 8px 18px -14px rgba(43,29,22,.5)}
+.wv-land .hero-fall .chip svg{color:#C96A3B}
+.wv-land .hero-fall .vizcard{border-color:#EAD3BC;box-shadow:0 40px 80px -40px rgba(43,29,22,.55)}
+.wv-land .hero-fall .vizbev{filter:drop-shadow(0 18px 26px rgba(43,29,22,.38));animation:wvbevbob 5.6s cubic-bezier(.45,0,.55,1) infinite;transform-origin:50% 100%}
+@keyframes wvbevbob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-9px) rotate(-1.4deg)}}
+.wv-land .leaf{position:absolute;top:-8%;z-index:2;pointer-events:none;opacity:0;animation:wvleaf linear infinite;will-change:transform,opacity}
+.wv-land .leaf svg{display:block;width:100%;height:auto}
+.wv-land .leaf.l1{left:6%;width:26px;color:#C96A3B;animation-duration:13s;animation-delay:-2s}
+.wv-land .leaf.l2{left:44%;width:20px;color:#E0A458;animation-duration:16s;animation-delay:-9s}
+.wv-land .leaf.l3{left:78%;width:24px;color:#B5552E;animation-duration:14.5s;animation-delay:-5s}
+.wv-land .leaf.l4{left:92%;width:16px;color:#D9A35A;animation-duration:18s;animation-delay:-13s}
+@keyframes wvleaf{0%{transform:translate3d(0,0,0) rotate(0deg);opacity:0}8%{opacity:.85}50%{transform:translate3d(-22px,55vh,0) rotate(160deg)}92%{opacity:.6}100%{transform:translate3d(14px,112%,0) rotate(340deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.wv-land .hero-fall .vizbev{animation:none}.wv-land .leaf{display:none}}
 .wv-land .sect{max-width:1160px;margin:0 auto;padding:44px 54px 0}
 .wv-land .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
 .wv-land .stat{background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px 24px}
@@ -277,7 +302,7 @@ const closeDate = iso => {
   try { return new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "America/New_York" }); }
   catch { return null; }
 };
-const OpeningStrip = ({ onGoCraft }) => {
+const useOpeningOffer = () => {
   const [offer, setOffer] = useState(null);
   useEffect(() => {
     let alive = true;
@@ -287,6 +312,9 @@ const OpeningStrip = ({ onGoCraft }) => {
       .catch(() => {});
     return () => { alive = false; };
   }, []);
+  return offer;
+};
+const OpeningStrip = ({ offer, onGoCraft }) => {
   if (!offer) return null;
   const months = offer.duration === "repeating" && offer.duration_in_months ? offer.duration_in_months : null;
   const closes = offer.expires_at ? closeDate(offer.expires_at) : null;
@@ -302,10 +330,21 @@ const OpeningStrip = ({ onGoCraft }) => {
   );
 };
 
-const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
+const Leaf = ({ n }) => (
+  <span className={`leaf l${n}`} aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5c-6.8.2-12.2 2.6-14.9 7.3-1.6 2.8-1.7 5.8-.7 8.3l-2.6 2.4 1.1 1.2 2.6-2.4c2.5 1.1 5.6 1 8.4-.6 4.7-2.7 7.1-8.1 7.3-14.9l-.1-1.3-1.1.0zm-2.3 2.3c-.6 5-2.6 8.7-5.9 10.6-1.9 1.1-3.8 1.3-5.5.8L14.2 10l-1.1-1.2-7.4 7.2c-.4-1.7-.2-3.6.9-5.5 1.9-3.3 5.6-5.3 10.6-5.9l1 .2z" /></svg>
+  </span>
+);
+
+const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => {
+  const offer = useOpeningOffer();
+  const fall = !!offer;
+  return (
   <>
-    <OpeningStrip onGoCraft={onGoCraft} />
-    {/* ── Hero ── */}
+    <OpeningStrip offer={offer} onGoCraft={onGoCraft} />
+    {/* ── Hero (fall ground while the grand-opening offer is live) ── */}
+    <div className={fall ? "hero-fall" : undefined}>
+    {fall && [1, 2, 3, 4].map(n => <Leaf key={n} n={n} />)}
     <div className="hero">
       <div className="heroviz">
         <img className="vizbev" src="/bev-hero.png" alt="Bev, your Wovely guide" />
@@ -318,7 +357,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
         </CoverFill>
       </div>
       <div>
-        <div className="eyebrow">Meet Bev, she runs your craft life</div>
+        <div className="eyebrow">{fall ? <><span className="dot" />Cozy season. The doors are open.</> : "Meet Bev, she runs your craft life"}</div>
         <h1 className="h1">More making. <span className="uline">Less managing.</span></h1>
         <p className="sub">Bev keeps your patterns, progress, yarn and supplies organized, checked and ready, so the hours you spend hunting and re-counting go back into actually crocheting.</p>
         <div className="ctarow">
@@ -331,6 +370,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
           <div className="chip"><Check />Supplies counted &amp; ordered from the app</div>
         </div>
       </div>
+    </div>
     </div>
 
     {/* ── Stats: the hours you get back ── */}
@@ -547,7 +587,8 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => (
       <a href="mailto:bev@wovely.app">Talk to us</a>
     </div>
   </>
-);
+  );
+};
 
 /* ── Google G mark (mockup gbtn) ── */
 const GoogleG = () => (
