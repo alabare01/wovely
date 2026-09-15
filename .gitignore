@@ -30,3 +30,6 @@ npm-debug.log*
 
 # local screenshot/visual-verify artifacts
 _shots/
+
+# purchased pattern PDFs used by the core-path probe; never in a public repo
+scripts/fixtures/
