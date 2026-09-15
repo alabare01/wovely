@@ -1,7 +1,7 @@
 // api/stitch-vision.js
 // Vercel serverless function — identifies crochet stitch from a photo via Gemini
 
-export const config = { maxDuration: 60, api: { bodyParser: { sizeLimit: "10mb" } } };
+export const config = { maxDuration: 120, api: { bodyParser: { sizeLimit: "10mb" } } };
 
 // ── SNAP & STITCH: a photo of a finished piece in, a starter pattern out ────
 // Consolidated here on 2026-09-15 rather than given its own file (CLAUDE.md:
@@ -54,7 +54,7 @@ async function handleSnap(req, res, key) {
           contents: [{ parts: [{ text: SNAP_PROMPT }, { inline_data: { mime_type: mimeType, data } }] }],
           generationConfig: { temperature: 0.1, maxOutputTokens: 8192 },
         }),
-        signal: AbortSignal.timeout(50_000),
+        signal: AbortSignal.timeout(110_000),
       }
     );
     if (!r.ok) {
