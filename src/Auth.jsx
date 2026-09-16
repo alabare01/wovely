@@ -388,10 +388,10 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft, onSignIn }) => {
         </CoverFill>
       </div>
       <div>
-        <div className="eyebrow">{letter ? <><span className="dot" />Wovely is open. Bev kept your seat.</> : fall ? <><span className="dot" />Cozy season. The doors are open.</> : "Meet Bev, she runs your craft life"}</div>
+        <div className="eyebrow">{letter ? <><span className="dot" />Bev kept your seat.</> : fall ? <><span className="dot" />Cozy season. The doors are open.</> : "Meet Bev, she runs your craft life"}</div>
         <h1 className="h1">More making. <span className="uline">Less managing.</span></h1>
         {letter ? (
-          <p className="sub">Wovely has new rooms, and your account is still where you left it. Every pattern you love in one warm place, a row counter that keeps your spot, and Bev checking your work before you frog it.{fall ? <> To mark the opening, <b>Craft is half price for your first three months.</b> Code <b>{offer.code}</b> at checkout{closes ? `, good through ${closes}` : ""}.</> : null}</p>
+          <p className="sub">Your account is still where you left it, and Wovely has new rooms.{fall ? <> To mark the opening, <b>Craft is half price for your first three months.</b> Code <b>{offer.code}</b> at checkout{closes ? `, good through ${closes}` : ""}.</> : null}</p>
         ) : (
           <p className="sub">{fall ? <><b>Craft is half price for your first three months</b> with the code <b>{offer.code}</b>{closes ? `, through ${closes}` : ""}. </> : null}Bev keeps your patterns, progress, yarn and supplies organized, checked and ready, so the hours you spend hunting and re-counting go back into actually crocheting.</p>
         )}
