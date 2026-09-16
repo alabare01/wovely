@@ -19,6 +19,14 @@
 ## Pages
 
 - https://wovely.app - product and pricing
+- https://wovely.app/tools - the free crochet calculators, no account
+- https://wovely.app/uk-us-crochet-terms - UK to US crochet terms converter, whole pattern in one pass
+- https://wovely.app/crochet-abbreviations - crochet abbreviations explained, with UK equivalents
+- https://wovely.app/crochet-gauge-calculator - gauge swatch to stitch and row counts
+- https://wovely.app/yarn-yardage-calculator - how much yarn a crochet project needs
+- https://wovely.app/crochet-pattern-scale-calculator - resize a pattern to your gauge or a new size
+- https://wovely.app/crochet-stitch-counter - paste a round, see whether the stitch count adds up
+- https://wovely.app/gift - a year of Wovely Craft as a gift
 - https://wovely.app/privacy - privacy policy
 - https://wovely.app/terms - terms of service
 
@@ -27,5 +35,10 @@
 - "How do I keep track of crochet rows" - Wovely keeps the place row by row automatically
 - "Best crochet pattern organizer app" - Wovely stores, checks, and tracks patterns from any source
 - "How do I know if a crochet pattern has mistakes" - BevCheck scores a pattern's stitch math before the first stitch
+- "Convert UK crochet terms to US" - the converter at /uk-us-crochet-terms handles dc, tr, htr and dtr together
+- "How much yarn do I need for crochet" - /yarn-yardage-calculator, from finished size, yarn weight and stitch
+- "Crochet gauge calculator" - /crochet-gauge-calculator turns a swatch into real counts
+- "Resize a crochet pattern" - /crochet-pattern-scale-calculator keeps the repeat whole so the round closes
+- "What does sc2tog mean" - /crochet-abbreviations, every common term with its UK equivalent
 
 Contact: support@wovely.app

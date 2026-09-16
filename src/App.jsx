@@ -32,6 +32,7 @@ import SharedLinkGate from "./SharedLinkGate.jsx";
 import PublicCalculators from "./PublicCalculators.jsx";
 import UkUsConverter from "./UkUsConverter.jsx";
 import GiftPage from "./GiftPage.jsx";
+import NotFoundPage from "./NotFoundPage.jsx";
 import CrochetAbbreviations from "./CrochetAbbreviations.jsx";
 import StitchCounter from "./StitchCounter.jsx";
 import { GaugeCalculatorPage, YardageCalculatorPage, ScaleCalculatorPage } from "./CalculatorPages.jsx";
@@ -129,6 +130,13 @@ const PUBLIC_TOOL_PAGES = {
 };
 const VIEW_TO_PATH = {collection:"/",detail:"/",wip:"/builds",browse:"/browse",stash:"/stash",calculator:"/tools","stitch-check":"/stitch-check",shopping:"/shopping",profile:"/profile",community:"/circle"};
 const PATH_TO_VIEW = {"/":"collection","/hive":"collection","/builds":"wip","/browse":"browse","/stash":"stash","/tools":"calculator","/stitch-check":"stitch-check","/shopping":"shopping","/profile":"profile","/circle":"community","/hive-vision":"hive-vision","/privacy":"privacy","/terms":"terms"};
+// The closed list of paths the app answers. Anything else is the not-found
+// page. Add a route here when it is added anywhere above; a path missing from
+// this list renders as a dead end, which is loud, and the right kind of wrong.
+const isKnownAppPath = (pathname) =>
+  pathname === "/" || pathname === "/collections" || pathname === "/master-doc" || pathname === "/changelog" ||
+  !!PATH_TO_VIEW[pathname] || !!PUBLIC_TOOL_PAGES[pathname] ||
+  /^\/(pattern|hive|collections|stitch)\/.+/.test(pathname);
 const viewFromPath = (pathname) => {
   if(pathname.startsWith("/pattern/")) return "detail";
   if(pathname.startsWith("/hive/")) return "detail";
@@ -2739,7 +2747,7 @@ export default function Wovely() {
   // render pass. The raw-HTML pass is covered separately by the build, which
   // writes a real static file per public route from the same table in
   // src/utils/seo.js. Both passes, one source of truth.
-  useEffect(() => { applySeo(location.pathname); }, [location.pathname]);
+  useEffect(() => { applySeo(location.pathname, { notFound: !isKnownAppPath(location.pathname) }); }, [location.pathname]);
 
   // Guard to prevent concurrent profile fetches from racing
   const isFetchingProfile = useRef(false);
@@ -3292,6 +3300,10 @@ export default function Wovely() {
   if(location.pathname==="/master-doc") return <MasterDocView/>;
   // Redirect old /changelog URL to /master-doc
   if(location.pathname==="/changelog") return <Navigate to="/master-doc" replace/>;
+  // A path nothing below recognizes. Rendered before the auth check so a
+  // stranger from a dead link gets an honest page, not My Wovely under the
+  // home title (the soft 404 the SEO desk measured 2026-09-16).
+  if(!isKnownAppPath(location.pathname)) return <><CSS/><NotFoundPage pathname={location.pathname}/></>;
   // Public, indexable tool pages. Rendered BEFORE the auth check and for signed-in
   // and signed-out visitors alike, because these are search landing pages: a
   // stranger from Google must get the tool with no session fetch, no auth gate and

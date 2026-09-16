@@ -563,7 +563,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft, onSignIn }) => {
       </div>
       <div className="pricepromise">
         <img src="/bev-sm.png" alt="Bev" />
-        <div><b>Bev's promise:</b> no surprises. Cancel anytime, and everything you made stays yours.</div>
+        <div><b>Bev's promise:</b> no surprises. Cancel anytime, and everything you made stays yours. Buying for someone else? <a href="/gift" style={{ color: "var(--accent)", fontWeight: 800 }}>Give a year of Craft</a>.</div>
       </div>
       <div className="trustrow">
         <div className="tchip"><Check size={15} sw={2.8} />Cancel anytime</div>
@@ -571,6 +571,25 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft, onSignIn }) => {
         <div className="tchip"><Check size={15} sw={2.8} />A real person reads every message</div>
         <div className="tchip"><Check size={15} sw={2.8} />Made with makers</div>
       </div>
+    </div>
+
+    {/* ── What Wovely is ─────────────────────────────────────────────────
+         ADDED 2026-09-16 on the SEO desk's Wednesday audit. Every engine that
+         answered "crochet row counter app" cited a page that states who, what
+         and how much in plain sentences. This page said it in a headline and
+         a schema. Six sentences, every one a fact already on the page; the
+         prices are the constants the cards read. If a limit changes, this
+         changes the same day or comes down. ── */}
+    <div className="sect" id="what">
+      <h2 className="sect-h">What Wovely is</h2>
+      <p className="sect-s" style={{ maxWidth: 720, textAlign: "left", fontWeight: 600 }}>
+        Wovely is a crochet pattern organizer with a row counter and a stitch checker, made by WOVELY, LLC in Ponte Vedra Beach, Florida.
+        You hand it a bought PDF, photos of a paper pattern, a link or pasted text; it reads the pattern and keeps your place row by row on every device.
+        BevCheck reads the stitch math on every import and flags a round that does not add up before you start it.
+        The free plan holds 5 patterns with full row tracking and needs no card; Craft is ${CRAFT_PRICE.monthly} a month or ${CRAFT_ANNUAL_TOTAL} a year for up to 100 patterns, collections, the Vault and the calculators.
+        Six free tools need no account: the UK to US terms converter, the abbreviations list, and the gauge, yardage, scale and stitch counters.
+        Start at wovely.app with an email address.
+      </p>
     </div>
 
     {/* ── Free tools ──────────────────────────────────────────────────────
@@ -592,7 +611,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft, onSignIn }) => {
         </a>
         <a className="toolcard" href="/crochet-abbreviations">
           <div className="tool-t">Crochet abbreviations, explained</div>
-          <div className="tool-s">Every common abbreviation with its UK equivalent and a plain description of what your hands actually do. Paste a row you are stuck on and each term in it gets labelled.</div>
+          <div className="tool-s">Every common abbreviation with its UK equivalent and a plain description of what your hands actually do. Paste a row you are stuck on and each term in it gets labeled.</div>
           <div className="tool-g">Look up a stitch →</div>
         </a>
         <a className="toolcard" href="/crochet-stitch-counter">
@@ -629,6 +648,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft, onSignIn }) => {
       <a href="/crochet-gauge-calculator">Gauge calculator</a>
       <a href="/yarn-yardage-calculator">Yardage calculator</a>
       <a href="/crochet-pattern-scale-calculator">Scale calculator</a>
+      <a href="/gift">Give a year</a>
       <a href="/privacy">Privacy</a>
       <a href="/terms">Terms</a>
       <a href="mailto:bev@wovely.app">Talk to us</a>
