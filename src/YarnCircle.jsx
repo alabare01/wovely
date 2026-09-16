@@ -52,7 +52,7 @@ const apiHeaders = () => {
    HARD RULE (2026-07-14): nothing in the Yarn Circle may display a number, a
    name, or an event that did not come out of Supabase. No demo posts, no
    seeded Lovelies, no fictional makers. This is a trust surface. */
-const WEEKLY_THEME = { title: "Tiny & Round", blurb: "Share a palm-sized make by Sunday. Bev picks a favourite on Monday." };
+const WEEKLY_THEME = { title: "Tiny & Round", blurb: "Share a palm-sized make by Sunday. Bev picks a favorite on Monday." };
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 const makesThisWeek = (posts) => posts.filter(p => p.created_at && (Date.now() - new Date(p.created_at).getTime()) < WEEK_MS).length;

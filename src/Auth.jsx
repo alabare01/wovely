@@ -92,7 +92,7 @@ html.wv-landing-active, body.wv-landing-active { height: auto; overflow-x: visib
 /* Fall hero (grand opening, 2026-09-15 to 11-30). The season lives in the
    ground and the accents: cream #FFF7EC, cinnamon #C96A3B, deep brown #2B1D16,
    the Wovely set in story/kit.mjs. The CTA stays lavender because that is the
-   brand's action colour, not a seasonal one. Remove .hero-fall to go back. */
+   brand's action color, not a seasonal one. Remove .hero-fall to go back. */
 .wv-land .hero-fall{position:relative;overflow:hidden;background:linear-gradient(180deg,#FFF7EC 0%,#FFF7EC 58%,rgba(255,247,236,0) 100%)}
 .wv-land .hero-fall::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(520px 320px at 18% 30%,rgba(255,201,120,.38),transparent 70%),radial-gradient(460px 300px at 84% 18%,rgba(201,106,59,.16),transparent 70%)}
 .wv-land .hero-fall .hero{position:relative;z-index:1}

@@ -1241,7 +1241,7 @@ const ProfileSettingsView = ({isPro,tier,authed,gateAction,onOpenProModal,onGoHo
   const handleShareWovely=async()=>{
     const url="https://wovely.app";
     try{
-      if(navigator.share){await navigator.share({title:"Wovely",text:"Bev keeps my crochet patterns and row counts in one cosy place.",url});return;}
+      if(navigator.share){await navigator.share({title:"Wovely",text:"Bev keeps my crochet patterns and row counts in one cozy place.",url});return;}
       await navigator.clipboard.writeText(url);
       setShareState("copied");setTimeout(()=>setShareState(null),2000);
     }catch{}
