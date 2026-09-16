@@ -19,6 +19,7 @@
 import puppeteer from 'puppeteer-core';
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 
 const env = Object.fromEntries(
   fs.readFileSync(new URL('../.env.local', import.meta.url), 'utf8')
@@ -43,6 +44,26 @@ if (!CHROME) { console.error('NO_BROWSER'); process.exit(2); }
 
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const stamp = () => new Date().toISOString().slice(11, 19);
+
+// ONE PROBE AT A TIME. 2026-09-16 18:00Z: the six-hourly task and a desk's
+// manual run hit production in the same minute, the server completed both
+// jobs in under a minute each, and the scheduled run still reported "no
+// finished row within 400000ms" and posted a false DOWN line to the public
+// feed. The WOVELY-PRODUCT desk runs at 14:00 ET, which IS 18:00Z, so without
+// this they collide every day. A lock younger than eight minutes is another
+// probe in flight: wait for it, then go.
+const LOCK = path.join(os.tmpdir(), 'wovely-core-probe.lock');
+const LOCK_TTL = 8 * 60_000;
+{
+  const t0 = Date.now();
+  while (fs.existsSync(LOCK) && Date.now() - fs.statSync(LOCK).mtimeMs < LOCK_TTL && Date.now() - t0 < LOCK_TTL) {
+    console.log(stamp(), 'another probe holds the lock, waiting');
+    await wait(15_000);
+  }
+  fs.writeFileSync(LOCK, String(process.pid));
+}
+const unlock = () => { try { fs.unlinkSync(LOCK); } catch {} };
+process.on('exit', unlock);
 
 // A small but real multi-object PDF with text pdf.js can read. Written to a
 // temp file so the file chooser has something to pick.
