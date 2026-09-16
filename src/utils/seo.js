@@ -18,7 +18,7 @@
 // can never disagree.
 
 const SITE = "https://wovely.app";
-const DEFAULT_TITLE = "Wovely: Crochet Pattern Organizer, Row Counter and Stitch Tracker";
+const DEFAULT_TITLE = "Wovely: Crochet Pattern Organizer and Row Counter App";
 const DEFAULT_DESC = "Save every crochet pattern, track every row, and keep your projects in one place. The home for your hooks, yarn, and works in progress.";
 
 // Public, indexable routes. Anything not listed here is app shell or private
@@ -32,7 +32,7 @@ export const PUBLIC_ROUTES = {
   },
   "/gift": {
     title: "Give Wovely for a Year | A Gift for a Crocheter",
-    description: "A year of Wovely Craft as a gift: a hundred patterns in one place, Bev checking every one, and every row counted. Sent with a note from Bev, ready within a business day.",
+    description: "A year of Wovely Craft as a gift: a hundred patterns in one place, Bev checking every one, every row counted. Sent with a note from Bev within a business day.",
     canonical: SITE + "/gift",
   },
   "/privacy": {
@@ -55,7 +55,7 @@ export const PUBLIC_ROUTES = {
   // just hidden.
   "/tools": {
     title: "Crochet Yardage, Gauge and Scale Calculators | Wovely",
-    description: "Free crochet calculators, no signup. Work out how much yarn a project needs, turn a gauge swatch into real stitch counts, and scale a pattern up or down without redoing the math.",
+    description: "Free crochet calculators, no signup: yarn yardage, a gauge swatch turned into real stitch counts, and a pattern scaled up or down without redoing the math.",
     canonical: SITE + "/tools",
   },
   // ADDED 2026-08-07. Same thesis as /tools, applied to the queries the audit
@@ -64,13 +64,13 @@ export const PUBLIC_ROUTES = {
   // no auth check, so a signed-out stranger from a search result gets the
   // working tool and nothing else.
   "/uk-us-crochet-terms": {
-    title: "UK to US Crochet Term Converter: Paste a Whole Pattern | Wovely",
-    description: "Convert a whole crochet pattern between UK and US terms in one pass. Handles dc, tr, htr and dtr together, so the shared abbreviations cannot collide the way they do when you edit by hand. Free, no signup, nothing uploaded.",
+    title: "UK to US Crochet Terms Converter, Whole Pattern | Wovely",
+    description: "Convert a whole crochet pattern between UK and US terms in one pass. dc, tr, htr and dtr are handled together so shared names cannot collide. Free, no signup.",
     canonical: SITE + "/uk-us-crochet-terms",
   },
   "/crochet-abbreviations": {
-    title: "Crochet Abbreviations Explained: sc2tog, dc2tog, Magic Ring, fpdc | Wovely",
-    description: "Every common crochet abbreviation with its UK equivalent and a plain-English description of how the stitch is actually worked. Paste a row you are stuck on and each term in it gets labelled.",
+    title: "Crochet Abbreviations: sc2tog, fpdc, Magic Ring | Wovely",
+    description: "Every common crochet abbreviation with its UK equivalent and a plain note on how the stitch is worked. Paste a row you are stuck on and each term gets labeled.",
     canonical: SITE + "/crochet-abbreviations",
   },
   // SPLIT OUT OF /tools 2026-09-07. Three calculators behind tabs on one URL is
@@ -80,22 +80,22 @@ export const PUBLIC_ROUTES = {
   // with embedded calculators and no publisher defending either query.
   "/crochet-gauge-calculator": {
     title: "Crochet Gauge Calculator: Swatch to Stitch Count | Wovely",
-    description: "Turn a crochet gauge swatch into real numbers. Enter your stitches and rows over a measured swatch and the finished size you want, and get the stitches to start with and the rows to work. Free, no signup.",
+    description: "Turn a crochet gauge swatch into real numbers: your stitches and rows over a measured swatch, the finished size you want, and the counts to start with. Free.",
     canonical: SITE + "/crochet-gauge-calculator",
   },
   "/yarn-yardage-calculator": {
-    title: "Yarn Yardage Calculator for Crochet: How Much Yarn Do I Need? | Wovely",
-    description: "Estimate the yards a crochet project needs from its finished size, the yarn weight and the stitch. Single crochet and double crochet are not the same answer. Free, no signup.",
+    title: "Crochet Yarn Yardage Calculator: How Much Yarn? | Wovely",
+    description: "Estimate the yards a crochet project needs from its finished size, yarn weight and stitch. Single and double crochet are not the same answer. Free, no signup.",
     canonical: SITE + "/yarn-yardage-calculator",
   },
   "/crochet-pattern-scale-calculator": {
-    title: "Crochet Pattern Scale Calculator: Resize to Your Gauge | Wovely",
+    title: "Crochet Pattern Scale Calculator: Resize to Gauge | Wovely",
     description: "Resize a crochet pattern to a different finished size or to your own gauge, keeping the stitch counts a whole multiple of the repeat so the round still closes.",
     canonical: SITE + "/crochet-pattern-scale-calculator",
   },
   "/crochet-stitch-counter": {
-    title: "Crochet Stitch Count Checker: Does This Round Add Up? | Wovely",
-    description: "Paste a written crochet round and see how many stitches it makes and how many it works across. When a count stops adding up, the gap between those two numbers tells you which round to recount.",
+    title: "Crochet Stitch Counter: Does This Round Add Up? | Wovely",
+    description: "Paste a written crochet round and see how many stitches it makes and how many it works across. When the two numbers differ, you know which round to recount.",
     canonical: SITE + "/crochet-stitch-counter",
   },
 };
@@ -131,8 +131,19 @@ const setCanonical = (href) => {
  * Apply title, description, canonical, Open Graph and robots for a pathname.
  * Safe to call on every route change; it is idempotent.
  */
-export function applySeo(pathname) {
+export function applySeo(pathname, { notFound = false } = {}) {
   if (typeof document === "undefined") return;
+
+  // A path the app does not recognize. The rewrite still answers 200 (see
+  // vite.config.js for why the catch-all stays), so the title and a rendered
+  // noindex are what keep Google from filing it as a copy of the home page.
+  if (notFound) {
+    document.title = "Page not found | Wovely";
+    setMetaByName("description", null);
+    setMetaByName("robots", "noindex, follow");
+    setCanonical(SITE + pathname);
+    return;
+  }
 
   const route = PUBLIC_ROUTES[pathname];
 

@@ -242,7 +242,7 @@ export default function CrochetAbbreviations() {
         </Faq>
         <Faq q="What does a magic ring do that chaining does not?">
           Chaining four and joining leaves a fixed hole in the middle that you cannot close later.
-          A magic ring is a loop you work into and then pull tight by the tail, so the centre shuts
+          A magic ring is a loop you work into and then pull tight by the tail, so the center shuts
           completely. For amigurumi that matters, because stuffing shows through the hole.
         </Faq>
         <Faq q="Why do fpdc and bpdc make ribbing?">

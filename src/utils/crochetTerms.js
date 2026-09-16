@@ -438,7 +438,7 @@ export const ABBREVIATIONS = [
 
   // ── amigurumi ──
   { abbr: "MR", name: "magic ring", uk: "MR", group: "Amigurumi",
-    what: "An adjustable loop you crochet into and then pull tight, so the centre of a round closes with no hole. Also written magic circle, adjustable ring, MC or AR." },
+    what: "An adjustable loop you crochet into and then pull tight, so the center of a round closes with no hole. Also written magic circle, adjustable ring, MC or AR." },
   { abbr: "FO", name: "fasten off", uk: "FO", group: "Amigurumi",
     what: "Cut the yarn, pull the tail all the way through the last loop, and pull tight." },
   { abbr: "pm / sm", name: "place marker / slip marker", uk: "pm / sm", group: "Amigurumi",

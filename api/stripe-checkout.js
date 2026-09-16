@@ -131,7 +131,7 @@ export default async function handler(req, res) {
       // Harmless outside the window: Stripe rejects an expired or unknown
       // code on its own page and the price is unchanged.
       allow_promotion_codes: true,
-      metadata: { userId, tier, cadence },
+      metadata: { userId, tier, cadence, app: 'wovely' },
       // Second carrier for the same id. metadata is the primary channel, but
       // the webhook has already logged "missing metadata.userId" in the wild,
       // and a payment we cannot attach to an account is the worst outcome on

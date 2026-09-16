@@ -159,7 +159,7 @@ export function YardageCalculatorPage() {
       <Faq q="Should I buy extra?">
         Buy more than the estimate, and buy it in the same dye lot. An estimate assumes an even
         tension and no frogging, and neither survives a real project. Yarn left over is a hat. Yarn
-        that runs out three rows from the end in a discontinued colour is a different project
+        that runs out three rows from the end in a discontinued color is a different project
         entirely.
       </Faq>
       <Faq q="Does this work in metres?">

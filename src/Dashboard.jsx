@@ -1037,7 +1037,7 @@ const CollectionView = ({userPatterns,starterPatterns,cat,setCat,search,setSearc
           <div style={{ fontFamily: PF, fontWeight: 600, fontSize: isMobile ? 30 : 38, letterSpacing: "-.01em", color: NAVY, marginTop: 4, lineHeight: 1.05 }}>
             Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}{firstName ? `, ${firstName}` : ""}
           </div>
-          <div style={{ fontWeight: 700, fontSize: 15, color: MUTED, marginTop: 3 }}>Everything you're making, in one cosy place.</div>
+          <div style={{ fontWeight: 700, fontSize: 15, color: MUTED, marginTop: 3 }}>Everything you're making, in one cozy place.</div>
         </div>
 
         <BevCorner patterns={visible} isMobile={isMobile} isPro={isPro} />
