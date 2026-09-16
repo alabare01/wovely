@@ -13,6 +13,11 @@ import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { T, useBreakpoint } from "../theme.jsx";
 import { stopReplayForToolPage } from "../utils/analytics.js";
+import GuestEmailAsk from "../GuestEmailAsk.jsx";
+import { getSession, isAnonymousSession } from "../supabase.js";
+
+// A member already has Bev's address book entry; the ask is for strangers.
+const isMember = () => { try { return !!getSession()?.access_token && !isAnonymousSession(); } catch { return false; } };
 
 /** The standard 2b card: solid white panel on the woven canvas. */
 export const CARD = {
@@ -84,6 +89,13 @@ export const Closer = ({
   cta = "Try Wovely free",
   note = "No account needed to start",
   to = "/",
+  // 2026-09-16 (WOVELY desk): /gift and the six tool pages are where search
+  // and the daily posts land, and none of them asked for an address. Same
+  // field, same store (waitlist_email on the anonymous user, source from ?s=),
+  // so waitlist-read.mjs counts it without a change. Off for a signed-in member.
+  ask = true,
+  askReason = "Keep this. Bev sends the pattern-scale trick once and nothing else.",
+  askWhere = "public_page",
 }) => (
   <div style={{ ...CARD, padding: isMobile ? 22 : 30, marginTop: 34, background: T.soft, borderColor: "#E2DAF6" }}>
     <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
@@ -106,6 +118,11 @@ export const Closer = ({
         {note}
       </span>
     </div>
+    {ask && !isMember() && (
+      <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid #E2DAF6" }}>
+        <GuestEmailAsk compact where={askWhere} align="left" reason={askReason} />
+      </div>
+    )}
   </div>
 );
 
@@ -168,7 +185,7 @@ export default function PublicPage({ h1, intro, path, children, showCloser = tru
 
         {children}
 
-        {showCloser && <Closer isMobile={isMobile} {...(closer || {})} />}
+        {showCloser && <Closer isMobile={isMobile} askWhere={"public" + String(path || "").replace(/[^a-z0-9]+/gi, "_")} {...(closer || {})} />}
         <Footer current={path} />
       </div>
     </div>
