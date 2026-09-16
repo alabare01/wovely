@@ -214,6 +214,14 @@ export function ScaleCalculatorPage() {
         rather than to its row count, and check the length as you go. Where a pattern shapes on
         specific rows, recalculate those positions from your own row gauge.
       </Faq>
+      <Faq q="I am using a different yarn on an amigurumi. What size safety eyes or nose do I need?">
+        The parts scale with the piece, in a straight line. Work out how much smaller or bigger
+        your version comes out (your stitches per 10 cm against the pattern's, or your finished
+        height against the designer's) and multiply the eye or nose size by the same figure. A
+        22 mm nose on a super bulky piece becomes roughly 12 to 14 mm in worsted, so buy the
+        nearest stocked size, 12 or 15 mm, and hold it against the head before you stuff. Safety
+        eyes only go in once, so test on the unstuffed piece.
+      </Faq>
       <Faq q="Does scaling change how much yarn I need?">
         Yes, and not in a straight line. Yarn use follows area, so a piece made 20 percent wider and
         20 percent longer needs roughly 44 percent more yarn, not 20. Run the new finished size

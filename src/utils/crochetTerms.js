@@ -443,6 +443,20 @@ export const ABBREVIATIONS = [
     what: "Cut the yarn, pull the tail all the way through the last loop, and pull tight." },
   { abbr: "pm / sm", name: "place marker / slip marker", uk: "pm / sm", group: "Amigurumi",
     what: "Put a stitch marker in the stitch named, or move the marker you already have up to the current round. In a spiral this is the only way to find the start." },
+  // Letter shorthand, common in Instagram, TikTok and translated amigurumi
+  // patterns. r/CrochetHelp 2026-09-15: "I'm not sure if in row 19 the
+  // (3X,V,3X) is on the same stitch or not." It is not; each letter is one
+  // instruction, the brackets group a repeat.
+  { abbr: "X", letter: true, name: "single crochet (letter shorthand)", uk: "X (dc)", group: "Amigurumi",
+    what: "One single crochet. 3X means three single crochets in the next three stitches, one each. Brackets like (3X, V, 3X) are a sequence to work in order, not one stitch." },
+  { abbr: "V", letter: true, name: "increase (letter shorthand)", uk: "V", group: "Amigurumi",
+    what: "Two single crochets in the same stitch, the shape of a V. Same as inc. Your count goes up by one." },
+  { abbr: "A", letter: true, name: "decrease (letter shorthand)", uk: "A", group: "Amigurumi",
+    what: "Two stitches joined into one, the shape of an A. Same as dec or sc2tog, usually the invisible decrease in amigurumi. Your count goes down by one." },
+  { abbr: "W", letter: true, name: "triple increase (letter shorthand)", uk: "W", group: "Amigurumi",
+    what: "Three single crochets in the same stitch. Your count goes up by two." },
+  { abbr: "M", letter: true, name: "triple decrease (letter shorthand)", uk: "M", group: "Amigurumi",
+    what: "Three stitches joined into one. Your count goes down by two. Rare; most patterns use two A's instead." },
 
   // ── pattern shorthand ──
   { abbr: "rnd", name: "round", uk: "rnd", group: "Pattern shorthand",
@@ -475,6 +489,10 @@ export const ABBREVIATIONS = [
 const ABBR_INDEX = (() => {
   const idx = Object.create(null);
   for (const a of ABBREVIATIONS) {
+    // The letter shorthand (X, V, A, W, M) is on the reference page but stays
+    // out of the row annotator: the annotator is case-insensitive and would
+    // read the "a" in "work a sc" as a decrease.
+    if (a.letter) continue;
     for (const key of a.abbr.toLowerCase().split(/\s*\/\s*/)) {
       idx[key.replace(/\s+/g, " ").trim()] = a;
     }
