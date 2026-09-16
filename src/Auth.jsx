@@ -296,6 +296,20 @@ const TopNav = ({ onLanding, onSignIn, onStartFree, showLinks }) => (
 // Palette is the campaign's fall set (cream, cinnamon, deep brown), on purpose
 // distinct from the app's lavender so it reads as a season, not a redesign.
 const PROMO_CODE = "COZY";
+// The first paint. VISITORS, 2026-09-15: 14 of 17 visits left from "/", and the
+// one traceable reader of the grand-opening letter (Gmail app, a phone, a slow
+// link) saw the generic hero for seven seconds and closed it, because the strip
+// and the fall hero existed only after the client-side Stripe read. So the
+// offer as Adam ruled it and as Stripe returned it on 2026-09-14 (coupon
+// 1IFGeqL7: 50 percent, 3 months, expires 2026-12-01 04:59 UTC) is the initial
+// state, which means it is in the prerendered HTML and on screen before the
+// bundle parses. It carries NO dollar figure: the price line appears only once
+// Stripe has answered, so the page still never shows a number Stripe did not
+// give. Stripe's answer replaces these fields; an explicit "not active" retires
+// the whole thing; a failed read leaves the paper figures standing. The
+// initializer is date-bound, so a build after the close date carries nothing.
+const OPENING_DEFAULT = { active: true, code: PROMO_CODE, percent_off: 50, duration: "repeating", duration_in_months: 3, expires_at: "2026-12-01T04:59:59.000Z", interval: "month", price_cents: null, currency: "usd", paper: true };
+const openingDefault = () => (Date.now() < Date.parse(OPENING_DEFAULT.expires_at) ? OPENING_DEFAULT : null);
 const money = (cents, currency) => {
   try { return new Intl.NumberFormat("en-US", { style: "currency", currency: (currency || "usd").toUpperCase() }).format(cents / 100); }
   catch { return "$" + (cents / 100).toFixed(2); }
@@ -305,12 +319,18 @@ const closeDate = iso => {
   catch { return null; }
 };
 const useOpeningOffer = () => {
-  const [offer, setOffer] = useState(null);
+  const [offer, setOffer] = useState(openingDefault);
   useEffect(() => {
     let alive = true;
     fetch(`/api/stripe-checkout?promo=${PROMO_CODE}`)
-      .then(r => (r.ok ? r.json() : null))
-      .then(j => { if (alive && j && j.active && j.percent_off && j.price_cents) setOffer(j); })
+      // 404 is Stripe saying the code is gone; 502 is the read failing, which
+      // says nothing about the code. Only the first retires the offer.
+      .then(r => (r.ok ? r.json() : r.status === 404 ? { active: false } : null))
+      .then(j => {
+        if (!alive || !j) return;
+        if (j.active && j.percent_off && j.price_cents) setOffer(j);
+        else if (j.active === false) setOffer(null);
+      })
       .catch(() => {});
     return () => { alive = false; };
   }, []);
@@ -326,7 +346,7 @@ const OpeningStrip = ({ offer, onGoCraft }) => {
       <span style={{ fontFamily: "'Fredoka',sans-serif", fontWeight: 700, color: "#C96A3B", marginRight: 8 }}>The doors are open.</span>
       Craft is {half ? "half price" : `${offer.percent_off}% off`}{months ? ` for ${months} months` : ""}: the code{" "}
       <b style={{ background: "#FFFFFF", border: "1px dashed #C96A3B", borderRadius: 8, padding: "1px 8px", letterSpacing: ".08em", fontFamily: "monospace" }}>{offer.code}</b>{" "}
-      at checkout takes {offer.percent_off}% off {money(offer.price_cents, offer.currency)} a {offer.interval || "month"}{closes ? `, through ${closes}` : ""}.{" "}
+      at checkout{offer.price_cents ? ` takes ${offer.percent_off}% off ${money(offer.price_cents, offer.currency)} a ${offer.interval || "month"}` : ""}{closes ? `${offer.price_cents ? "," : " is good"} through ${closes}` : ""}.{" "}
       <a onClick={onGoCraft} role="button" tabIndex={0} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onGoCraft(e); } }} style={{ color: "#C96A3B", fontWeight: 800, textDecoration: "underline", cursor: "pointer", whiteSpace: "nowrap" }}>See Craft</a>
     </div>
   );
@@ -338,9 +358,18 @@ const Leaf = ({ n }) => (
   </span>
 );
 
-const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => {
+// The letter link is https://wovely.app?s=letter (grand-opening-letter.mjs).
+// Someone arriving from it is an existing member Bev wrote to by name, and the
+// letter said "Bev kept your seat" and "pick up where you left off". The hero
+// says the same words back and its first button is sign in, not try free. Read
+// once at mount, never during the prerender, so the crawler copy is unchanged.
+const fromLetter = () => { try { return /(^|[?&])s=letter(&|$)/.test(location.search); } catch { return false; } };
+
+const Landing = ({ annual, setAnnual, onStartFree, onGoCraft, onSignIn }) => {
   const offer = useOpeningOffer();
   const fall = !!offer;
+  const [letter] = useState(fromLetter);
+  const closes = offer && offer.expires_at ? closeDate(offer.expires_at) : null;
   return (
   <>
     <OpeningStrip offer={offer} onGoCraft={onGoCraft} />
@@ -359,12 +388,25 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft }) => {
         </CoverFill>
       </div>
       <div>
-        <div className="eyebrow">{fall ? <><span className="dot" />Cozy season. The doors are open.</> : "Meet Bev, she runs your craft life"}</div>
+        <div className="eyebrow">{letter ? <><span className="dot" />Wovely is open. Bev kept your seat.</> : fall ? <><span className="dot" />Cozy season. The doors are open.</> : "Meet Bev, she runs your craft life"}</div>
         <h1 className="h1">More making. <span className="uline">Less managing.</span></h1>
-        <p className="sub">Bev keeps your patterns, progress, yarn and supplies organized, checked and ready, so the hours you spend hunting and re-counting go back into actually crocheting.</p>
+        {letter ? (
+          <p className="sub">Wovely has new rooms, and your account is still where you left it. Every pattern you love in one warm place, a row counter that keeps your spot, and Bev checking your work before you frog it.{fall ? <> To mark the opening, <b>Craft is half price for your first three months.</b> Code <b>{offer.code}</b> at checkout{closes ? `, good through ${closes}` : ""}.</> : null}</p>
+        ) : (
+          <p className="sub">{fall ? <><b>Craft is half price for your first three months</b> with the code <b>{offer.code}</b>{closes ? `, through ${closes}` : ""}. </> : null}Bev keeps your patterns, progress, yarn and supplies organized, checked and ready, so the hours you spend hunting and re-counting go back into actually crocheting.</p>
+        )}
         <div className="ctarow">
-          <button className="cta big" onClick={onStartFree}>Try Wovely free</button>
-          <div className="micro"><b>✓</b> No account needed · 5 free patterns</div>
+          {letter ? (
+            <>
+              <button className="cta big" onClick={onSignIn}>Pick up where you left off</button>
+              <div className="micro">New here? <a onClick={onStartFree} role="button" tabIndex={0} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onStartFree(e); } }} style={{ textDecoration: "underline", cursor: "pointer" }}>Try Wovely free</a></div>
+            </>
+          ) : (
+            <>
+              <button className="cta big" onClick={onStartFree}>Try Wovely free</button>
+              <div className="micro"><b>✓</b> No account needed · 5 free patterns</div>
+            </>
+          )}
         </div>
         <div className="heroask">
           <GuestEmailAsk compact where="landing" align="left" reason={fall ? "One note from Bev, and the code that halves your first three months. Nothing else." : "One note from Bev with the code. Nothing else, ever."} />
@@ -937,7 +979,7 @@ const Auth = ({ onEnter, onEnterAsNew, onTryAnonymous, startAt = null, notice = 
         <div style={{ padding: "18px 20px 0" }}>{notice}</div>
       )}
       {screen === "landing" && (
-        <Landing annual={annual} setAnnual={setAnnual} onStartFree={goTry} onGoCraft={goCraft} />
+        <Landing annual={annual} setAnnual={setAnnual} onStartFree={goTry} onGoCraft={goCraft} onSignIn={() => goAuth("signin")} />
       )}
       {screen === "try" && (
         <TryScreen onDemo={goDemo} onImport={() => tryFork("import")} onSignIn={() => goAuth("signin")} />
