@@ -29,6 +29,49 @@ const supabase = createClient(
 );
 
 const CRAFT_PRICE_ID = process.env.STRIPE_CRAFT_PRICE_ID;
+const CRAFT_ANNUAL_PRICE_ID = process.env.STRIPE_CRAFT_ANNUAL_PRICE_ID;
+
+// ONE STRIPE ACCOUNT, MANY PRODUCTS. This endpoint receives every event on
+// the account, including 2ndBrain care plans, workshops and retainers. On
+// 2026-09-16 a $200 care-plan checkout with empty metadata was read as a
+// Wovely Craft sale: the tier defaulted to craft, the office celebrated, and
+// the admin mail said "Someone just paid for Wovely." Nothing here may act
+// on an event it cannot prove is Wovely's. Proof, any one of:
+//   - the session carries a Wovely user id (metadata.userId or
+//     client_reference_id, which api/stripe-checkout.js always sets)
+//   - metadata.app === 'wovely' (stamped by stripe-checkout.js from today)
+//   - the price is a Wovely price (env ids) or its product is named Wovely
+//   - user_profiles already holds this subscription id
+function isWovelyPrice(price) {
+  if (!price) return false;
+  const id = typeof price === 'string' ? price : price.id;
+  if (id && (id === CRAFT_PRICE_ID || id === CRAFT_ANNUAL_PRICE_ID)) return true;
+  const name = typeof price === 'object' ? (price.product?.name || price.nickname || '') : '';
+  return /wovely/i.test(name);
+}
+
+async function subscriptionIsWovely(subscriptionId) {
+  if (!subscriptionId) return false;
+  const { data } = await supabase
+    .from('user_profiles')
+    .select('id')
+    .eq('stripe_subscription_id', subscriptionId)
+    .limit(1);
+  return Array.isArray(data) && data.length > 0;
+}
+
+async function ignored(event, why, _t0) {
+  console.log('[stripe-webhook] not a Wovely event, ignored:', event.type, why);
+  const _url = process.env.VITE_SUPABASE_URL;
+  const _key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (_url && _key) {
+    await fetch(_url + '/rest/v1/vercel_logs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': _key, 'Authorization': 'Bearer ' + _key, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ timestamp: new Date().toISOString(), level: 'info', message: 'POST /api/stripe-webhook -> 200 ' + event.type + ' ignored, not Wovely: ' + why + ' (' + (Date.now() - _t0) + 'ms)', source: 'serverless', request_path: '/api/stripe-webhook', request_method: 'POST', status_code: 200, project_id: 'wovely' })
+    }).catch(() => {});
+  }
+}
 
 // Map a Stripe price_id back to a Wovely tier string. Craft is the only paid
 // tier now, so any paid subscription event on this account resolves to craft.
@@ -120,14 +163,20 @@ export default async function handler(req, res) {
     // The session's line_items isn't expanded by default; fetch the
     // subscription to get the price id we need to derive the tier from.
     let purchasedTier = session.metadata?.tier || 'craft';
+    let price = null;
     if (subscriptionId) {
       try {
-        const sub = await stripe.subscriptions.retrieve(subscriptionId);
-        const priceId = sub.items?.data?.[0]?.price?.id;
-        purchasedTier = tierFromPriceId(priceId, session.metadata?.tier);
+        const sub = await stripe.subscriptions.retrieve(subscriptionId, { expand: ['items.data.price.product'] });
+        price = sub.items?.data?.[0]?.price || null;
+        purchasedTier = tierFromPriceId(price?.id, session.metadata?.tier);
       } catch (e) {
         console.warn('[stripe-webhook] subscription retrieve failed, using metadata tier:', e.message);
       }
+    }
+    const ours = !!userId || session.metadata?.app === 'wovely' || isWovelyPrice(price);
+    if (!ours) {
+      await ignored(event, 'session ' + session.id + ' price ' + (price?.id || 'n/a') + ' product ' + (price?.product?.name || 'n/a'), _t0);
+      return res.json({ received: true, ignored: true });
     }
     if (userId) {
       await setTierForUser(userId, purchasedTier, {
@@ -158,6 +207,12 @@ export default async function handler(req, res) {
     const inv = event.data.object;
     const first = inv.billing_reason === 'subscription_create';
     // The first invoice rides with checkout.session.completed above; a renewal is its own moment.
+    const invPrice = inv.lines?.data?.[0]?.price || null;
+    const invOurs = isWovelyPrice(invPrice) || await subscriptionIsWovely(inv.subscription);
+    if (!first && !invOurs) {
+      await ignored(event, 'invoice ' + inv.id + ' subscription ' + (inv.subscription || 'n/a'), _t0);
+      return res.json({ received: true, ignored: true });
+    }
     if (!first) {
       const cents = typeof inv.amount_paid === 'number' ? inv.amount_paid : null;
       await celebrate({ kind: 'sale', what: 'Wovely renewal', who: 'a returning customer', amount: cents != null ? cents / 100 : undefined, id: 'in:' + inv.id, synthetic: !!inv.livemode === false });
@@ -170,6 +225,10 @@ export default async function handler(req, res) {
     const priceId = subscription.items?.data?.[0]?.price?.id;
     // Only relevant when the subscription is still active. cancel_at_period_end
     // doesn't change tier; the actual deletion event will.
+    if ((subscription.status === 'active' || subscription.status === 'trialing') && !(await subscriptionIsWovely(subscription.id))) {
+      await ignored(event, 'subscription ' + subscription.id + ' not on any user_profiles row', _t0);
+      return res.json({ received: true, ignored: true });
+    }
     if (subscription.status === 'active' || subscription.status === 'trialing') {
       const newTier = tierFromPriceId(priceId, null);
       await setTierBySubscription(subscription.id, newTier);
@@ -180,6 +239,10 @@ export default async function handler(req, res) {
   // 3. Cancellation — back to free.
   if (event.type === 'customer.subscription.deleted') {
     const subscription = event.data.object;
+    if (!(await subscriptionIsWovely(subscription.id))) {
+      await ignored(event, 'subscription ' + subscription.id + ' not on any user_profiles row', _t0);
+      return res.json({ received: true, ignored: true });
+    }
     await setTierBySubscription(subscription.id, 'free');
     console.log('[stripe-webhook] tier=free (cancelled) for subscription:', subscription.id);
     await notifyAdmin(
