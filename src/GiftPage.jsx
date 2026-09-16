@@ -61,6 +61,8 @@ export default function GiftPage() {
         body: "Send them the free version first. It holds five patterns, ticks every row, and needs no card. If they are still hooked in a week, come back here.",
         cta: "Try Wovely free",
         note: "No account needed to start",
+        askReason: "Not today? Bev will remind you in November, once, and that is all.",
+        askWhere: "gift",
       }}
     >
       <div style={{ ...CARD, padding: isMobile ? 20 : 30, marginBottom: 18, background: "#FFF7EC", borderColor: "#F1DFC7" }}>
