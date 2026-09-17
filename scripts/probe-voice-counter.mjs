@@ -62,7 +62,7 @@ try {
     const starter = await clickText(/open the demo|starter|start with this|try this one|use this pattern|open the starter/);
     must(!!starter, `${width}: starter pick (${starter || 'none matched'})`);
     // The demo counter: the rows are aria-pressed buttons and the header reads "Round n of 8".
-    await page.waitForFunction(() => /Round d+ of d+/.test(document.body.innerText) && !!document.querySelector('button[aria-pressed]'), { timeout: 45_000 }).catch(() => {});
+    await page.waitForFunction(() => /Round \d+ of \d+/.test(document.body.innerText) && !!document.querySelector('button[aria-pressed]'), { timeout: 45_000 }).catch(() => {});
     const hasCounter = await page.$('button[aria-pressed="false"]');
     must(!!hasCounter, `${width}: the round counter rendered`);
     if (!hasCounter) { console.log('body:', (await bodyText()).slice(0, 500).replace(/[\r\n]+/g, ' | ')); await page.close(); continue; }
@@ -80,10 +80,10 @@ try {
       await page.screenshot({ path: path.join(outDir, `voice-counter-${width}-on.png`) });
     }
     // The tap counter still counts after the mic was touched.
-    const before = await page.evaluate(() => (document.body.innerText.match(/Round (d+) of/) || [])[1]);
+    const before = await page.evaluate(() => (document.body.innerText.match(/Round (\d+) of/) || [])[1]);
     await page.evaluate(() => { const rows = Array.from(document.querySelectorAll('button[aria-pressed]')).filter(b => b.getAttribute('aria-label') === null); rows[0] && rows[0].click(); });
     await wait(700);
-    const after = await page.evaluate(() => (document.body.innerText.match(/Round (d+) of/) || [])[1]);
+    const after = await page.evaluate(() => (document.body.innerText.match(/Round (\d+) of/) || [])[1]);
     must(Number(after) === Number(before) + 1, `${width}: a tap still counts a round (${before} to ${after})`);
     must(errors.length === 0, `${width}: no page errors${errors.length ? ' (' + errors[0].slice(0, 120) + ')' : ''}`);
     await page.close();
