@@ -3,6 +3,7 @@ import GuestEmailAsk from "./GuestEmailAsk.jsx";
 import posthog from "posthog-js";
 import { T } from "./theme.jsx";
 import { pulse } from "./utils/pulse.js";
+import useVoiceCounter from "./useVoiceCounter.js";
 
 /* ─────────────────────────────────────────────────────────────────────────────
    GUEST DEMO: the zero-commitment path off the try screen.
@@ -172,6 +173,12 @@ export default function GuestDemo({ onBack, onStartReal, onImportOwn, onSignIn }
 
   const started = doneCount > 0;
 
+  // Hands-free, same hook as the real counter: "next" ticks the next round,
+  // "undo" unticks the last. The demo is where a stranger meets it first.
+  const voiceNext = () => { const r = DEMO_ROWS[nextIdx]; if (r) toggle(r, nextIdx); };
+  const voiceUndo = () => { const last = DEMO_ROWS.map(r => doneIds.has(r.id)).lastIndexOf(true); if (last >= 0) toggle(DEMO_ROWS[last], last); };
+  const voice = useVoiceCounter({ onNext: voiceNext, onUndo: voiceUndo, enabled: true });
+
   return (
     <div style={{
       maxWidth: 660, margin: "0 auto", width: "100%", boxSizing: "border-box",
@@ -237,6 +244,27 @@ export default function GuestDemo({ onBack, onStartReal, onImportOwn, onSignIn }
             BevCheck: every round adds up
           </span>
         </div>
+        {voice.supported && (
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12, paddingTop: 12, borderTop: `1px solid ${T.line}` }}>
+            <button
+              onClick={voice.toggle}
+              aria-pressed={voice.on}
+              aria-label={voice.on ? "Stop listening" : "Count by voice"}
+              style={{
+                width: 44, height: 44, borderRadius: "50%", flex: "none", cursor: "pointer",
+                border: voice.on ? 0 : `1.5px solid ${T.line}`,
+                background: voice.on ? T.accent : "#fff", color: voice.on ? "#fff" : T.accent,
+                boxShadow: voice.on ? `0 0 0 5px ${T.soft}` : "none",
+                display: "flex", alignItems: "center", justifyContent: "center", transition: "background .2s",
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0014 0M12 18v3M9 21h6" /></svg>
+            </button>
+            <div role="status" aria-live="polite" style={{ fontWeight: 700, fontSize: 12.5, lineHeight: 1.45, color: voice.why ? T.coral : voice.on ? T.accentD : T.muted }}>
+              {voice.why || (voice.on ? voice.heard : "Hands full of yarn? Tap the mic and say next.")}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* ── The rows ── */}
