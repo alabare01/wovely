@@ -2,6 +2,7 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import { T } from "./theme.jsx";
 import { isReferenceChip } from "./utils/docType.js";
 import GuestEmailAsk from "./GuestEmailAsk.jsx";
+import useVoiceCounter from "./useVoiceCounter.js";
 
 // ─── CLIENT-SIDE REPEAT BRACKET PARSER (for old patterns) ─────────────────
 const parseRepeatBrackets = (text) => {
@@ -206,6 +207,8 @@ const RowManager = ({
   const incRow=()=>{if(activeCurRow)toggle(activeCurRow.id);};
   const decRow=()=>{const last=[...activeSec.rows].reverse().find(r=>r.done);if(last)toggle(last.id);};
   const showCounter=activeTotal>0;
+  // Hands-free: "next" marks the round, "undo" takes one back (useVoiceCounter.js).
+  const voice=useVoiceCounter({onNext:incRow,onUndo:decRow,enabled:showCounter});
 
   const handleDotTap=(globalIdx,dotIdx)=>{
     const row=rows[globalIdx];if(!row)return;
@@ -296,8 +299,20 @@ const RowManager = ({
         </button>
         <div style={{fontWeight:800,fontSize:10.5,letterSpacing:".05em",textTransform:"uppercase",color:T.ink3}}>Round done</div>
       </div>
+      {voice.supported&&(
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:5}}>
+          <button onClick={voice.toggle} aria-pressed={voice.on} aria-label={voice.on?"Stop listening":"Count by voice"} title="Say next or undo" style={{width:56,height:56,borderRadius:"50%",border:voice.on?0:`1.5px solid ${T.border}`,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",background:voice.on?T.terra:"#fff",color:voice.on?"#fff":T.terra,boxShadow:voice.on?`0 0 0 6px ${T.surface}`:"none",transition:"background .2s"}}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3M9 21h6"/></svg>
+          </button>
+          <div style={{fontWeight:800,fontSize:10.5,letterSpacing:".05em",textTransform:"uppercase",color:voice.on?T.terra:T.ink3}}>{voice.on?"Listening":"Voice"}</div>
+        </div>
+      )}
     </div>
   );
+  // One line under the counter: what the mic last heard, or why it stopped.
+  const VoiceLine=()=>(voice.on||voice.why)?(
+    <div role="status" aria-live="polite" style={{fontWeight:700,fontSize:13,color:voice.why?T.coral:T.terra,marginTop:10,lineHeight:1.5}}>{voice.why||voice.heard}</div>
+  ):null;
   const focusLabel=`Round ${Math.min(activeDone+1,activeTotal)} of ${activeTotal}`;
   const partLabel=activePartNo?`Part ${activePartNo}: ${activePartName}`:activePartName;
   return (
@@ -308,10 +323,10 @@ const RowManager = ({
           <div style={{flex:"1 1 260px",minWidth:0}}>
             <div style={{fontWeight:800,fontSize:12,letterSpacing:".12em",textTransform:"uppercase",color:T.terra}}>{activeCurRow?`Now working · ${focusLabel}`:"Part complete"}</div>
             <div style={{fontFamily:T.serif,fontWeight:600,fontSize:24,color:T.ink,marginTop:3,lineHeight:1.15}}>{partLabel}</div>
-            <div style={{fontWeight:700,fontSize:14,color:T.ink3,marginTop:2,maxWidth:420,lineHeight:1.5}}>Tap ＋ for each finished round, or tick rows in the list below. Same counter, always in step.</div>
+            <div style={{fontWeight:700,fontSize:14,color:T.ink3,marginTop:2,maxWidth:420,lineHeight:1.5}}>Tap ＋ for each finished round, or tick rows in the list below. Same counter, always in step.{voice.supported&&" Or tap the mic and say next."}</div>
             <div style={{fontFamily:T.serif,fontWeight:600,fontSize:15,color:T.terra,background:T.surface,padding:"6px 14px",borderRadius:999,marginTop:10,display:"inline-block"}}>{activePct}% complete · Bev saved your spot</div>
           </div>
-          <CounterCluster/>
+          <div><CounterCluster/><VoiceLine/></div>
         </div>
       )}
       {showCounter&&(
@@ -334,7 +349,7 @@ const RowManager = ({
           <div style={{width:"min(420px,80vw)",height:10,borderRadius:999,background:T.border,marginTop:30,overflow:"hidden"}}>
             <span style={{display:"block",height:"100%",borderRadius:999,width:`${activePct}%`,background:`linear-gradient(90deg,${T.terra},${T.pink})`,transition:"width .3s"}}/>
           </div>
-          <div style={{marginTop:34}}><CounterCluster big/></div>
+          <div style={{marginTop:34}}><CounterCluster big/><VoiceLine/></div>
           <div style={{fontWeight:700,fontSize:14.5,color:T.ink3,marginTop:26,maxWidth:560}}>Next: <b style={{color:T.ink}}>{activeNextRow?activeNextRow.text:activeCurRow?"last round of this part":"take a bow"}</b></div>
         </div>
       )}
