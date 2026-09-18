@@ -378,7 +378,17 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft, onSignIn }) => {
     {fall && [1, 2, 3, 4].map(n => <Leaf key={n} n={n} />)}
     <div className="hero">
       <div className="heroviz">
-        <img className="vizbev" src="/bev-hero.png" alt="Bev, your Wovely guide" />
+        {fall ? (
+          // The approved Bev-alone fall still (Adam, 2026-09-17: fall goes on Bev,
+          // never around her), the hook-and-yarn one, cut to alpha from the set in
+          // the vault. Falls back to the year-round Bev when the season closes.
+          <picture>
+            <source srcSet="/bev-hero-fall.webp" type="image/webp" />
+            <img className="vizbev" src="/bev-hero-fall.png" width="640" height="640" alt="Bev, your Wovely guide, with a hook and a ball of rust yarn" />
+          </picture>
+        ) : (
+          <img className="vizbev" src="/bev-hero.png" alt="Bev, your Wovely guide" />
+        )}
         <CoverFill src="/landing-dragons.jpg" bgSrc="/landing-dragons-blur.jpg" alt="Two crocheted dragons, a real Wovely maker's project" className="vizcard">
           <div className="vizbadge">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3l7 3v5c0 4.5-3 7.6-7 9-4-1.4-7-4.5-7-9V6z" /><path d="M9 12l2 2 4-4" /></svg>
