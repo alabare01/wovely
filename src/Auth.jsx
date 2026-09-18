@@ -384,7 +384,7 @@ const Landing = ({ annual, setAnnual, onStartFree, onGoCraft, onSignIn }) => {
           // the vault. Falls back to the year-round Bev when the season closes.
           <picture>
             <source srcSet="/bev-hero-fall.webp" type="image/webp" />
-            <img className="vizbev" src="/bev-hero-fall.png" width="640" height="640" alt="Bev, your Wovely guide, with a hook and a ball of rust yarn" />
+            <img className="vizbev" src="/bev-hero-fall.png" alt="Bev, your Wovely guide, with a hook and a ball of rust yarn" />
           </picture>
         ) : (
           <img className="vizbev" src="/bev-hero.png" alt="Bev, your Wovely guide" />
