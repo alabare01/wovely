@@ -39,6 +39,26 @@ const hasTrailingStitches = (row) => {
   return /[a-zA-Z]/.test(after);
 };
 
+// ─── END-OF-ROUND COUNT ────────────────────────────────────────────────────
+// The number a pattern prints at the end of a round is the one check a maker
+// can do before moving on, and the boards are full of people who only found
+// the miss ten rounds later (p-025, p-028, p-034, p-037). Extraction stores it
+// as stitch_count and the import appends it to the text as "(30)"; older
+// patterns and hand-typed rows only have the text, so both are read. Repeat
+// brackets like "(sc, inc) x 6" never match: the count is the trailing
+// "(30)", "(30 sts)", "= 30 sts", "30 sts." and nothing else.
+export const endCount = (row) => {
+  if (!row || row.isHeader) return null;
+  if (Number.isFinite(row.stitch_count) && row.stitch_count > 0) return row.stitch_count;
+  const text = String(row.text || "").trim();
+  let m = text.match(/\(\s*(\d{1,4})\s*(?:sts?|stitches|sc|dc|hdc|tr)?\s*\)\s*\.?$/i);
+  if (!m) m = text.match(/[=:]\s*(\d{1,4})\s*(?:sts?|stitches)\s*\.?$/i);
+  if (!m) m = text.match(/(?:^|[\s,;.])(\d{1,4})\s*(?:sts?|stitches)\s*(?:total|in all|around)?\s*\.?$/i);
+  if (!m) return null;
+  const n = parseInt(m[1], 10);
+  return n > 0 ? n : null;
+};
+
 const SubCounter = ({row, globalIdx, onDotTap, onRepeatDone}) => {
   const rb = (row.repeat_brackets || []).find(b => b.count > 1);
   if (!rb) return null;
@@ -204,7 +224,13 @@ const RowManager = ({
   const activePct=activeTotal?Math.round(activeDone/activeTotal*100):0;
   const activePartNo=activeSec.header?linearSections.filter(s=>s.header).findIndex(s=>s.header.id===activeSec.header.id)+1:null;
   const activePartName=activeSec.header?activeSec.header.text.replace(/──/g,"").trim():(p.title||"Your rounds");
-  const incRow=()=>{if(activeCurRow)toggle(activeCurRow.id);};
+  // The count this round should end on, and the one after it. Shown on the
+  // NOW card and in focus mode so the check happens before the tap, not ten
+  // rounds later. Rows without a printed count show nothing rather than a guess.
+  const curEnd=endCount(activeCurRow);
+  const [lastCheck,setLastCheck]=useState(null);
+  useEffect(()=>{if(!lastCheck)return;const t=setTimeout(()=>setLastCheck(null),6000);return()=>clearTimeout(t);},[lastCheck]);
+  const incRow=()=>{if(activeCurRow){const n=endCount(activeCurRow);setLastCheck(n?{label:activeCurRow.label||`Round ${activeDone+1}`,count:n}:null);toggle(activeCurRow.id);}};
   const decRow=()=>{const last=[...activeSec.rows].reverse().find(r=>r.done);if(last)toggle(last.id);};
   const showCounter=activeTotal>0;
   // Hands-free: "next" marks the round, "undo" takes one back (useVoiceCounter.js).
@@ -313,6 +339,23 @@ const RowManager = ({
   const VoiceLine=()=>(voice.on||voice.why)?(
     <div role="status" aria-live="polite" style={{fontWeight:700,fontSize:13,color:voice.why?T.coral:T.terra,marginTop:10,lineHeight:1.5}}>{voice.why||voice.heard}</div>
   ):null;
+  // One line: what this round ends on, or what the round just ticked should
+  // have ended on. Nothing renders when the pattern printed no count.
+  const CountLine=({big})=>{
+    if(lastCheck)return(
+      <div role="status" aria-live="polite" data-count-line="checked" style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontSize:big?16:13.5,color:T.sage,marginTop:big?18:10,lineHeight:1.5}}>
+        <svg width={big?18:15} height={big?18:15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2"/></svg>
+        <span>{lastCheck.label} done. You should be holding <b style={{color:T.ink}}>{lastCheck.count}</b> stitches.{curEnd?` Next round ends on ${curEnd}.`:""}</span>
+      </div>
+    );
+    if(!curEnd)return null;
+    return(
+      <div data-count-line="ends" style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontSize:big?16:13.5,color:T.terra,marginTop:big?18:10,lineHeight:1.5}}>
+        <svg width={big?18:15} height={big?18:15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2"/></svg>
+        <span>This round ends on <b style={{color:T.ink,fontSize:big?22:16}}>{curEnd}</b> stitches. Count before you tap.</span>
+      </div>
+    );
+  };
   const focusLabel=`Round ${Math.min(activeDone+1,activeTotal)} of ${activeTotal}`;
   const partLabel=activePartNo?`Part ${activePartNo}: ${activePartName}`:activePartName;
   return (
@@ -325,6 +368,7 @@ const RowManager = ({
             <div style={{fontFamily:T.serif,fontWeight:600,fontSize:24,color:T.ink,marginTop:3,lineHeight:1.15}}>{partLabel}</div>
             <div style={{fontWeight:700,fontSize:14,color:T.ink3,marginTop:2,maxWidth:420,lineHeight:1.5}}>Tap ＋ for each finished round, or tick rows in the list below. Same counter, always in step.{voice.supported&&" Or tap the mic and say next."}</div>
             <div style={{fontFamily:T.serif,fontWeight:600,fontSize:15,color:T.terra,background:T.surface,padding:"6px 14px",borderRadius:999,marginTop:10,display:"inline-block"}}>{activePct}% complete · Bev saved your spot</div>
+            <div><CountLine/></div>
           </div>
           <div><CounterCluster/><VoiceLine/></div>
         </div>
@@ -346,6 +390,7 @@ const RowManager = ({
           </button>
           <div style={{fontWeight:800,fontSize:13,letterSpacing:".14em",textTransform:"uppercase",color:T.terra}}>{partLabel} · {activeCurRow?focusLabel:"complete"}</div>
           <div style={{fontFamily:T.serif,fontWeight:600,fontSize:"clamp(28px,4.6vw,48px)",lineHeight:1.15,maxWidth:720,marginTop:18,color:T.ink}}>{activeCurRow?activeCurRow.text:`All ${activeTotal} rounds done 🎉`}</div>
+          <CountLine big/>
           <div style={{width:"min(420px,80vw)",height:10,borderRadius:999,background:T.border,marginTop:30,overflow:"hidden"}}>
             <span style={{display:"block",height:"100%",borderRadius:999,width:`${activePct}%`,background:`linear-gradient(90deg,${T.terra},${T.pink})`,transition:"width .3s"}}/>
           </div>
