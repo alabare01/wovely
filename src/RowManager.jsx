@@ -230,7 +230,22 @@ const RowManager = ({
   const curEnd=endCount(activeCurRow);
   const [lastCheck,setLastCheck]=useState(null);
   useEffect(()=>{if(!lastCheck)return;const t=setTimeout(()=>setLastCheck(null),6000);return()=>clearTimeout(t);},[lastCheck]);
-  const incRow=()=>{if(activeCurRow){const n=endCount(activeCurRow);setLastCheck(n?{label:activeCurRow.label||`Round ${activeDone+1}`,count:n}:null);toggle(activeCurRow.id);}};
+  // ─── THE COUNT NUDGE ─────────────────────────────────────────────────────
+  // Most hand-typed and older patterns print no count at the end of a round,
+  // so the end-of-round line above has nothing to say and a maker can go
+  // twenty rounds before finding the miss. Hooked sells "gentle reminders to
+  // count every few rows" as a feature (boards p-013). Here it is a quiet line
+  // every N finished rounds, only on rounds that printed no count (when one is
+  // printed, the line above already asks). N lives on the device, default 5,
+  // 0 is off, set from the strip under the NOW card.
+  const NUDGE_KEY="wovely.countNudge";
+  const [nudgeEvery,setNudgeEvery]=useState(()=>{try{const v=parseInt(localStorage.getItem(NUDGE_KEY)??"5",10);return Number.isFinite(v)&&v>=0?v:5;}catch{return 5;}});
+  const setNudge=(v)=>{setNudgeEvery(v);try{localStorage.setItem(NUDGE_KEY,String(v));}catch{}};
+  const incRow=()=>{if(activeCurRow){const n=endCount(activeCurRow);const doneNow=activeDone+1;
+    if(n)setLastCheck({label:activeCurRow.label||`Round ${doneNow}`,count:n});
+    else if(nudgeEvery>0&&doneNow%nudgeEvery===0&&doneNow<activeTotal)setLastCheck({nudge:true,done:doneNow});
+    else setLastCheck(null);
+    toggle(activeCurRow.id);}};
   const decRow=()=>{const last=[...activeSec.rows].reverse().find(r=>r.done);if(last)toggle(last.id);};
   const showCounter=activeTotal>0;
   // Hands-free: "next" marks the round, "undo" takes one back (useVoiceCounter.js).
@@ -342,6 +357,12 @@ const RowManager = ({
   // One line: what this round ends on, or what the round just ticked should
   // have ended on. Nothing renders when the pattern printed no count.
   const CountLine=({big})=>{
+    if(lastCheck&&lastCheck.nudge)return(
+      <div role="status" aria-live="polite" data-count-line="nudge" style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontSize:big?16:13.5,color:T.sage,marginTop:big?18:10,lineHeight:1.5}}>
+        <svg width={big?18:15} height={big?18:15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.5l3 1.8"/></svg>
+        <span><b style={{color:T.ink}}>{lastCheck.done} rounds in.</b> A quick count now saves a rip-out later.</span>
+      </div>
+    );
     if(lastCheck)return(
       <div role="status" aria-live="polite" data-count-line="checked" style={{display:big?"block":"inline-flex",alignItems:"center",gap:8,maxWidth:big?520:undefined,fontWeight:700,fontSize:big?16:13.5,color:T.sage,marginTop:big?18:10,lineHeight:1.5}}>
         <svg width={big?18:15} height={big?18:15} style={big?{verticalAlign:"-3px",marginRight:8}:undefined} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2"/></svg>
@@ -375,7 +396,13 @@ const RowManager = ({
       )}
       {showCounter&&(
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:14,margin:"0 0 14px"}}>
-          <div style={{fontWeight:700,fontSize:13,color:T.ink3,lineHeight:1.5}}>Tap the round you just finished and the counter follows along. Finished rounds fade out.</div>
+          <div style={{fontWeight:700,fontSize:13,color:T.ink3,lineHeight:1.5}}>Tap the round you just finished and the counter follows along. Finished rounds fade out.
+            <label style={{display:"block",marginTop:6,fontWeight:700,fontSize:13,color:T.ink3}}>Nudge me to count every
+              <select data-nudge-every value={nudgeEvery} onChange={e=>setNudge(parseInt(e.target.value,10))} aria-label="Nudge me to count every" style={{margin:"0 6px",padding:"3px 6px",borderRadius:8,border:`1.5px solid ${T.border}`,background:"#fff",fontFamily:T.sans,fontWeight:800,fontSize:13,color:T.terra}}>
+                <option value={0}>never</option><option value={3}>3</option><option value={5}>5</option><option value={10}>10</option>
+              </select>rounds
+            </label>
+          </div>
           <button onClick={()=>setFocusOn(true)} style={{display:"inline-flex",alignItems:"center",gap:8,border:`1.5px solid ${T.border}`,borderRadius:12,background:"#fff",padding:"10px 16px",fontFamily:T.sans,fontWeight:800,fontSize:13.5,color:T.terra,cursor:"pointer",whiteSpace:"nowrap",flexShrink:0}}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 3H4.5A1.5 1.5 0 003 4.5V8M16 3h3.5A1.5 1.5 0 0121 4.5V8M8 21H4.5A1.5 1.5 0 013 19.5V16M16 21h3.5a1.5 1.5 0 001.5-1.5V16"/></svg>
             Focus mode
