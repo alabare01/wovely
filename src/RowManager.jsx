@@ -343,15 +343,15 @@ const RowManager = ({
   // have ended on. Nothing renders when the pattern printed no count.
   const CountLine=({big})=>{
     if(lastCheck)return(
-      <div role="status" aria-live="polite" data-count-line="checked" style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontSize:big?16:13.5,color:T.sage,marginTop:big?18:10,lineHeight:1.5}}>
-        <svg width={big?18:15} height={big?18:15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2"/></svg>
+      <div role="status" aria-live="polite" data-count-line="checked" style={{display:big?"block":"inline-flex",alignItems:"center",gap:8,maxWidth:big?520:undefined,fontWeight:700,fontSize:big?16:13.5,color:T.sage,marginTop:big?18:10,lineHeight:1.5}}>
+        <svg width={big?18:15} height={big?18:15} style={big?{verticalAlign:"-3px",marginRight:8}:undefined} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2"/></svg>
         <span>{lastCheck.label} done. You should be holding <b style={{color:T.ink}}>{lastCheck.count}</b> stitches.{curEnd?` Next round ends on ${curEnd}.`:""}</span>
       </div>
     );
     if(!curEnd)return null;
     return(
-      <div data-count-line="ends" style={{display:"inline-flex",alignItems:"center",gap:8,fontWeight:700,fontSize:big?16:13.5,color:T.terra,marginTop:big?18:10,lineHeight:1.5}}>
-        <svg width={big?18:15} height={big?18:15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2"/></svg>
+      <div data-count-line="ends" style={{display:big?"block":"inline-flex",alignItems:"center",gap:8,maxWidth:big?520:undefined,fontWeight:700,fontSize:big?16:13.5,color:T.terra,marginTop:big?18:10,lineHeight:1.5}}>
+        <svg width={big?18:15} height={big?18:15} style={big?{verticalAlign:"-3px",marginRight:8}:undefined} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3.2l7 3v4.8c0 4.4-3 7.4-7 8.8-4-1.4-7-4.4-7-8.8V6.2z"/><path d="M9 12l2 2 4-4.2"/></svg>
         <span>This round ends on <b style={{color:T.ink,fontSize:big?22:16}}>{curEnd}</b> stitches. Count before you tap.</span>
       </div>
     );

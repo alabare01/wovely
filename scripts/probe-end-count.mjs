@@ -83,9 +83,14 @@ try {
     if (mobile) await page.setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1');
     const errors = [];
     page.on('pageerror', e => errors.push(e.message));
+    // Ticks persist, so the second width starts from a fresh pattern.
+    await fetch(`${URL_}/rest/v1/patterns?id=eq.${patternId}`, { method: 'PATCH', headers: { ...svcH, 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify({ rows: ROWS }) });
     await page.evaluateOnNewDocument((s) => { localStorage.setItem('yh_session', JSON.stringify(s)); }, session);
     await page.goto(`${BASE}/pattern/${patternId}`, { waitUntil: 'networkidle2', timeout: 60_000 });
-    await page.waitForFunction(() => /Now working/i.test(document.body.innerText), { timeout: 45_000 }).catch(() => {});
+    await page.waitForFunction(() => /Instructions/.test(document.body.innerText), { timeout: 45_000 }).catch(() => {});
+    // The pattern opens on Materials; the counter lives under Instructions.
+    await page.evaluate(() => { const all = Array.from(document.querySelectorAll('button, [role=tab], div, span')); const t = all.filter(el => (el.innerText || '').trim() === 'Instructions' && el.offsetParent !== null); const deepest = t.find(el => !t.some(o => o !== el && el.contains(o))); deepest && deepest.click(); });
+    await page.waitForFunction(() => /Now working/i.test(document.body.innerText), { timeout: 30_000 }).catch(() => {});
     await wait(1200);
     // Every round is fresh, so the pattern may open on Round 1 or on whatever
     // the app treats as the current round; read the line rather than assume.
