@@ -299,16 +299,16 @@ const Calculators = ({embedded=false,initialTab="gauge"}) => {
               {gaugeMatch.rowDiff4!==null&&Math.abs(gaugeMatch.rowDiff4)>=1&&" Your row count is off, and that is normal in crochet: work to the measurement the pattern gives rather than its row number, and recount any shaping placed by row."}
             </Note>}
             {gaugeMatch.verdict==="tight"&&<Note tone="warn">
-              Too many stitches: {gaugeMatch.mine4.toFixed(1)} per four inches where the pattern wants {gaugeMatch.want4.toFixed(1)}. Your fabric is tighter, so the finished piece comes out small.
-              {" "}Next: go up {gaugeMatch.steps===1?"one hook size":`about ${gaugeMatch.steps} hook sizes`} (a half-millimetre step moves the count by roughly one stitch per four inches in worsted; less in fine yarn, more in bulky), work a fresh swatch, and measure it after washing or blocking, in the middle, not at the edge.
-              {gaugeMatch.steps>2&&" More than two steps means this yarn is thinner than the one the pattern was written for, or the pattern's gauge is optimistic. Changing hooks further gives a stiff, holey fabric; the better fix is a heavier yarn, or scaling the pattern to your own gauge on the Scale tab."}
-              {" "}If you have already gone up and it barely moved, your swatch was measured under stretch or flat when the piece will be worked in the round; swatch in the round for a piece worked in the round, and hold the yarn looser on purpose for the first inch.
+              Too many stitches: {gaugeMatch.mine4.toFixed(1)} per four inches, the pattern wants {gaugeMatch.want4.toFixed(1)}. Tighter fabric, smaller finished piece.
+              <br/><br/>Next: go up {gaugeMatch.steps===1?"one hook size":`about ${gaugeMatch.steps} hook sizes`}. A half-millimetre step is roughly one stitch per four inches in worsted, less in fine yarn, more in bulky. Fresh swatch, wash or block it, measure the middle.
+              {gaugeMatch.steps>2&&<><br/><br/>More than two steps means the yarn is thinner than the pattern's. Hooks past that give a stiff, holey fabric; use a heavier yarn, or scale the pattern to your gauge on the Scale tab.</>}
+              <br/><br/>Already went up and it barely moved? Swatch in the round for a piece worked in the round; most of us pull tighter there.
             </Note>}
             {gaugeMatch.verdict==="loose"&&<Note tone="warn">
-              Too few stitches: {gaugeMatch.mine4.toFixed(1)} per four inches where the pattern wants {gaugeMatch.want4.toFixed(1)}. Your fabric is looser, so the finished piece comes out big and hungry for yarn.
-              {" "}Next: go down {gaugeMatch.steps===1?"one hook size":`about ${gaugeMatch.steps} hook sizes`} (a half-millimetre step moves the count by roughly one stitch per four inches in worsted; less in fine yarn, more in bulky), work a fresh swatch, and measure after washing or blocking, in the middle of the square.
-              {gaugeMatch.steps>2&&" More than two steps means this yarn is heavier than the one the pattern was written for, or your tension is much looser than the designer's. Going down further gives a board; the better fix is a lighter yarn, or scaling the pattern to your own gauge on the Scale tab."}
-              {" "}If you already went down a size and it is still out, that is one step too few, not something you are doing wrong: the count moves about a stitch per step, and the number above is how many the gap actually needs.
+              Too few stitches: {gaugeMatch.mine4.toFixed(1)} per four inches, the pattern wants {gaugeMatch.want4.toFixed(1)}. Looser fabric, bigger finished piece, more yarn.
+              <br/><br/>Next: go down {gaugeMatch.steps===1?"one hook size":`about ${gaugeMatch.steps} hook sizes`}. A half-millimetre step is roughly one stitch per four inches in worsted, less in fine yarn, more in bulky. Fresh swatch, wash or block it, measure the middle.
+              {gaugeMatch.steps>2&&<><br/><br/>More than two steps means the yarn is heavier than the pattern's. Hooks past that give a board; use a lighter yarn, or scale the pattern to your gauge on the Scale tab.</>}
+              <br/><br/>Already went down a size and it is still out? That was one step of the {gaugeMatch.steps===1?"one":gaugeMatch.steps} the gap needs, not something you did wrong.
             </Note>}
           </div>}
         </div>

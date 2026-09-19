@@ -45,19 +45,27 @@ try {
     const iSt = idx('stitches'), iSw = idx('swatch'), iPat = idx('pattern stitches');
     must(iSt >= 0 && iSw >= 0 && iPat >= 0, `${tag} inputs found (stitches=${iSt}, swatch=${iSw}, pattern stitches=${iPat})`);
     if (iPat < 0) { await page.close(); continue; }
-    const type = async (i, v) => { await inputs[i].click({ clickCount: 3 }); await inputs[i].type(String(v)); };
+    // A triple-click does not reliably select a type=number field; select it
+    // in the page, clear it, then type, and read the value back.
+    const type = async (i, v) => {
+      await inputs[i].click(); await inputs[i].evaluate(el => el.select()); await page.keyboard.press('Backspace');
+      await inputs[i].type(String(v)); await wait(60);
+      const got = await inputs[i].evaluate(el => el.value);
+      if (got !== String(v)) console.log(`     (typed ${v} into input ${i}, field reads ${JSON.stringify(got)})`);
+    };
     const verdict = () => page.evaluate(() => document.querySelector('[data-gauge-verdict]')?.getAttribute('data-gauge-verdict') || 'none');
     const noteText = () => page.evaluate(() => document.querySelector('[data-gauge-verdict]')?.innerText || '');
 
-    // p-023: 16 stitches over a 5 in swatch when the pattern wants 16 over 4 in. Loose, three steps.
-    await type(iSt, 16); await type(iSw, 5); await type(iPat, 16); await wait(150);
+    // p-023: the pattern says 16 stitches make 4 in; hers make 5 in. Over her 5 in
+    // window that is 16 of hers against 20 of the pattern's. Loose, three steps.
+    await type(iSt, 16); await type(iSw, 5); await type(iPat, 20); await wait(150);
     must((await verdict()) === 'loose', `${tag} p-023 shape reads loose`);
     must(/go down about 3 hook sizes/.test(await noteText()), `${tag} p-023 says about 3 hook sizes`);
     must(/Scale tab/.test(await noteText()), `${tag} p-023 points past two steps at the Scale tab`);
     await shot(page, `gauge-loose-${tag}`);
 
     // p-043: 18 over 4 in when the pattern wants 16. Tight, two steps.
-    await type(iSw, 4); await type(iSt, 18); await wait(150);
+    await type(iSw, 4); await type(iSt, 18); await type(iPat, 16); await wait(150);
     must((await verdict()) === 'tight', `${tag} p-043 shape reads tight`);
     must(/go up about 2 hook sizes/.test(await noteText()), `${tag} p-043 says about 2 hook sizes`);
     must(/in the round/.test(await noteText()), `${tag} p-043 names the in-the-round cause`);
@@ -69,7 +77,7 @@ try {
     must(/You match/.test(await noteText()), `${tag} match says so`);
 
     // Empty pattern box: no verdict at all.
-    await inputs[iPat].click({ clickCount: 3 }); await page.keyboard.press('Backspace'); await wait(150);
+    await inputs[iPat].click(); await inputs[iPat].evaluate(el => el.select()); await page.keyboard.press('Backspace'); await wait(150);
     must((await verdict()) === 'none', `${tag} no pattern gauge, no verdict`);
     must(errs.length === 0, `${tag} no page errors${errs.length ? ' (' + errs[0].slice(0, 80) + ')' : ''}`);
     await page.close();
