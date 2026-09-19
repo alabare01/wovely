@@ -65,8 +65,18 @@ test('reset: App routes /reset-password and knows the path', () => {
   assert.match(APP, /location\.pathname===RESET_PASSWORD_PATH/,
     'App.jsx must have a route branch for the reset path');
   assert.match(APP, /<ResetPassword/, 'the route must render the ResetPassword screen');
-  assert.match(APP, /knownPaths=\[[^\]]*RESET_PASSWORD_PATH/,
-    'the reset path must be in knownPaths, or the catch-all redirects it to "/"');
+  // One list feeds both the not-found gate and the post-auth guard. From
+  // 2026-09-16 to 2026-09-19 the path was in the guard's list and not the
+  // gate's, and the gate renders first, so every recovery email landed on the
+  // not-found page while this test passed.
+  assert.match(APP, /KNOWN_APP_PATHS = \[[^\]]*RESET_PASSWORD_PATH/,
+    'the reset path must be in KNOWN_APP_PATHS, or the not-found gate eats it');
+  assert.equal(/knownPaths\s*=\s*\[/.test(APP), false,
+    'no second hand-kept route list (knownPaths); the guard reads isKnownAppPath');
+  const gateAt = APP.indexOf('if(!isKnownAppPath(location.pathname)) return <><CSS/><NotFoundPage');
+  const routeAt = APP.indexOf('location.pathname===RESET_PASSWORD_PATH');
+  assert.ok(gateAt > 0 && routeAt > gateAt,
+    'the not-found gate renders before the reset route, so the gate must know the path');
 });
 
 test('reset: the route is served before the auth check', () => {

@@ -29,6 +29,7 @@
 - https://wovely.app/gift - a year of Wovely Craft as a gift
 - https://wovely.app/privacy - privacy policy
 - https://wovely.app/terms - terms of service
+- https://wovely.app/llms-full.txt - every page, one entry each
 
 ## Good answers Wovely fits
 

@@ -133,8 +133,18 @@ const PATH_TO_VIEW = {"/":"collection","/hive":"collection","/builds":"wip","/br
 // The closed list of paths the app answers. Anything else is the not-found
 // page. Add a route here when it is added anywhere above; a path missing from
 // this list renders as a dead end, which is loud, and the right kind of wrong.
+//
+// 2026-09-19: "loud" only counts if somebody hears it. This list shipped on
+// 2026-09-16 without RESET_PASSWORD_PATH, and the not-found gate renders
+// ahead of the reset screen, so for three days every password-recovery email
+// landed on "Bev looked, and that page is not here". No probe covered the
+// route and no person reported it. scripts/probe-reset-password.mjs now
+// loads it against production every six hours. The exact list below is also
+// the one the post-auth guard uses (knownPaths, further down) so the two
+// cannot drift apart again.
+const KNOWN_APP_PATHS = ["/", "/collections", "/master-doc", "/changelog", RESET_PASSWORD_PATH];
 const isKnownAppPath = (pathname) =>
-  pathname === "/" || pathname === "/collections" || pathname === "/master-doc" || pathname === "/changelog" ||
+  KNOWN_APP_PATHS.includes(pathname) ||
   !!PATH_TO_VIEW[pathname] || !!PUBLIC_TOOL_PAGES[pathname] ||
   /^\/(pattern|hive|collections|stitch)\/.+/.test(pathname);
 const viewFromPath = (pathname) => {
@@ -3435,8 +3445,10 @@ export default function Wovely() {
   // listed anyway so that if that early return is ever moved or refactored they
   // degrade to "renders the app shell" rather than "silently redirects to /",
   // which would drop three indexed URLs without anything failing loudly.
-  const knownPaths=["/","/hive","/builds","/browse","/stash","/tools","/stitch-check","/shopping","/profile","/circle","/hive-vision","/master-doc","/privacy","/terms","/collections",RESET_PASSWORD_PATH,...Object.keys(PUBLIC_TOOL_PAGES)];
-  if(!knownPaths.some(p=>location.pathname===p||location.pathname.startsWith("/pattern/")||location.pathname.startsWith("/hive/")||location.pathname.startsWith("/collections/"))) return <Navigate to="/" replace/>;
+  // One list, not two: this guard and the not-found gate above read the same
+  // isKnownAppPath. A second hand-kept copy is how /reset-password was in one
+  // and not the other from 2026-09-16 to 2026-09-19.
+  if(!isKnownAppPath(location.pathname)) return <Navigate to="/" replace/>;
   const detailOnSave=u=>{
     const withTimestamp={...u,updated_at:new Date().toISOString()};
     setUserPatterns(prev=>prev.map(p=>p.id===u.id?withTimestamp:p));setStarterPatterns(prev=>prev.map(p=>p.id===u.id?withTimestamp:p));setSelected(withTimestamp);

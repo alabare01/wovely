@@ -1,0 +1,103 @@
+# Wovely, every public page
+
+> Wovely (wovely.app) is a crochet pattern organizer with a row counter and stitch tracker, made by Wovely, LLC in Ponte Vedra Beach, Florida. Free for five patterns; Craft is 6.99 USD a month or 54.99 USD a year. Each entry below is one page, in the page's own words.
+
+## Wovely: Crochet Pattern Organizer and Row Counter App
+URL: https://wovely.app/
+Summary: Save every crochet pattern, track every row, and keep your projects in one place. The home for your hooks, yarn, and works in progress.
+H1: More making. Less managing.
+
+What it does: import a crochet pattern from a PDF, photos, a link or pasted text and keep the original in the Vault; BevCheck verifies every row's stitch counts before the first stitch; your place is kept row by row on every device; multi-part patterns and MCAL collections get a clue calendar; gauge, yardage and scale calculators; yarn and hook stash with supply lists.
+
+Pricing, as the page shows it: Free for 5 patterns with full row tracking and BevCheck on every import, no card. Craft is 6.99 USD a month or 54.99 USD a year for up to 100 patterns, advanced imports, collections, the Vault, calculators, full BevCheck and live chat that reaches a real person. Through November 30, 2026 the code COZY takes half off Craft for the first three months.
+
+## Give Wovely for a Year | A Gift for a Crocheter
+URL: https://wovely.app/gift
+Summary: A year of Wovely Craft as a gift: a hundred patterns in one place, Bev checking every one, every row counted. Sent with a note from Bev within a business day.
+H1: Give Wovely for a year
+
+A hundred patterns instead of five. BevCheck on every one. Collections for the big projects. Their year starts the day Bev switches it on, within a business day of your order.
+
+Send them the free version first. It holds five patterns, ticks every row, and needs no card. If they are still hooked in a week, come back here.
+
+## Privacy Policy | Wovely
+URL: https://wovely.app/privacy
+Summary: How Wovely collects, uses, and protects your information, including patterns you upload, payment data handled by Stripe, and your rights over your data.
+H1: Privacy Policy
+
+This Privacy Notice for Wovely LLC describes how and why we might access, collect, store, use, and/or share your personal information when you use our services, including when you visit wovely.app.
+
+Personal information you disclose to us: We collect personal information that you voluntarily provide when you register, express interest in our products, participate in activities, or contact us.
+
+## Terms of Service | Wovely
+URL: https://wovely.app/terms
+Summary: The terms that govern your use of Wovely, including subscriptions and billing, ownership of patterns you upload, acceptable use, and dispute resolution.
+H1: Terms of Service
+
+These Terms of Service constitute a legally binding agreement between you and Wovely LLC ("Company," "we," "us," or "our") concerning your access to and use of the website wovely.app and any related services (collectively, the "Services"). By accessing or using the Services, you agree to be bound by these Terms. If you do not agree, do not use the Services.
+
+Wovely is a crochet pattern management and tracking application. We provide tools for importing, organizing, and following crochet patterns, including PDF import, row tracking, stitch checking, yarn stash management, and related features.
+
+## Crochet Yardage, Gauge and Scale Calculators | Wovely
+URL: https://wovely.app/tools
+Summary: Free crochet calculators, no signup: yarn yardage, a gauge swatch turned into real stitch counts, and a pattern scaled up or down without redoing the math.
+H1: Crochet gauge, yardage and scale calculators
+
+Each calculator also has its own page, with the questions people actually ask about it: the gauge calculator, the yarn yardage calculator, and the pattern scale calculator.
+
+Gauge. Crochet a square, measure four inches across the middle of it rather than at the edges, and count the stitches and rows inside that measurement. Put those numbers in with your target size and you get the number of stitches to start with and the number of rows to work. Measuring the edges is the usual reason a blanket comes out the wrong width.
+
+## UK to US Crochet Terms Converter, Whole Pattern | Wovely
+URL: https://wovely.app/uk-us-crochet-terms
+Summary: Convert a whole crochet pattern between UK and US terms in one pass. dc, tr, htr and dtr are handled together so shared names cannot collide. Free, no signup.
+H1: UK to US crochet term converter
+
+The two dialects do not use different abbreviations. They use the same abbreviations for different stitches. UK dc is US sc. US dc is UK tr. That overlap is the whole problem.
+
+Work down a UK pattern with a chart and you change every dc to sc. Then you reach a tr and change it to dc. Your pattern now contains two kinds of dc: the ones you already converted and the ones you just created. Go back over it and you convert the new ones a second time. One pass, done by a person, quietly corrupts the document.
+
+## Crochet Abbreviations: sc2tog, fpdc, Magic Ring | Wovely
+URL: https://wovely.app/crochet-abbreviations
+Summary: Every common crochet abbreviation with its UK equivalent and a plain note on how the stitch is worked. Paste a row you are stuck on and each term gets labeled.
+H1: Crochet abbreviations, explained
+
+Single crochet two together, a decrease. Pull up a loop in the next stitch, then pull up a loop in the one after, so you have three loops on the hook. Yarn over and pull through all three. Two stitches have become one and your count drops by one.
+
+The mechanics are the same: several partly worked stitches closed together at the top. The difference is where they go. A dc2tog is worked across two different stitches and decreases your count. A cluster is usually worked into one stitch or one chain space, so the count does not drop and you get a solid textured bump instead.
+
+## Crochet Gauge Calculator: Swatch to Stitch Count | Wovely
+URL: https://wovely.app/crochet-gauge-calculator
+Summary: Turn a crochet gauge swatch into real numbers: your stitches and rows over a measured swatch, the finished size you want, and the counts to start with. Free.
+H1: Crochet gauge calculator
+
+Work a square a good deal bigger than the area you plan to measure, in the stitch the pattern uses, then lay it flat without stretching it. Measure a four inch window somewhere in the middle rather than at the edges, and count the stitches and rows inside it. The edges of a swatch always lie about the tension.
+
+Hook size first, because it moves tension the most for the least effort. A larger hook gives you fewer stitches to the inch, a smaller hook gives you more. Change one size, work a fresh swatch and measure again. If the stitch count comes right and the row count is still off, that is normal in crochet and usually handled by working to a measurement rather than to a row number.
+
+## Crochet Yarn Yardage Calculator: How Much Yarn? | Wovely
+URL: https://wovely.app/yarn-yardage-calculator
+Summary: Estimate the yards a crochet project needs from its finished size, yarn weight and stitch. Single and double crochet are not the same answer. Free, no signup.
+H1: Yarn yardage calculator
+
+It depends on three things and nothing else: the finished area, the yarn weight and the stitch. A worsted weight throw around 50 by 60 inches in single crochet runs well over a thousand yards, and the same blanket in double crochet uses noticeably less, because taller stitches cover more area per yard. Put your own numbers in above rather than trusting a rounded figure from a blog.
+
+A single crochet is short and dense, so it takes many more stitches to cover the same square inch. Double and treble crochet are taller and more open. Same yarn, same blanket, and the yardage can differ by a third or more purely on stitch choice.
+
+## Crochet Pattern Scale Calculator: Resize to Gauge | Wovely
+URL: https://wovely.app/crochet-pattern-scale-calculator
+Summary: Resize a crochet pattern to a different finished size or to your own gauge, keeping the stitch counts a whole multiple of the repeat so the round still closes.
+H1: Crochet pattern scale calculator
+
+For a plain fabric, largely yes. For anything with a repeat, no: the new count has to stay a multiple of the repeat or the pattern stops lining up at the end of the round. That is why this page takes the repeat as well as the count and rounds to a number that still works.
+
+Two ways, and they are not equivalent. A heavier yarn with a bigger hook keeps every stitch count identical and scales the whole thing, which is the safe route. Adding increase rounds changes the shape as well as the size, and for a piece that has to be stuffed and sewn, shape changes compound.
+
+## Crochet Stitch Counter: Does This Round Add Up? | Wovely
+URL: https://wovely.app/crochet-stitch-counter
+Summary: Paste a written crochet round and see how many stitches it makes and how many it works across. When the two numbers differ, you know which round to recount.
+H1: Crochet stitch count checker
+
+Everything above is arithmetic on one round, and arithmetic is the easy half. The half that actually costs people an evening is continuity: whether round 14 is worked across the number round 13 really finished with, all the way down a pattern. A round can be perfectly correct on its own and still be impossible, because the round above it did not leave the right number of stitches to work into.
+
+That is why a pattern gets read end to end before it is trusted, one round against the next, with every stated count reconciled against the instructions that produce it. It is the job a technical editor does on a pattern before it is published, and it is not something a single text box can do for you.
+
