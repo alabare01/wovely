@@ -102,6 +102,27 @@ export function GaugeCalculatorPage() {
         that is normal in crochet and usually handled by working to a measurement rather than to a
         row number.
       </Faq>
+      <Faq q="I went down a hook size and the swatch is still too big. Now what?">
+        Then it needs more than one step, and that is the yarn talking, not you. A half millimetre of
+        hook moves the count by roughly one stitch over four inches in a worsted weight, so a swatch
+        that is an inch over usually wants two or three steps, not one. Type the pattern's gauge into
+        the match box above and it says how many. Past two or three steps the fabric turns stiff, and
+        the better fix is a lighter yarn or scaling the pattern to your own gauge on the Scale tab.
+      </Faq>
+      <Faq q="My swatch matched and the sweater still came out tight. Why?">
+        Three usual reasons. The swatch was measured before washing and the yarn relaxed or shrank
+        after. The swatch was worked flat and the sweater in the round, and most of us pull tighter in
+        the round. Or tension drifted over a long piece, which it does when the hands warm up or the
+        evening gets tense. Wash and block the swatch the way the sweater will live, swatch in the
+        round for a piece worked in the round, and measure the body against the schematic after the
+        first few inches rather than at the end.
+      </Faq>
+      <Faq q="Do I need a new swatch for every colour of the same yarn?">
+        Usually no. Plain dyed shades of one yarn gauge the same. The exceptions are heavily dyed
+        darks, speckles and ombres, and anything with a different fibre blend under the same brand
+        name, which can run a touch thicker or thinner. If the project mixes those, swatch the darkest
+        or the busiest one and trust the rest.
+      </Faq>
       <Faq q="Does gauge really matter for a blanket?">
         Less than it does for a garment, but it still decides how much yarn you buy and how big the
         finished thing ends up. A blanket worked at a looser tension than the pattern assumed comes
