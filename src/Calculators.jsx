@@ -129,6 +129,31 @@ const Calculators = ({embedded=false,initialTab="gauge"}) => {
   // does not crochet. Renamed 2026-09-07.
   const startingStitches=Math.round(stPerInch*parseFloat(targetW)||0);
   const totalRowsCalc=Math.round(roPerInch*parseFloat(targetH)||0);
+  // ── MATCH THE PATTERN ──────────────────────────────────────────
+  // The boards' gauge posts are never "what is my gauge"; they are "my swatch
+  // does not match the pattern and I have already changed hook once, what now"
+  // (p-023, a swatch still an inch over after a hook down; p-043, a sweater
+  // too tight after a swatch that measured right). The arithmetic above never
+  // answered that. This does: an optional pattern gauge over the same swatch
+  // window, and a next step that says which way, roughly how far, and when
+  // to stop changing hooks and change the plan instead.
+  const [patternSts,setPatternSts]=useState(""),[patternRows,setPatternRows]=useState("");
+  const gaugeMatch=(()=>{
+    const p=parseFloat(patternSts), m=parseFloat(stitches), sw=parseFloat(swatchSize);
+    if(!(p>0)||!(m>0)||!(sw>0)) return null;
+    // Everything is compared per four inches so the rule of thumb below holds
+    // whatever window they measured over.
+    const mine4=m/sw*4, want4=p/sw*4, diff4=mine4-want4, pct=diff4/want4*100;
+    const pr=parseFloat(patternRows), mr=parseFloat(rows);
+    const rowDiff4=(pr>0&&mr>0)?(mr/sw*4)-(pr/sw*4):null;
+    // Rule of thumb, stated as one on the page: a half-millimetre hook step
+    // moves the count by about one stitch per four inches in a worsted weight,
+    // less in fine yarn, more in bulky. Past two steps the fabric stops being
+    // the fabric the pattern was written for, so the honest advice changes.
+    const steps=Math.max(1,Math.round(Math.abs(diff4)));
+    return {mine4,want4,diff4,pct,rowDiff4,steps,
+      verdict: Math.abs(pct)<3 ? "match" : diff4>0 ? "tight" : "loose"};
+  })();
   // ── YARDAGE ENGINE INPUTS ───────────────────────────────────────
   // Two things went wrong here and both were invisible on screen.
   //
@@ -259,6 +284,33 @@ const Calculators = ({embedded=false,initialTab="gauge"}) => {
             <ResultCard isMobile={isMobile} label="sts / inch" val={stPerInch.toFixed(1)}/>
             <ResultCard isMobile={isMobile} label="rows / inch" val={roPerInch.toFixed(1)}/>
           </div>
+          <div style={DIVIDER}/>
+          <div style={LABEL}>match the pattern (optional)</div>
+          <div style={{fontSize:11.5,color:T.ink3,lineHeight:1.6,marginTop:4,marginBottom:8,textAlign:"center"}}>
+            The gauge printed on the pattern, over the same {swatchSize||"4"} in window as your swatch.
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:two,gap:16}}>
+            <Input label="pattern stitches" val={patternSts} set={setPatternSts}/>
+            <Input label="pattern rows" val={patternRows} set={setPatternRows}/>
+          </div>
+          {gaugeMatch&&<div style={{marginTop:12}} data-gauge-verdict={gaugeMatch.verdict}>
+            {gaugeMatch.verdict==="match"&&<Note>
+              You match. {gaugeMatch.mine4.toFixed(1)} stitches per four inches against the pattern's {gaugeMatch.want4.toFixed(1)}, which is inside the wobble of a tape measure. Wash or block the swatch the way you will treat the finished piece and measure once more; if it still matches, start.
+              {gaugeMatch.rowDiff4!==null&&Math.abs(gaugeMatch.rowDiff4)>=1&&" Your row count is off, and that is normal in crochet: work to the measurement the pattern gives rather than its row number, and recount any shaping placed by row."}
+            </Note>}
+            {gaugeMatch.verdict==="tight"&&<Note tone="warn">
+              Too many stitches: {gaugeMatch.mine4.toFixed(1)} per four inches where the pattern wants {gaugeMatch.want4.toFixed(1)}. Your fabric is tighter, so the finished piece comes out small.
+              {" "}Next: go up {gaugeMatch.steps===1?"one hook size":`about ${gaugeMatch.steps} hook sizes`} (a half-millimetre step moves the count by roughly one stitch per four inches in worsted; less in fine yarn, more in bulky), work a fresh swatch, and measure it after washing or blocking, in the middle, not at the edge.
+              {gaugeMatch.steps>2&&" More than two steps means this yarn is thinner than the one the pattern was written for, or the pattern's gauge is optimistic. Changing hooks further gives a stiff, holey fabric; the better fix is a heavier yarn, or scaling the pattern to your own gauge on the Scale tab."}
+              {" "}If you have already gone up and it barely moved, your swatch was measured under stretch or flat when the piece will be worked in the round; swatch in the round for a piece worked in the round, and hold the yarn looser on purpose for the first inch.
+            </Note>}
+            {gaugeMatch.verdict==="loose"&&<Note tone="warn">
+              Too few stitches: {gaugeMatch.mine4.toFixed(1)} per four inches where the pattern wants {gaugeMatch.want4.toFixed(1)}. Your fabric is looser, so the finished piece comes out big and hungry for yarn.
+              {" "}Next: go down {gaugeMatch.steps===1?"one hook size":`about ${gaugeMatch.steps} hook sizes`} (a half-millimetre step moves the count by roughly one stitch per four inches in worsted; less in fine yarn, more in bulky), work a fresh swatch, and measure after washing or blocking, in the middle of the square.
+              {gaugeMatch.steps>2&&" More than two steps means this yarn is heavier than the one the pattern was written for, or your tension is much looser than the designer's. Going down further gives a board; the better fix is a lighter yarn, or scaling the pattern to your own gauge on the Scale tab."}
+              {" "}If you already went down a size and it is still out, that is one step too few, not something you are doing wrong: the count moves about a stitch per step, and the number above is how many the gap actually needs.
+            </Note>}
+          </div>}
         </div>
       </>}
 
