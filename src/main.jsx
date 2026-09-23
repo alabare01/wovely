@@ -8,7 +8,8 @@ import { isNoReplayPath } from './utils/analytics.js'
 import { startPulseSession } from './utils/pulse.js'
 import { captureSource } from './utils/source.js'
 import { registerServiceWorker } from './utils/serviceWorker.js'
-import { initNative } from './utils/native.js'
+import { initNative, isNative } from './utils/native.js'
+import { startPixels } from './utils/pixels.js'
 import './index.css'
 
 // Prevent browser from restoring scroll position on back/forward (iOS bfcache)
@@ -26,6 +27,9 @@ posthog.init('phc_CgK3ydJGk6XRtRPLQ8cnXxkqSroQBsuYrV9VsWk2r76Y', {
   capture_pageleave: true,
   disable_session_recording: isNoReplayPath(),
 });
+
+// Ad platform pixels mirror PostHog's own events; see src/utils/pixels.js.
+startPixels(posthog, { native: isNative() });
 
 // Tell the monitor a person arrived. Signups already emailed Adam; the much
 // larger group who show up and never sign up were invisible, and at ~49
