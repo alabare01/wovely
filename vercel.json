@@ -102,6 +102,19 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.wovely.app"
+        }
+      ],
+      "destination": "https://wovely.app/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/tools",
