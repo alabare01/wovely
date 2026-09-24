@@ -104,6 +104,17 @@
   ],
   "redirects": [
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.wovely.app"
+        }
+      ],
+      "destination": "https://wovely.app/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
