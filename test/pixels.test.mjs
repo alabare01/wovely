@@ -7,7 +7,8 @@ const win = (host, webdriver = false) => ({ location: { hostname: host }, naviga
 test("the Wovely dataset is set and is not the 2ndBrain one", () => {
   assert.equal(PIXELS.meta, "1094637423151254");
   assert.equal(PIXELS.ga4, "");
-  assert.equal(PIXELS.google, "AW-18410615088");
+  // 2ndBrain's Google Ads tag must never load on Wovely: the audiences do not mix
+  assert.notEqual(PIXELS.google, "AW-18410615088");
   assert.notEqual(PIXELS.meta, "2688987694849962");
 });
 

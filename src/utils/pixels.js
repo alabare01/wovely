@@ -28,7 +28,10 @@
 export const PIXELS = {
   meta: "1094637423151254",
   ga4: "",
-  google: "AW-18410615088",
+  // Empty on purpose (2026-09-23): AW-18410615088 is 2ndBrain's Google Ads tag (2ndbrainway assets/track.js).
+  // Loading it here would pour Wovely visitors and conversions into 2ndBrain's ad account. Wovely gets its own
+  // Google tag once its Ads account and GA4 stream exist and the IDs are read off Google's own pages.
+  google: "",
 };
 
 export const META_MAP = {
@@ -55,16 +58,6 @@ export const metaEventFor = (event, props) => {
   return f ? f(props || {}) : null;
 };
 
-const loadGoogle = (w, gids) => {
-  w.dataLayer = w.dataLayer || [];
-  w.gtag = w.gtag || function () { w.dataLayer.push(arguments); };
-  w.gtag("js", new Date());
-  for (const id of gids) w.gtag("config", id);
-  const s = w.document.createElement("script");
-  s.async = true; s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(gids[0]);
-  (w.document.head || w.document.getElementsByTagName("head")[0]).appendChild(s);
-};
-
 const loadMeta = (w, id) => {
   if (w.fbq) return;
   const n = (w.fbq = function () {
@@ -82,17 +75,12 @@ const loadMeta = (w, id) => {
 export const startPixels = (posthog, { native = false } = {}) => {
   try {
     if (typeof window === "undefined" || !shouldLoad({ window, native })) return;
-    const gids = [PIXELS.google, PIXELS.ga4].filter(Boolean);
-    if (gids.length) loadGoogle(window, gids);
-    if (PIXELS.meta) loadMeta(window, PIXELS.meta);
+    if (!PIXELS.meta) return;
+    loadMeta(window, PIXELS.meta);
     posthog.on("eventCaptured", (e) => {
       try {
         const m = e && metaEventFor(e.event, e.properties);
         if (m && window.fbq) window.fbq("track", m[0], m[1] || {});
-        if (m && window.gtag && PIXELS.google) {
-          const cat = e.event === "upgrade_entitlement_check" ? "purchase" : (e.event === "email_captured" || e.event === "user_signed_up" ? "lead" : null);
-          if (cat) window.gtag("event", "conversion", { send_to: PIXELS.google, event_category: cat });
-        }
       } catch { /* a pixel must never break the app */ }
     });
   } catch { /* a pixel must never break the app */ }
