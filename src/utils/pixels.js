@@ -25,13 +25,12 @@
 // 1323654684161849, created 2026-09-23 by SAMM on Adam's authority. It is a
 // separate dataset from 2ndBrain's on purpose: audiences must not mix.
 
+// Meta only, on purpose (2026-09-23). AW-18410615088 is 2ndBrain's Google Ads
+// tag; loading it here would pour Wovely visitors and conversions into
+// 2ndBrain's ad account. Google Analytics and Google Ads come in their own
+// change once Wovely's own IDs are read off Google's own pages.
 export const PIXELS = {
   meta: "1094637423151254",
-  ga4: "",
-  // Empty on purpose (2026-09-23): AW-18410615088 is 2ndBrain's Google Ads tag (2ndbrainway assets/track.js).
-  // Loading it here would pour Wovely visitors and conversions into 2ndBrain's ad account. Wovely gets its own
-  // Google tag once its Ads account and GA4 stream exist and the IDs are read off Google's own pages.
-  google: "",
 };
 
 export const META_MAP = {
