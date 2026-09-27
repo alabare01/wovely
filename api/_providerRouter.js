@@ -3,7 +3,13 @@
 // Returns 'gemini' or 'haiku' based on Gemini health cache
 
 const GEMINI_MODEL = 'gemini-2.5-flash';
-const PROBE_TIMEOUT_MS = 2000;
+const PROBE_TIMEOUT_MS = 5000;
+// 2026-09-27: the Anthropic org is disabled, so routing to 'haiku' on a failed
+// probe sends every import to a provider that answers 400 and the job dies without
+// Gemini ever being tried (probe-pdf-import failed this way at 12:00Z). Until the
+// org is restored, a failed probe still returns 'gemini'. Set ANTHROPIC_AVAILABLE=1
+// in Vercel to bring back the probe-driven switch to Claude.
+const CLAUDE_AVAILABLE = process.env.ANTHROPIC_AVAILABLE === '1';
 const CACHE_HEALTHY_MS = 60000;
 const CACHE_DEGRADED_MS = 30000;
 
@@ -48,7 +54,8 @@ export async function getPreferredProvider(geminiKey) {
 
   console.log('[providerRouter] Probing Gemini health...');
   const geminiHealthy = await probeGemini(geminiKey);
-  const provider = geminiHealthy ? 'gemini' : 'haiku';
+  const provider = geminiHealthy || !CLAUDE_AVAILABLE ? 'gemini' : 'haiku';
+  if (!geminiHealthy && !CLAUDE_AVAILABLE) console.warn('[providerRouter] Gemini probe failed but Claude is unavailable: staying on gemini');
   const ttl = geminiHealthy ? CACHE_HEALTHY_MS : CACHE_DEGRADED_MS;
 
   healthCache.provider = provider;
