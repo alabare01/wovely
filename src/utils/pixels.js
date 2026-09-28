@@ -33,6 +33,52 @@ export const PIXELS = {
   meta: "1094637423151254",
 };
 
+// ─── GOOGLE ANALYTICS 4, WOVELY'S OWN PROPERTY (2026-09-28) ─────────────────
+//
+// Wovely is its own business, so it gets its own GA4 property under
+// adam@wovely.app, never a stream on 2ndBrain's (G-KYJ4D76JVN). The id is a
+// build-time config value, VITE_GA4_ID, set in the Vercel project's env once it
+// is read off Google's own Admin > Data streams page. Until then it is empty
+// and nothing Google loads. A 2ndBrain id, or any Google Ads (AW-) id, is
+// refused outright so the audiences can never mix.
+const TWO_BRAIN_IDS = ["G-KYJ4D76JVN", "AW-18410615088"];
+export const ga4IdFrom = (raw) => {
+  const id = String(raw || "").trim();
+  if (!/^G-[A-Z0-9]{6,12}$/.test(id)) return "";
+  if (TWO_BRAIN_IDS.includes(id)) return "";
+  return id;
+};
+let envId = "";
+try { envId = import.meta.env && import.meta.env.VITE_GA4_ID; } catch { envId = ""; }
+export const GA4_ID = ga4IdFrom(envId);
+
+// PostHog event -> GA4 recommended event. Page views are sent by hand (SPA
+// routes), so gtag's own automatic page_view is switched off below.
+export const GA4_MAP = {
+  $pageview: (p) => ["page_view", { page_location: p.$current_url, page_path: p.$pathname }],
+  email_captured: () => ["generate_lead", { method: "email" }],
+  user_signed_up: () => ["sign_up", { method: "wovely" }],
+  checkout_started: (p) => ["begin_checkout", { currency: "USD", items: [{ item_id: String(p.tier || "craft"), item_variant: String(p.cadence || "monthly") }] }],
+  upgrade_entitlement_check: (p) =>
+    p && p.paid === true ? ["purchase", { currency: "USD", items: [{ item_id: String(p.tier || "paid") }] }] : null,
+};
+export const ga4EventFor = (event, props) => {
+  const f = GA4_MAP[event];
+  return f ? f(props || {}) : null;
+};
+
+const loadGa4 = (w, id) => {
+  if (w.gtag) return;
+  w.dataLayer = w.dataLayer || [];
+  w.gtag = function () { w.dataLayer.push(arguments); };
+  w.gtag("js", new Date());
+  w.gtag("config", id, { send_page_view: false });
+  const s = w.document.createElement("script");
+  s.async = true;
+  s.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(id);
+  (w.document.head || w.document.getElementsByTagName("head")[0]).appendChild(s);
+};
+
 export const META_MAP = {
   $pageview: () => ["PageView"],
   email_captured: () => ["Lead"],
@@ -74,12 +120,17 @@ const loadMeta = (w, id) => {
 export const startPixels = (posthog, { native = false } = {}) => {
   try {
     if (typeof window === "undefined" || !shouldLoad({ window, native })) return;
-    if (!PIXELS.meta) return;
-    loadMeta(window, PIXELS.meta);
+    if (!PIXELS.meta && !GA4_ID) return;
+    if (PIXELS.meta) loadMeta(window, PIXELS.meta);
+    if (GA4_ID) loadGa4(window, GA4_ID);
     posthog.on("eventCaptured", (e) => {
       try {
         const m = e && metaEventFor(e.event, e.properties);
         if (m && window.fbq) window.fbq("track", m[0], m[1] || {});
+      } catch { /* a pixel must never break the app */ }
+      try {
+        const g = GA4_ID && e && ga4EventFor(e.event, e.properties);
+        if (g && window.gtag) window.gtag("event", g[0], { send_to: GA4_ID, ...(g[1] || {}) });
       } catch { /* a pixel must never break the app */ }
     });
   } catch { /* a pixel must never break the app */ }

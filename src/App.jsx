@@ -774,6 +774,7 @@ const TieredUpgradeModal = ({ onClose, currentTier, reason, isAnonymous = false,
       posthog.capture("checkout_failed", { tier: tierKey, cadence, code: result.code, surface: "plans_modal" });
       return;
     }
+    posthog.capture("checkout_started", { tier: tierKey, cadence, surface: "plans_modal" });
     window.location.href = result.url;
     // If we are still mounted after the watchdog window the navigation never
     // happened (blocked, or the tab lost the gesture). Hand the user the URL
@@ -2614,6 +2615,7 @@ export default function Wovely() {
       return false;
     }
     setCheckoutFailure(null);
+    posthog.capture("checkout_started", { tier: tierKey, cadence: cad, surface: "post_signup" });
     window.location.href = result.url;
     // Still here after the watchdog window means the redirect never took.
     // Surface the URL so the user can finish by hand.
@@ -3204,6 +3206,7 @@ export default function Wovely() {
       return;
     }
     setCheckoutFailure(null);
+    posthog.capture("checkout_started",{tier:TIER_CRAFT,cadence:"monthly",surface:"upgrade_intent"});
     window.location.href=result.url;
     checkoutWatchdogRef.current=setTimeout(()=>{
       posthog.capture("checkout_failed",{tier:TIER_CRAFT,cadence:"monthly",code:"redirect_stalled",surface:"upgrade_intent"});
