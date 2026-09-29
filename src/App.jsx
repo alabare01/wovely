@@ -4408,13 +4408,18 @@ export default function Wovely() {
             </div>
             <nav style={{position:"fixed",left:0,right:0,bottom:0,height:"calc(68px + env(safe-area-inset-bottom, 0px))",paddingBottom:"env(safe-area-inset-bottom, 0px)",background:"linear-gradient(180deg,#8474DA 0%,#6E5AC8 100%)",display:"flex",alignItems:"center",padding:"6px 8px",boxSizing:"border-box",zIndex:30,boxShadow:"0 -10px 26px -12px rgba(46,28,104,.5)"}}>
               <div style={{display:"flex",flex:1,justifyContent:"space-between",gap:2,padding:"0 2px",maxWidth:isTablet?680:430,margin:"0 auto"}}>
+                {/* Items size to their label (flex 1 1 auto, never below
+                    max-content) and the label steps down to 8.5 px under
+                    ~365 px, so "Workbench" and "BevCheck" no longer run into
+                    each other on a 375 px phone (equal 1/7 slots were ~49 px,
+                    narrower than "Workbench"). 2026-09-29. */}
                 {TABS.map(t=>{
                   const active=view===t.key;
                   const locked=t.proOnly&&!isPro&&!(!authed||isAnonymous);
                   return (
-                    <button key={t.key} onClick={()=>{if(locked){setShowProModal(true);return;}navigateToView(t.key);}} style={{flex:1,minWidth:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,padding:"8px 2px",borderRadius:12,border:"none",background:active?"rgba(255,255,255,.18)":"transparent",cursor:"pointer",opacity:locked?.6:1,transition:"background .15s"}}>
+                    <button key={t.key} onClick={()=>{if(locked){setShowProModal(true);return;}navigateToView(t.key);}} style={{flex:"1 1 auto",minWidth:"max-content",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,padding:"8px 2px",borderRadius:12,border:"none",background:active?"rgba(255,255,255,.18)":"transparent",cursor:"pointer",opacity:locked?.6:1,transition:"background .15s"}}>
                       <span style={{width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",opacity:.94}}>{React.cloneElement(NAV_ICON[t.key],{width:20,height:20})}</span>
-                      <span style={{fontFamily:T.body,fontWeight:800,fontSize:9.5,lineHeight:1,color:"#fff",whiteSpace:"nowrap"}}>{t.tm}</span>
+                      <span style={{fontFamily:T.body,fontWeight:800,fontSize:"clamp(8.5px, 2.6vw, 9.5px)",letterSpacing:"-.01em",lineHeight:1,color:"#fff",whiteSpace:"nowrap"}}>{t.tm}</span>
                     </button>
                   );
                 })}
