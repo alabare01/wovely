@@ -4341,13 +4341,16 @@ export default function Wovely() {
       {/* 2b mobile topbar (Wovely App 2b.dc.html ≤640px): brand moves up here
           (.tbbrand), profile becomes the round .tbprof button — nav lives in
           the fixed bottom bar, so no hamburger. */}
-      <div style={{padding:"0 18px",height:60,display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:20,flexShrink:0,background:"rgba(251,249,255,.9)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
-        <div onClick={()=>{if(isAdam)handleLogoTap();navigateToView("collection");}} style={{display:"flex",alignItems:"center",gap:9,cursor:"pointer"}}>
-          <img src="/bev_neutral.png" alt="Bev" style={{width:34,height:34,borderRadius:"50%",border:"2px solid #DCD0F7",background:T.soft,objectFit:"cover"}}/>
+      <div style={{padding:"0 18px",height:60,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,minWidth:0,position:"sticky",top:0,zIndex:20,flexShrink:0,background:"rgba(251,249,255,.9)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)"}}>
+        <div onClick={()=>{if(isAdam)handleLogoTap();navigateToView("collection");}} style={{display:"flex",alignItems:"center",gap:9,cursor:"pointer",minWidth:0}}>
+          <img src="/bev_neutral.png" alt="Bev" style={{width:34,height:34,borderRadius:"50%",border:"2px solid #DCD0F7",background:T.soft,objectFit:"cover",flexShrink:0}}/>
           <span style={{fontFamily:T.disp,fontSize:20,fontWeight:600,color:T.ink,lineHeight:1}}>Wovely</span>
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>setChatOpen(true)} aria-label="Talk to us" title="Talk to us" style={{display:"flex",alignItems:"center",gap:8,background:"none",border:0,cursor:"pointer",fontWeight:800,fontSize:14,color:T.accent,fontFamily:T.body}}><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20 11.5a7.5 7.5 0 01-10.9 6.7L4.5 19l1-4.1A7.5 7.5 0 1120 11.5z"/></svg>Talk to us</button>
+        {/* flexShrink:0 and the label that drops below 360 px (index.css
+            .wv-talk-label) keep all three header controls on screen on the
+            narrowest phones instead of pushing the last one off the edge. */}
+        <div style={{display:"flex",alignItems:"center",gap:10,flexShrink:0}}>
+          <button onClick={()=>setChatOpen(true)} aria-label="Talk to us" title="Talk to us" style={{display:"flex",alignItems:"center",gap:8,background:"none",border:0,cursor:"pointer",fontWeight:800,fontSize:14,color:T.accent,fontFamily:T.body,whiteSpace:"nowrap"}}><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M20 11.5a7.5 7.5 0 01-10.9 6.7L4.5 19l1-4.1A7.5 7.5 0 1120 11.5z"/></svg><span className="wv-talk-label">Talk to us</span></button>
           <button onClick={()=>openAddModal()} aria-label="Add pattern" style={{background:T.accent,border:"none",borderRadius:"50%",width:36,height:36,cursor:"pointer",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 8px 18px -6px ${T.accent}`}}><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg></button>
           <button onClick={()=>navigateToView("profile")} aria-label="Profile & Settings" style={{width:36,height:36,borderRadius:"50%",background:"#fff",border:`1px solid ${T.line}`,color:T.accent,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,padding:0}}>
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 19c.8-3.4 3.4-5.2 6.5-5.2s5.7 1.8 6.5 5.2"/></svg>
@@ -4391,8 +4394,17 @@ export default function Wovely() {
           <>
             {/* Gold yarn cord, rotated to run along the bar's top edge (mockup
                 .yarncord mobile treatment) */}
-            <div aria-hidden="true" style={{position:"fixed",left:0,top:"calc(100vh - 58px - env(safe-area-inset-bottom, 0px))",width:17,height:"100vw",transformOrigin:"top left",transform:"rotate(-90deg)",zIndex:31,pointerEvents:"none",overflow:"hidden",display:"flex",flexDirection:"column",filter:"drop-shadow(3px 2px 3px rgba(90,58,10,.55))"}}>
-              {Array.from({length:14}).map((_,i)=><img key={i} src={CORD_GOLD} alt="" style={{width:"100%",display:"block",flex:"none",transform:i%2?"scaleY(-1)":"none"}}/>)}
+            {/* The cord strip is a rotated 100vw-tall column holding ~1.5k px of
+                images. It now sits inside a viewport-wide fixed box that clips,
+                so no part of it (the 100vw box, the images past its end, the
+                drop shadow) can add horizontal overflow to the document. iOS
+                Safari grows the layout viewport to fit such overflow, which
+                pushes the whole shell past the screen edge (2026-09-29). */}
+            <div aria-hidden="true" style={{position:"fixed",left:0,right:0,top:"calc(100vh - 58px - 25px - env(safe-area-inset-bottom, 0px))",height:29,overflow:"hidden",zIndex:31,pointerEvents:"none"}}>
+              {/* 8 px of headroom above the cord and 4 below keep its drop shadow. */}
+              <div style={{position:"absolute",left:0,top:25,width:17,height:"100vw",transformOrigin:"top left",transform:"rotate(-90deg)",overflow:"hidden",display:"flex",flexDirection:"column",filter:"drop-shadow(3px 2px 3px rgba(90,58,10,.55))"}}>
+                {Array.from({length:14}).map((_,i)=><img key={i} src={CORD_GOLD} alt="" style={{width:"100%",display:"block",flex:"none",transform:i%2?"scaleY(-1)":"none"}}/>)}
+              </div>
             </div>
             <nav style={{position:"fixed",left:0,right:0,bottom:0,height:"calc(68px + env(safe-area-inset-bottom, 0px))",paddingBottom:"env(safe-area-inset-bottom, 0px)",background:"linear-gradient(180deg,#8474DA 0%,#6E5AC8 100%)",display:"flex",alignItems:"center",padding:"6px 8px",boxSizing:"border-box",zIndex:30,boxShadow:"0 -10px 26px -12px rgba(46,28,104,.5)"}}>
               <div style={{display:"flex",flex:1,justifyContent:"space-between",gap:2,padding:"0 2px",maxWidth:isTablet?680:430,margin:"0 auto"}}>

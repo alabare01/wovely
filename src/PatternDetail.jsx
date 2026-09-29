@@ -671,7 +671,14 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
   const activeChipRef=useRef(null);
   useEffect(()=>{if(hubScoped)activeChipRef.current?.scrollIntoView({inline:"center",block:"nearest"});},[hubSection,hubScoped]);
   return (
-    <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",background:T.bg}}>
+    // minWidth:0 + maxWidth:100% keep the detail page inside its column, and
+    // overflow-wrap:anywhere (inherited by every text node below, RowManager
+    // included) lets imported text with no spaces (a URL, "sc2tog,sc2tog,...",
+    // a long file name) break instead of setting the page's min-content width.
+    // An iPhone reported the page wider than the screen right after a PDF
+    // import (2026-09-29); iOS Safari widens the layout viewport to fit
+    // content that overflows, so nothing here may be wider than its box.
+    <div style={{display:"flex",flexDirection:"column",minHeight:"100vh",background:T.bg,minWidth:0,maxWidth:"100%",overflowWrap:"anywhere"}}>
       <CSS/>
       {showScale&&<ScaleModal pattern={p} onClose={()=>setShowScale(false)} Btn={Btn}/>}
       {showShare&&<ShareCardModal pattern={{...p,rows}} onClose={()=>setShowShare(false)} pct={pct} Btn={Btn}/>}
@@ -744,9 +751,11 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             );
           })()}
           <ChartsAndImagesSection pattern={p} tier={tier} isAnonymous={isAnonymous} onShowUpgrade={onShowUpgrade} pinnedImageId={pinnedImageId} onTogglePin={onTogglePin} activeTab={tab} scopedPartName={hubScoped?hubSectionTitle:null} isMultiPart={isMultiPart} />
-          <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`}}>
+          {/* Tabs share the width equally; on a screen too narrow for all three
+              labels they scroll inside this row rather than widening the page. */}
+          <div style={{display:"flex",background:T.surface,borderBottom:`1px solid ${T.border}`,overflowX:"auto",scrollbarWidth:"none",WebkitOverflowScrolling:"touch"}}>
             {[["materials","Materials"],["rows","Instructions"],["notes","Notes"]].map(([key,label])=>(
-              <button key={key} onClick={()=>setTab(key)} style={{flex:1,padding:"15px 0",border:"none",background:"transparent",color:tab===key?T.accent:T.muted,fontWeight:tab===key?800:700,fontSize:15,cursor:"pointer",borderBottom:"3px solid "+(tab===key?T.accent:"transparent"),marginBottom:-1,transition:"color .15s"}}>{label}</button>
+              <button key={key} onClick={()=>setTab(key)} style={{flex:1,minWidth:"max-content",whiteSpace:"nowrap",padding:"15px 10px",border:"none",background:"transparent",color:tab===key?T.accent:T.muted,fontWeight:tab===key?800:700,fontSize:15,cursor:"pointer",borderBottom:"3px solid "+(tab===key?T.accent:"transparent"),marginBottom:-1,transition:"color .15s"}}>{label}</button>
             ))}
           </div>
         </div>
@@ -796,7 +805,7 @@ const Detail = ({p,onBack,onSave,pct,estYards,estSkeins,pdfThumbUrl,CSS,Bar,Phot
             <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 0",borderBottom:`1px solid ${T.border}`}}>
               <div style={{width:6,height:6,borderRadius:99,background:T.terra,flexShrink:0}}/>
               {editing?<div style={{display:"flex",gap:8,flex:1}}><input value={m.name} onChange={e=>{const a=[...draft.materials];a[i]={...a[i],name:e.target.value};setDraft({...draft,materials:a});}} style={{flex:1,border:`1px solid ${T.border}`,borderRadius:8,padding:"6px 10px",fontSize:13,background:T.linen,color:T.ink,outline:"none"}}/><input value={m.amount} onChange={e=>{const a=[...draft.materials];a[i]={...a[i],amount:e.target.value};setDraft({...draft,materials:a});}} style={{width:80,border:`1px solid ${T.border}`,borderRadius:8,padding:"6px 10px",fontSize:13,background:T.linen,color:T.ink,outline:"none"}}/></div>
-              :<div style={{flex:1,display:"flex",justifyContent:"space-between",alignItems:"center"}}><span style={{fontSize:14,color:T.ink2}}>{m.name}</span><span style={{fontSize:12,color:T.ink3,fontWeight:600}}>{m.amount}</span></div>}
+              :<div style={{flex:1,minWidth:0,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}><span style={{flex:1,minWidth:0,fontSize:14,color:T.ink2}}>{m.name}</span><span style={{flexShrink:0,maxWidth:"45%",textAlign:"right",fontSize:12,color:T.ink3,fontWeight:600}}>{m.amount}</span></div>}
             </div>
           ))}
           {editing&&<button onClick={()=>setDraft({...draft,materials:[...draft.materials,{id:Date.now(),name:"",amount:"",yardage:0}]})} style={{marginTop:14,width:"100%",border:`1.5px dashed ${T.border}`,background:"none",borderRadius:11,padding:"10px",color:T.ink3,cursor:"pointer",fontSize:13}}>+ Add material</button>}

@@ -50,9 +50,9 @@ const PatternHeader = ({
             <button onClick={onBack} style={{display:"inline-flex",alignItems:"center",gap:8,background:"#fff",border:`1px solid ${T.line}`,borderRadius:12,padding:"10px 16px",fontFamily:T.body,fontWeight:800,fontSize:14,color:T.ink,cursor:"pointer",marginBottom:18}}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 5.5l-7 6.5 7 6.5"/></svg>{backText.replace(/^←\s*/,"")}
             </button>
-            <div style={{display:"grid",gridTemplateColumns:isDesktop?"300px 1fr":"1fr",gap:isDesktop?30:16,alignItems:"start"}}>
+            <div style={{display:"grid",gridTemplateColumns:isDesktop?"300px minmax(0,1fr)":"minmax(0,1fr)",gap:isDesktop?30:16,alignItems:"start"}}>
               {/* Cover — live component map in a 2b light card */}
-              <div style={{position:"relative",height:isDesktop?230:190,borderRadius:22,overflow:"hidden",background:T.linen,border:`1px solid ${T.line}`}}>
+              <div style={{position:"relative",width:"100%",minWidth:0,height:isDesktop?230:190,borderRadius:22,overflow:"hidden",background:T.linen,border:`1px solid ${T.line}`}}>
                 <WireframeViewer components={p.snapComponents} labeled={true} fillContainer={true}/>
                 {/* Snap confidence signal */}
                 <div style={{position:"absolute",top:12,left:12,display:"inline-flex",alignItems:"center",gap:6,background:T.accent,borderRadius:999,padding:"5px 11px",fontSize:11,fontWeight:800,color:"#fff",fontFamily:T.body,pointerEvents:"none"}}>
@@ -65,12 +65,12 @@ const PatternHeader = ({
               </div>
               {/* Right column */}
               <div style={{minWidth:0}}>
-                <div style={{display:"inline-flex",alignItems:"center",gap:9,background:"#EAF7F1",color:"#1E8A63",border:"1px solid #CDEBDE",fontWeight:800,fontSize:13,padding:"8px 14px",borderRadius:999}}>
+                <div style={{display:"inline-flex",alignItems:"center",gap:9,maxWidth:"100%",background:"#EAF7F1",color:"#1E8A63",border:"1px solid #CDEBDE",fontWeight:800,fontSize:13,padding:"8px 14px",borderRadius:999}}>
                   <img src="/bev-sm.png" alt="Bev" style={{width:24,height:24,borderRadius:"50%"}}/>BevCheck passed · snapped and mapped
                 </div>
                 {editing
                   ? <input value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})} style={{width:"100%",marginTop:14,background:"#fff",border:`1.5px solid ${T.line}`,borderRadius:12,padding:"8px 12px",color:T.ink,fontSize:isDesktop?30:24,fontFamily:T.disp,fontWeight:600,outline:"none"}}/>
-                  : <h1 style={{fontFamily:T.disp,fontWeight:600,fontSize:isDesktop?36:26,letterSpacing:"-.01em",margin:"14px 0 0",lineHeight:1.05,color:T.ink}}>{p.title}</h1>}
+                  : <h1 style={{fontFamily:T.disp,fontWeight:600,fontSize:isDesktop?36:26,letterSpacing:"-.01em",margin:"14px 0 0",lineHeight:1.05,color:T.ink,overflowWrap:"anywhere"}}>{p.title}</h1>}
                 <div style={{display:"flex",gap:10,marginTop:16,flexWrap:"wrap"}}>
                   {p.source_file_url&&onViewSource&&<button onClick={onViewSource} style={paction}>
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={T.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 3.5H7.5A1.5 1.5 0 006 5v14a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0018 19V8z"/><path d="M13.5 3.5V8H18"/></svg>Source</button>}
@@ -102,9 +102,9 @@ const PatternHeader = ({
             <button onClick={onBack} style={{display:"inline-flex",alignItems:"center",gap:8,background:"#fff",border:`1px solid ${T.line}`,borderRadius:12,padding:"10px 16px",fontFamily:T.body,fontWeight:800,fontSize:14,color:T.ink,cursor:"pointer",marginBottom:18}}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round"><path d="M14.5 5.5l-7 6.5 7 6.5"/></svg>{backText.replace(/^←\s*/,"")}
             </button>
-            <div style={{display:"grid",gridTemplateColumns:isDesktop?"300px 1fr":"1fr",gap:isDesktop?30:16,alignItems:"start"}}>
+            <div style={{display:"grid",gridTemplateColumns:isDesktop?"300px minmax(0,1fr)":"minmax(0,1fr)",gap:isDesktop?30:16,alignItems:"start"}}>
               {/* Cover — blurred coverfill card */}
-              <div style={{position:"relative",height:isDesktop?230:190,borderRadius:22,overflow:"hidden",background:"#EDE7F7",border:`1px solid ${T.line}`}}>
+              <div style={{position:"relative",width:"100%",minWidth:0,height:isDesktop?230:190,borderRadius:22,overflow:"hidden",background:"#EDE7F7",border:`1px solid ${T.line}`}}>
                 {cover
                   ? <>
                       <div style={{position:"absolute",inset:0,backgroundImage:`url('${cover}')`,backgroundSize:"cover",backgroundPosition:"center",filter:"blur(22px) saturate(1.15)",transform:"scale(1.22)"}}/>
@@ -114,12 +114,12 @@ const PatternHeader = ({
               </div>
               {/* Right column */}
               <div style={{minWidth:0}}>
-                <div style={{display:"inline-flex",alignItems:"center",gap:9,background:"#EAF7F1",color:"#1E8A63",border:"1px solid #CDEBDE",fontWeight:800,fontSize:13,padding:"8px 14px",borderRadius:999}}>
+                <div style={{display:"inline-flex",alignItems:"center",gap:9,maxWidth:"100%",background:"#EAF7F1",color:"#1E8A63",border:"1px solid #CDEBDE",fontWeight:800,fontSize:13,padding:"8px 14px",borderRadius:999}}>
                   <img src="/bev-sm.png" alt="Bev" style={{width:24,height:24,borderRadius:"50%"}}/>{p.isStarter?"BevCheck passed · free Wovely original":"BevCheck passed · pattern validated"}
                 </div>
                 {editing
                   ? <input value={draft.title} onChange={e=>setDraft({...draft,title:e.target.value})} style={{width:"100%",marginTop:14,background:"#fff",border:`1.5px solid ${T.line}`,borderRadius:12,padding:"8px 12px",color:T.ink,fontSize:isDesktop?30:24,fontFamily:T.disp,fontWeight:600,outline:"none"}}/>
-                  : <h1 style={{fontFamily:T.disp,fontWeight:600,fontSize:isDesktop?36:26,letterSpacing:"-.01em",margin:"14px 0 0",lineHeight:1.05,color:T.ink}}>{p.title}</h1>}
+                  : <h1 style={{fontFamily:T.disp,fontWeight:600,fontSize:isDesktop?36:26,letterSpacing:"-.01em",margin:"14px 0 0",lineHeight:1.05,color:T.ink,overflowWrap:"anywhere"}}>{p.title}</h1>}
                 <div style={{display:"flex",gap:10,marginTop:16,flexWrap:"wrap"}}>
                   {p.source_file_url&&onViewSource&&<button onClick={onViewSource} style={paction}>
                     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={T.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 3.5H7.5A1.5 1.5 0 006 5v14a1.5 1.5 0 001.5 1.5h9A1.5 1.5 0 0018 19V8z"/><path d="M13.5 3.5V8H18"/></svg>Source</button>}
